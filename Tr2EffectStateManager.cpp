@@ -305,7 +305,7 @@ void Tr2EffectStateManager::ApplyShaderBuffer( ShaderType inputType, uint32_t sa
 
 	if( m_isManagedRendering )
 	{
-		auto record = std::make_pair( (const void*)&buffer, Tr2RenderContextEnum::COLOR_SPACE_LINEAR );
+		auto record = std::make_pair( Tr2ObjectALOpaquePointer( &buffer ), Tr2RenderContextEnum::COLOR_SPACE_LINEAR );
 		if( record == m_currentValues.m_samplerTextures[inputType][samplerIx] )
 		{
 			return;
@@ -322,7 +322,7 @@ void Tr2EffectStateManager::ApplyTexture( ShaderType inputType, uint32_t sampler
 
 	if( m_isManagedRendering )
 	{
-		auto record = std::make_pair( (const void*)&texture, colorSpace );
+		auto record = std::make_pair( Tr2ObjectALOpaquePointer( &texture ), colorSpace );
 		if( record == m_currentValues.m_samplerTextures[inputType][samplerIx] )
 		{
 			return;

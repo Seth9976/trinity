@@ -170,7 +170,7 @@ private:
 	{
 		void Reset();
 		
-		std::pair<const void*, Tr2RenderContextEnum::ColorSpace> m_samplerTextures[Tr2RenderContextEnum::SHADER_TYPE_COUNT][SAMPLER_MAX_COUNT];
+		std::pair<Tr2ObjectALOpaquePointer, Tr2RenderContextEnum::ColorSpace> m_samplerTextures[Tr2RenderContextEnum::SHADER_TYPE_COUNT][SAMPLER_MAX_COUNT];
 		uint32_t m_samplerSetupBinding[Tr2RenderContextEnum::SHADER_TYPE_COUNT][SAMPLER_MAX_COUNT];
 		uint32_t m_shader[Tr2RenderContextEnum::SHADER_TYPE_COUNT];
 		uint32_t m_pixelShader;
@@ -179,13 +179,13 @@ private:
 
 		struct HalStream
 		{
-			const Tr2VertexBufferAL* m_vertexBuffer;
+			Tr2ObjectALOpaquePointer m_vertexBuffer;
 			uint32_t m_offset;
 			uint32_t m_stride;
 		};
 		HalStream m_streams[VERTEX_STREAM_MAX_COUNT];
 
-		const Tr2IndexBufferAL* m_indexBuffer;
+		Tr2ObjectALOpaquePointer m_indexBuffer;
 		Tr2EffectStateManager::RenderingMode m_renderingMode;
 		uint32_t m_renderStateSetup;
 	};
