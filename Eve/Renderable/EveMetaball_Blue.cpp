@@ -32,6 +32,9 @@ const Be::ClassInfo* EveMetaball::ExposeToBlue()
 		MAP_ATTRIBUTE( "minBounds", m_minBounds, "Used for culling", Be::READ )
 		MAP_ATTRIBUTE( "maxBounds", m_maxBounds, "Used for culling", Be::READ )
 
+		MAP_ATTRIBUTE( "isolevel", m_isolevel, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "gooValue", m_gooValue, "", Be::READWRITE | Be::PERSIST )
+
 		MAP_METHOD_AND_WRAP( "UpdateBuffers", UpdateBuffers, "rebuild internal data" )
 
     EXPOSURE_END()

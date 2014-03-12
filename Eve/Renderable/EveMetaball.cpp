@@ -15,293 +15,9 @@
 #include "Eve/EveConstantBufferFormats.h"
 #include "Eve/EveTransform.h"
 #include "Eve/Renderable/EveMetaballItem.h"
+#include "Eve/Renderable/EveMetaballTables.h"
 
 using namespace Tr2RenderContextEnum;
-
-// --------------------------------------------------------------------------------
-//  some statics for quick lookup
-// --------------------------------------------------------------------------------
-static Vector3 s_vertexOffsetTable[8] = {
-	Vector3( 0.f, 0.f, 1.f ),
-	Vector3( 1.f, 0.f, 1.f ),
-	Vector3( 1.f, 0.f, 0.f ),
-	Vector3( 0.f, 0.f, 0.f ),
-	Vector3( 0.f, 1.f, 1.f ),
-	Vector3( 1.f, 1.f, 1.f ),
-	Vector3( 1.f, 1.f, 0.f ),
-	Vector3( 0.f, 1.f, 0.f ) };
-
-static int s_edgeToVertsTable[12][2] = {
-	{0, 1}, //0
-	{1, 2}, //1
-	{2, 3}, //2
-	{3, 0}, //3
-	{4, 5}, //4
-	{5, 6}, //5
-	{6, 7}, //6
-	{7, 4}, //7
-	{0, 4}, //8
-	{1, 5}, //9
-	{2, 6}, //10
-	{3, 7}}; //11
-
-static int s_triTable[256][16] = {
-	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 8, 3, 9, 8, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 3, 1, 2, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 2, 10, 0, 2, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{2, 8, 3, 2, 10, 8, 10, 9, 8, -1, -1, -1, -1, -1, -1, -1},
-	{3, 11, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 11, 2, 8, 11, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 9, 0, 2, 3, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 11, 2, 1, 9, 11, 9, 8, 11, -1, -1, -1, -1, -1, -1, -1},
-	{3, 10, 1, 11, 10, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 10, 1, 0, 8, 10, 8, 11, 10, -1, -1, -1, -1, -1, -1, -1},
-	{3, 9, 0, 3, 11, 9, 11, 10, 9, -1, -1, -1, -1, -1, -1, -1},
-	{9, 8, 10, 10, 8, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 7, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 3, 0, 7, 3, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 1, 9, 8, 4, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 1, 9, 4, 7, 1, 7, 3, 1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 10, 8, 4, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{3, 4, 7, 3, 0, 4, 1, 2, 10, -1, -1, -1, -1, -1, -1, -1},
-	{9, 2, 10, 9, 0, 2, 8, 4, 7, -1, -1, -1, -1, -1, -1, -1},
-	{2, 10, 9, 2, 9, 7, 2, 7, 3, 7, 9, 4, -1, -1, -1, -1},
-	{8, 4, 7, 3, 11, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{11, 4, 7, 11, 2, 4, 2, 0, 4, -1, -1, -1, -1, -1, -1, -1},
-	{9, 0, 1, 8, 4, 7, 2, 3, 11, -1, -1, -1, -1, -1, -1, -1},
-	{4, 7, 11, 9, 4, 11, 9, 11, 2, 9, 2, 1, -1, -1, -1, -1},
-	{3, 10, 1, 3, 11, 10, 7, 8, 4, -1, -1, -1, -1, -1, -1, -1},
-	{1, 11, 10, 1, 4, 11, 1, 0, 4, 7, 11, 4, -1, -1, -1, -1},
-	{4, 7, 8, 9, 0, 11, 9, 11, 10, 11, 0, 3, -1, -1, -1, -1},
-	{4, 7, 11, 4, 11, 9, 9, 11, 10, -1, -1, -1, -1, -1, -1, -1},
-	{9, 5, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 5, 4, 0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 5, 4, 1, 5, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{8, 5, 4, 8, 3, 5, 3, 1, 5, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 10, 9, 5, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{3, 0, 8, 1, 2, 10, 4, 9, 5, -1, -1, -1, -1, -1, -1, -1},
-	{5, 2, 10, 5, 4, 2, 4, 0, 2, -1, -1, -1, -1, -1, -1, -1},
-	{2, 10, 5, 3, 2, 5, 3, 5, 4, 3, 4, 8, -1, -1, -1, -1},
-	{9, 5, 4, 2, 3, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 11, 2, 0, 8, 11, 4, 9, 5, -1, -1, -1, -1, -1, -1, -1},
-	{0, 5, 4, 0, 1, 5, 2, 3, 11, -1, -1, -1, -1, -1, -1, -1},
-	{2, 1, 5, 2, 5, 8, 2, 8, 11, 4, 8, 5, -1, -1, -1, -1},
-	{10, 3, 11, 10, 1, 3, 9, 5, 4, -1, -1, -1, -1, -1, -1, -1},
-	{4, 9, 5, 0, 8, 1, 8, 10, 1, 8, 11, 10, -1, -1, -1, -1},
-	{5, 4, 0, 5, 0, 11, 5, 11, 10, 11, 0, 3, -1, -1, -1, -1},
-	{5, 4, 8, 5, 8, 10, 10, 8, 11, -1, -1, -1, -1, -1, -1, -1},
-	{9, 7, 8, 5, 7, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 3, 0, 9, 5, 3, 5, 7, 3, -1, -1, -1, -1, -1, -1, -1},
-	{0, 7, 8, 0, 1, 7, 1, 5, 7, -1, -1, -1, -1, -1, -1, -1},
-	{1, 5, 3, 3, 5, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 7, 8, 9, 5, 7, 10, 1, 2, -1, -1, -1, -1, -1, -1, -1},
-	{10, 1, 2, 9, 5, 0, 5, 3, 0, 5, 7, 3, -1, -1, -1, -1},
-	{8, 0, 2, 8, 2, 5, 8, 5, 7, 10, 5, 2, -1, -1, -1, -1},
-	{2, 10, 5, 2, 5, 3, 3, 5, 7, -1, -1, -1, -1, -1, -1, -1},
-	{7, 9, 5, 7, 8, 9, 3, 11, 2, -1, -1, -1, -1, -1, -1, -1},
-	{9, 5, 7, 9, 7, 2, 9, 2, 0, 2, 7, 11, -1, -1, -1, -1},
-	{2, 3, 11, 0, 1, 8, 1, 7, 8, 1, 5, 7, -1, -1, -1, -1},
-	{11, 2, 1, 11, 1, 7, 7, 1, 5, -1, -1, -1, -1, -1, -1, -1},
-	{9, 5, 8, 8, 5, 7, 10, 1, 3, 10, 3, 11, -1, -1, -1, -1},
-	{5, 7, 0, 5, 0, 9, 7, 11, 0, 1, 0, 10, 11, 10, 0, -1},
-	{11, 10, 0, 11, 0, 3, 10, 5, 0, 8, 0, 7, 5, 7, 0, -1},
-	{11, 10, 5, 7, 11, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{10, 6, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 3, 5, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 0, 1, 5, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 8, 3, 1, 9, 8, 5, 10, 6, -1, -1, -1, -1, -1, -1, -1},
-	{1, 6, 5, 2, 6, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 6, 5, 1, 2, 6, 3, 0, 8, -1, -1, -1, -1, -1, -1, -1},
-	{9, 6, 5, 9, 0, 6, 0, 2, 6, -1, -1, -1, -1, -1, -1, -1},
-	{5, 9, 8, 5, 8, 2, 5, 2, 6, 3, 2, 8, -1, -1, -1, -1},
-	{2, 3, 11, 10, 6, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{11, 0, 8, 11, 2, 0, 10, 6, 5, -1, -1, -1, -1, -1, -1, -1},
-	{0, 1, 9, 2, 3, 11, 5, 10, 6, -1, -1, -1, -1, -1, -1, -1},
-	{5, 10, 6, 1, 9, 2, 9, 11, 2, 9, 8, 11, -1, -1, -1, -1},
-	{6, 3, 11, 6, 5, 3, 5, 1, 3, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 11, 0, 11, 5, 0, 5, 1, 5, 11, 6, -1, -1, -1, -1},
-	{3, 11, 6, 0, 3, 6, 0, 6, 5, 0, 5, 9, -1, -1, -1, -1},
-	{6, 5, 9, 6, 9, 11, 11, 9, 8, -1, -1, -1, -1, -1, -1, -1},
-	{5, 10, 6, 4, 7, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 3, 0, 4, 7, 3, 6, 5, 10, -1, -1, -1, -1, -1, -1, -1},
-	{1, 9, 0, 5, 10, 6, 8, 4, 7, -1, -1, -1, -1, -1, -1, -1},
-	{10, 6, 5, 1, 9, 7, 1, 7, 3, 7, 9, 4, -1, -1, -1, -1},
-	{6, 1, 2, 6, 5, 1, 4, 7, 8, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 5, 5, 2, 6, 3, 0, 4, 3, 4, 7, -1, -1, -1, -1},
-	{8, 4, 7, 9, 0, 5, 0, 6, 5, 0, 2, 6, -1, -1, -1, -1},
-	{7, 3, 9, 7, 9, 4, 3, 2, 9, 5, 9, 6, 2, 6, 9, -1},
-	{3, 11, 2, 7, 8, 4, 10, 6, 5, -1, -1, -1, -1, -1, -1, -1},
-	{5, 10, 6, 4, 7, 2, 4, 2, 0, 2, 7, 11, -1, -1, -1, -1},
-	{0, 1, 9, 4, 7, 8, 2, 3, 11, 5, 10, 6, -1, -1, -1, -1},
-	{9, 2, 1, 9, 11, 2, 9, 4, 11, 7, 11, 4, 5, 10, 6, -1},
-	{8, 4, 7, 3, 11, 5, 3, 5, 1, 5, 11, 6, -1, -1, -1, -1},
-	{5, 1, 11, 5, 11, 6, 1, 0, 11, 7, 11, 4, 0, 4, 11, -1},
-	{0, 5, 9, 0, 6, 5, 0, 3, 6, 11, 6, 3, 8, 4, 7, -1},
-	{6, 5, 9, 6, 9, 11, 4, 7, 9, 7, 11, 9, -1, -1, -1, -1},
-	{10, 4, 9, 6, 4, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 10, 6, 4, 9, 10, 0, 8, 3, -1, -1, -1, -1, -1, -1, -1},
-	{10, 0, 1, 10, 6, 0, 6, 4, 0, -1, -1, -1, -1, -1, -1, -1},
-	{8, 3, 1, 8, 1, 6, 8, 6, 4, 6, 1, 10, -1, -1, -1, -1},
-	{1, 4, 9, 1, 2, 4, 2, 6, 4, -1, -1, -1, -1, -1, -1, -1},
-	{3, 0, 8, 1, 2, 9, 2, 4, 9, 2, 6, 4, -1, -1, -1, -1},
-	{0, 2, 4, 4, 2, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{8, 3, 2, 8, 2, 4, 4, 2, 6, -1, -1, -1, -1, -1, -1, -1},
-	{10, 4, 9, 10, 6, 4, 11, 2, 3, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 2, 2, 8, 11, 4, 9, 10, 4, 10, 6, -1, -1, -1, -1},
-	{3, 11, 2, 0, 1, 6, 0, 6, 4, 6, 1, 10, -1, -1, -1, -1},
-	{6, 4, 1, 6, 1, 10, 4, 8, 1, 2, 1, 11, 8, 11, 1, -1},
-	{9, 6, 4, 9, 3, 6, 9, 1, 3, 11, 6, 3, -1, -1, -1, -1},
-	{8, 11, 1, 8, 1, 0, 11, 6, 1, 9, 1, 4, 6, 4, 1, -1},
-	{3, 11, 6, 3, 6, 0, 0, 6, 4, -1, -1, -1, -1, -1, -1, -1},
-	{6, 4, 8, 11, 6, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{7, 10, 6, 7, 8, 10, 8, 9, 10, -1, -1, -1, -1, -1, -1, -1},
-	{0, 7, 3, 0, 10, 7, 0, 9, 10, 6, 7, 10, -1, -1, -1, -1},
-	{10, 6, 7, 1, 10, 7, 1, 7, 8, 1, 8, 0, -1, -1, -1, -1},
-	{10, 6, 7, 10, 7, 1, 1, 7, 3, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 6, 1, 6, 8, 1, 8, 9, 8, 6, 7, -1, -1, -1, -1},
-	{2, 6, 9, 2, 9, 1, 6, 7, 9, 0, 9, 3, 7, 3, 9, -1},
-	{7, 8, 0, 7, 0, 6, 6, 0, 2, -1, -1, -1, -1, -1, -1, -1},
-	{7, 3, 2, 6, 7, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{2, 3, 11, 10, 6, 8, 10, 8, 9, 8, 6, 7, -1, -1, -1, -1},
-	{2, 0, 7, 2, 7, 11, 0, 9, 7, 6, 7, 10, 9, 10, 7, -1},
-	{1, 8, 0, 1, 7, 8, 1, 10, 7, 6, 7, 10, 2, 3, 11, -1},
-	{11, 2, 1, 11, 1, 7, 10, 6, 1, 6, 7, 1, -1, -1, -1, -1},
-	{8, 9, 6, 8, 6, 7, 9, 1, 6, 11, 6, 3, 1, 3, 6, -1},
-	{0, 9, 1, 11, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{7, 8, 0, 7, 0, 6, 3, 11, 0, 11, 6, 0, -1, -1, -1, -1},
-	{7, 11, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{7, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{3, 0, 8, 11, 7, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 1, 9, 11, 7, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{8, 1, 9, 8, 3, 1, 11, 7, 6, -1, -1, -1, -1, -1, -1, -1},
-	{10, 1, 2, 6, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 10, 3, 0, 8, 6, 11, 7, -1, -1, -1, -1, -1, -1, -1},
-	{2, 9, 0, 2, 10, 9, 6, 11, 7, -1, -1, -1, -1, -1, -1, -1},
-	{6, 11, 7, 2, 10, 3, 10, 8, 3, 10, 9, 8, -1, -1, -1, -1},
-	{7, 2, 3, 6, 2, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{7, 0, 8, 7, 6, 0, 6, 2, 0, -1, -1, -1, -1, -1, -1, -1},
-	{2, 7, 6, 2, 3, 7, 0, 1, 9, -1, -1, -1, -1, -1, -1, -1},
-	{1, 6, 2, 1, 8, 6, 1, 9, 8, 8, 7, 6, -1, -1, -1, -1},
-	{10, 7, 6, 10, 1, 7, 1, 3, 7, -1, -1, -1, -1, -1, -1, -1},
-	{10, 7, 6, 1, 7, 10, 1, 8, 7, 1, 0, 8, -1, -1, -1, -1},
-	{0, 3, 7, 0, 7, 10, 0, 10, 9, 6, 10, 7, -1, -1, -1, -1},
-	{7, 6, 10, 7, 10, 8, 8, 10, 9, -1, -1, -1, -1, -1, -1, -1},
-	{6, 8, 4, 11, 8, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{3, 6, 11, 3, 0, 6, 0, 4, 6, -1, -1, -1, -1, -1, -1, -1},
-	{8, 6, 11, 8, 4, 6, 9, 0, 1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 4, 6, 9, 6, 3, 9, 3, 1, 11, 3, 6, -1, -1, -1, -1},
-	{6, 8, 4, 6, 11, 8, 2, 10, 1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 10, 3, 0, 11, 0, 6, 11, 0, 4, 6, -1, -1, -1, -1},
-	{4, 11, 8, 4, 6, 11, 0, 2, 9, 2, 10, 9, -1, -1, -1, -1},
-	{10, 9, 3, 10, 3, 2, 9, 4, 3, 11, 3, 6, 4, 6, 3, -1},
-	{8, 2, 3, 8, 4, 2, 4, 6, 2, -1, -1, -1, -1, -1, -1, -1},
-	{0, 4, 2, 4, 6, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 9, 0, 2, 3, 4, 2, 4, 6, 4, 3, 8, -1, -1, -1, -1},
-	{1, 9, 4, 1, 4, 2, 2, 4, 6, -1, -1, -1, -1, -1, -1, -1},
-	{8, 1, 3, 8, 6, 1, 8, 4, 6, 6, 10, 1, -1, -1, -1, -1},
-	{10, 1, 0, 10, 0, 6, 6, 0, 4, -1, -1, -1, -1, -1, -1, -1},
-	{4, 6, 3, 4, 3, 8, 6, 10, 3, 0, 3, 9, 10, 9, 3, -1},
-	{10, 9, 4, 6, 10, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 9, 5, 7, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 3, 4, 9, 5, 11, 7, 6, -1, -1, -1, -1, -1, -1, -1},
-	{5, 0, 1, 5, 4, 0, 7, 6, 11, -1, -1, -1, -1, -1, -1, -1},
-	{11, 7, 6, 8, 3, 4, 3, 5, 4, 3, 1, 5, -1, -1, -1, -1},
-	{9, 5, 4, 10, 1, 2, 7, 6, 11, -1, -1, -1, -1, -1, -1, -1},
-	{6, 11, 7, 1, 2, 10, 0, 8, 3, 4, 9, 5, -1, -1, -1, -1},
-	{7, 6, 11, 5, 4, 10, 4, 2, 10, 4, 0, 2, -1, -1, -1, -1},
-	{3, 4, 8, 3, 5, 4, 3, 2, 5, 10, 5, 2, 11, 7, 6, -1},
-	{7, 2, 3, 7, 6, 2, 5, 4, 9, -1, -1, -1, -1, -1, -1, -1},
-	{9, 5, 4, 0, 8, 6, 0, 6, 2, 6, 8, 7, -1, -1, -1, -1},
-	{3, 6, 2, 3, 7, 6, 1, 5, 0, 5, 4, 0, -1, -1, -1, -1},
-	{6, 2, 8, 6, 8, 7, 2, 1, 8, 4, 8, 5, 1, 5, 8, -1},
-	{9, 5, 4, 10, 1, 6, 1, 7, 6, 1, 3, 7, -1, -1, -1, -1},
-	{1, 6, 10, 1, 7, 6, 1, 0, 7, 8, 7, 0, 9, 5, 4, -1},
-	{4, 0, 10, 4, 10, 5, 0, 3, 10, 6, 10, 7, 3, 7, 10, -1},
-	{7, 6, 10, 7, 10, 8, 5, 4, 10, 4, 8, 10, -1, -1, -1, -1},
-	{6, 9, 5, 6, 11, 9, 11, 8, 9, -1, -1, -1, -1, -1, -1, -1},
-	{3, 6, 11, 0, 6, 3, 0, 5, 6, 0, 9, 5, -1, -1, -1, -1},
-	{0, 11, 8, 0, 5, 11, 0, 1, 5, 5, 6, 11, -1, -1, -1, -1},
-	{6, 11, 3, 6, 3, 5, 5, 3, 1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 10, 9, 5, 11, 9, 11, 8, 11, 5, 6, -1, -1, -1, -1},
-	{0, 11, 3, 0, 6, 11, 0, 9, 6, 5, 6, 9, 1, 2, 10, -1},
-	{11, 8, 5, 11, 5, 6, 8, 0, 5, 10, 5, 2, 0, 2, 5, -1},
-	{6, 11, 3, 6, 3, 5, 2, 10, 3, 10, 5, 3, -1, -1, -1, -1},
-	{5, 8, 9, 5, 2, 8, 5, 6, 2, 3, 8, 2, -1, -1, -1, -1},
-	{9, 5, 6, 9, 6, 0, 0, 6, 2, -1, -1, -1, -1, -1, -1, -1},
-	{1, 5, 8, 1, 8, 0, 5, 6, 8, 3, 8, 2, 6, 2, 8, -1},
-	{1, 5, 6, 2, 1, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 3, 6, 1, 6, 10, 3, 8, 6, 5, 6, 9, 8, 9, 6, -1},
-	{10, 1, 0, 10, 0, 6, 9, 5, 0, 5, 6, 0, -1, -1, -1, -1},
-	{0, 3, 8, 5, 6, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{10, 5, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{11, 5, 10, 7, 5, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{11, 5, 10, 11, 7, 5, 8, 3, 0, -1, -1, -1, -1, -1, -1, -1},
-	{5, 11, 7, 5, 10, 11, 1, 9, 0, -1, -1, -1, -1, -1, -1, -1},
-	{10, 7, 5, 10, 11, 7, 9, 8, 1, 8, 3, 1, -1, -1, -1, -1},
-	{11, 1, 2, 11, 7, 1, 7, 5, 1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 3, 1, 2, 7, 1, 7, 5, 7, 2, 11, -1, -1, -1, -1},
-	{9, 7, 5, 9, 2, 7, 9, 0, 2, 2, 11, 7, -1, -1, -1, -1},
-	{7, 5, 2, 7, 2, 11, 5, 9, 2, 3, 2, 8, 9, 8, 2, -1},
-	{2, 5, 10, 2, 3, 5, 3, 7, 5, -1, -1, -1, -1, -1, -1, -1},
-	{8, 2, 0, 8, 5, 2, 8, 7, 5, 10, 2, 5, -1, -1, -1, -1},
-	{9, 0, 1, 5, 10, 3, 5, 3, 7, 3, 10, 2, -1, -1, -1, -1},
-	{9, 8, 2, 9, 2, 1, 8, 7, 2, 10, 2, 5, 7, 5, 2, -1},
-	{1, 3, 5, 3, 7, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 7, 0, 7, 1, 1, 7, 5, -1, -1, -1, -1, -1, -1, -1},
-	{9, 0, 3, 9, 3, 5, 5, 3, 7, -1, -1, -1, -1, -1, -1, -1},
-	{9, 8, 7, 5, 9, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{5, 8, 4, 5, 10, 8, 10, 11, 8, -1, -1, -1, -1, -1, -1, -1},
-	{5, 0, 4, 5, 11, 0, 5, 10, 11, 11, 3, 0, -1, -1, -1, -1},
-	{0, 1, 9, 8, 4, 10, 8, 10, 11, 10, 4, 5, -1, -1, -1, -1},
-	{10, 11, 4, 10, 4, 5, 11, 3, 4, 9, 4, 1, 3, 1, 4, -1},
-	{2, 5, 1, 2, 8, 5, 2, 11, 8, 4, 5, 8, -1, -1, -1, -1},
-	{0, 4, 11, 0, 11, 3, 4, 5, 11, 2, 11, 1, 5, 1, 11, -1},
-	{0, 2, 5, 0, 5, 9, 2, 11, 5, 4, 5, 8, 11, 8, 5, -1},
-	{9, 4, 5, 2, 11, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{2, 5, 10, 3, 5, 2, 3, 4, 5, 3, 8, 4, -1, -1, -1, -1},
-	{5, 10, 2, 5, 2, 4, 4, 2, 0, -1, -1, -1, -1, -1, -1, -1},
-	{3, 10, 2, 3, 5, 10, 3, 8, 5, 4, 5, 8, 0, 1, 9, -1},
-	{5, 10, 2, 5, 2, 4, 1, 9, 2, 9, 4, 2, -1, -1, -1, -1},
-	{8, 4, 5, 8, 5, 3, 3, 5, 1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 4, 5, 1, 0, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{8, 4, 5, 8, 5, 3, 9, 0, 5, 0, 3, 5, -1, -1, -1, -1},
-	{9, 4, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 11, 7, 4, 9, 11, 9, 10, 11, -1, -1, -1, -1, -1, -1, -1},
-	{0, 8, 3, 4, 9, 7, 9, 11, 7, 9, 10, 11, -1, -1, -1, -1},
-	{1, 10, 11, 1, 11, 4, 1, 4, 0, 7, 4, 11, -1, -1, -1, -1},
-	{3, 1, 4, 3, 4, 8, 1, 10, 4, 7, 4, 11, 10, 11, 4, -1},
-	{4, 11, 7, 9, 11, 4, 9, 2, 11, 9, 1, 2, -1, -1, -1, -1},
-	{9, 7, 4, 9, 11, 7, 9, 1, 11, 2, 11, 1, 0, 8, 3, -1},
-	{11, 7, 4, 11, 4, 2, 2, 4, 0, -1, -1, -1, -1, -1, -1, -1},
-	{11, 7, 4, 11, 4, 2, 8, 3, 4, 3, 2, 4, -1, -1, -1, -1},
-	{2, 9, 10, 2, 7, 9, 2, 3, 7, 7, 4, 9, -1, -1, -1, -1},
-	{9, 10, 7, 9, 7, 4, 10, 2, 7, 8, 7, 0, 2, 0, 7, -1},
-	{3, 7, 10, 3, 10, 2, 7, 4, 10, 1, 10, 0, 4, 0, 10, -1},
-	{1, 10, 2, 8, 7, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 9, 1, 4, 1, 7, 7, 1, 3, -1, -1, -1, -1, -1, -1, -1},
-	{4, 9, 1, 4, 1, 7, 0, 8, 1, 8, 7, 1, -1, -1, -1, -1},
-	{4, 0, 3, 7, 4, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{4, 8, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{9, 10, 8, 10, 11, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{3, 0, 9, 3, 9, 11, 11, 9, 10, -1, -1, -1, -1, -1, -1, -1},
-	{0, 1, 10, 0, 10, 8, 8, 10, 11, -1, -1, -1, -1, -1, -1, -1},
-	{3, 1, 10, 11, 3, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 2, 11, 1, 11, 9, 9, 11, 8, -1, -1, -1, -1, -1, -1, -1},
-	{3, 0, 9, 3, 9, 11, 1, 2, 9, 2, 11, 9, -1, -1, -1, -1},
-	{0, 2, 11, 8, 0, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{3, 2, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{2, 3, 8, 2, 8, 10, 10, 8, 9, -1, -1, -1, -1, -1, -1, -1},
-	{9, 10, 2, 0, 9, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{2, 3, 8, 2, 8, 10, 0, 1, 8, 1, 10, 8, -1, -1, -1, -1},
-	{1, 10, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{1, 3, 8, 9, 1, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 9, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -315,7 +31,9 @@ EveMetaball::EveMetaball( IRoot* lockobj ) :
 	m_minBounds( 0.f, 0.f, 0.f ),
 	m_maxBounds( 0.f, 0.f, 0.f ),
 	m_vertexDeclHandle( Tr2EffectStateManager::UNINITIALIZED_DECLARATION ),
-	m_triangleCount( 0 )
+	m_triangleCount( 0 ),
+	m_isolevel( 1.0 ),
+	m_gooValue( 1.0 )
 {
 	// 0
 	D3DXMatrixIdentity( &m_worldTransform );
@@ -559,10 +277,10 @@ bool EveMetaball::OnPrepareResources()
 	CR_RETURN_VAL( m_indexBuffer.Create( 36, USAGE_CPU_WRITE, IB_32BIT, nullptr, renderContext ), false );
 	unsigned int* indexBuffer;
 	CR_RETURN_VAL( m_indexBuffer.Lock( indexBuffer, LOCK_WRITEONLY, renderContext ), false );
-	indexBuffer[ 0] = 0; indexBuffer[ 1] = 1; indexBuffer[ 2] = 2;
-	indexBuffer[ 3] = 2; indexBuffer[ 4] = 1; indexBuffer[ 5] = 3;
+	indexBuffer[ 0 ] = 0; indexBuffer[ 1 ] = 1; indexBuffer[ 2 ] = 2;
+	indexBuffer[ 3 ] = 2; indexBuffer[ 4 ] = 1; indexBuffer[ 5 ] = 3;
 	m_indexBuffer.Unlock( renderContext );
-
+	
 	return true;
 }
 
@@ -571,6 +289,14 @@ bool EveMetaball::OnPrepareResources()
 // --------------------------------------------------------------------------------
 void EveMetaball::RenderDebugInfo( Tr2RenderContext& renderContext )
 {
+	uint32_t color = 0xff0000ff;
+	Tr2Renderer::DrawBox( m_minBounds, m_maxBounds, color );
+
+	for( auto it = m_sourceItems.begin(); it != m_sourceItems.end(); ++it )
+	{
+		EveMetaballItemPtr item = (*it);
+		Tr2Renderer::DrawSphere( item->GetPosition(), item->GetRadius(), 8, 0xffff00ff );
+	}
 }
 
 
@@ -605,73 +331,42 @@ void EveMetaball::UpdateBuffers()
 
 	std::vector<Triangle> allTriangles;
 	allTriangles.reserve( ( m_triangleCount != 0 ) ? m_triangleCount : 10000 );
-	float sampleValuesBuffer[8];
 
-
-	Vector3 currentPos = m_minBounds;
-	while( currentPos.z < m_maxBounds.z )
+	Vector3 steps;
+	D3DXVec3Subtract( &steps, &m_maxBounds, &m_minBounds );
+	D3DXVec3Scale( &steps, &steps, 1.0f / m_boxSize );
+	
+	int startX = (int)floor( m_minBounds.x / m_boxSize );
+	for( int x = startX; x < steps.x; ++x )
 	{
-		currentPos.y = m_minBounds.y;
-		while( currentPos.y < m_maxBounds.y )
+		int startY = (int)floor( m_minBounds.y / m_boxSize );
+		for( int y = startY; y < steps.y; ++y )
 		{
-			currentPos.x = m_minBounds.x;
-			while( currentPos.x < m_maxBounds.x )
+			int startZ = (int)floor( m_minBounds.z / m_boxSize );
+			for( int z = startZ; z < steps.z; ++z )
 			{
-				// what configuration is it?
-				unsigned int boxConfig = GetBoxIntersectionMask( sampleValuesBuffer, &currentPos, m_boxSize );
-				if( boxConfig != 0 )
+				Vector3 coordinate = Vector3( (float)x, (float)y, (float)z );
+				Cell cell = GetCellValues(coordinate );
+
+				int nTriangles = 0;
+	            Triangle triangles[5];
+
+				Triangulate( cell, triangles, nTriangles );
+				for( int i = 0; i < nTriangles; ++i)
 				{
-					const int* edgesList = s_triTable[boxConfig];
-
-					int triIdx = 0;
-					while( edgesList[ 3 * triIdx ] != -1 )
-					{
-						int edgeIdx0 = edgesList[ 3 * triIdx + 0 ];
-						int edgeIdx1 = edgesList[ 3 * triIdx + 1 ];
-						int edgeIdx2 = edgesList[ 3 * triIdx + 2 ];
-
-						float edge0StartValue = sampleValuesBuffer[ s_edgeToVertsTable[edgeIdx0][0] ];
-						float edge0EndValue = sampleValuesBuffer[ s_edgeToVertsTable[edgeIdx0][1] ];
-						float edge1StartValue = sampleValuesBuffer[ s_edgeToVertsTable[edgeIdx1][0] ];
-						float edge1EndValue = sampleValuesBuffer[ s_edgeToVertsTable[edgeIdx1][1] ];
-						float edge2StartValue = sampleValuesBuffer[ s_edgeToVertsTable[edgeIdx2][0] ];
-						float edge2EndValue = sampleValuesBuffer[ s_edgeToVertsTable[edgeIdx2][1] ];
-
-						float fscale0 = ( 1.f - edge0StartValue ) / ( edge0EndValue - edge0StartValue );
-						float fscale1 = ( 1.f - edge1StartValue ) / ( edge1EndValue - edge1StartValue );
-						float fscale2 = ( 1.f - edge2StartValue ) / ( edge2EndValue - edge2StartValue );
-
-						Vector3 offset0, offset1, offset2;
-						D3DXVec3Lerp( &offset0, &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx0][0]], &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx0][1]], fscale0 );
-						D3DXVec3Lerp( &offset1, &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx1][0]], &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx1][1]], fscale1 );
-						D3DXVec3Lerp( &offset2, &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx2][0]], &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx2][1]], fscale2 );
-
-						Vector3 dir1 = offset1 - offset0;
-						Vector3 dir2 = offset2 - offset0;
-						D3DXVec3Normalize( &dir1, &dir1 );
-						D3DXVec3Normalize( &dir2, &dir2 );
-
-						Triangle tri;
-						tri.position[0] = currentPos + m_boxSize * offset0;
-						tri.position[1] = currentPos + m_boxSize * offset1;
-						tri.position[2] = currentPos + m_boxSize * offset2;
-						D3DXVec3Cross( &tri.normal, &dir2, &dir1 );
-
-						allTriangles.push_back( tri );
-
-						++triIdx;
-					}
+					allTriangles.push_back( triangles[i] );
 				}
-
-				currentPos.x += m_boxSize;
 			}
-			currentPos.y += m_boxSize;
 		}
-		currentPos.z += m_boxSize;
 	}
 
 	// now we know the triangle count
 	m_triangleCount = (unsigned int)allTriangles.size();
+	
+	if ( m_triangleCount == 0 )
+	{
+		return;
+	}
 
 	// fill the vertex buffer
 	USE_MAIN_THREAD_RENDER_CONTEXT();
@@ -689,61 +384,99 @@ void EveMetaball::UpdateBuffers()
 	for( unsigned int i = 0; i < allTriangles.size(); ++i )
 	{
 		vertexBuffer[ 3 * i + 0 ].position = allTriangles[ i ].position[0];
-		vertexBuffer[ 3 * i + 0 ].normal = allTriangles[ i ].normal;
+		vertexBuffer[ 3 * i + 0 ].normal = allTriangles[ i ].normal[0];
 		vertexBuffer[ 3 * i + 1 ].position = allTriangles[ i ].position[2];
-		vertexBuffer[ 3 * i + 1 ].normal = allTriangles[ i ].normal;
+		vertexBuffer[ 3 * i + 1 ].normal = allTriangles[ i ].normal[1];
 		vertexBuffer[ 3 * i + 2 ].position = allTriangles[ i ].position[1];
-		vertexBuffer[ 3 * i + 2 ].normal = allTriangles[ i ].normal;
+		vertexBuffer[ 3 * i + 2 ].normal = allTriangles[ i ].normal[2];
 	}
 	m_vertexBuffer.Unlock( renderContext );
 
 }
 
-// --------------------------------------------------------------------------------
-// Description:
-// --------------------------------------------------------------------------------
-unsigned int EveMetaball::GetBoxIntersectionMask( float* sampleDataList, const Vector3* boxPosition, float size ) const
+EveMetaball::Cell EveMetaball::GetCellValues( Vector3 coordinate )
 {
-	unsigned int mask = 0;
-
-	// check all 8 points
-	for( unsigned int p = 0; p < 8; ++p )
+	Cell cell;
+	cell.mask = 0;
+	cell.position = coordinate * m_boxSize;
+	for( int p = 0; p < 8; ++p )
 	{
-		// actual position
-		Vector3 pnt = *boxPosition + size * s_vertexOffsetTable[ p ];
-		// check if is inside volume
-		float sample = SamplePointInsideVolume( &pnt );
-		if( sample < 1.f )
+		cell.value[p] = 0.0f;
+		cell.normal[p] = Vector3( 0.0f, 0.0f, 0.0f );
+		//Traverse all metball items
+		for( auto it = m_sourceItems.begin(); it != m_sourceItems.end(); ++it )
 		{
-			mask |= 1 << p;
+			EveMetaballItemPtr item = (*it);
+			Vector3 position = cell.position + s_vertexOffsetTable[p] * m_boxSize;
+			Vector3 v = position - item->GetPosition();
+			float radius = item->GetRadius();
+			float lengthSq = D3DXVec3LengthSq( &v );
+			float length = D3DXVec3Length( &v );
+
+			// normal
+			Vector3 normal;
+			D3DXVec3Scale( &normal, &v, radius * m_gooValue / lengthSq);
+			cell.normal[p] += normal;
+			// iso value
+			//cell.value[p] += 1.0f / pointWeight;
+			cell.value[p] += pow( item->GetRadius() / length, m_gooValue );
+			// bitmask
+			if( cell.value[p] > m_isolevel )
+			{
+				cell.mask |= 1 << p;
+			}
+
 		}
-		if( sampleDataList )
-		{
-			sampleDataList[ p ] = sample;
-		}
+		D3DXVec3Normalize( &cell.normal[p], &cell.normal[p] );
 	}
-	return mask;
+	return cell;
 }
 
-
-// --------------------------------------------------------------------------------
-// Description:
-// --------------------------------------------------------------------------------
-float EveMetaball::SamplePointInsideVolume( const Vector3* samplePosition ) const
+void EveMetaball::Triangulate(Cell cell, Triangle *triangles, int &nTriangles)
 {
-	float minDistance = FLT_MAX;
-	float threshold = 0.f;
-	for( EveMetaballItemVector::const_iterator it = m_sourceItems.begin(); it != m_sourceItems.end(); ++it )
+	const int* edgesList = s_triTable[cell.mask];
+
+	int triIdx = 0;
+	while( edgesList[ 3 * triIdx ] != -1 )
 	{
-		EveMetaballItemPtr item = (*it);
-		Vector3 centerPos = *samplePosition - item->GetPosition();
-		float d = D3DXVec3Length( &centerPos ) / item->GetRadius();
-		minDistance = min( minDistance, d );
+		int edgeIdx0 = edgesList[ 3 * triIdx + 0 ];
+		int edgeIdx1 = edgesList[ 3 * triIdx + 1 ];
+		int edgeIdx2 = edgesList[ 3 * triIdx + 2 ];
+
+		float edge0StartValue = cell.value[ s_edgeToVertsTable[edgeIdx0][0] ];
+		float edge0EndValue = cell.value[ s_edgeToVertsTable[edgeIdx0][1] ];
+		float edge1StartValue = cell.value[ s_edgeToVertsTable[edgeIdx1][0] ];
+		float edge1EndValue = cell.value[ s_edgeToVertsTable[edgeIdx1][1] ];
+		float edge2StartValue = cell.value[ s_edgeToVertsTable[edgeIdx2][0] ];
+		float edge2EndValue = cell.value[ s_edgeToVertsTable[edgeIdx2][1] ];
+
+		float fscale0 = ( m_isolevel - edge0StartValue ) / ( edge0EndValue - edge0StartValue );
+		float fscale1 = ( m_isolevel - edge1StartValue ) / ( edge1EndValue - edge1StartValue );
+		float fscale2 = ( m_isolevel - edge2StartValue ) / ( edge2EndValue - edge2StartValue );
+
+		Vector3 offset0, offset1, offset2;
+		D3DXVec3Lerp( &offset0, &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx0][0]], &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx0][1]], fscale0 );
+		D3DXVec3Lerp( &offset1, &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx1][0]], &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx1][1]], fscale1 );
+		D3DXVec3Lerp( &offset2, &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx2][0]], &s_vertexOffsetTable[s_edgeToVertsTable[edgeIdx2][1]], fscale2 );
+
+		Triangle tri;
+		tri.position[0] = cell.position + m_boxSize * offset0;
+		tri.position[1] = cell.position + m_boxSize * offset1;
+		tri.position[2] = cell.position + m_boxSize * offset2;
+
+		D3DXVec3Lerp( &tri.normal[0], &cell.normal[s_edgeToVertsTable[edgeIdx0][0]], &cell.normal[s_edgeToVertsTable[edgeIdx0][1]], fscale0 );
+		D3DXVec3Lerp( &tri.normal[1], &cell.normal[s_edgeToVertsTable[edgeIdx1][0]], &cell.normal[s_edgeToVertsTable[edgeIdx1][1]], fscale1 );
+		D3DXVec3Lerp( &tri.normal[2], &cell.normal[s_edgeToVertsTable[edgeIdx2][0]], &cell.normal[s_edgeToVertsTable[edgeIdx2][1]], fscale2 );
+
+		D3DXVec3Normalize( &tri.normal[0], &tri.normal[0]);
+		D3DXVec3Normalize( &tri.normal[1], &tri.normal[1]);
+		D3DXVec3Normalize( &tri.normal[2], &tri.normal[2]);
+
+		triangles[triIdx] = tri;
+		++triIdx;
 	}
-
-	return minDistance - threshold;
+	nTriangles = triIdx;
 }
-
 
 
 

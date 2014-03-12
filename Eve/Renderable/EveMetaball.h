@@ -64,15 +64,16 @@ public:
 	// IInitialize
 	virtual bool Initialize();
 
-	// here we can sample the density field
-	float SamplePointInsideVolume( const Vector3* samplePosition ) const;
-
-	// building the geometry
-	unsigned int GetBoxIntersectionMask( float* sampleDataList, const Vector3* boxPosition, float size ) const;
-
 	// update all the index and vertex buffers to the latest density field
 	void UpdateBuffers();
 
+	struct Cell
+	{
+		unsigned int mask;
+		Vector3 position;
+		Vector3 normal[8];
+		float value[8];
+	};
 
 private:
 	// vertex
@@ -91,8 +92,11 @@ private:
 	struct Triangle
 	{
 		Vector3 position[3];
-		Vector3 normal;
+		Vector3 normal[3];
 	};
+
+	Cell GetCellValues( Vector3 postition );
+	void Triangulate( Cell cell, Triangle *triangles, int &nTriangles );
 
 	// general
 	std::string m_name;
@@ -100,6 +104,9 @@ private:
 
 	// debug
 	float m_boxSize;
+
+	float m_isolevel;
+	float m_gooValue;
 
 	// metaball data
 	unsigned int m_triangleCount;
