@@ -70,6 +70,7 @@ public:
 		Vector3 position;
 		Vector3 scaling;
 		Quaternion rotation;
+		Color color;
 		Vector4 layer1Transform, layer2Transform, layer1Scroll, layer2Scroll;
 		int boneIndex;
 	};

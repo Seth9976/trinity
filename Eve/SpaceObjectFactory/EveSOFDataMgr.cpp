@@ -315,6 +315,7 @@ bool EveSOFDataMgr::LoadHullData( EveSOFDataPtr srcData )
 				pssid.position = planeSetItemData->m_position;
 				pssid.rotation = planeSetItemData->m_rotation;
 				pssid.scaling = planeSetItemData->m_scaling;
+				pssid.color = planeSetItemData->m_color;
 				hpsd.items.push_back( pssid );
 			}
 			hd.planeSets.push_back( hpsd );

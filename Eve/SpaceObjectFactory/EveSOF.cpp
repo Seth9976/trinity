@@ -131,6 +131,7 @@ IRootPtr EveSOF::Build( const char* hullName, const char* factionName, const cha
 	// effects on ships
 	SetupSpriteSets( newShip, hullData, factionData );
 	SetupSpotlightSets( newShip, hullData, factionData );
+	SetupPlaneSets( newShip, hullData, factionData );
 
 	// attachments to ship
 	SetupBoosters( newShip, hullData, raceData );
@@ -434,10 +435,20 @@ void EveSOF::SetupPlaneSets( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hu
 			EvePlaneSetItemPtr planeSetItem;
 			planeSetItem.CreateInstance();
 			// fill it up
-
+			planeSetItem->m_position = psiit->position;
+			planeSetItem->m_rotation = psiit->rotation;
+			planeSetItem->m_scaling = psiit->scaling;
+			planeSetItem->m_color = psiit->color;
+			planeSetItem->m_layer1Transform = psiit->layer1Transform;
+			planeSetItem->m_layer1Scroll = psiit->layer1Scroll;
+			planeSetItem->m_layer2Transform = psiit->layer2Transform;
+			planeSetItem->m_layer2Scroll = psiit->layer2Scroll;
+			planeSetItem->m_boneIndex = psiit->boneIndex;
 			// add it
 			planeSet->AddPlaneItem( planeSetItem );
 		}
+		// rebuild it internally
+		planeSet->Rebuild();
 		// add to ship
 		ship->AddPlaneSet( planeSet );
 	}
