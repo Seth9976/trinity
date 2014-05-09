@@ -186,6 +186,7 @@ void EveSOF::FillMeshAreaVector( const std::vector<EveSOFDataMgr::HullAreas>* hu
 		// every area has it's own shader, nothing we can share here
 		Tr2EffectPtr newShader;
 		newShader.CreateInstance();
+		newShader->StartUpdate();
 		newShader->SetEffectPathName( area->shaderPath.c_str() );
 
 		const std::map<std::string, Vector4>* factionShaderParams = nullptr;
@@ -227,6 +228,9 @@ void EveSOF::FillMeshAreaVector( const std::vector<EveSOFDataMgr::HullAreas>* hu
 			ModifyTextureResPath( resPath, it->first.c_str(), factionData );
 			newShader->AddResourceTexture2D( it->first.c_str(), resPath.c_str() );
 		}
+
+		// that's it for setting up this shader, must rebuild cache on it!
+		newShader->EndUpdate();
 
 		// new mesharea
 		Tr2MeshAreaPtr newMeshArea;
@@ -334,8 +338,10 @@ void EveSOF::SetupSpotlightSets( EveShip2Ptr ship, const EveSOFDataMgr::HullData
 		// create shaders
 		Tr2EffectPtr coneEffect;
 		coneEffect.CreateInstance();
+		coneEffect->StartUpdate();
 		Tr2EffectPtr glowEffect;
 		glowEffect.CreateInstance();
+		glowEffect->StartUpdate();
 
 		// set skinned or unskinned shader
 		if( spotlightSetData->skinned )
@@ -359,6 +365,10 @@ void EveSOF::SetupSpotlightSets( EveShip2Ptr ship, const EveSOFDataMgr::HullData
 		zOffsetParam->m_name = BlueSharedString( "zOffset" );
 		zOffsetParam->m_value = spotlightSetData->zOffset;
 		coneEffect->m_parameters.Append( zOffsetParam->GetRawRoot() );
+
+		// that's it for setting up these shaders, must rebuild cache on it!
+		coneEffect->EndUpdate();
+		glowEffect->EndUpdate();
 
 		// set to set
 		spotlightSet->SetConeEffect( coneEffect );
@@ -423,6 +433,7 @@ void EveSOF::SetupPlaneSets( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hu
 		// create shader
 		Tr2EffectPtr planeEffect;
 		planeEffect.CreateInstance();
+		planeEffect->StartUpdate();
 
 		// set skinned or unskinned shader
 		if( planeSetData->skinned )
@@ -442,7 +453,8 @@ void EveSOF::SetupPlaneSets( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hu
 		// parameters
 		planeEffect->AddParameterVector4( "PlaneData", &planeSetData->planeData );
 
-		// set to set
+		// finish up shader and set it
+		planeEffect->EndUpdate();
 		planeSet->SetEffect( planeEffect );
 
 		// add all individual items
@@ -501,9 +513,7 @@ void EveSOF::SetupChildren( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hul
 		child->SetTranslation( chit->translation );
 
 		ship->AddToChildrenList( child );
-
 	}
-	
 }
 
 // --------------------------------------------------------------------------------
@@ -530,21 +540,29 @@ void EveSOF::SetupBoosters( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hul
 	// set the booster set's internal data
 	set->SetData( rdata->glowScale, &rdata->glowColor, rdata->symHaloScale, rdata->haloScaleX, rdata->haloScaleY, &rdata->haloColor, hdata->alwaysOn );
 
+	// create and setup booster effect
 	Tr2EffectPtr effect;
 	effect.CreateInstance();
+	effect->StartUpdate();
 	effect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/Booster.fx" );
 	effect->AddParameterColor( "Color", &rdata->color );
 	effect->AddParameterVector4( "BoosterScale", &rdata->scale );
 	effect->AddResourceTexture2D( "WaveMap", "res:/Texture/Sprite/waveHiFi.dds" );
 	effect->AddResourceTexture2D( "DiffuseMap", rdata->textureResPath.c_str() );
+	// finish effect and set it
+	effect->EndUpdate();
 	set->SetEffect( effect );
 
+	// create and setup glows
 	EveSpriteSetPtr glow;
 	glow.CreateInstance();
 	Tr2EffectPtr glowEffect;
 	glowEffect.CreateInstance();
+	glowEffect->StartUpdate();
 	glowEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/BoosterGlow.fx" );
 	glowEffect->AddResourceTexture2D( "DiffuseMap", "res:/Texture/Particle/whitesharp.dds" );
+	// finish effect and set it
+	effect->EndUpdate();
 	glow->SetEffect( glowEffect );
 	set->SetGlow( glow );
 
@@ -552,11 +570,13 @@ void EveSOF::SetupBoosters( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hul
 	{
 		Tr2EffectPtr trailEffect;
 		trailEffect.CreateInstance();
+		trailEffect->StartUpdate();
 		EveTrailsSetPtr trail;
 		trail.CreateInstance();
 		trailEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/VolumetricTrails.fx" );
 		trailEffect->AddParameterVector4( "TrailSize", &rdata->trailSize );
 		trailEffect->AddParameterColor( "TrailColor", &rdata->trailColor );
+		trailEffect->EndUpdate();
 		trail->SetEffect( trailEffect );
 		trail->SetMeshResPath( "res:/dx9/model/ship/booster/volumetricTrail.gr2" );
 		set->SetTrail( trail );
@@ -591,6 +611,7 @@ void EveSOF::SetupHullDecals( EveShip2Ptr ship, const EveSOFDataMgr::HullData* h
 		// the decal effect
 		Tr2EffectPtr shader;
 		shader.CreateInstance();
+		shader->StartUpdate();
 		shader->SetEffectPathName( hdit->shaderPath.c_str() );
 		// set parameters
 		for( auto hdpit = hdit->parameters.begin(); hdpit != hdit->parameters.end(); ++hdpit )
@@ -603,6 +624,7 @@ void EveSOF::SetupHullDecals( EveShip2Ptr ship, const EveSOFDataMgr::HullData* h
 			shader->AddResourceTexture2D( hdtit->first.c_str(), hdtit->second.resFilePath.c_str() );
 		}
 		// init and add
+		shader->EndUpdate();
 		decal->SetEffect( shader );
 		decal->Initialize();
 		ship->AddDecal( decal );
