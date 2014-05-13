@@ -562,7 +562,7 @@ void EveSOF::SetupBoosters( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hul
 	glowEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/BoosterGlow.fx" );
 	glowEffect->AddResourceTexture2D( "DiffuseMap", "res:/Texture/Particle/whitesharp.dds" );
 	// finish effect and set it
-	effect->EndUpdate();
+	glowEffect->EndUpdate();
 	glow->SetEffect( glowEffect );
 	set->SetGlow( glow );
 
