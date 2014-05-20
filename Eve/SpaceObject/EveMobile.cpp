@@ -126,8 +126,14 @@ void EveMobile::UpdateSyncronous( EveUpdateContext& updateContext )
 		// next!
 		++locatorInfoIdx;
 
+		// now prep to get the renderables
+		EveTurretSet::ParentData pd;
+		pd.transform = m_worldTransform;
+		pd.shipData = m_spaceObjectMiscData;
+		pd.clipData = m_spaceObjectClipData;
+		pd.clipDataEx = m_spaceObjectClipDataEx;
 		// call standard update function
-		(*it)->Update( deltaT, time, &m_worldTransform );
+		(*it)->Update( deltaT, time, &pd );
 	}
 }
 

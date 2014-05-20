@@ -45,15 +45,18 @@ public:
 	virtual void SetPerObjectDataToDevice( Tr2ConstantBufferAL** buffers, unsigned constantTypeMask, Tr2RenderContext& renderContext ) const;
 
 	// vs per object data
-	Vector4 m_clipData;
+	Vector4 m_baseCutoffData;
 	Matrix m_shipMatrix;
 	// per turret data
 	Vector4 m_turretData[EVE_MAX_TURRETS_PER_SET];
-	Matrix m_turretWorld[EVE_MAX_TURRETS_PER_SET];
+	Matrix m_turretLocal[EVE_MAX_TURRETS_PER_SET];
 	// pose matrices are 4x3, since there is a lot of them
 	float m_turretPose[EVE_MAX_BONES_PER_TURRET * EVE_MAX_TURRETS_PER_SET][4 * 3];
+
 	// pixel shader per object data
-	// empty for now...
+	Vector4 m_shipData;
+	Vector4 m_clipData1;
+	Vector4 m_clipData2;
 };
 
 // --------------------------------------------------------------------------------
@@ -82,6 +85,16 @@ public:
 
 	EveTurretSet(IRoot* lockobj = NULL);
 	~EveTurretSet();
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	// public structs
+	struct ParentData
+	{
+		Matrix transform;
+		Vector4 shipData;
+		Vector4 clipData;
+		Vector4 clipDataEx;
+	};
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
@@ -119,7 +132,7 @@ public:
 	void SetLocalTransform( unsigned int turretIndex, const Matrix* localMatrix );
 	void UpdateModelLOD();
 	// timing and worldspace positioning
-	void Update( float deltaT, Be::Time time, const Matrix* parentMatrix );
+	void Update( float deltaT, Be::Time time, const ParentData* parentData );
 	// rendering
 	void GetRenderables( const TriFrustum& frustum, std::vector<ITr2Renderable*>& renderables );
 	void GetRenderablesCastingShadow( const TriFrustumOrtho& frustum, std::vector<ITr2Renderable*>& renderables );
@@ -236,9 +249,12 @@ private:
 	// current lod level
 	LOD m_lodLevel;
 
-	// locator on the ship
+	// locator on the parent ship
 	std::string m_locatorName;
 	int m_slotNumber;
+
+	// parent ship data
+	ParentData m_parentData;
 
 	// keep a vector of data on each pair of the turret
 	struct SingleTurretData

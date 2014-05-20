@@ -113,6 +113,8 @@ EveTurretSet::EveTurretSet( IRoot* lockobj ) :
 	m_slotNumber( -1 )
 {
 	// 0
+	memset( &m_parentData, 0, sizeof( ParentData ) );
+	D3DXMatrixIdentity( &m_parentData.transform );
 	for( unsigned int i = 0; i < SYSBONE_MAX; ++i )
 	{
 		m_systemBoneID[i] = INVALID_BONE_INDEX;
@@ -570,18 +572,21 @@ void EveTurretSet::UpdateModelLOD()
 //   time - time delta since last frame
 //   parentMatrix - transform of parent object (usually a ship)
 // --------------------------------------------------------------------------------
-void EveTurretSet::Update( float deltaT, Be::Time time, const Matrix* parentMatrix )
+void EveTurretSet::Update( float deltaT, Be::Time time, const ParentData* parentData )
 {
 	if( !m_singleTurrets.size() )
 	{
 		return;
 	}
 
+	// keep parent's transform
+	m_parentData = *parentData;
+
 	// update single turret list
 	for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		// first parent matrix (ship or station), then local matrix (locator position)
-		D3DXMatrixMultiply( &it->worldMatrix, &it->localMatrix, parentMatrix );
+		D3DXMatrixMultiply( &it->worldMatrix, &it->localMatrix, &m_parentData.transform );
 		// we need the inverse matrix for the tracking later
 		D3DXMatrixInverse( &it->invWorldMatrix, NULL, &it->worldMatrix );
 		// this validates this turret
@@ -689,7 +694,7 @@ void EveTurretSet::Update( float deltaT, Be::Time time, const Matrix* parentMatr
 
 		if( m_laserMissBehaviour )
 		{
-			UpdateMissPosition( parentMatrix );
+			UpdateMissPosition( &m_parentData.transform );
 		}
 	}
 
@@ -756,14 +761,14 @@ void EveTurretSet::Update( float deltaT, Be::Time time, const Matrix* parentMatr
 				for( unsigned int i = 0; i < m_firingEffect->GetPerMuzzleEffectCount(); ++i )
 				{
 					// use something relatively sensible, even absent geometry
-					m_firingEffect->SetMuzzleTransform( i, parentMatrix );
+					m_firingEffect->SetMuzzleTransform( i, &m_parentData.transform );
 				}
 				m_firingEffectMuzzlePosSet = true;
 			}
 
 			if( !m_laserMissBehaviour )
 			{
-				UpdateMissPosition( parentMatrix );
+				UpdateMissPosition( &m_parentData.transform );
 			}
 			PopShotMissed();
 			m_firingEffect->SetEndPosition( GetShotMissed() ? &m_targetPositionMiss : &m_targetPosition );
@@ -1329,10 +1334,10 @@ Tr2PerObjectData* EveTurretSet::GetPerObjectData( ITriRenderBatchAccumulator* ac
 	D3DXMatrixIdentity( &idMatrix );
 
 	// tell "parent"-ship matrix
-	perObjectData->m_shipMatrix = idMatrix;
+	D3DXMatrixTranspose( &perObjectData->m_shipMatrix, &m_parentData.transform );
 
-	// put together clip-data, so we can have clip planes/volumes on rendering turrets
-	perObjectData->m_clipData = Vector4( m_bottomClipHeight, 0.f, 0.f, 0.f );
+	// put together clip-data, so we can have a clip plane to cut off the turrets base to avoid intersections
+	perObjectData->m_baseCutoffData = Vector4( m_bottomClipHeight, 0.f, 0.f, 0.f );
 
 	// fill with data
 	if( !m_singleTurrets.empty() )
@@ -1360,20 +1365,27 @@ Tr2PerObjectData* EveTurretSet::GetPerObjectData( ITriRenderBatchAccumulator* ac
 						{
 							// column_major for shaders
 							TriMatrixTranspose( (Matrix*)&perObjectData->m_turretPose[baseBoneIndex + j], &compositeMatrixArray[toBoneIndices[j]], 4 * 3 * sizeof( float ) );
-							D3DXMatrixTranspose( &perObjectData->m_turretWorld[baseTurretIndex], &m_singleTurrets[i].worldMatrix );
 						}
 						else
 						{
 							// column_major for shaders
 							TriMatrixTranspose( (Matrix*)&perObjectData->m_turretPose[baseBoneIndex + j], &idMatrix, 4 * 3 * sizeof( float ) );
-							D3DXMatrixTranspose( &perObjectData->m_turretWorld[baseTurretIndex], &m_singleTurrets[i].worldMatrix );
 						}
 					}
 					else
 					{
 						TriMatrixTranspose( (Matrix*)&perObjectData->m_turretPose[baseBoneIndex + j], &idMatrix, 4 * 3 * sizeof( float ) );
-						perObjectData->m_turretWorld[baseTurretIndex] = idMatrix;
 					}
+				}
+
+				// local matrix of each turret instance
+				if( m_singleTurrets[i].valid )
+				{
+					D3DXMatrixTranspose( &perObjectData->m_turretLocal[baseTurretIndex], &m_singleTurrets[i].localMatrix );
+				}
+				else
+				{
+					perObjectData->m_turretLocal[baseTurretIndex] = idMatrix;
 				}
 
 				// extra data per turret (glow, ...)
@@ -1384,6 +1396,11 @@ Tr2PerObjectData* EveTurretSet::GetPerObjectData( ITriRenderBatchAccumulator* ac
 				++baseTurretIndex;
 			}
 		}
+
+		// ps data
+		perObjectData->m_shipData = m_parentData.shipData;
+		perObjectData->m_clipData1 = m_parentData.clipData;
+		perObjectData->m_clipData2 = m_parentData.clipDataEx;
 	}
 
 	return perObjectData;
@@ -2247,7 +2264,10 @@ void EveTurretSetPerObjectData::SetPerObjectDataToDevice( Tr2ConstantBufferAL** 
 		EVE_MAX_TURRETS_PER_SET +								    // Vector4 array
 		4 * EVE_MAX_TURRETS_PER_SET +								// Matrix4x4 array
 		3 * EVE_MAX_BONES_PER_TURRET * EVE_MAX_TURRETS_PER_SET;		// Matrix4x3 array
-	FillAndSetConstants( *buffers[VERTEX_SHADER], &m_clipData, vsConstantCount * 16, VERTEX_SHADER, Tr2Renderer::GetPerObjectVSStartRegister(), renderContext );
+	FillAndSetConstants( *buffers[VERTEX_SHADER], &m_baseCutoffData, vsConstantCount * 16, VERTEX_SHADER, Tr2Renderer::GetPerObjectVSStartRegister(), renderContext );
+
+	FillAndSetConstants( *buffers[PIXEL_SHADER], &m_shipData, 3 * 16, PIXEL_SHADER, Tr2Renderer::GetPerObjectPSStartRegister(), renderContext );
+
 }
 
 
