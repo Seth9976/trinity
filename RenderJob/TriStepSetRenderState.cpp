@@ -6,7 +6,7 @@ TriStepSetRenderState::TriStepSetRenderState( IRoot* lockobj )
 {
 }
 
-TriStepResult TriStepSetRenderState::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetRenderState::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	renderContext.SetRenderState( m_state, m_value );
 	return RS_OK;

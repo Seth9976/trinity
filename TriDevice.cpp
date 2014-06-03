@@ -393,16 +393,16 @@ bool TriDevice::GetEffectLoadDisabled()					{ return  Tr2Renderer::m_disableEffe
 bool TriDevice::GetAsyncLoadDisabled()					{ return  Tr2Renderer::m_disableAsyncLoad; }
 
 
-void TriDevice::Update( Be::Time t )
+void TriDevice::Update( Be::Time realTime, Be::Time simTime )
 {
-	TriSrand(t);
+	TriSrand( simTime );
 
 	UpdateCursor();
 
 	UpdateList &updateArray = GetUpdateList();
 	for( UpdateList::iterator i = updateArray.begin(); i!= updateArray.end(); ++i )
 	{
-		(*i)->Update(t);
+		(*i)->Update( realTime, simTime );
 	}
 
 #if BINK_ENABLED
@@ -419,7 +419,7 @@ void TriDevice::Update( Be::Time t )
 	}
 	for( auto it = curveSets.cbegin(); it != curveSets.cend(); ++it )
 	{
-		(*it)->Update( TimeAsDouble( t ) );
+		(*it)->Update( realTime, simTime );
 	}
 	curveSets.Remove(-1);
 
@@ -740,7 +740,7 @@ void TriDevice::OnTick( Be::Time realTime, Be::Time simTime, void* cookie )
 		BeCrashes->SetCrashKeyValueW( (wchar_t*)L"frameCounter", buffer );
 	}
 
-	Be::Time delta = simTime - mTime;
+	Be::Time delta = simTime - m_simTime;
 	if( delta < 0L )
 	{
 		delta = 0L;
@@ -759,7 +759,8 @@ void TriDevice::OnTick( Be::Time realTime, Be::Time simTime, void* cookie )
 	}
 
 	BeOS->NextScheduledEvent( mTickInterval );
-	mTime = simTime;
+	m_simTime = simTime;
+	m_realTime = realTime;
 
 	if( mCreationTime == 0 )
 	{
@@ -786,13 +787,13 @@ void TriDevice::OnTick( Be::Time realTime, Be::Time simTime, void* cookie )
 		reloadSet.clear();
 	}
    
-	Update(mTime);
-	HandleRenderTick(simTime);
+	Update( realTime, simTime );
+	HandleRenderTick( realTime, simTime );
 }
 
 void TriDevice::OnSimClockRebase( Be::Time oldTime, Be::Time newTime )
 {
-	mTime += newTime - oldTime;
+	m_simTime += newTime - oldTime;
 }
 
 float TriDevice::GetAnimationTimeElapsed( float startTime )
@@ -1303,7 +1304,7 @@ bool TriDevice::Render()
 
 	if( m_renderJobs )
 	{		
-		m_renderJobs->Run( mTime );
+		m_renderJobs->Run( m_realTime, m_simTime );
 	}
 
 	CallCallbacks( m_presentCallbacks );

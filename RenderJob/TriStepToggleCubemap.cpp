@@ -40,7 +40,7 @@ void TriStepToggleCubemap::py__init__( Be::OptionalWithDefaultValue<bool, true> 
 // Return value:
 //   RS_OK always.
 // -------------------------------------------------------------
-TriStepResult TriStepToggleCubemap::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepToggleCubemap::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( this->m_scene )
 	{		

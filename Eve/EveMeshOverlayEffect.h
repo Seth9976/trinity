@@ -35,7 +35,7 @@ public:
 	bool Initialize();
 	
 	const PTr2EffectVector& GetEffects( TriBatchType batchType, bool& success ) const;
-	void Update( Be::Time time );
+	void Update( Be::Time realTime, Be::Time simTime );
 
 	PTr2EffectVector m_opaqueEffects;
 	PTr2EffectVector m_decalEffects;

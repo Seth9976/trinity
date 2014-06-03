@@ -20,7 +20,7 @@ public:
 	TriStepRenderObject( IRoot* lockobj = 0 );
 	~TriStepRenderObject();
 
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	void py__init__( ITr2Renderable* obj );
 

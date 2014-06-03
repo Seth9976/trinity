@@ -19,7 +19,7 @@ public:
 
 	virtual void Render( Tr2RenderContext& renderContext );	
 	virtual void RenderDebugInfo( Tr2RenderContext& renderContext );
-	virtual void Update(Be::Time time);
+	virtual void Update( Be::Time realTime, Be::Time simTime );
 
 private:
 	ITriRenderBatchAccumulator* m_opaqueRenderBatches;

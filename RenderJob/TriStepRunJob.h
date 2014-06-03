@@ -17,7 +17,7 @@ public:
 	~TriStepRunJob(void);
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	void SetRenderJob( TriRenderJob* job );
 

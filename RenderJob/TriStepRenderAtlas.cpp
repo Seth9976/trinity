@@ -32,7 +32,7 @@ void TriStepRenderAtlas::py__init__( Tr2TextureAtlas* atlas, Tr2AtlasTexture* te
 	SetFocus( texture );
 }
 
-TriStepResult TriStepRenderAtlas::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderAtlas::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_atlas )
 	{

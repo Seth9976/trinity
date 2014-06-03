@@ -638,7 +638,7 @@ void Tr2IntEnlightenTaskManager::InvalidateResult()
 }
 
 // ------------------------------------------------------------------------------------------------------
-void Tr2IntEnlightenTaskManager::Update( Be::Time time )
+void Tr2IntEnlightenTaskManager::Update( Be::Time realTime, Be::Time simTime )
 {
 	if( !IsExecuting() )
 	{

@@ -8,7 +8,7 @@ TriStepResolve::TriStepResolve( IRoot* lockobj )
 {
 }
 
-TriStepResult TriStepResolve::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepResolve::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 

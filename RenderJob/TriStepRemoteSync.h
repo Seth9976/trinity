@@ -15,7 +15,7 @@ public:
 	void py__init__( Be::OptionalWithDefaultValue<int, -1> id );
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	// an id to create access a unique instance of the events
 	int GetId(){ return m_id; }

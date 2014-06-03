@@ -2,7 +2,7 @@
 #include "TriStepPopViewTransform.h"
 #include "Tr2Renderer.h"
 
-TriStepResult TriStepPopViewTransform::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepPopViewTransform::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	Tr2Renderer::PopViewTransform();
 	return RS_OK;

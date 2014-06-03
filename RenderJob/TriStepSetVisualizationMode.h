@@ -31,7 +31,7 @@ public:
 	void py__init__( ITr2VisualizationModeRenderer* object, int mode );
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	void SetObject( ITr2VisualizationModeRenderer* object );
 	void SetVisualizationMode( int mode );

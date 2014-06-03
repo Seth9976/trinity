@@ -49,7 +49,7 @@ void TriStepRemoteSync::py__init__( Be::OptionalWithDefaultValue<int, -1> id )
 	SetId( id );
 }
 
-TriStepResult TriStepRemoteSync::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRemoteSync::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	// An event to stall the beginning of the rendering til set
 	if( m_begin == NULL )

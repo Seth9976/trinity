@@ -28,7 +28,7 @@ TriStepClearUav::TriStepClearUav( IRoot* lockobj )
 // Return Value:
 //   RS_OK always
 // --------------------------------------------------------------------------------------
-TriStepResult TriStepClearUav::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepClearUav::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_buffer )
 	{

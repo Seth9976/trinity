@@ -72,7 +72,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Scene
-	virtual void Update( Be::Time time );
+	virtual void Update( Be::Time realTime, Be::Time simTime );
 	virtual void Render( Tr2RenderContext& renderContext );
 	virtual void RenderDebugInfo( Tr2RenderContext& renderContext );
 

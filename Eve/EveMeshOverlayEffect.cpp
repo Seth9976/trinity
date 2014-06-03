@@ -87,12 +87,12 @@ const PTr2EffectVector& EveMeshOverlayEffect::GetEffects(TriBatchType batchType,
 // Description:
 //   Update
 // --------------------------------------------------------------------------------------
-void EveMeshOverlayEffect::Update( Be::Time time )
+void EveMeshOverlayEffect::Update( Be::Time realTime, Be::Time simTime )
 {
 	if( !m_update || !m_curveSet )
 	{
 		return;
 	}
 
-	m_curveSet->Update( time );
+	m_curveSet->Update( realTime, simTime );
 }

@@ -41,7 +41,7 @@ public:
 
 	void Render( Tr2RenderContext& renderContext );
 	void RenderDebugInfo( Tr2RenderContext& renderContext );
-	void Update( Be::Time time );
+	void Update( Be::Time realTime, Be::Time simTime );
 	
 	virtual void ReleaseResources( TriStorage s );
 protected:

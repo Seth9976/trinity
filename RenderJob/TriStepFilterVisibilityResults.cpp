@@ -53,7 +53,7 @@ void TriStepFilterVisibilityResults::py__init__(
 // Return value:
 //   RS_OK always
 // -------------------------------------------------------------
-TriStepResult TriStepFilterVisibilityResults::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepFilterVisibilityResults::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_inputResults && m_outputResults )
 	{

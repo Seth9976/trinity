@@ -29,7 +29,7 @@ public:
 	TriStepEnableWireframeMode( IRoot* lockobj = 0 );
 	~TriStepEnableWireframeMode(void);
 
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 protected:
 	void py__init__( bool value );

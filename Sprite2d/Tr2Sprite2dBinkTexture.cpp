@@ -114,7 +114,7 @@ void Tr2Sprite2dBinkTexture::UnmuteAudio()
 	m_isMuted = false;
 }
 
-void Tr2Sprite2dBinkTexture::Update( Be::Time time )
+void Tr2Sprite2dBinkTexture::Update( Be::Time realTime, Be::Time simTime )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 

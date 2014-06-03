@@ -11,7 +11,7 @@ TriStepRenderSceneDebug::~TriStepRenderSceneDebug(void)
 {
 }
 
-TriStepResult TriStepRenderSceneDebug::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderSceneDebug::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_scene )
 	{

@@ -7,7 +7,7 @@ TriStepSetStdRndStates::TriStepSetStdRndStates( IRoot* lockobj ) :
 {
 }
 
-TriStepResult TriStepSetStdRndStates::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetStdRndStates::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	renderContext.m_esm.ApplyStandardStates( m_renderingMode );
 	return RS_OK;

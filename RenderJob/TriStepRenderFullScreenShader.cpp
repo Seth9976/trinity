@@ -17,7 +17,7 @@ void TriStepRenderFullScreenShader::py__init__( ITr2ShaderMaterial* shader )
 	m_shader = shader;
 }
 
-TriStepResult TriStepRenderFullScreenShader::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderFullScreenShader::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 
 	if( m_shader )

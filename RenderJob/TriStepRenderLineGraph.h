@@ -22,7 +22,7 @@ public:
 		Be::Optional<float> scale,
 		Be::Optional<bool> autoScale );
 
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 protected:
 	PTr2LineGraphVector m_lineGraphs;

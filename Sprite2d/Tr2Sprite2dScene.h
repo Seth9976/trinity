@@ -39,7 +39,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// ITr2Scene
-	virtual void Update( Be::Time time );
+	virtual void Update( Be::Time realTime, Be::Time simTime );
 	virtual void Render( Tr2RenderContext& renderContext );
 
 	virtual void RenderDebugInfo( Tr2RenderContext& renderContext );
@@ -165,6 +165,9 @@ private:
 
 	std::wstring m_name;
 	bool m_display;
+
+	Be::Time m_realTime;
+	Be::Time m_simTime;
 
 	PITr2SpriteObjectVector m_children;
 	PITr2SpriteObjectVector m_background;

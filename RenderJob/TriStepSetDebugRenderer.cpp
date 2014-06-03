@@ -26,7 +26,7 @@ TriStepSetDebugRenderer::~TriStepSetDebugRenderer(void)
 // Return value:
 //   RS_OK always.
 // -------------------------------------------------------------
-TriStepResult TriStepSetDebugRenderer::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetDebugRenderer::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	extern ITr2DebugRendererPtr g_debugRenderer;
 	g_debugRenderer = m_debugRenderer;

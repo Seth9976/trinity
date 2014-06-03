@@ -17,7 +17,7 @@ void TriStepSetView::SetViewCameraParent( TriView* view, EveCamera* camera, ITri
 	m_cameraParent = cameraParent;
 }
 
-TriStepResult TriStepSetView::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetView::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_view )
 	{
@@ -25,7 +25,7 @@ TriStepResult TriStepSetView::Execute( Be::Time time, Tr2RenderContext& renderCo
 	}
 	else if( m_camera )
 	{
-		m_camera->Update( time );
+		m_camera->Update( simTime );
 		Tr2Renderer::SetViewTransform( m_camera->GetViewMatrix()->GetTransform() );
 	}
 	return RS_OK;

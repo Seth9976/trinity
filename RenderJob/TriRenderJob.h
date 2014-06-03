@@ -27,7 +27,7 @@ public:
 	TriRenderJob( IRoot* lockobj = 0 );
 	~TriRenderJob(void);
 
-	TriRenderJobStatus Run( Be::Time time, Tr2RenderContext *renderContext = nullptr );
+	TriRenderJobStatus Run( Be::Time realTime, Be::Time simTime, Tr2RenderContext *renderContext = nullptr );
 
 	//Tr2RenderContext&	GetRenderContext();
 

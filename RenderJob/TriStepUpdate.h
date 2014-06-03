@@ -16,7 +16,7 @@ public:
 	~TriStepUpdate(void);
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	// Python __init__ constructor
 	void SetUpdateable( ITr2Updateable* obj );

@@ -49,7 +49,7 @@ public:
 	~EveLensflare();
 
 	// timing
-	void Update( Be::Time time );
+	void Update( Be::Time realTime, Be::Time simTime );
 
 	// prepare some data necessary for rendering
 	void PrepareRender( const TriFrustum& frustum );

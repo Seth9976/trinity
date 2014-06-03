@@ -19,7 +19,7 @@ void TriStepVisibilityQuery::py__init__( ITr2VisibilityQueryable* queryable, Tr2
 	SetResultsObject( results );
 }
 
-TriStepResult TriStepVisibilityQuery::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepVisibilityQuery::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_queryable )
 	{

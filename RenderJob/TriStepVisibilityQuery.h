@@ -20,7 +20,7 @@ public:
 	void py__init__( ITr2VisibilityQueryable* queryable, Tr2VisibilityResults* results );
 
 	// RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	void SetQueryScene( ITr2VisibilityQueryable* queryable )
 	{

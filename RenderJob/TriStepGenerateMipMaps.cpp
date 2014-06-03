@@ -11,7 +11,7 @@ TriStepGenerateMipMaps::~TriStepGenerateMipMaps(void)
 {
 }
 
-TriStepResult TriStepGenerateMipMaps::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepGenerateMipMaps::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_renderTarget )
 	{

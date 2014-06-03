@@ -22,7 +22,7 @@ public:
 		Be::OptionalWithDefaultValue<unsigned, 1> groupDimZ );
 	
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 	
 	ITr2ShaderMaterialPtr m_effect;
 	unsigned m_groupDimX;

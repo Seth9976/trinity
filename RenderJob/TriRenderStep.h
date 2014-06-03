@@ -23,7 +23,7 @@ public:
 	virtual ~TriRenderStep();
 
 	bool IsEnabled() const;
-	virtual TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext ) = 0;
+	virtual TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext ) = 0;
 
 protected:
 	std::string m_name;

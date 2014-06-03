@@ -61,7 +61,7 @@ EveLensflare::~EveLensflare()
 // Arguments:
 //   time - time delta since last frame
 // --------------------------------------------------------------------------------
-void EveLensflare::Update( Be::Time time )
+void EveLensflare::Update( Be::Time realTime, Be::Time simTime )
 {
 	Vector3 dirVec;
 
@@ -73,7 +73,7 @@ void EveLensflare::Update( Be::Time time )
 	// update the position of this lensflare
 	if( m_translationCurve )
 	{
-		m_translationCurve->Update( &m_position, time );
+		m_translationCurve->Update( &m_position, simTime );
 	}
 
 	// calc sun size depending on it's position in the client and some very strange, very old magic numbers
@@ -89,7 +89,7 @@ void EveLensflare::Update( Be::Time time )
 
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 	{
-		( *it )->Update( time );
+		( *it )->Update( realTime, simTime );
 	}
 }
 

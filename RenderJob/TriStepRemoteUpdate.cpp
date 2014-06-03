@@ -128,7 +128,7 @@ TriStepRemoteUpdate::~TriStepRemoteUpdate(void)
 	}
 }
 
-TriStepResult TriStepRemoteUpdate::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRemoteUpdate::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	// Lock and read
 	if( m_sharedMemory != NULL )

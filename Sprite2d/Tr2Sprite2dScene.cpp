@@ -185,9 +185,12 @@ Tr2Sprite2dScene::~Tr2Sprite2dScene()
 	m_clipStack = NULL;
 }
 
-void Tr2Sprite2dScene::Update( Be::Time time )
+void Tr2Sprite2dScene::Update( Be::Time realTime, Be::Time simTime )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
+
+	m_realTime = realTime;
+	m_simTime = simTime;
 
 	if( !m_display )
 	{
@@ -203,7 +206,7 @@ void Tr2Sprite2dScene::Update( Be::Time time )
 
 	for( TriCurveSetVector::const_iterator it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 	{
-		(*it)->Update( TimeAsDouble( time ) );
+		(*it)->Update( realTime, simTime );
 	}
 
 	if( m_clearFinishedCurveSets )
@@ -1904,7 +1907,7 @@ void Tr2Sprite2dScene::RunJobHelper( TriRenderJob* job )
 	Tr2Renderer::PopDepthStencilBuffer( renderContext );
 
 	Tr2Renderer::PushViewport();
-	job->Run( BeOS->GetCurrentFrameTime() );
+	job->Run( m_realTime, m_simTime );
 	Tr2Renderer::PopViewport();
 
 	Tr2Renderer::PushDepthStencilBuffer( nullDS, renderContext );

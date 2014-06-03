@@ -36,7 +36,7 @@ void TriStepRunComputeShader::py__init__(
 	m_groupDimZ = groupDimZ;
 }
 
-TriStepResult TriStepRunComputeShader::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRunComputeShader::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	CCP_STATS_INC( rsRunComputeShaderCount );

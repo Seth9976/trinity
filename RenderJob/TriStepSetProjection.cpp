@@ -16,7 +16,7 @@ void TriStepSetProjection::SetProjection( TriProjection* projection )
 	m_projection = projection;
 }
 
-TriStepResult TriStepSetProjection::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetProjection::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_projection )
 	{

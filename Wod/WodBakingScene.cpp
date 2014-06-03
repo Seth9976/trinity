@@ -137,12 +137,12 @@ void WodBakingScene::RenderDebugInfo( Tr2RenderContext& renderContext )
 {
 }
 
-void WodBakingScene::Update(Be::Time time)
+void WodBakingScene::Update( Be::Time realTime, Be::Time simTime )
 {
 	if( m_skinnedObject )
 	{
-		m_skinnedObject->PrePhysicsUpdate( time );
-		m_skinnedObject->PostPhysicsUpdate( time, NULL );
+		m_skinnedObject->PrePhysicsUpdate( simTime );
+		m_skinnedObject->PostPhysicsUpdate( simTime, NULL );
 	}
 }
 

@@ -11,7 +11,7 @@ BLUE_CLASS( TriStepPopViewTransform ) : public TriRenderStep
 public:
 	EXPOSE_TO_BLUE();
 	
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 };
 
 TYPEDEF_BLUECLASS( TriStepPopViewTransform );

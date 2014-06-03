@@ -67,7 +67,7 @@ TriStepResult TriStepRenderTexture::ClearIfFail( bool result, Tr2RenderContext& 
 	return RS_OK;
 }
 
-TriStepResult TriStepRenderTexture::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderTexture::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_renderTarget )
 	{

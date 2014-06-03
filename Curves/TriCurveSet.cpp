@@ -29,9 +29,9 @@ TriCurveSet::~TriCurveSet()
 	}
 }
 
-void TriCurveSet::Update( Be::Time time )
+void TriCurveSet::Update(  Be::Time realTime, Be::Time simTime  )
 {
-	Update(TimeAsDouble( time ));
+	Update(TimeAsDouble( simTime ));
 }
 
 
@@ -177,5 +177,5 @@ bool TriCurveSet::IsPlaying()
 
 void TriCurveSet::UpdateWithCurrentTime()
 {
-	Update( BeOS->GetCurrentFrameTime() );
+	Update( double(BeOS->GetCurrentFrameTime()) );
 }

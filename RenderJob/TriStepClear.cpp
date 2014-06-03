@@ -17,7 +17,7 @@ TriStepClear::~TriStepClear(void)
 {
 }
 
-TriStepResult TriStepClear::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepClear::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	unsigned int flags = 0;
 

@@ -170,7 +170,8 @@ void Tr2RenderJobs::RunJobs( uint32_t affinity )
 			( rj->GetThreadAffinity() % (m_threads.size()+1) ) == affinity )
 		{
 			TriRenderJobStatus status = 
-								rj->Run(	m_time,
+								rj->Run(	m_realTime,
+											m_simTime,
 											affinity	? m_threads[affinity-1].m_renderContext
 														: &static_cast<Tr2RenderContext&>( Tr2RenderContext_GetMainThreadRenderContext() )
 								);
@@ -188,7 +189,7 @@ void Tr2RenderJobs::RunJobs( uint32_t affinity )
 
 #endif
 
-void Tr2RenderJobs::Run( Be::Time time )
+void Tr2RenderJobs::Run( Be::Time realTime, Be::Time simTime )
 {
 	CCP_STATS_SCOPED_TIME( deviceRenderJobs );
 	CCP_STATS_SET( deviceChainedRenderJobsCount, m_scheduledChained.size() );
@@ -204,7 +205,8 @@ void Tr2RenderJobs::Run( Be::Time time )
 	m_copyOfJobs.insert( m_copyOfJobs.end(), m_scheduledRecurring.begin(), m_scheduledRecurring.end() );	
 	ON_BLOCK_EXIT( [&]{ m_copyOfJobs.clear(); } );
 
-	m_time = time;
+	m_realTime = realTime;
+	m_simTime = simTime;
 	
 #ifdef _WIN32
 	KickAllThreads();
@@ -218,7 +220,7 @@ void Tr2RenderJobs::Run( Be::Time time )
 	for( auto it = m_copyOfJobs.cbegin(); it != m_copyOfJobs.cend(); ++it )
 	{
 		TriRenderJob* rj = *it;
-		TriRenderJobStatus status = rj->Run( time );
+		TriRenderJobStatus status = rj->Run( realTime, simTime );
         CCP_ASSERT( status != RJ_FAILED );
 	}
 #endif
@@ -232,7 +234,7 @@ void Tr2RenderJobs::Run( Be::Time time )
 	for( auto it = m_copyOfJobs.cbegin(); it != m_copyOfJobs.cend(); ++it )
 	{
 		TriRenderJob* rj = *it;
-		TriRenderJobStatus status = rj->Run( time );
+		TriRenderJobStatus status = rj->Run( realTime, simTime );
 		if( status == RJ_IN_PROGRESS )
 		{
 			continuedJobs.Insert( -1, rj );
@@ -255,7 +257,7 @@ void Tr2RenderJobs::Run( Be::Time time )
 	for( auto it = m_copyOfJobs.cbegin(); it != m_copyOfJobs.cend(); ++it )
 	{
 		TriRenderJob* rj = *it;
-		TriRenderJobStatus status = rj->Run( time );
+		TriRenderJobStatus status = rj->Run( realTime, simTime );
 		if( status == RJ_IN_PROGRESS )
 		{
 			for( ; it != m_copyOfJobs.cend(); ++it )
@@ -276,14 +278,14 @@ void Tr2RenderJobs::Run( Be::Time time )
 	continuedJobs.Remove( -1 );
 }
 
-void Tr2RenderJobs::RunUpdate( Be::Time time )
+void Tr2RenderJobs::RunUpdate( Be::Time realTime, Be::Time simTime )
 {
 	m_copyOfJobs.insert( m_copyOfJobs.end(), m_updateRecurring.begin(), m_updateRecurring.end() );	
 	ON_BLOCK_EXIT( [&]{ m_copyOfJobs.clear(); } );
 	for( auto it = m_copyOfJobs.cbegin(); it != m_copyOfJobs.cend(); ++it )
 	{
 		TriRenderJob* rj = *it;
-		TriRenderJobStatus status = rj->Run( time );
+		TriRenderJobStatus status = rj->Run( realTime, simTime );
         CCP_ASSERT( status != RJ_FAILED );
 	}
 }

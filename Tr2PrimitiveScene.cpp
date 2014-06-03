@@ -109,7 +109,7 @@ void Tr2PrimitiveScene::RenderDebugInfo( Tr2RenderContext& renderContext )
 // Description:
 //   Implements ITr2Scene::Update. Nothing to do here.
 // --------------------------------------------------------------------------------------
-void Tr2PrimitiveScene::Update( Be::Time time )
+void Tr2PrimitiveScene::Update( Be::Time realTime, Be::Time simTime )
 {
 }
 

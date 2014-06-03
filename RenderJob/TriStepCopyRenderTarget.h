@@ -22,7 +22,7 @@ public:
 	
 	TriStepCopyRenderTarget( IRoot* lockobj = 0 );
 	
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 private:
 #if BLUE_WITH_PYTHON

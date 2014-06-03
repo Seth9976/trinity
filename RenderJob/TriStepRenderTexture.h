@@ -20,7 +20,7 @@ public:
 	~TriStepRenderTexture(void);
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	void SetTexture( ID3DTexture* tex );
 	void SetTexture( Tr2AtlasTexture* tex );

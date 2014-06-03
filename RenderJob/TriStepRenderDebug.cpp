@@ -50,7 +50,7 @@ void TriStepRenderDebug::SubmitGeometry( Tr2RenderContext& renderContext )
 
 Vector4 ColorToVec4( uint32_t color );
 
-TriStepResult TriStepRenderDebug::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderDebug::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	// Render point clouds
 	renderContext.m_esm.ApplyVertexDeclaration( g_debugResourceHelper.GetVertexPosColorDecl() );

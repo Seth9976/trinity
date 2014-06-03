@@ -26,7 +26,7 @@ TriStepEnableWireframeMode::~TriStepEnableWireframeMode(void)
 // Return value:
 //   RS_OK always.
 // -------------------------------------------------------------
-TriStepResult TriStepEnableWireframeMode::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepEnableWireframeMode::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	renderContext.m_esm.SetWireframeRendering( m_enableWireframe );
 	return RS_OK;

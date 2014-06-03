@@ -551,11 +551,11 @@ void Tr2InteriorScene::SetVisualizationMode( int visualizationMode )
 	SetVisualizeMethod();
 }
 
-void Tr2InteriorScene::Update( Be::Time time )
+void Tr2InteriorScene::Update( Be::Time realTime, Be::Time simTime )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	if( time == m_lastUpdateTime)
+	if( simTime == m_lastUpdateTime)
 		// NB: Multiple calls on the same 'frame' should be ignored,
 		//     but are not strictly errors, according to Dan Speed.
 		return;
@@ -570,10 +570,10 @@ void Tr2InteriorScene::Update( Be::Time time )
 
 	if( m_apexScene )
 	{
-		m_apexScene->PreUpdate( time, m_apexLODResourceBudget, m_apexLODResourceBudgetConsumed );
+		m_apexScene->PreUpdate( simTime, m_apexLODResourceBudget, m_apexLODResourceBudgetConsumed );
 	}
 
-	m_lastUpdateTime = time;
+	m_lastUpdateTime = simTime;
 
 	Vector3 dir( XMVectorMultiply(
 		XMVector3Normalize( m_sunDirection ),
@@ -587,14 +587,14 @@ void Tr2InteriorScene::Update( Be::Time time )
 
 	if( m_ragdollScene != NULL )
     {
-		m_ragdollScene->PrePhysics( time );
+		m_ragdollScene->PrePhysics( simTime );
 	}
 
 	{
 		CCP_STATS_ZONE( "UpdateCurves" );
 		for( TriCurveSetVector::const_iterator it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 		{
-			( *it )->Update( TimeAsDouble( time ) );
+			( *it )->Update( realTime, simTime );
 		}
 	}
 
@@ -678,7 +678,7 @@ void Tr2InteriorScene::Update( Be::Time time )
 		// since everything in the scene is in a cell, this ::Update spreads to all renderables
 		for( Tr2InteriorCellVector::iterator it = m_cells.begin(); it != m_cells.end(); ++it )
 		{
-			( *it )->Update( time, m_enlightenVisibilityUpdateThreshold );
+			( *it )->Update( simTime, m_enlightenVisibilityUpdateThreshold );
 		}
 	}
 
@@ -689,7 +689,7 @@ void Tr2InteriorScene::Update( Be::Time time )
 		// when a skinned object is intersecting multiple cells (e.g. crossing a portal)
 		for( PITr2InteriorDynamicVector::iterator it = m_dynamics.begin(); it != m_dynamics.end(); ++it )
 		{
-			( *it )->PrePhysicsUpdate( time );
+			( *it )->PrePhysicsUpdate( simTime );
 		}
 	}
 
@@ -711,7 +711,7 @@ void Tr2InteriorScene::Update( Be::Time time )
 		// when a skinned object is intersecting multiple cells (e.g. crossing a portal)
 		for( PITr2InteriorDynamicVector::iterator it = m_dynamics.begin(); it != m_dynamics.end(); ++it )
 		{
-			( *it )->PostPhysicsUpdate( time, m_apexScene );
+			( *it )->PostPhysicsUpdate( simTime, m_apexScene );
 		}
 	}
 
@@ -719,7 +719,7 @@ void Tr2InteriorScene::Update( Be::Time time )
 		CCP_STATS_ZONE( "Update" );
 		for( PITr2InteriorLightVector::iterator it = m_lights.begin(); it != m_lights.end(); ++it )
 		{
-			( *it )->Update( time );
+			( *it )->Update( simTime );
 		}
 	}
 
@@ -730,7 +730,7 @@ void Tr2InteriorScene::Update( Be::Time time )
 
 	if( m_apexScene )
 	{
-		m_apexScene->PostUpdate( time, m_apexLODResourceBudget, m_apexLODResourceBudgetConsumed );
+		m_apexScene->PostUpdate( simTime, m_apexLODResourceBudget, m_apexLODResourceBudgetConsumed );
 	}
 }
 

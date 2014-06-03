@@ -46,7 +46,7 @@ void TriStepRenderCubeMap::py__init__( TriTextureRes* tex )
 	m_texture = tex;
 }
 
-TriStepResult TriStepRenderCubeMap::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderCubeMap::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_texture && m_texture->GetTexture() && m_texture->GetType() == Tr2RenderContextEnum::TEX_TYPE_CUBE )
 	{

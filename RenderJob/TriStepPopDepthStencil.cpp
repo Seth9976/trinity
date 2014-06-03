@@ -11,7 +11,7 @@ TriStepPopDepthStencil::~TriStepPopDepthStencil(void)
 {
 }
 
-TriStepResult TriStepPopDepthStencil::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepPopDepthStencil::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	Tr2Renderer::PopDepthStencilBuffer( renderContext );
 	return RS_OK;

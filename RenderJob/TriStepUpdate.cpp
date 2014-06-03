@@ -14,11 +14,11 @@ void TriStepUpdate::SetUpdateable( ITr2Updateable* obj )
 	m_object = obj;
 }
 
-TriStepResult TriStepUpdate::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepUpdate::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_object )
 	{
-		m_object->Update( time );
+		m_object->Update( realTime, simTime );
 	}
 	return RS_OK;
 }

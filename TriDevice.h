@@ -85,7 +85,7 @@ public:
 
 	int mTickInterval;
 
-	void Update( Be::Time time );
+	void Update( Be::Time realTime, Be::Time simTime );
 
 	bool Render();
 
@@ -220,7 +220,8 @@ public:
 	TriDevice(IRoot* lockobj = NULL);
 	~TriDevice();
 
-	Be::Time mTime;
+	Be::Time m_realTime;
+	Be::Time m_simTime;
 
 	unsigned int CreateScreenVertexDecl();
 
@@ -284,7 +285,7 @@ private:
 	bool ResetDevice( unsigned adapter, const Tr2PresentParametersAL* pp );
 	bool DoLowLevelDeviceReset( const Tr2PresentParametersAL& );
 
-	void HandleRenderTick(Be::Time timestamp);
+	void HandleRenderTick( Be::Time realTime, Be::Time simTime );
 
 	void DeviceLost();
 

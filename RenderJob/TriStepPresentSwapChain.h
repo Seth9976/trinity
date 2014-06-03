@@ -15,7 +15,7 @@ public:
     TriStepPresentSwapChain( IRoot* lockobj = NULL );
 
 	//IRenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	void py__init__( Tr2SwapChain* sc );
 

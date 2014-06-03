@@ -8,7 +8,7 @@ TriStepCopyRenderTarget::TriStepCopyRenderTarget( IRoot* lockobj )
 {
 }
 
-TriStepResult TriStepCopyRenderTarget::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepCopyRenderTarget::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( ( !m_destinationRT && !m_destinationTexture ) || !m_sourceRT )
 	{

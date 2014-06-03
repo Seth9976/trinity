@@ -22,8 +22,8 @@ public:
 	Tr2RenderJobs( IRoot* lockobj = 0 );
 	~Tr2RenderJobs();
 	
-	void Run( Be::Time time );
-	void RunUpdate( Be::Time time );
+	void Run( Be::Time realTime, Be::Time simTime );
+	void RunUpdate( Be::Time realTime, Be::Time simTime );
 
 #ifdef _WIN32
 	void		SetThreadPoolSize( uint32_t	poolSize );
@@ -39,7 +39,8 @@ private:
 	// Used to run the jobs:
 	typedef std::vector<TriRenderJobPtr>	RenderJobVector;
 	RenderJobVector m_copyOfJobs;  // we need to copy jobs because lists can change when executed
-	Be::Time		m_time;
+	Be::Time		m_simTime;
+	Be::Time		m_realTime;
 	bool			m_stop;
 
 	void	RunJobs( uint32_t affinity );

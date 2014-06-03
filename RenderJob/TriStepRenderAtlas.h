@@ -22,7 +22,7 @@ public:
 	void py__init__( Tr2TextureAtlas* atlas, Tr2AtlasTexture* texture );
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	// Python __init__ constructor
 	void SetAtlas( Tr2TextureAtlas *atlas );

@@ -13,7 +13,7 @@ TriStepSetDepthStencil::~TriStepSetDepthStencil(void)
 {
 }
 
-TriStepResult TriStepSetDepthStencil::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetDepthStencil::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_depthStencil )
 	{

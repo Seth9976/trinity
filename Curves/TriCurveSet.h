@@ -24,7 +24,7 @@ public:
 	~TriCurveSet();
 
 	void Update( double time );
-	void Update( Be::Time time );
+	void Update( Be::Time realTime, Be::Time simTime );
 
 	void Play();
 	void Stop();

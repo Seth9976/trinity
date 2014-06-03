@@ -22,7 +22,7 @@ TriStepRenderFps::~TriStepRenderFps(void)
 }
 
 
-TriStepResult TriStepRenderFps::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderFps::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	// these values are static for this implementation, but it should be considered 
 	// to change this in a follwing sprint

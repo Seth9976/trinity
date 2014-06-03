@@ -15,7 +15,7 @@ void TriStepRenderScene::py__init__( ITr2Scene* scene )
 	m_scene = scene;
 }
 
-TriStepResult TriStepRenderScene::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderScene::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_scene )
 	{

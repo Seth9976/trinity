@@ -105,7 +105,7 @@ void TriDevice::UpdateCursor()
 #endif
 }
 
-void TriDevice::HandleRenderTick( Be::Time timestamp )
+void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 
@@ -166,7 +166,7 @@ void TriDevice::HandleRenderTick( Be::Time timestamp )
 
 	if( m_renderJobs )
 	{
-		m_renderJobs->RunUpdate( timestamp );
+		m_renderJobs->RunUpdate( realTime, simTime );
 	}
 	
 	// Present the backbuffer from the last renderering to the front buffer.

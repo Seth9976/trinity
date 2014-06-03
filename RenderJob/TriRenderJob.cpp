@@ -55,7 +55,7 @@ uint32_t TriRenderJob::GetThreadAffinity() const
 	return m_threadAffinity;
 }
 
-TriRenderJobStatus TriRenderJob::Run( Be::Time time, Tr2RenderContext *renderContextPtr )
+TriRenderJobStatus TriRenderJob::Run( Be::Time realTime, Be::Time simTime, Tr2RenderContext *renderContextPtr )
 {
 	D3DPERF_EVENT1( L"TriRenderJob::%S", CA2W(m_name.c_str()) );
 
@@ -94,7 +94,7 @@ TriRenderJobStatus TriRenderJob::Run( Be::Time time, Tr2RenderContext *renderCon
 	{
 		if( copyOfSteps[m_currentStep] && copyOfSteps[m_currentStep]->IsEnabled() )
 		{
-			result = copyOfSteps[m_currentStep]->Execute( time, renderContext );
+			result = copyOfSteps[m_currentStep]->Execute( realTime, simTime, renderContext );
 
 			// We almost never want a job that leaves the renderTarget/depthStencil stack in a changed state.
 			if( m_stackGuard )

@@ -233,7 +233,7 @@ bool EveSpaceScene::OnPrepareResources()
 	return true;
 }
 
-void EveSpaceScene::Update( Be::Time time )
+void EveSpaceScene::Update( Be::Time realTime, Be::Time simTime )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -242,7 +242,7 @@ void EveSpaceScene::Update( Be::Time time )
 		return;
 	}
 
-	m_updateContext.SetTime(time);
+	m_updateContext.SetTime(simTime);
 
 	{
 		EveTransformVector::const_iterator it;
@@ -260,7 +260,7 @@ void EveSpaceScene::Update( Be::Time time )
 
 	if( m_dustfieldConstaint )
 	{
-		m_dustfieldConstaint->Update( time, m_ballpark );
+		m_dustfieldConstaint->Update( simTime, m_ballpark );
 	}
 
 	if( m_dustfield )
@@ -270,7 +270,7 @@ void EveSpaceScene::Update( Be::Time time )
 
 	if( m_starfield )
 	{
-		m_starfield->Update( time );
+		m_starfield->Update( simTime );
 	}
 
 	// Update planets
@@ -279,13 +279,13 @@ void EveSpaceScene::Update( Be::Time time )
 	// Update lensflares
 	for( EveLensflareVector::const_iterator it = m_lensflares.begin(); it != m_lensflares.end(); ++it )
 	{
-		(*it)->Update( time );
+		(*it)->Update( realTime, simTime );
 	}
 
 	// Update all space objects
 	for( TriCurveSetVector::const_iterator it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 	{
-		(*it)->Update( TimeAsDouble( time ) );
+		(*it)->Update( realTime, simTime );
 	}
 
 	{
@@ -309,7 +309,7 @@ void EveSpaceScene::Update( Be::Time time )
 	{
 		Vector3 sunDirection;
 
-		m_sunBall->Update( &sunDirection, time );
+		m_sunBall->Update( &sunDirection, simTime );
 		D3DXVec3Normalize( &sunDirection, &sunDirection );
 		m_sunData.DirWorld = -sunDirection;
 	}
@@ -322,17 +322,17 @@ void EveSpaceScene::Update( Be::Time time )
 		IEveReferencePointPtr refObject( m_ballpark );
 		if( refObject )
 		{
-			refObject->GetReferencePoint( &sceneReferencePoint, time );
+			refObject->GetReferencePoint( &sceneReferencePoint, simTime );
 		}
 	}
 
-	Tr2ParticleSystem::UpdateAllSystems( time );
+	Tr2ParticleSystem::UpdateAllSystems( simTime );
 	
 	//GPU particles need to perform rendering calls in order to update,
 	// but we set some state here needed to allow 'global' particle behaviour
 	UpdateEgoPosition( sceneReferencePoint.x, sceneReferencePoint.y, sceneReferencePoint.z );
 
-	m_updateTime = time;
+	m_updateTime = simTime;
 }
 
 static bool GetShadowReceiverBounds( 

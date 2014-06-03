@@ -11,7 +11,7 @@ TriStepRunJob::~TriStepRunJob(void)
 {
 }
 
-TriStepResult TriStepRunJob::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRunJob::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( m_name.c_str() );
 
@@ -20,7 +20,7 @@ TriStepResult TriStepRunJob::Execute( Be::Time time, Tr2RenderContext& renderCon
 		return RS_OK;
 	}
 
-	TriRenderJobStatus status = m_job->Run( time );
+	TriRenderJobStatus status = m_job->Run( realTime, simTime );
 
 	switch( status )
 	{

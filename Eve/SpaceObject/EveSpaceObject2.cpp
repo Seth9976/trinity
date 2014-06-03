@@ -330,12 +330,12 @@ void EveSpaceObject2::UpdateAsyncronous( EveUpdateContext& updateContext )
 			m_lastCurveUpdateTime = time;
 			for( TriCurveSetVector::const_iterator it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 			{
-				(*it)->Update( TimeAsDouble( time ) );
+				(*it)->Update( time, time );
 			}
 
 			for( auto it = m_overlayEffects.begin(); it != m_overlayEffects.end(); ++it )
 			{
-				(*it)->Update( time );
+				(*it)->Update( time, time );
 			}
 		}
 	}
@@ -2070,7 +2070,7 @@ void EveSpaceObject2::UpdateCurveSet( const std::string& name, Be::Time time )
 	{
 		if( (*it)->GetName() == name )
 		{
-			(*it)->Update( time );
+			(*it)->Update( time, time );
 		}
 	}
 }

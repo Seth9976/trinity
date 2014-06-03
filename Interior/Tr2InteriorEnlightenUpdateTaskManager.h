@@ -74,7 +74,7 @@ public:
 	// Waits for completion of all tasks
 	void WaitToComplete();
 	// Fetch results of Enlighten update if they are ready
-	void Update( Be::Time time );
+	void Update( Be::Time realTime, Be::Time simTime );
 private:
 	void UnlockCells();
 

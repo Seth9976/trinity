@@ -2,7 +2,7 @@
 #include "TriStepPushViewTransform.h"
 #include "Tr2Renderer.h"
 
-TriStepResult TriStepPushViewTransform::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepPushViewTransform::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	Tr2Renderer::PushViewTransform();
 	return RS_OK;

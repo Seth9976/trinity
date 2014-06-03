@@ -5,7 +5,7 @@ TriStepPresentSwapChain::TriStepPresentSwapChain( IRoot* lockobj )
 {
 }
 
-TriStepResult TriStepPresentSwapChain::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepPresentSwapChain::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_swapChain )
 	{

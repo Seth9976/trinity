@@ -20,7 +20,7 @@ TriStepSetVariableStore::~TriStepSetVariableStore(void)
 
 }
 
-TriStepResult TriStepSetVariableStore::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetVariableStore::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	switch( m_type )
 	{

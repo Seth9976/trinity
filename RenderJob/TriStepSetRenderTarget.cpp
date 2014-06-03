@@ -20,7 +20,7 @@ void TriStepSetRenderTarget::py__init__( Tr2RenderTarget* renderTarget )
 	m_renderTarget = renderTarget;
 }
 
-TriStepResult TriStepSetRenderTarget::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetRenderTarget::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_renderTarget )
 	{

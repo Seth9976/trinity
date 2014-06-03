@@ -18,7 +18,7 @@ public:
 	void py__init__( Be::Optional<Tr2DepthStencil*> depthStencil );
 
 	//IRenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
 	Tr2DepthStencilPtr	m_depthStencil;
 	bool				m_pushCurrent;

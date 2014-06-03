@@ -45,7 +45,7 @@ void TriStepRenderLineGraph::py__init__(
 	}
 }
 
-TriStepResult TriStepRenderLineGraph::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepRenderLineGraph::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_autoScale )
 	{

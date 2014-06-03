@@ -36,7 +36,7 @@ void TriStepSetVisualizationMode::py__init__( ITr2VisualizationModeRenderer* obj
 // Return value:
 //   RS_OK always.
 // -------------------------------------------------------------
-TriStepResult TriStepSetVisualizationMode::Execute( Be::Time time, Tr2RenderContext& renderContext )
+TriStepResult TriStepSetVisualizationMode::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( m_object )
 	{

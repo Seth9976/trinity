@@ -27,7 +27,7 @@ public:
 	TriStepClearUav( IRoot* lockobj = 0 );
 
 	//RenderStep
-	TriStepResult Execute( Be::Time time, Tr2RenderContext& renderContext );
+	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 private:
 #if BLUE_WITH_PYTHON
 	// Python __init__ constructor
