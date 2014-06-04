@@ -18,7 +18,7 @@
 #include "Eve/IEveTransform.h"
 #include "Vector3d.h"
 #include "Tr2PersistentPerObjectData.h"
-#include "Eve/EveAnimationData.h"
+#include "Eve/Animation/EveAnimationData.h"
 
 // forwards
 BLUE_DECLARE( EveSpaceObject2 );

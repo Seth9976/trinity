@@ -10,7 +10,7 @@
 
 #include "EveMobile.h"
 #include "Eve/EveTurretSet.h"
-#include "Eve/EveLocator2.h"
+#include "Eve/SpaceObject/Utils/EveLocator2.h"
 #include "Eve/EveUpdateContext.h"
 #include "Utilities/ViewDistanceInfo.h"
 

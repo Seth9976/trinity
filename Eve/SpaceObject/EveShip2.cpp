@@ -5,7 +5,7 @@
 #include "EveShip2.h"
 #include "Attachments/EveBoosterSet2.h"
 #include "Eve/EveTurretSet.h"
-#include "Eve/EveLocator2.h"
+#include "Eve/SpaceObject/Utils/EveLocator2.h"
 #include "Curves/TriCurveSet.h"
 #include "Tr2GrannyAnimation.h"
 #include "Eve/EveUpdateContext.h"
