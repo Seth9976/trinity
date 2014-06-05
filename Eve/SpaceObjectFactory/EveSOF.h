@@ -54,7 +54,7 @@ private:
 
 	// helper functions
 	void ModifyTextureResPath( std::string& resPath, const char* name, const EveSOFDataMgr::FactionData* factionData ) const;
-	bool EveSOF::InsertStringStub( std::string& baseString, const char* beforeSubstr, const char* insertStr ) const;
+	bool InsertStringStub( std::string& baseString, const char* beforeSubstr, const char* insertStr ) const;
 	void FillMeshAreaVector( const std::vector<EveSOFDataMgr::HullAreas>* hullAreas, const FactionAreaMap* factionAreas, const EveSOFDataMgr::FactionData* factionData, Tr2MeshAreaVector* meshAreaVector ) const;
 	void ModifyResourcePathsForLOD( const Tr2MeshAreaVector* areas, const char* lodInsert ) const;
 	Tr2MeshPtr CreateMeshLOD( const Tr2Mesh* base, const char* lodInsert ) const;
