@@ -20,7 +20,7 @@ const Be::ClassInfo* Tr2ShaderManager::ExposeToBlue()
 		"shaderLibrary",      
 		m_shaderLibrary,
 		"the list of all high level shaders in use", 
-		Be::READWRITE
+		Be::PERSIST | Be::READWRITE
 	)
 
 	EXPOSURE_END()
