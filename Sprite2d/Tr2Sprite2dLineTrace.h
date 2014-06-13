@@ -73,7 +73,7 @@ private:
 		const Color& toColor, 
 		float capAngleTo);
 	void AddVertex(Tr2Sprite2dVertexBase& v, float xOffset, float yOffset, float halfWidth, bool isAA, float texOffset1, Color color);
-	void Tr2Sprite2dLineTrace::AddRoundJoint(
+	void AddRoundJoint(
 		Tr2Sprite2dScene* renderer,
 		float capAngleTo, 
 		Tr2Sprite2dVertexBase v2, 
