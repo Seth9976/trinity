@@ -237,6 +237,10 @@ void Tr2Effect::AddParameterColor( const char* name, const Color* value )
 // ---------------------------------------------------------------
 void Tr2Effect::RebuildCachedDataInternal()
 {
+	if( m_insideStartUpdate )
+	{
+		return;
+	}
 	m_parameterHash = INVALID_PARAMETER_HASH;
 
 	if( m_effectResource )

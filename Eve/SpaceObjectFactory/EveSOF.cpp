@@ -261,18 +261,7 @@ void EveSOF::FillMeshAreaVector( const std::vector<EveSOFDataMgr::HullAreas>* hu
 			{
 				skinnedName.insert( pos + 1, insertString );
 			}
-			// To Steve/Pall: Leaving this comment here. Why not just save the full shader path
-			// with skinned rathere than going through all this file checking and
-			// name mangling. Doing it like this for now to unblock artists. 
-			//  - Logi
-			if( FileExists( skinnedName ) )
-			{
-				newShader->SetEffectPathName( skinnedName.c_str() );
-			}
-			else
-			{
-				newShader->SetEffectPathName( area->shaderPath.c_str() );
-			}
+			newShader->SetEffectPathName( skinnedName.c_str() );
 		}
 		else
 		{
@@ -355,6 +344,7 @@ bool EveSOF::InsertStringStub( std::string& baseString, const char* beforeSubstr
 // --------------------------------------------------------------------------------
 void EveSOF::ModifyResourcePathsForLOD( const Tr2MeshAreaVector* areas, const char* lodInsert ) const
 {
+	const char* name = nullptr;
 	for( auto it = areas->begin(); it != areas->end(); ++it )
 	{
 		Tr2EffectPtr effect; 
@@ -365,12 +355,16 @@ void EveSOF::ModifyResourcePathsForLOD( const Tr2MeshAreaVector* areas, const ch
 		for( auto resIt = effect->m_resources.begin(); resIt != effect->m_resources.end(); ++resIt )
 		{
 			TriTexture2DParameterPtr textureRes;
-			if( (*resIt)->QueryInterface( BlueInterfaceIID<TriTexture2DParameter>(), (void**)&textureRes ) )
+			name = (*resIt)->GetParameterName();
+			if( !strcmp( name, "PgsMap" ) || !strcmp( name, "NormalMap" ) || !strcmp( name, "DiffuseMap" ) || !strcmp( name, "AoMap" ) )
 			{
-				std::string resPathCopy = textureRes->GetResourcePath();
-				if( InsertStringStub( resPathCopy, ".dds", lodInsert ) && FileExists( resPathCopy ) )
+				if( (*resIt)->QueryInterface( BlueInterfaceIID<TriTexture2DParameter>(), (void**)&textureRes ) )
 				{
-					textureRes->SetResourcePath( resPathCopy.c_str() );
+					std::string resPathCopy = textureRes->GetResourcePath();
+					if( InsertStringStub( resPathCopy, ".dds", lodInsert ) )
+					{
+						textureRes->SetResourcePath( resPathCopy.c_str() );
+					}
 				}
 			}
 		}
@@ -390,7 +384,7 @@ Tr2MeshPtr EveSOF::CreateMeshLOD( const Tr2Mesh* base, const char* lodInsert ) c
 	ModifyResourcePathsForLOD( mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT ), lodInsert );
 	
 	std::string path = mesh->GetMeshResPath();
-	if( InsertStringStub( path, ".gr2", lodInsert ) && FileExists( path ) )
+	if( InsertStringStub( path, ".gr2", lodInsert ) )
 	{
 		mesh->SetMeshResPath( path.c_str() );
 	}
@@ -926,14 +920,13 @@ void EveSOF::SetupDecals( EveShip2Ptr ship, const EveSOFDataMgr::HullData* hullD
 		shader.CreateInstance();
 		shader->StartUpdate();
 
-		// shader name is base, but can be overwritten, if provided
-		shader->SetEffectPathName( hdit->shaderPath.c_str() );
-		if( fdd )
+		if( fdd && !fdd->shaderPath.empty() )
 		{
-			if( !fdd->shaderPath.empty() )
-			{
-				shader->SetEffectPathName( fdd->shaderPath.c_str() );
-			}
+			shader->SetEffectPathName( fdd->shaderPath.c_str() );
+		}
+		else
+		{
+			shader->SetEffectPathName( hdit->shaderPath.c_str() );
 		}
 
 		// always set hull parameters & textures for this decal
