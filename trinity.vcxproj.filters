@@ -817,6 +817,9 @@
     <ClInclude Include="Eve\SpaceObjectFactory\EveSOFDataMgr.h">
       <Filter>Source Files\Eve\SpaceObjectFactory</Filter>
     </ClInclude>
+    <ClInclude Include="Eve\SpaceObjectFactory\EveSOFDNA.h">
+      <Filter>Source Files\Eve\SpaceObjectFactory</Filter>
+    </ClInclude>
     <ClInclude Include="Font\Tr2FontManager.h">
       <Filter>Source Files\Font</Filter>
     </ClInclude>
@@ -2669,6 +2672,12 @@
       <Filter>Source Files\Eve\SpaceObjectFactory</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObjectFactory\EveSOFData_Blue.cpp">
+      <Filter>Source Files\Eve\SpaceObjectFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObjectFactory\EveSOFDNA.cpp">
+      <Filter>Source Files\Eve\SpaceObjectFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObjectFactory\EveSOFDNA_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObjectFactory</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObjectFactory\EveSOF_Blue.cpp">
