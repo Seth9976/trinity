@@ -161,7 +161,7 @@ IRootPtr EveSOF::BuildFromDNA( const char* dnaString )
 IRootPtr EveSOF::Build( const char* hullName, const char* factionName, const char* raceName )
 {
 	// make a SOF ship dna string
-	std::string dnaString = std::string( hullName ) + "." + std::string( factionName ) + "." + std::string( raceName );
+	std::string dnaString = std::string( hullName ) + ":" + std::string( factionName ) + ":" + std::string( raceName );
 
 	// pass on to real build function
 	return BuildFromDNA( dnaString.c_str() );
