@@ -48,26 +48,3 @@ const Be::ClassInfo* EveAnimationCommand::ExposeToBlue()
 		MAP_ATTRIBUTE_WITH_CHOOSER( "data", m_data, "", Be::READWRITE | Be::PERSIST, NULL )
     EXPOSURE_END()
 }
-
-BLUE_DEFINE( EveAnimationSequence );
-const Be::ClassInfo* EveAnimationSequence::ExposeToBlue()
-{
-    EXPOSURE_BEGIN( EveAnimationSequence, "" )
-        MAP_INTERFACE( EveAnimationSequence )
-
-		MAP_ATTRIBUTE( "animation", m_animation, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "curves", m_curves, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "commands", m_commands, "", Be::READWRITE | Be::PERSIST )
-    EXPOSURE_END()
-}
-
-
-BLUE_DEFINE( EveTransitionSequence );
-const Be::ClassInfo* EveTransitionSequence::ExposeToBlue()
-{
-    EXPOSURE_BEGIN( EveTransitionSequence, "" )
-        MAP_INTERFACE( EveTransitionSequence )
-
-		MAP_ATTRIBUTE( "transitionState", m_transitionState, "", Be::READWRITE | Be::PERSIST )
-    EXPOSURE_CHAINTO( EveAnimationSequence )
-}

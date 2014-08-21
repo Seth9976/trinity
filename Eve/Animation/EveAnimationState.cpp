@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "EveAnimationState.h"
+#include "EveAnimationSequencer.h"
 #include "Eve/SpaceObject/EveSpaceObject2.h"
 #include "Eve/SpaceObject/EveMobile.h"
 #include "Eve/SpaceObject/EveShip2.h"
@@ -7,21 +8,31 @@
 #include "Tr2GrannyAnimation.h"
 #include "Tr2Renderer.h"
 
+static BlueStructureDefinition EveAnimationStateTransitionStructureDef[] =
+{ 
+	{ "name", Be::SHAREDSTRING_1, 0 },
+	{ "transitionName", Be::SHAREDSTRING_1, 8 }, 
+	{0} 
+};
+
+	
 // --------------------------------------------------------------------------------
 // Description:
 //   Initialize data members
 // --------------------------------------------------------------------------------
 EveAnimationState::EveAnimationState( IRoot* lockobj ) :
+	PARENTLOCK( m_curves ),
+	PARENTLOCK( m_commands ),
+	PARENTLOCK( m_initCommands ),
+	PARENTLOCK( m_initCurves ),
 	PARENTLOCK( m_transitions ),
 	m_progress( EVE_ANIM_INACTIVE ),
-	m_currentSequence( EVE_ANISTAGE_INVALID ),
-	m_transitionName( "" ),
-	m_transitionPending( false ),
-	m_pendingCommands( false ),
-	m_pendingCommandDelay( 0.f ),
 	m_animationDuration( 0.f ),
-	m_startTime( 0.f )
+	m_startTime( 0.f ),
+	m_secondsRemaining( 0.f ),
+	m_doInitialization( false )
 {
+	m_transitions.SetStructureDefinition( EveAnimationStateTransitionStructureDef );
 }
 
 EveAnimationState::~EveAnimationState() 
@@ -30,12 +41,9 @@ EveAnimationState::~EveAnimationState()
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Find the end time of a sequence that is starting. Results stored in
-//   m_animationsDoneAt
-// Arguments:
-//   sequence - The animation sequence that is starting
+//   Update the time when animations/curves are completed for this state.
 // --------------------------------------------------------------------------------
-void EveAnimationState::UpdateSequenceDuration( EveSpaceObject2Ptr owner, const EveAnimationSequencePtr sequence )
+void EveAnimationState::UpdateDuration( EveSpaceObject2Ptr owner )
 {
 	float currentAnimationTime = Tr2Renderer::GetAnimationTime();
 	m_startTime = currentAnimationTime;
@@ -47,174 +55,66 @@ void EveAnimationState::UpdateSequenceDuration( EveSpaceObject2Ptr owner, const 
 	}
 
 	float maxCurveDuration = 0.f;
-	if( sequence )
+	for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
 	{
-		for( auto it = sequence->m_curves.cbegin(); it != sequence->m_curves.cend(); it++ )
-		{
-			maxCurveDuration = max( maxCurveDuration, owner->GetCurveSetDuration( (*it)->m_name ) );
-		}
+		maxCurveDuration = max( maxCurveDuration, owner->GetCurveSetDuration( (*it)->m_name ) );
 	}
-	// NOTE: If a curve takes longer than the animation we get an animation 'jump' unless the animation loops
+
 	m_animationDuration = max( m_animationDuration, maxCurveDuration );
 }
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Starts playing appropriate animation sequences depending on the previous
-//   state.
-// Arguments:
-//   state - the previously completed animation state
+//   Deactivate this state. May take a while to wind down.
 // --------------------------------------------------------------------------------
-void EveAnimationState::TransitionFrom( EveAnimationStatePtr state, EveSpaceObject2Ptr owner )
+void EveAnimationState::Stop( EveSpaceObject2Ptr owner )
 {
-	m_transitionName = "";
-	m_transitionPending = false;
-	m_startTime = 0;
-	m_animationDuration = 0;
+	m_progress = EVE_ANIM_FINALIZING;
+	EndAnimation( owner );
+}
 
-	if( !state )
-	{
-		DoEnterSequence();
-		return;
-	}
+// --------------------------------------------------------------------------------
+// Description:
+//   Start this state.
+// Arguments:
+//   owner - the owning animation sequencer
+//   mode - is it a transition, does it need to run init curves etc.
+// --------------------------------------------------------------------------------
+void EveAnimationState::Start( EveAnimationStateSequencerPtr owner, EveAnimationStateStartCommand mode )
+{
+	m_doInitialization = mode == EVE_ANIM_START_INIT;
 
-	if( state->m_transitionName == m_name && state->HasTransition( m_name ) )
+	m_startTime = Tr2Renderer::GetAnimationTime();
+	m_animationDuration = 0.f;
+
+	if( mode == EVE_ANIM_START_TRANSITION )
 	{
-		// The other state had a transition to this state. Skip the enter sequence.
-		m_currentSequence = EVE_ANISTAGE_ENTER;
-		m_progress = EVE_ANIM_ENTERING;
+		m_progress = EVE_ANIM_FINALIZING;
 	}
 	else
 	{
-		DoEnterSequence();
+		m_progress = EVE_ANIM_RUNNING;
 	}
+
+	PlayAnimation( owner );
+	UpdateDuration( owner->GetOwner() );
 }
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Plays whatever animation sequence is appropriate when going into the state
-//   that's passed in.
+//   Check if this state has a transition sequence for states identified by stateName.
 // Arguments:
-//   state - the state we'll go into after this object has finished transitioning.
-// --------------------------------------------------------------------------------
-void EveAnimationState::TransitionTo( EveAnimationStatePtr state, EveSpaceObject2Ptr owner )
-{
-	m_transitionName = "";
-	m_transitionPending = true;
-	if( !state )
-	{
-		return;
-	}
-	
-	m_transitionName = state->m_name;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Play this state's enter animation sequence.
-// --------------------------------------------------------------------------------
-void EveAnimationState::DoEnterSequence()
-{
-	m_progress = EVE_ANIM_ENTERING;
-	m_currentSequence = EVE_ANISTAGE_INVALID;
-
-	if( !GetAnimationSequence( EVE_ANISTAGE_ENTER ) )
-	{
-		m_startTime = Tr2Renderer::GetAnimationTime();
-		m_animationDuration = 0.f;
-	}
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Play this state's main animation sequence.
-// --------------------------------------------------------------------------------
-void EveAnimationState::DoMainSequence()
-{
-	m_progress = EVE_ANIM_RUNNING;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Play this state's exit animation sequence.
-// --------------------------------------------------------------------------------
-void EveAnimationState::DoExitSequence()
-{
-	m_progress = EVE_ANIM_EXITING;
-
-	if( !GetAnimationSequence( EVE_ANISTAGE_EXIT ) )
-	{
-		m_progress = EVE_ANIM_DONE;
-		return;
-	}
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Play this state's transition animation sequence appropriate for the stateID
-//   that's passed in.
-// Arguments:
-//   stateID - id of the state we should transition into.
-// --------------------------------------------------------------------------------
-void EveAnimationState::DoTransitionSequence( std::string stateName )
-{
-	m_progress = EVE_ANIM_TRANSITIONING;
-	m_transitionName = stateName;
-
-	EveTransitionSequencePtr transition = GetTransition( stateName );
-	if( !transition )
-	{
-		m_progress = EVE_ANIM_DONE;
-		return;
-	}
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Get animation sequence for the specified stage.
-// Arguments:
-//   stage - desired animation stage
+//   stateName - The name of the state we'd transition into
 // Returns:
-//   the animation sequence for the specified stage, can be nullptr.
+//   name of transition state or nullptr
 // --------------------------------------------------------------------------------
-EveAnimationSequencePtr EveAnimationState::GetAnimationSequence( EveAnimationStage stage )
+const char* EveAnimationState::GetTransition( const std::string& stateName ) const
 {
-	EveAnimationSequencePtr sequence;
-	switch( stage )
+	for( auto it = m_transitions.begin(); it != m_transitions.end(); it++ )
 	{
-	case EVE_ANISTAGE_ENTER:
-		sequence = m_enterSequence;
-		break;
-	case EVE_ANISTAGE_MAIN:
-		sequence = m_mainSequence;
-		break;
-	case EVE_ANISTAGE_EXIT:
-		sequence = m_exitSequence;
-		break;
-	case EVE_ANISTAGE_TRANSITION:
-		sequence = GetTransition( m_transitionName );
-		break;
-	default:
-		break;
-	};
-	return sequence;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Get transition sequence into the desired state.
-// Arguments:
-//   stateName - name of the state that we want to get a transition sequence for
-// Returns:
-//   Transition sequence into stateName if it exists or nullptr otherwise.
-// --------------------------------------------------------------------------------
-EveTransitionSequencePtr EveAnimationState::GetTransition( std::string stateName )
-{
-	for( auto it = m_transitions.cbegin(); it != m_transitions.cend(); it++ )
-	{
-		if( (*it)->m_transitionState == stateName )
+		if( stateName == it->name.c_str() )
 		{
-			return *it;
+			return it->transitionName.c_str();
 		}
 	}
 	return nullptr;
@@ -222,29 +122,18 @@ EveTransitionSequencePtr EveAnimationState::GetTransition( std::string stateName
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Check if this state has a transition sequence for states identified by id.
-// Arguments:
-//   id - The id of the state we'd transition into
-// Returns:
-//   boolean indicating weather this state has a transition into the id state.
-// --------------------------------------------------------------------------------
-bool EveAnimationState::HasTransition( std::string stateName )
-{
-	return GetTransition( stateName );
-}
-
-// --------------------------------------------------------------------------------
-// Description:
 //   Play curves in the animation sequence
 // --------------------------------------------------------------------------------
-void EveAnimationState::DoAnimationSequenceCurves( EveSpaceObject2Ptr owner, EveAnimationSequencePtr sequence )
+void EveAnimationState::PlayCurves( EveSpaceObject2Ptr owner )
 {
-	if( !sequence )
-	{
-		return;
+	if( m_doInitialization )
+	{	
+		for( auto it = m_initCurves.cbegin(); it != m_initCurves.cend(); it++ )
+		{
+			owner->PlayCurveSet( (*it)->m_name );
+		}
 	}
-
-	for( auto it = sequence->m_curves.cbegin(); it != sequence->m_curves.cend(); it++ )
+	for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
 	{
 		owner->PlayCurveSet( (*it)->m_name );
 	}
@@ -254,14 +143,17 @@ void EveAnimationState::DoAnimationSequenceCurves( EveSpaceObject2Ptr owner, Eve
 // Description:
 //   Play commands in the animation sequence
 // --------------------------------------------------------------------------------
-void EveAnimationState::DoAnimationSequenceCommands( EveSpaceObject2Ptr owner, EveAnimationSequencePtr sequence )
+void EveAnimationState::ExecuteCommands( EveSpaceObject2Ptr owner )
 {
-	if( !sequence )
+	if( m_doInitialization )
 	{
-		return;
+		for( auto it = m_initCommands.cbegin(); it != m_initCommands.cend(); it++ )
+		{
+			owner->ExecuteAnimationStateCommand( (*it)->m_command, (*it)->m_data );
+		}
 	}
 	
-	for( auto it = sequence->m_commands.cbegin(); it != sequence->m_commands.cend(); it++ )
+	for( auto it = m_commands.cbegin(); it != m_commands.cend(); it++ )
 	{
 		owner->ExecuteAnimationStateCommand( (*it)->m_command, (*it)->m_data );
 	}
@@ -271,72 +163,40 @@ void EveAnimationState::DoAnimationSequenceCommands( EveSpaceObject2Ptr owner, E
 // Description:
 //   Play animations, commands and curves in the animation sequence
 // --------------------------------------------------------------------------------
-void EveAnimationState::DoAnimationSequence( EveSpaceObject2Ptr owner, EveAnimationSequencePtr sequence )
+void EveAnimationState::PlayAnimation( EveAnimationStateSequencerPtr owner )
 {
-	if( !sequence )
+	if( m_animation )
 	{
-		return;
-	}
-
-	m_pendingCommands = false;
-	m_pendingCommandDelay = owner->GetAnimationController()->GetAnimationChainCompleteTime() - Tr2Renderer::GetAnimationTime();
-	if( m_pendingCommandDelay > 0.f )
-	{
-		m_pendingCommands = true;
-	}
-	
-	// granny animation
-	if( sequence->m_animation )
-	{
-		EveAnimationPtr anim = sequence->m_animation;
-		owner->GetAnimationController()->PlayAnimation( anim->m_name.c_str(), false, anim->m_loops, anim->m_delay, anim->m_speed, false );
-	}
-
-	if( m_pendingCommands )
-	{
-		return;
-	}
-
-	DoAnimationSequenceCurves( owner, sequence );
-	DoAnimationSequenceCommands( owner, sequence );
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Start the sequence specified, update end time etc.
-// --------------------------------------------------------------------------------
-void EveAnimationState::PlaySequence( EveSpaceObject2Ptr owner, EveAnimationStage type )
-{
-	EveAnimationSequencePtr sequence = GetAnimationSequence( type );
-	DoAnimationSequence( owner, sequence );
-	UpdateSequenceDuration( owner, sequence );
-	m_currentSequence = type;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Stop sthe current sequence stage.
-// --------------------------------------------------------------------------------
-void EveAnimationState::StopCurrentSequence( EveSpaceObject2Ptr owner, Be::Time time )
-{
-	EveAnimationSequencePtr sequence;
-	if( m_currentSequence == EVE_ANISTAGE_TRANSITION )
-	{
-		sequence = GetTransition( m_transitionName );
-	}
-	else
-	{
-		sequence = GetAnimationSequence( m_currentSequence );
-	}
-
-	if( sequence )
-	{
-		for( auto it = sequence->m_curves.cbegin(); it != sequence->m_curves.cend(); it++ )
+		auto ac = owner->GetOwner()->GetAnimationController();
+		bool success = ac->PlayAnimation( m_animation->m_name.c_str(), false, m_animation->m_loops, m_animation->m_delay, m_animation->m_speed, false );
+		if( m_progress == EVE_ANIM_RUNNING && !success )
 		{
-			owner->UpdateCurveSet( (*it)->m_name, time );
-			owner->StopCurveSet( (*it)->m_name );
+			ac->PlayAnimation( owner->GetDefaultAnimation(), false, m_animation->m_loops, m_animation->m_delay, m_animation->m_speed, false );
 		}
 	}
+
+	PlayCurves( owner->GetOwner() );
+	ExecuteCommands( owner->GetOwner() );
+}
+
+
+// --------------------------------------------------------------------------------
+// Description:
+//   End current animation.
+// --------------------------------------------------------------------------------
+void EveAnimationState::EndAnimation( EveSpaceObject2Ptr owner )
+{
+	auto ac = owner->GetAnimationController();
+	ac->EndAnimation();
+
+	float currentAnimationTime = Tr2Renderer::GetAnimationTime();
+	float animationDuration = 0;
+	if( ac && ac->IsInitialized() )
+	{
+		m_animationDuration = ac->GetAnimationChainCompleteTime() - currentAnimationTime;
+	}
+
+	m_animationDuration = max( m_animationDuration, animationDuration );
 }
 
 // --------------------------------------------------------------------------------
@@ -348,79 +208,41 @@ void EveAnimationState::Update( Be::Time time, EveSpaceObject2Ptr owner )
 	float animationDelta = Tr2Renderer::GetAnimationTimeElapsed( m_startTime );
 	m_secondsRemaining = m_animationDuration - animationDelta;
 
-	if( m_pendingCommands && ( m_pendingCommandDelay - animationDelta ) <= 0 )
-	{
-		DoAnimationSequenceCurves( owner, GetAnimationSequence( m_currentSequence ) );
-		DoAnimationSequenceCommands( owner, GetAnimationSequence( m_currentSequence ) );
-		m_pendingCommands = false;
-	}
 	if( animationDelta < m_animationDuration )
 	{
 		return;
 	}
-	switch(m_progress)
+
+	if( m_progress == EVE_ANIM_FINALIZING )
 	{
-	case EVE_ANIM_ENTERING:
-		if( m_currentSequence == EVE_ANISTAGE_ENTER )
-		{
-			StopCurrentSequence( owner, time );
-			if( !m_transitionPending )
-			{
-				DoMainSequence();
-				PlaySequence( owner, EVE_ANISTAGE_MAIN );
-			}
-			else if( HasTransition( m_transitionName ) )
-			{
-				DoTransitionSequence( m_transitionName );
-				PlaySequence( owner, EVE_ANISTAGE_TRANSITION );
-			}
-			else
-			{
-				DoExitSequence();
-				PlaySequence( owner, EVE_ANISTAGE_EXIT );
-			}
-		}
-		else
-		{
-			PlaySequence( owner, EVE_ANISTAGE_ENTER );
-		}
-		break;
-	case EVE_ANIM_RUNNING:
-		if( !m_transitionPending )
-		{
-			break;
-		}
-	case EVE_ANIM_TRANSITIONING:
-	case EVE_ANIM_EXITING:
-		if( m_currentSequence == EVE_ANISTAGE_MAIN )
-		{
-			StopCurrentSequence( owner, time );
-			if( HasTransition( m_transitionName ) )
-			{
-				DoTransitionSequence( m_transitionName );
-				PlaySequence( owner, EVE_ANISTAGE_TRANSITION );
-			}
-			else
-			{
-				DoExitSequence();
-				PlaySequence( owner, EVE_ANISTAGE_EXIT );
-			}
-		}
-		else
-		{
-			StopCurrentSequence( owner, time );
-			m_progress = EVE_ANIM_DONE;
-			Cleanup();
-		}
-		break;
-	default:
-		break;
-	};
+		m_progress = EVE_ANIM_DONE;
+		Cleanup( owner, time );
+	}
 }
 
-void EveAnimationState::Cleanup()
+// --------------------------------------------------------------------------------
+// Description:
+//   Stop animations/curves associated with this state.
+// --------------------------------------------------------------------------------
+void EveAnimationState::Cleanup( EveSpaceObject2Ptr owner, Be::Time time )
 {
-	m_currentSequence = EVE_ANISTAGE_INVALID;
+	for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
+	{
+		owner->UpdateCurveSet( (*it)->m_name, time );
+		owner->StopCurveSet( (*it)->m_name );
+	}
+	if( m_doInitialization )
+	{
+		for( auto it = m_initCurves.cbegin(); it != m_initCurves.cend(); it++ )
+		{
+			owner->UpdateCurveSet( (*it)->m_name, time );
+			owner->StopCurveSet( (*it)->m_name );
+		}
+	}
+
+	m_doInitialization = false;
+	m_startTime = 0.f;
+	m_animationDuration = 0.f;
 }
 
 

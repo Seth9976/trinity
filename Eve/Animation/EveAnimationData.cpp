@@ -13,12 +13,3 @@ EveAnimationCurve::EveAnimationCurve( IRoot* lockobj )
 EveAnimationCommand::EveAnimationCommand( IRoot* lockobj ) :
 	m_command( ANIM_CMD_NONE )
 {}
-
-EveAnimationSequence::EveAnimationSequence( IRoot* lockobj ) :
-	PARENTLOCK( m_curves ),
-	PARENTLOCK( m_commands )
-{}
-
-	
-EveTransitionSequence::EveTransitionSequence( IRoot* lockobj )
-{}

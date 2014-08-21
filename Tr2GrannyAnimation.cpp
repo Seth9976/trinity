@@ -455,12 +455,12 @@ float Tr2GrannyAnimation::GetAnimationChainCompleteTime()
 	return m_baseLayer.GetAnimationChainCompleteTime();
 }
 
-void Tr2GrannyAnimation::PostPhysicsAnimation( Be::Time time, const Matrix &modelTransform )
+void Tr2GrannyAnimation::PostPhysicsAnimation( Be::Time time, const Matrix& modelTransform )
 {
 	return;
 }
 
-const std::string * Tr2GrannyAnimation::GetAnimationBoneList( unsigned int &numBones )
+const std::string * Tr2GrannyAnimation::GetAnimationBoneList( unsigned int& numBones ) const
 {
 	numBones = (unsigned int)m_boneList.size();
 	if( numBones )
@@ -589,6 +589,33 @@ void Tr2GrannyAnimation::AddAnimationLayer( const char* layerName )
 		m_compositePose = GrannyNewLocalPose( m_skeleton->BoneCount );
 	}
 	GetAnimationLayer( layerName )->InitializeAnimationLayer( this );
+}
+
+void Tr2GrannyAnimation::AddAnimationLayerWithTrackMask( const char* layerName, const char* trackMask )
+{
+	if( GetAnimationLayer( layerName ) )
+	{
+		GetAnimationLayer( layerName )->ExtractTrackMask( this, trackMask );
+		return;
+	}
+
+	Tr2GrannyAnimationLayer layer;
+	layer.m_name = layerName;
+	layer.ExtractTrackMask( this, trackMask );
+	m_animationLayers[layerName] = layer;
+
+	if( !IsInitialized() )
+	{
+		return;
+	}
+	
+	if( !m_compositePose )
+	{
+		m_compositePose = GrannyNewLocalPose( m_skeleton->BoneCount );
+	}
+	GetAnimationLayer( layerName )->InitializeAnimationLayer( this );
+
+	return;
 }
 
 void Tr2GrannyAnimation::AddAnimationLayerBone( const char* layerName, const char* boneName )

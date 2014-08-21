@@ -30,6 +30,7 @@ public:
 	void SampleAnimation( float animationTime, granny_local_pose* compositePose, granny_local_pose* resultPose );
 	void AddBone( const Tr2GrannyAnimation* grannyAnimation, const char* name );
 	void RemoveBone( const Tr2GrannyAnimation* grannyAnimation, const char* name );
+	void ExtractTrackMask( const Tr2GrannyAnimation* grannyAnimation, const char* name );
 	
 	std::string m_name;
 	
@@ -52,6 +53,8 @@ private:
 
 	int m_boneCount;
 	float m_defaultBoneWeight;
+
+	const char* m_trackMaskName;
 };
 
 #endif //Tr2GrannyAnimationLayer_h

@@ -105,7 +105,8 @@ class EveSpaceObject2 :
     public ITr2Pickable,
 	public ITriTargetable,
 	public IWorldPosition,
-	public ITr2ShLightingReceiver
+	public ITr2ShLightingReceiver,
+	public INotify
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -200,6 +201,10 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IWorldPosition
 	virtual const Vector3* GetWorldPosition();
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// IWorldPosition
+	bool OnModified( Be::Var* value );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// animation controller

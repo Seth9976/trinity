@@ -7,6 +7,13 @@
 #ifndef EveAnimationData_H
 #define EveAnimationData_H
 
+enum EveAnimationStateProgress {
+	EVE_ANIM_INACTIVE = 1,
+	EVE_ANIM_RUNNING = 2,
+	EVE_ANIM_FINALIZING = 4,
+	EVE_ANIM_DONE = 8
+};
+
 enum EveAnimationCmd
 {
 	ANIM_CMD_NONE = 0,
@@ -65,36 +72,6 @@ public:
 };
 TYPEDEF_BLUECLASS( EveAnimationCommand );
 BLUE_DECLARE_VECTOR( EveAnimationCommand );
-
-
-BLUE_CLASS( EveAnimationSequence ) : public IRoot
-{
-public:
-	EveAnimationSequence( IRoot* lockobj = NULL );
-	~EveAnimationSequence() {}
-	
-	EXPOSE_TO_BLUE();
-
-	EveAnimationPtr m_animation;
-	PEveAnimationCurveVector m_curves;
-	PEveAnimationCommandVector m_commands;
-};
-TYPEDEF_BLUECLASS( EveAnimationSequence );
-BLUE_DECLARE_VECTOR( EveAnimationSequence );
-
-
-BLUE_CLASS( EveTransitionSequence ) : public EveAnimationSequence
-{
-public:
-	EveTransitionSequence( IRoot* lockobj = NULL );
-	~EveTransitionSequence() {}
-	
-	EXPOSE_TO_BLUE();
-
-	std::string m_transitionState;
-};
-TYPEDEF_BLUECLASS( EveTransitionSequence );
-BLUE_DECLARE_VECTOR( EveTransitionSequence );
 
 
 #endif

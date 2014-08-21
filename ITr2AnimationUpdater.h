@@ -8,7 +8,7 @@ BLUE_INTERFACE( ITr2AnimationUpdater ) : public IRoot
 	virtual void PostPhysicsAnimation( Be::Time time, const Matrix &modelTransform ) = 0;
 
 	virtual const Matrix* GetAnimationTransforms() = 0;
-	virtual const std::string *GetAnimationBoneList( unsigned int &numBones ) = 0;
+	virtual const std::string *GetAnimationBoneList( unsigned int& numBones ) const = 0;
 };
 
 

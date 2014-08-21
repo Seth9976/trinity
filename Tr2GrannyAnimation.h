@@ -40,6 +40,7 @@ public:
 	void AddAnimationLayer( const char* layerName );
 	void AddAnimationLayerBone( const char* layerName, const char* boneName );
 	void RemoveAnimationLayerBone( const char* layerName, const char* boneName );
+	void AddAnimationLayerWithTrackMask( const char* layerName, const char* trackMask );
 
 	void PlayAnimationOnce( const char* animName );
 	void PlayAnimationEx( const char* animName, int loopCount, float delay, float speed );
@@ -58,7 +59,7 @@ public:
 	void PrePhysicsAnimation( Be::Time time, const Matrix &modelTransform );
 	void PostPhysicsAnimation( Be::Time time, const Matrix &modelTransform );
 	const Matrix* GetAnimationTransforms();
-	const std::string *GetAnimationBoneList( unsigned int &numBones );
+	const std::string *GetAnimationBoneList( unsigned int& numBones ) const;
 
 	//////////////////////////////////////////////////////////////////////////
 	// IAsyncLoadedResNotifyTarget

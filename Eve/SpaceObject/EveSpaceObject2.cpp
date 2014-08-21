@@ -112,7 +112,6 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_transformedImpactDirections = NULL;
 	m_alignedTransformMatrix = (XMMATRIX*)CCP_ALIGNED_MALLOC( "EveSpaceObject2/m_alignedTransformMatrix", sizeof(XMMATRIX), 16);
 
-	m_animationSequencer.CreateInstance();
 	m_animationUpdater.CreateInstance();
 	m_persistedDamageLocators.SetStructureDefinition( EveDamageLocatorStructureDef );
 	memset( m_shLightingCoefficients, 0, sizeof( m_shLightingCoefficients ) );
@@ -1227,6 +1226,15 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 		// this list is too long will hold one element for each mesharea at least... Optimize!
 		TriRenderBatchAreaBlock::Optimize( m_overlayMeshAreaBlocks );
 	}
+}
+
+bool EveSpaceObject2::OnModified( Be::Var* val )
+{
+	if( IsMatch( val, m_animationSequencer ) && m_animationSequencer )
+	{
+		m_animationSequencer->SetOwner( this );
+	}
+	return true;
 }
 
 bool EveSpaceObject2::GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query ) const

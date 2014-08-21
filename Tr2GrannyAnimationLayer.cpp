@@ -16,6 +16,7 @@ Tr2GrannyAnimationLayer::Tr2GrannyAnimationLayer() :
 Tr2GrannyAnimationLayer::Tr2GrannyAnimationLayer( float defaultBoneWeight ) :
 	m_modelInstance( nullptr ),
 	m_trackMask( nullptr ),
+	m_trackMaskName( nullptr ),
 	m_defaultBoneWeight( defaultBoneWeight ),
 	m_boneCount( 0 )
 {
@@ -34,6 +35,10 @@ void Tr2GrannyAnimationLayer::InitializeAnimationLayer( const Tr2GrannyAnimation
 	m_boneCount = skeleton->BoneCount;
 	m_trackMask = GrannyNewTrackMask( m_defaultBoneWeight, skeleton->BoneCount );
 
+	if( m_trackMaskName )
+	{
+		ExtractTrackMask( grannyAnimation, m_trackMaskName );
+	}
 	for( auto it = m_bones.begin(); it != m_bones.end(); it++ )
 	{
 		unsigned int boneIndex;
@@ -254,6 +259,29 @@ void Tr2GrannyAnimationLayer::AddBone( const Tr2GrannyAnimation* grannyAnimation
 	}
 
 	GrannySetTrackMaskBoneWeight( m_trackMask, boneIndex, 1.0 );
+}
+
+void Tr2GrannyAnimationLayer::ExtractTrackMask( const Tr2GrannyAnimation* grannyAnimation, const char* name )
+{
+	m_trackMaskName = name;
+	if( !m_trackMask )
+	{
+		return;
+	}
+	
+	granny_extract_track_mask_result etmr = GrannyExtractTrackMask(
+		m_trackMask,
+		m_boneCount,
+		GrannyGetSourceSkeleton( m_modelInstance ),
+		name,
+		0.0f,
+		false );
+	if ( etmr == GrannyExtractTrackMaskResult_NoDataPresent )
+	{
+		CCP_LOGNOTICE( "Tr2GrannyAnimationLayer: Track mask not found." );
+	}
+
+	return;
 }
 
 void Tr2GrannyAnimationLayer::RemoveBone( const Tr2GrannyAnimation* grannyAnimation, const char* name )
