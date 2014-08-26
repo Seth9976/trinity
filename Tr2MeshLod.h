@@ -43,6 +43,7 @@ public:
 	virtual TriGeometryRes* GetGeometryResource() const;
 	void SetGeometryResource( Tr2LodResource* lodResource );
 
+	virtual bool GetBoundingBox( Vector3& min, Vector3& max ) const;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
