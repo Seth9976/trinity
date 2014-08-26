@@ -1761,19 +1761,35 @@ void EveSpaceObject2::GetLocalToWorldTransform( Matrix &transform )
 
 void EveSpaceObject2::FreezeHighDetailMesh()
 {
+	bool didIt = false;
+
 	if( m_highDetailMesh )
 	{
 		m_mesh = dynamic_cast<Tr2MeshBase*>( m_highDetailMesh->GetObject( ) );
 		if( m_mesh )
 		{
-			m_allowLodSelection = false;
-			m_lodLevel = LOD_HIGH;
+			didIt = true;
+
 			m_highDetailMesh.Unlock();
 			m_mediumDetailMesh.Unlock();
 			m_lowDetailMesh.Unlock();
-
-			PrepareForAnimation();
 		}
+	}
+	else if( m_meshLod )
+	{
+		didIt = true;
+
+		m_mesh = m_meshLod;
+		m_meshLod->SelectLod( TR2_LOD_HIGH );
+
+	}
+
+	if( didIt )
+	{
+		m_allowLodSelection = false;
+		m_lodLevel = LOD_HIGH;
+
+		PrepareForAnimation();
 	}
 }
 
