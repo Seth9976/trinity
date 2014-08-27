@@ -56,7 +56,7 @@ void TriDevice::HandleRenderTick(  Be::Time realTime, Be::Time simTime )
 		g_emulateDriverReset = false;
 		if( !mDeviceLost )
 		{
-			CCP_LOGWARN( "DX11 device removed, reason: %x", hr );
+			CCP_LOGERR( "DX11 device removed, reason: %x", hr );
 			Tr2Renderer::SetIsDeviceResetting( true );
 			DeviceLost();
 			ReleaseDeviceResources( TRISTORAGE_ALL );
