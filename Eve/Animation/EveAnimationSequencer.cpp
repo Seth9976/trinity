@@ -150,7 +150,7 @@ bool EveAnimationStateSequencer::CheckCompletionAndChangeStates()
 	}
 	else if( m_isTransitioning )
 	{
-		if( stateName=m_pendingStates[0]->GetTransition( lastState->GetName() ) )
+		if( ( stateName = m_pendingStates[0]->GetTransition( lastState->GetName() ) ) )
 		{
 			nextState = GetAnimationState( stateName );
 			m_pendingStates.Clear();
