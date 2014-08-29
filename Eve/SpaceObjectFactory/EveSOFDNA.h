@@ -8,10 +8,10 @@
 #define EveSOFDNA_H
 
 #include "EveSOFDataMgr.h"
+#include "ITr2Renderable.h"
 
 // forwards
 BLUE_DECLARE( EveSOFDNA );
-enum TriBatchType;
 
 // --------------------------------------------------------------------------------
 // Description:

@@ -8,6 +8,7 @@
 #define EveSOF_H
 
 #include "EveSOFDataMgr.h"
+#include "ITr2Renderable.h"
 
 // forwards
 BLUE_DECLARE( Tr2Effect );
@@ -18,7 +19,6 @@ BLUE_DECLARE( EveSOFDNA );
 BLUE_DECLARE( Tr2MeshLod );
 BLUE_DECLARE( Tr2MeshArea );
 BLUE_DECLARE_VECTOR( Tr2MeshArea );
-enum TriBatchType;
 
 // --------------------------------------------------------------------------------
 // Description:
