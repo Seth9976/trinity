@@ -618,16 +618,15 @@ bool TriTextureRes::Create(	uint32_t width,
 	if( !m_memoryUse )
 	{
 		// Estimate memory use for the resource cache.
-		// Ignoring format, reporting based on uncompressed textures.
-		// It's better to overestimate here rather than underestimate.
-		unsigned w = m_width;
-		unsigned h = m_height;
-		m_memoryUse = w * h * 4;
-		for( unsigned i = 1; i < m_mipCount; ++i )
+		uint32_t w = m_width;
+		uint32_t h = m_height;
+		uint32_t bpp = GetBytesPerPixel( m_format );
+		m_memoryUse = w * h * bpp;
+		for( uint32_t i = 1; i < m_mipCount; ++i )
 		{			
 			w /= 2;
 			h /= 2;
-			m_memoryUse += w * h * 4;
+			m_memoryUse += w * h * bpp;
 		}
 	}
 

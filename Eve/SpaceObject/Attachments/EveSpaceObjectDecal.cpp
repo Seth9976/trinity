@@ -657,9 +657,6 @@ void EveSpaceObjectDecal::CreateDecalIndexBuffer( TriGeometryResPtr geomRes )
 				m_rebuildIndexBuffer = false;
 			}
 
-			// report it, cause it should not be called too often...
-			CCP_LOG( "EveSpaceObjectDecal: finished rebuilding indexbuffer for %s in %f seconds", m_name.c_str(), timer.GetSeconds() );
-
 			if( unlockBuffers )
 			{
 				meshData->m_indexBuffer.Unlock( renderContext );
