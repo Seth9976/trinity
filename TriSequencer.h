@@ -87,6 +87,10 @@ public:
 		double time
 		);
 
+	void ScaleTime(
+		float s
+		);
+
 	PITriScalarFunctionVector  mFunctions;
 
 	TriScalarSequencer(IRoot* lockobj = NULL);
@@ -612,6 +616,10 @@ public:
         double time
         );
 
+	void ScaleTime(
+		float s
+		);
+
 
     TriPerlinCurve(IRoot* lockobj = NULL);
     ~TriPerlinCurve();
@@ -665,6 +673,10 @@ public:
 	float GetValue()
 		;
 
+	void ScaleTime(
+		float s
+		);
+
     TriScalarDistanceCurve(IRoot* lockobj = NULL);
     ~TriScalarDistanceCurve();
 
@@ -711,6 +723,9 @@ public:
         double time
         );
 
+	void ScaleTime(
+		float s
+		);
 
     TriSineCurve(IRoot* lockobj = NULL);
     ~TriSineCurve();
@@ -755,6 +770,10 @@ public:
     float GetValueAt(
         double time
         );
+
+	void ScaleTime(
+		float s
+		);
 
 	void Randomize();
 

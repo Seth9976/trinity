@@ -60,6 +60,10 @@ BLUE_INTERFACE(ITriScalarFunction) : public ITriFunction
 	virtual float GetValueAt(
 		double time
 		) = 0;
+
+	virtual void ScaleTime(
+		float s
+		) = 0;
 };
 
 BLUE_INTERFACE(ITriVectorFunction) : public ITriFunction

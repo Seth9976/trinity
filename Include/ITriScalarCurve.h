@@ -39,11 +39,7 @@ BLUE_INTERFACE(ITriScalarCurve) : public ITriScalarFunction
 	
 	virtual void Sort(
 		) = 0;
-
-	virtual void ScaleTime(
-		float s
-		) = 0;
-
+	
 	virtual void ScaleValue(
 		float s
 		) = 0;

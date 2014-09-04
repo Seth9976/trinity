@@ -24,6 +24,7 @@ public:
 	virtual float Update( double time );
 	virtual float GetValueAt( Be::Time time );
 	virtual float GetValueAt( double time );
+	virtual void ScaleTime( float s );
 
 	//////////////////////////////////////////////////////////////////////////
 	// IInitialize
@@ -46,6 +47,7 @@ private:
 	Tr2MayaAnimationEnginePtr	m_animationEngine;
 	float						m_length;
 	float						m_value;
+	float						m_scale;
 	std::string					m_name;
 	void		ComputeLength();
 };

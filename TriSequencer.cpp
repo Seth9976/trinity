@@ -165,7 +165,15 @@ float TriScalarSequencer::GetValueAtAdd(
 	return ret;
 }
 
-
+void TriScalarSequencer::ScaleTime( 
+	float scale 
+	)
+{
+	for( int i = 0; i < mFunctions.GetSize();  i++ )
+	{
+		mFunctions[i]->ScaleTime( scale );
+	}
+}
 
 
 TriVectorSequencer::TriVectorSequencer(IRoot* lockobj) :
@@ -1063,6 +1071,14 @@ float TriPerlinCurve::GetValueAt(
 	return (((float)PerlinNoise1D( pos  * mSpeed , mAlpha, mBeta, mN) + 1.0f ) / 2.0f) * mScale + mOffset;
 }
 
+
+void TriPerlinCurve::ScaleTime(
+	float s
+	)
+{
+	mScale = s;
+}
+
 /////////////////////////////
 
 TriScalarDistanceCurve::TriScalarDistanceCurve(IRoot* lockobj) :
@@ -1119,6 +1135,14 @@ float TriScalarDistanceCurve::GetValue()
 			ret = dist * mScale + mOffset;
 	}
     return ret;
+}
+
+
+void TriScalarDistanceCurve::ScaleTime(
+	float s
+	)
+{
+	mScale = s;
 }
 
 
@@ -1179,6 +1203,13 @@ float TriSineCurve::GetValueAt(
     return (float)ret;
 }
 
+void TriSineCurve::ScaleTime(
+	float s
+	)
+{
+	mScale = s;
+}
+
 /////////////////////////////
 
 
@@ -1231,6 +1262,13 @@ float TriRandomConstantCurve::GetValueAt(
 	if (!mHold)
 		Randomize();
     return mValue;
+}
+
+void TriRandomConstantCurve::ScaleTime(
+	float s
+	)
+{
+	// there is really no way to scale a random constant curve...
 }
 
 void TriRandomConstantCurve::Randomize()

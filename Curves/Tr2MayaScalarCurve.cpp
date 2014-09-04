@@ -6,7 +6,8 @@
 Tr2MayaScalarCurve::Tr2MayaScalarCurve( IRoot* lockobj ):
 	m_index(-1),
 	m_value(0.0f),
-	m_length(0.0f)
+	m_length(0.0f),
+	m_scale(1.0f)
 {
 }
 
@@ -46,7 +47,7 @@ void Tr2MayaScalarCurve::UpdateValue( double time )
 	{	
 		if( m_index > -1 )
 		{
-			m_value = m_animationEngine->evaluate( m_index, (float)time );
+			m_value = m_animationEngine->evaluate( m_index, (float)time * m_scale );
 		}	
 	}
 }
@@ -73,10 +74,15 @@ float Tr2MayaScalarCurve::GetValueAt( double time )
 	{	
 		if( m_index > -1 )
 		{
-			return m_animationEngine->evaluate( m_index, (float)time );
+			return m_animationEngine->evaluate( m_index, (float)time * m_scale );
 		}	
 	}
 	return 0;
+}
+
+void Tr2MayaScalarCurve::ScaleTime( float s )
+{
+	m_scale = s;
 }
 
 void Tr2MayaScalarCurve::ComputeLength()
@@ -93,7 +99,7 @@ void Tr2MayaScalarCurve::ComputeLength()
 
 	if( m_index > -1  )
 	{
-		m_length = m_animationEngine->getLength(m_index);
+		m_length = m_animationEngine->getLength(m_index) * m_scale;
 	}	
 }
 
