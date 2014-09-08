@@ -318,13 +318,17 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 // --------------------------------------------------------------------------------
 bool EveSOF::GenerateLodResourcePaths( std::string& mediumResPath, std::string& lowResPath, const char* resPath, const char* usage ) const
 {
-	if( !strcmp( usage, "PgsMap" ) || !strcmp( usage, "NormalMap" ) || !strcmp( usage, "DiffuseMap" ) || !strcmp( usage, "AoMap" ) )
+	// only dds files will ever have lods
+	if( StringFind( resPath, ".dds" ) )
 	{
-		mediumResPath = resPath;
-		StringInsertStub(mediumResPath, ".dds", "_mediumDetail");
-		lowResPath = resPath;
-		StringInsertStub(lowResPath, ".dds", "_lowDetail");
-		return true;
+		if( !strcmp( usage, "PgsMap" ) || !strcmp( usage, "NormalMap" ) || !strcmp( usage, "DiffuseMap" ) || !strcmp( usage, "AoMap" ) )
+		{
+			mediumResPath = resPath;
+			StringInsertStub( mediumResPath, ".dds", "_mediumDetail" );
+			lowResPath = resPath;
+			StringInsertStub( lowResPath, ".dds", "_lowDetail" );
+			return true;
+		}
 	}
 	return false;
 }

@@ -317,22 +317,26 @@ const char* EveSOFDNA::GetFactionResPathInsert() const
 // --------------------------------------------------------------------------------
 void EveSOFDNA::ModifyTextureResPath( std::string& resPath, const char* resName ) const
 {
-	if( !strcmp( resName, "PgsMap" ) && !m_factionData->resPathInsert.empty() )
+	if( !m_factionData->resPathInsert.empty() )
 	{
-		std::string resPathCopy = resPath;
-
-		// insert sub folder
-		size_t index = resPath.rfind("/");
-		if( index != std::string::npos )
+		// hardcoded texture param names which'll get an override
+		if( !strcmp( resName, "PgsMap" ) || !strcmp( resName, "SpecularMap" ) || !strcmp( resName, "MaskMap" ) || !strcmp( resName, "SubMaskMap" ) )
 		{
-			resPathCopy.insert( index + 1, m_factionData->resPathInsert + "/" );
-		}
+			std::string resPathCopy = resPath;
 
-		// insert part into filename
-		std::string insertStr = "_" + m_factionData->resPathInsert;
-		if( StringInsertStub( resPathCopy, "_pgs", insertStr.c_str() ) && FileExists( resPathCopy ) )
-		{
-			resPath = resPathCopy;
+			// insert sub folder
+			size_t index = resPath.rfind("/");
+			if( index != std::string::npos )
+			{
+				resPathCopy.insert( index + 1, m_factionData->resPathInsert + "/" );
+			}
+
+			// insert part into filename
+			std::string insertStr = "_" + m_factionData->resPathInsert;
+			if( StringInsertStub( resPathCopy, "_", insertStr.c_str() ) && FileExists( resPathCopy ) )
+			{
+				resPath = resPathCopy;
+			}
 		}
 	}
 }

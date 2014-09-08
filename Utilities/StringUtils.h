@@ -77,6 +77,17 @@ inline bool StringStartsWithI( const char* baseString, const char* startString )
 	return ( b.compare( 0, f.size(), f ) == 0 );
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Try to find a substring
+//   Similar to Python's x in y
+// --------------------------------------------------------------------------------
+inline bool StringFind( const char* baseString, const char* searchString )
+{
+	std::string b( baseString );
+	return ( b.find( searchString ) != std::string::npos );
+}
+
 
 
 
