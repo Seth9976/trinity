@@ -333,7 +333,7 @@ void EveSOFDNA::ModifyTextureResPath( std::string& resPath, const char* resName 
 
 			// insert part into filename
 			std::string insertStr = "_" + m_factionData->resPathInsert;
-			if( StringInsertStub( resPathCopy, "_", insertStr.c_str() ) && FileExists( resPathCopy ) )
+			if( StringInsertStubBefore( resPathCopy, "_", insertStr.c_str() ) && FileExists( resPathCopy ) )
 			{
 				resPath = resPathCopy;
 			}

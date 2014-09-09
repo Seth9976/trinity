@@ -11,7 +11,7 @@
 // Description:
 //   Inserts insertStr before the last instance of beforeSubstr in baseString.
 // --------------------------------------------------------------------------------
-inline bool StringInsertStub( std::string& baseString, const char* beforeSubstr, const char* insertStr )
+inline bool StringInsertStubBefore( std::string& baseString, const char* beforeSubstr, const char* insertStr )
 {
 	size_t index = baseString.rfind( beforeSubstr );
 	if( index == std::string::npos )
@@ -20,6 +20,22 @@ inline bool StringInsertStub( std::string& baseString, const char* beforeSubstr,
 	}
 
 	baseString.insert( index, insertStr );
+	return true;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Inserts insertStr after the last instance of afterSubstr in baseString.
+// --------------------------------------------------------------------------------
+inline bool StringInsertStubAfter( std::string& baseString, const char* afterSubstr, const char* insertStr )
+{
+	size_t index = baseString.rfind( afterSubstr );
+	if( index == std::string::npos )
+	{
+		return false;
+	}
+
+	baseString.insert( index + strlen( afterSubstr ), insertStr );
 	return true;
 }
 

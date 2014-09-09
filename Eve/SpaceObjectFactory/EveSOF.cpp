@@ -186,8 +186,8 @@ void EveSOF::SetupMesh( EveShip2Ptr ship, const EveSOFDNAPtr dna ) const
 	std::string highDetail = dna->GetHullGeometryResPath();
 	std::string mediumDetail = highDetail;
 	std::string lowDetail = highDetail;
-	StringInsertStub( mediumDetail, ".gr2", "_mediumDetail" );
-	StringInsertStub( lowDetail, ".gr2", "_lowDetail" );
+	StringInsertStubBefore( mediumDetail, ".gr2", "_mediumDetail" );
+	StringInsertStubBefore( lowDetail, ".gr2", "_lowDetail" );
 
 	Tr2LodResourcePtr lodResource;
 	lodResource.CreateInstance();
@@ -248,8 +248,10 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 		newShader.CreateInstance();
 		newShader->StartUpdate();
 
-		// res path of the shader
-		std::string shaderPath = dna->GetAreaShaderLocationResPath() + std::string("/") + dna->GetShaderPrefix( dna->IsHullAnimated() ) + area->shader;
+		// construct res path of the shader
+		std::string shaderPath = std::string("/") + area->shader;
+		StringInsertStubAfter( shaderPath, "/", dna->GetShaderPrefix( dna->IsHullAnimated() ) );
+		shaderPath = dna->GetAreaShaderLocationResPath() + shaderPath;
 		newShader->SetEffectPathName( shaderPath.c_str() );
 
 		// parameters
@@ -330,9 +332,9 @@ bool EveSOF::GenerateLodResourcePaths( std::string& mediumResPath, std::string& 
 		if( !strcmp( usage, "PgsMap" ) || !strcmp( usage, "NormalMap" ) || !strcmp( usage, "DiffuseMap" ) || !strcmp( usage, "AoMap" ) )
 		{
 			mediumResPath = resPath;
-			StringInsertStub( mediumResPath, ".dds", "_mediumDetail" );
+			StringInsertStubBefore( mediumResPath, ".dds", "_mediumDetail" );
 			lowResPath = resPath;
-			StringInsertStub( lowResPath, ".dds", "_lowDetail" );
+			StringInsertStubBefore( lowResPath, ".dds", "_lowDetail" );
 			return true;
 		}
 	}
