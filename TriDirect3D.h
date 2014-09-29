@@ -37,6 +37,7 @@ class PresentationParameters : public Tr2PresentParametersAL
 public:
 	PresentationParameters();
 	PresentationParameters( const Tr2PresentParametersAL& o ): Tr2PresentParametersAL( o ) {}
+	bool IsAdapterRequired() const { return outputWindow || !software; }
 #if BLUE_WITH_PYTHON
 	BluePyDict Get() const;
 	bool Set(PyObject *dict);

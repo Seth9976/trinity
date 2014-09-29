@@ -145,11 +145,17 @@ TriDevice::TriDevice(IRoot* lockobj) :
 {	
 	Tr2DisplayModeInfo empty = {0};
 	mDisplayMode = empty;
-	if( FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( mAdapter, mDisplayMode ) ) )
-	{
-		return;
-	}
-	
+	// At this point, in the constructor, we are just setting defaults.  We really 
+	// don't know if the device will require an adapter or not (in the case of
+	// software rendering an adapter is not necessary).
+	ALResult ignoreThisResult = 
+		Tr2VideoAdapterInfo::GetAdapterDisplayMode( mAdapter, mDisplayMode );
+	// In the case where an adapter wouldn't be required (we don't know yet) it 
+	// is fine for the method above to fail so we must explicitly ignore the result
+	// of calling the method (otherwise the results checking, when enabled, would 
+	// complain).
+	ignoreThisResult.GetResult();
+
 	// Set default presentation parameters
 	mPresentParam.mode.width = 0;
 	mPresentParam.mode.height = 0;
@@ -221,6 +227,7 @@ bool TriDevice::CreateSimpleDevice(
 	pp.outputWindow = hwnd;
 	pp.software = (m_deviceType == TriDevice::DEVICE_TYPE_SOFTWARE);
 
+	pp.windowed = false;
 	if( type == FULLSCREEN )
 	{
 		Tr2DisplayModeInfo mode;
@@ -232,9 +239,8 @@ bool TriDevice::CreateSimpleDevice(
 		pp.mode.format = mode.format;
 		pp.mode.refreshRateNumerator = mode.refreshRateNumerator;
 		pp.mode.refreshRateDenominator = mode.refreshRateDenominator;
-		pp.windowed = false;
 	}
-	else
+	else if( type == WINDOWED )
 	{
 		pp.windowed = true;
 	}
@@ -277,8 +283,13 @@ bool TriDevice::InitD3DDevice()
 {
 	// Get the default viewport
 	// fill out local structures
-	if( !DeviceExists()												|| 
-		FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( 
+	if( !DeviceExists() )
+	{
+		return false;
+	}
+
+	if( mPresentParam.IsAdapterRequired()
+		&& FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( 
 						Tr2VideoAdapterInfo::DEFAULT_ADAPTER, 
 						mDisplayMode ) ) 
 		)
@@ -361,7 +372,8 @@ bool TriDevice::ChangeDevice(
 	mHeight = pp->mode.height;
 	mPresentParam = *pp;
 	// find out the mode we are in now
-	if( FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( mAdapter, mDisplayMode ) ) )
+	if( mPresentParam.IsAdapterRequired() &&
+		FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( mAdapter, mDisplayMode ) ) )
 	{
 		return false;
 	}
@@ -833,7 +845,8 @@ bool TriDevice::ResetDevice( unsigned adapter, const Tr2PresentParametersAL* pp 
 	mPresentParam = *pp;
 	
 	// We may have changed display modes
-	if( FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( mAdapter, mDisplayMode ) ) )
+	if( mPresentParam.IsAdapterRequired()
+		&& FAILED( Tr2VideoAdapterInfo::GetAdapterDisplayMode( mAdapter, mDisplayMode ) ) )
 	{
 		CCP_LOGNOTICE( "Device Reset: Adapter Display Mode Changed" );
 		Tr2Renderer::SetResourceCreationAllowed( true );
