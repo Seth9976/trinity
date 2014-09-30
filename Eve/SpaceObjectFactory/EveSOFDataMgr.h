@@ -226,6 +226,7 @@ public:
 		// hull area paramaters
 		std::map<std::string, FactionAreaData> opaqueAreaParameters;
 		std::map<std::string, FactionAreaData> transparentAreaParameters;
+		std::map<std::string, FactionAreaData> additiveAreaParameters;
 		// spritesets
 		std::map<int, FactionSpriteSetColorData> spriteSetsColor;
 		// spotlight sets

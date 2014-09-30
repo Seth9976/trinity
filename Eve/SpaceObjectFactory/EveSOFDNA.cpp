@@ -453,6 +453,9 @@ const Vector4* EveSOFDNA::GetFactionMeshAreaParameters( TriBatchType type, const
 	case TRIBATCHTYPE_TRANSPARENT:
 		areaParameters = &m_factionData->transparentAreaParameters;
 		break;
+	case TRIBATCHTYPE_ADDITIVE:
+		areaParameters = &m_factionData->additiveAreaParameters;
+		break;
 	default:
 		return nullptr;
 	}

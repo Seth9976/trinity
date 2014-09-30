@@ -712,6 +712,18 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 		}
 		fd.transparentAreaParameters[hullAreaData->m_name] = ad;
 	}
+	for( auto hait = srcData->m_additiveAreas.begin(); hait != srcData->m_additiveAreas.end(); ++hait )
+	{
+		EveSOFDataFactionHullAreaPtr hullAreaData = (*hait);
+
+		FactionAreaData ad;
+		for( auto hapit = hullAreaData->m_parameters.begin(); hapit != hullAreaData->m_parameters.end(); ++hapit )
+		{
+			EveSOFDataParameterPtr parameterData = (*hapit);
+			ad.parameters[parameterData->m_name] = parameterData->m_value;
+		}
+		fd.additiveAreaParameters[hullAreaData->m_name] = ad;
+	}
 }
 
 // --------------------------------------------------------------------------------
