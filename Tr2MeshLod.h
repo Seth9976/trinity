@@ -26,6 +26,7 @@ public:
 
 	// Selects the given level of detail for the mesh
 	void SelectLod( Tr2Lod lod );
+	Tr2Lod GetSelectedLod() const { return m_selectedLod; }
 
 	// Add an associated resource, such as a texture used on an area of the mesh.
 	// When level of detail is selected, it is also applied to associated

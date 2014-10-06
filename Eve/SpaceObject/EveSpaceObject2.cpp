@@ -200,6 +200,10 @@ bool EveSpaceObject2::Initialize()
 	}
 	else if( m_meshLod )
 	{
+		if( m_meshLod->GetSelectedLod() == TR2_LOD_UNSPECIFIED )
+		{
+			m_meshLod->SelectLod( TR2_LOD_LOW );
+		}
 		m_allowLodSelection = true;
 	}
 
