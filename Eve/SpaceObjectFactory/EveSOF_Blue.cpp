@@ -17,8 +17,6 @@ const Be::ClassInfo* EveSOF::ExposeToBlue()
 
 		MAP_METHOD_AND_WRAP( "Build", Build, "na" )
 		MAP_METHOD_AND_WRAP( "BuildFromDNA", BuildFromDNA, "na" )
-		MAP_METHOD_AND_WRAP( "Load", Load, "na" )
-
 
     EXPOSURE_END()
 }

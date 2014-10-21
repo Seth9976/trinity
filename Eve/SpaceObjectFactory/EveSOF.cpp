@@ -73,50 +73,6 @@ EveSOF::~EveSOF()
 
 // --------------------------------------------------------------------------------
 // Description:
-//   This is the old way of loading a ship via redfile
-// --------------------------------------------------------------------------------
-IRootPtr EveSOF::Load( const char* resFile, const char* hullName, const char* factionName, const char* raceName )
-{
-	// load it like we used to: blue res manager
-	IRootPtr p;
-	p.Attach( BeResMan->LoadObject( resFile ) );
-	if( p == nullptr )
-	{
-		return p;
-	}
-
-	// stop it here if no SOF info
-	if( ( hullName[0] == 0 ) || ( factionName[0] == 0 ) || ( raceName[0] == 0 ) )
-	{
-		return p;
-	}
-
-	// create a temporary(!) DNA object
-	EveSOFDNAPtr dna;
-	dna.CreateInstance();
-
-	// init it with given dna string
-	std::string dnaString = std::string( hullName ) + ":" + std::string( factionName ) + ":" + std::string( raceName );
-	dna->Setup( dnaString.c_str(), &m_dataMgr );
-
-	// if this dna is not correct, we are done here
-	if( !dna->isValid() )
-	{
-		return p;
-	}
-
-	// see if we can attach boosters, but only to ships
-	EveShip2Ptr newShip;
-	if( p->QueryInterface( BlueInterfaceIID<EveShip2>(), (void**)&newShip ) )
-	{
-		SetupBoosters( newShip, dna );
-	}
-
-	return p;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
 //   Build a ship from a dna string
 // --------------------------------------------------------------------------------
 IRootPtr EveSOF::BuildFromDNA( const char* dnaString )

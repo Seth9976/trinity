@@ -41,9 +41,6 @@ public:
 	// build a spaceship from a dns string and return a EveShip2 object
 	IRootPtr BuildFromDNA( const char* dnaString );
 
-	// maintain the old style loading (with a bit of the new way...)
-	IRootPtr Load( const char* resFile, const char* hullName, const char* factionName, const char* raceName );
-
 
 private:
 	// all setup functions for the to-be-created spaceship
