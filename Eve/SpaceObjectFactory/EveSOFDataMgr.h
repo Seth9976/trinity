@@ -224,6 +224,10 @@ public:
 		// texture insert
 		std::string resPathInsert;
 
+		// material usage ids
+		int materialUsageMain;
+		int materialUsageMask;
+
 		// hull area paramaters
 		std::map<BlueSharedString, FactionAreaData> opaqueAreaParameters;
 		std::map<BlueSharedString, FactionAreaData> transparentAreaParameters;

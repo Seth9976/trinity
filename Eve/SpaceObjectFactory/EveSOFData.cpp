@@ -56,7 +56,9 @@ EveSOFDataFaction::EveSOFDataFaction( IRoot* lockobj ) :
 	PARENTLOCK( m_decals ),
 	PARENTLOCK( m_spriteSets ),
 	PARENTLOCK( m_spotlightSets ),
-	PARENTLOCK( m_planeSets )
+	PARENTLOCK( m_planeSets ),
+	m_materialUsageMain( 0 ),
+	m_materialUsageMask( 1 )
 {}
 
 

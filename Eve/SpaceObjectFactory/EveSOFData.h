@@ -508,6 +508,10 @@ public:
 	PEveSOFDataFactionSpotlightSetVector m_spotlightSets;
 	PEveSOFDataFactionPlaneSetVector m_planeSets;
 	PEveSOFDataFactionDecalVector m_decals;
+
+	// material usage
+	int m_materialUsageMain;
+	int m_materialUsageMask;
 };
 TYPEDEF_BLUECLASS( EveSOFDataFaction );
 BLUE_DECLARE_VECTOR( EveSOFDataFaction );

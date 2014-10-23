@@ -432,6 +432,8 @@ const Be::ClassInfo* EveSOFDataFaction::ExposeToBlue()
 		MAP_ATTRIBUTE( "spriteSets", m_spriteSets, "All the groups of sprite sets.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "spotlightSets", m_spotlightSets, "All the groups of spotlight sets.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "planeSets", m_planeSets, "All the groups of plane sets.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "materialUsageMain", m_materialUsageMain, "Which of the three materials is the main?", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "materialUsageMask", m_materialUsageMask, "Which of the three materials is the mask?", Be::READWRITE | Be::PERSIST )
     EXPOSURE_END()
 }
 
