@@ -16,7 +16,12 @@ EveDistanceField::EveDistanceField( IRoot* lockobj ) :
 void EveDistanceField::Update( const EveUpdateContext& updateContext )
 {
 	Vector3 posObj;
-	Vector3 posRef = *m_camera->GetPosition();
+
+	Vector3 posRef( 0, 0, 0 );
+	if( m_camera )
+	{
+		posRef = *m_camera->GetPosition();
+	}
 	float distanceNow = FLT_MAX;
 	Be::Time t = updateContext.GetTime();
 
@@ -36,14 +41,13 @@ void EveDistanceField::Update( const EveUpdateContext& updateContext )
 	}
 
 	m_distance = m_distance * ( 1 - delta ) + distanceNow * delta;
-	if( !m_curveSet->IsPlaying() )
-	{
-		m_curveSet->Play();
-		m_curveSet->Update( 0 );
-	}
-
 	if( m_curveSet )
 	{
+		if( !m_curveSet->IsPlaying() )
+		{
+			m_curveSet->Play();
+			m_curveSet->Update( 0 );
+		}
 		m_curveSet->Update( m_distance );
 	}
 }
