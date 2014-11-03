@@ -39,6 +39,10 @@ private:
 	// Number of pixels on the bottom edge of the texture
 	unsigned int m_bottomEdgeSize;
 
+	// Offset the sprite. Positive values will make it smaller vertically,
+	// and negative bigger. The sprite is shifted horizontally by this offset.
+	int m_offset;
+
 	// If true, the center piece of the texture is stretched to fill
 	// the display width of the stretch sprite.
 	bool m_fillCenter;

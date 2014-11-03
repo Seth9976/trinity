@@ -67,8 +67,13 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 
 		const Color white( WHITE );
 
-		float scaledWidth = m_displayWidth;
-		float scaledHeight = m_displayHeight;
+		float offset = (float)m_offset;
+		float offset_2 = offset * 2.0f;
+
+		float scaledWidth = m_displayWidth - offset;
+		float scaledHeight = m_displayHeight - offset_2;
+		float offsetX = offset;
+		float offsetY = offset;
 
 		Tr2Sprite2dVertexBase vertices[8];
 		Tr2Sprite2dVertexBase* v = &vertices[0];
@@ -77,7 +82,7 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 		//
 		// Vertex 0
 		v->position.x = 0.0f;
-		v->position.y = 0.0f;
+		v->position.y = offsetY;
 		v->position.z = 0.0f;
 		v->texCoord[0].x = 0.0f;
 		v->texCoord[0].y = 0.0f;
@@ -98,7 +103,7 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 		//
 		// Vertex 2
 		v->position.x = 0.0f;
-		v->position.y = topEdgeSize;
+		v->position.y = offsetY + topEdgeSize;
 		v->position.z = 0.0f;
 		v->texCoord[0].x = 0.0f;
 		v->texCoord[0].y = topEdgeSize / srcHeight;
@@ -107,7 +112,7 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 
 		// Vertex 3
 		v->position.x = scaledWidth;
-		v->position.y = topEdgeSize;
+		v->position.y = offsetY + topEdgeSize;
 		v->position.z = 0.0f;
 		v->texCoord[0].x = 1.0f;
 		v->texCoord[0].y = topEdgeSize / srcHeight;
@@ -119,7 +124,7 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 		//
 		// Vertex 4
 		v->position.x = 0.0f;
-		v->position.y = scaledHeight - bottomEdgeSize;
+		v->position.y = offsetY + scaledHeight - bottomEdgeSize;
 		v->position.z = 0.0f;
 		v->texCoord[0].x = 0.0f;
 		v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
@@ -128,7 +133,7 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 
 		// Vertex 5
 		v->position.x = scaledWidth;
-		v->position.y = scaledHeight - bottomEdgeSize;
+		v->position.y = offsetY + scaledHeight - bottomEdgeSize;
 		v->position.z = 0.0f;
 		v->texCoord[0].x = 1.0f;
 		v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
