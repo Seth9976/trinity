@@ -1203,6 +1203,11 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 		return;
 	}
 
+	if( !m_geometryResFromMesh || !m_geometryResFromMesh->IsGood() )
+	{
+		m_geometryResFromMesh = nullptr;
+		return;
+	}
 	m_animationUpdater->SetUseMeshBinding( true );	
 	m_animationUpdater->SetSharedGeometryRes( m_geometryResFromMesh );
 	m_animationUpdater->RebuildCachedData( p );
