@@ -6,8 +6,8 @@
 #include "StdAfx.h"
 #include "EveSceneStaticParticles.h"
 
-#include "..\EveTransform.h"
-#include "..\..\Tr2InstancedMesh.h"
+#include "../EveTransform.h"
+#include "../../Tr2InstancedMesh.h"
 
 // --------------------------------------------------------------------------------
 // Description:
