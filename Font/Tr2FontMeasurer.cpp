@@ -740,7 +740,7 @@ int Tr2FontMeasurer::GetFontSize() const
 	return m_fontSize;
 }
 
-void Tr2FontMeasurer::PrepareSprites( Tr2Sprite2dScene* renderer, const Vector2& translation, const Color& color, Tr2SpriteObjectEffect sfx )
+void Tr2FontMeasurer::PrepareSprites( Tr2Sprite2dScene* renderer, const Vector2& translation, const Color& color, Tr2SpriteObjectEffect sfx, Tr2SpriteObjectBlendMode blendMode )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -866,7 +866,7 @@ void Tr2FontMeasurer::PrepareSprites( Tr2Sprite2dScene* renderer, const Vector2&
 				Tr2Sprite2dD3DVertex& curVertex = m_vertices[spriteIx*4 + i];
 
 				curVertex.color = finalColor;
-				curVertex.blendMode = TR2_SBM_BLEND;
+				curVertex.blendMode = blendMode;
 				curVertex.spriteEffect = sfx;
 				curVertex.transformIndex = 0;
 				curVertex.tileMode = 0;
@@ -974,7 +974,7 @@ void Tr2FontMeasurer::PrepareSprites( Tr2Sprite2dScene* renderer, const Vector2&
 				Tr2Sprite2dD3DVertex& curVertex = m_vertices[spriteIx*4 + i];
 
 				curVertex.color = finalColor;
-				curVertex.blendMode = TR2_SBM_BLEND;
+				curVertex.blendMode = blendMode;
 				curVertex.spriteEffect = TR2_SFX_FILL;
 				curVertex.transformIndex = 0;
 				curVertex.tileMode = 0;

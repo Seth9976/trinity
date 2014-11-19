@@ -71,6 +71,7 @@ public:
 	void* GetData( unsigned count );
 	void UpdateData();
 	void UpdateBoundingBox();
+	bool GetBoundingBox( Vector3& minAabb, Vector3& maxAabb ) const;
 	void DestroyData();
 	unsigned GetStride() const;
 	void Spawn();

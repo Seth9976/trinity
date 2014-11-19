@@ -39,7 +39,7 @@ void Tr2Sprite2dTextObject::GatherSprites( Tr2Sprite2dScene* renderer )
 	{
 		if( m_isDirty )
 		{
-			m_fontMeasurer->PrepareSprites( renderer, m_translation, m_color, m_spriteEffect );
+			m_fontMeasurer->PrepareSprites( renderer, m_translation, m_color, m_spriteEffect, m_blendMode );
 			m_isDirty = false;
 		}
 

@@ -51,6 +51,8 @@ public:
 	void SetRotation( Quaternion rotation ) { m_rotation = rotation; };
 	void SetTranslation( Vector3 translation ) { m_translation = translation; };
 
+	Tr2MeshBasePtr GetMesh() const;
+
 	// GetPerObjectData is left unimplemented. Subclasses
 	// must be created for each type of scene to create the proper per object data.
 

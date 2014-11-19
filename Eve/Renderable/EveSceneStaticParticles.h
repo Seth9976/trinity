@@ -8,6 +8,7 @@
 #ifndef EveSceneStaticParticles_H
 #define EveSceneStaticParticles_H
 
+#include "Vector3d.h"
 #include "ITr2Renderable.h"
 #include "ITr2GeometryProvider.h"
 #include "Eve/IEveSpaceObject2.h"
@@ -16,7 +17,8 @@
 #include "Tr2PersistentPerObjectData.h"
 
 BLUE_DECLARE( EveTransform );
-
+BLUE_DECLARE( Tr2RuntimeInstanceData );
+BLUE_DECLARE( Tr2InstancedMesh );
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -30,18 +32,60 @@ public:
 	EveSceneStaticParticles(IRoot* lockobj = NULL);
 	~EveSceneStaticParticles();
 
+	// structs
+	struct ClusterData
+	{
+		Vector3d position;
+		float radius;
+		Color color1;
+		Color color2;
+	};
+
+	struct ParticleBufferItem
+	{
+		Vector3 position;
+		float size;
+		Color color;
+	};
+
 	//////////////////////////////////////////////////////////////////////////
 	// IInitialize
 	virtual bool Initialize();
 
-	void AddCluster(Vector3 position, int count, float posDeviation, Color color1, Color color2);
-	void AddSingle(Vector3 position, float size, Color color);
+	// update & render
+	void UpdateAsyncronous( EveUpdateContext& updateContext );
+	void GetRenderables( const TriFrustum& frustum, std::vector<ITr2Renderable*>& renderables );
+	void UpdateViewDistanceInfo( const TriFrustum& frustum, ViewDistanceInfo& viewDistance ) const;
+	void RenderDebugInfo( Tr2RenderContext& renderContext );
+
+	// manage clusters
+	void AddCluster( Vector3d position, float radius, Color color1, Color color2 );
+	void ClearClusters();
+	void Rebuild();
 
 private:
+	// helper functions to access the right places in the loaded data
+	Tr2RuntimeInstanceData* GetInstanceDataObject();
+	Tr2InstancedMesh* GetInstanceMeshObject();
+
+	// general data of this whole system
 	float m_minSize;
 	float m_maxSize;
-	int m_maxParticleCount;
+	size_t m_maxParticleCount;
+	float m_clusterParticleDensity;
+	float m_clusterParticleDensityAdjust;
 
+	// keep a list of all clusers we have
+	std::vector<ClusterData> m_clusters;
+
+	// data for positioning
+	Vector3d m_centerOfClusters;
+	Matrix m_worldMatrix;
+
+	// bounding sphere
+	Vector4 m_boundingSphere;
+
+	// the actual rendering object
 	EveTransformPtr m_transform;
 };
 

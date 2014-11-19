@@ -242,6 +242,7 @@ void Tr2RuntimeInstanceData::SetLayout( const Tr2VertexDefinition& layout )
 	m_vb.Destroy();
 	m_uavBuffer.Destroy();
 	m_stride = 0;
+	m_count = 0;
 	for( auto it = layout.m_items.begin(); it != layout.m_items.end(); ++it )
 	{
 		if( it->m_stream != 0 )
@@ -383,6 +384,17 @@ void Tr2RuntimeInstanceData::UpdateBoundingBox()
 			}
 		}
 	}
+}
+
+// --------------------------------------------------------------------------------------
+// Description:
+//   Just return the aa bounding box data.
+// --------------------------------------------------------------------------------------
+bool Tr2RuntimeInstanceData::GetBoundingBox( Vector3& minAabb, Vector3& maxAabb ) const
+{
+	minAabb = m_aabbMin;
+	maxAabb = m_aabbMax;
+	return true;
 }
 
 // --------------------------------------------------------------------------------------

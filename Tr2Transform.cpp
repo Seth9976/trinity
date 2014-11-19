@@ -292,3 +292,12 @@ float Tr2Transform::GetSortValue()
 	float distance = D3DXVec3Length( &d );
 	return distance * m_sortValueMultiplier;
 }
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Return the base mesh
+// --------------------------------------------------------------------------------
+Tr2MeshBasePtr Tr2Transform::GetMesh() const
+{
+	return m_mesh;
+}

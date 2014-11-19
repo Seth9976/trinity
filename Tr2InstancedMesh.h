@@ -74,6 +74,7 @@ public:
 					 ITr2MeshBatchCallback* callback = nullptr ) const;
 	float CalcMeshSortValue( const Matrix& worldTransform );
 	bool GetBoundingBox( Vector3& min, Vector3& max ) const;
+	void SetBoundingBox( const Vector3& min, const Vector3& max );
 	bool GetAreaBoundingBox( unsigned int areaIx, Vector3& min, Vector3& max ) const;
 	bool GetBoundingSphere( Vector4& sphere );
 	bool IsLoading() const;

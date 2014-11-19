@@ -479,6 +479,19 @@ bool Tr2InstancedMesh::GetBoundingBox( Vector3& min, Vector3& max ) const
 
 // --------------------------------------------------------------------------------------
 // Description:
+//   Sets the bounding box for this mesh.
+// Arguments:
+//   min - Min bounds in local space
+//   max - Max bounds in local space
+// --------------------------------------------------------------------------------------
+void Tr2InstancedMesh::SetBoundingBox( const Vector3& min, const Vector3& max )
+{
+	m_minBounds = min;
+	m_maxBounds = max;
+}
+
+// --------------------------------------------------------------------------------------
+// Description:
 //   Returns area bounding box (equalt to explicit bounding box) for this mesh.
 // Arguments:
 //   areaIx - area index

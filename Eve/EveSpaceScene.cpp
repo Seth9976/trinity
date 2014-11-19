@@ -294,6 +294,11 @@ void EveSpaceScene::Update( Be::Time realTime, Be::Time simTime )
 	{
 		m_starfield->Update( simTime );
 	}
+
+	if( m_staticParticles )
+	{
+		m_staticParticles->UpdateAsyncronous( m_updateContext );
+	}
 	
 	for( auto it = m_distanceFields.begin(); it != m_distanceFields.end(); ++it )
 	{
@@ -1161,6 +1166,11 @@ void EveSpaceScene::GatherBatches( Tr2RenderContext& renderContext )
 		obj->GetRenderables( frustum, renderables, Tr2Renderer::GetIdentityTransform() );
 	}
 
+	if( m_staticParticles )
+	{
+		m_staticParticles->GetRenderables( frustum, renderables );
+	}
+
 	std::vector<ITr2Renderable*> shadowRenderables;
 	for( std::vector<ShadowReceiver>::iterator it = objectsReceivingShadow.begin(); it != objectsReceivingShadow.end(); ++it )
 	{
@@ -1180,6 +1190,10 @@ void EveSpaceScene::GatherBatches( Tr2RenderContext& renderContext )
 	{
 		UpdateViewDistanceInfo<IEveSpaceObject2Vector>( m_objects, frustum, viewDistance );
 		UpdateViewDistanceInfo<PEvePlanetVector>( m_planets, frustum, viewDistance );
+		if( m_staticParticles )
+		{
+			m_staticParticles->UpdateViewDistanceInfo( frustum, viewDistance );
+		}
 		m_nearClip = viewDistance.m_near;
 		m_farClip = viewDistance.m_far;
 	}
@@ -1448,7 +1462,7 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 		PopulatePerFrameVSData( m_perFrameVS );
 		ApplyPerFrameData( renderContext );
 	}
-	
+
 	// Draw the planets to the z-buffer to occlude any stations etc.
 	// that might be drawn behind moons.
 	for( EvePlanetVector::iterator it = m_planets.begin(); it != m_planets.end(); ++it )
@@ -2330,6 +2344,11 @@ void EveSpaceScene::RenderDebugInfo( Tr2RenderContext& renderContext )
 	{
 		IEveSpaceObject2* obj = *it;
 		obj->RenderDebugInfo( renderContext );
+	}
+
+	if( m_staticParticles )
+	{
+		m_staticParticles->RenderDebugInfo( renderContext );
 	}
 
 	Tr2Renderer::RenderDebugInfo( renderContext );
