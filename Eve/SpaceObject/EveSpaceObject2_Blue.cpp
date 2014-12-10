@@ -80,30 +80,6 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 		)
 
 		MAP_ATTRIBUTE
-		( 
-			"highDetailMesh",    
-			m_highDetailMesh,
-			"Proxy for a mesh used for rendering in high detail.", 
-			Be::READWRITE | Be::PERSIST
-		)
-
-		MAP_ATTRIBUTE
-		( 
-			"mediumDetailMesh",    
-			m_mediumDetailMesh,
-			"Proxy for a mesh used for rendering in medium detail.", 
-			Be::READWRITE | Be::PERSIST
-		)
-
-		MAP_ATTRIBUTE
-		( 
-			"lowDetailMesh",    
-			m_lowDetailMesh,
-			"Proxy for a mesh used for rendering in low detail.", 
-			Be::READWRITE | Be::PERSIST
-		)
-
-		MAP_ATTRIBUTE
 		(
 			"mesh",  
 			m_mesh, 

@@ -6,6 +6,7 @@
 #include "SpaceObject/Attachments/EveSpotlightSet.h"
 #include "SpaceObject/Attachments/EveSpaceObjectDecal.h"
 #include "Tr2Mesh.h"
+#include "Tr2MeshLod.h"
 #include "Tr2Effect.h"
 #include "Miniball3.h"
 #include "Eve/SpaceObject/Utils/EveLocator2.h"
@@ -433,10 +434,10 @@ bool EveShip2Builder::Build()
 	CalculateAudioBooster();
 
 	// Combine the meshes - high detail first
-	Tr2MeshPtr mesh;
+	Tr2MeshLodPtr mesh;
 	mesh.CreateInstance();
 
-	m_ship->SetHighDetailMesh( mesh );
+	m_ship->SetMeshLod( mesh );
 
 	InitializeGrannyFile();
 
@@ -454,7 +455,16 @@ bool EveShip2Builder::Build()
 	CalculateBoundingSphere( offsets );
 
 	FinalizeGrannyFile( m_highDetailOutputName );
-	mesh->SetMeshResPath( m_highDetailOutputName.c_str() );
+
+	Tr2LodResourcePtr lodResource;
+	lodResource.CreateInstance();
+
+	for( int i = 0; i < TR2_LOD_COUNT; ++i )
+	{
+		lodResource->SetResourcePath( Tr2Lod( i ), m_highDetailOutputName.c_str() );
+	}
+
+	mesh->SetGeometryResource( lodResource );
 
 	CCP_LOG( "EveShip2Builder::Build took %g seconds", time.GetSeconds() );
 
@@ -551,7 +561,7 @@ void EveShip2Builder::Weld( granny_uint8* referenceVB, int referenceCount, grann
 	CCP_FREE( referencePositions );
 }
 
-bool EveShip2Builder::AddMeshToGrannyFile( TriGrannyResPtr* grannies, int ix, Tr2Mesh* mesh, const Vector3& offset, Tr2Mesh* dstMesh )
+bool EveShip2Builder::AddMeshToGrannyFile( TriGrannyResPtr* grannies, int ix, Tr2Mesh* mesh, const Vector3& offset, Tr2MeshLod* dstMesh )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 

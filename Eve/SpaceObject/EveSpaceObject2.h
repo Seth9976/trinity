@@ -129,13 +129,7 @@ public:
 
 	// Mesh accessors, used by the builder
 	Tr2MeshBase* GetMesh() const { return m_mesh; }
-	Tr2MeshBase* GetHighDetailMesh() const;
-	Tr2MeshBase* GetMediumDetailMesh() const;
-	Tr2MeshBase* GetLowDetailMesh() const;
 	void SetMesh( Tr2MeshBase* mesh );
-	void SetHighDetailMesh( Tr2MeshBase* mesh );
-	void SetMediumDetailMesh( Tr2MeshBase* mesh );
-	void SetLowDetailMesh( Tr2MeshBase* mesh );
 
 	void SetMeshLod( Tr2MeshLod* meshLod );
 
@@ -314,9 +308,6 @@ protected:
 	// lod level
 	LodLevel m_lodLevel;
 	LodLevel m_lodLevelWithChildren;
-	IBlueObjectProxyPtr m_highDetailMesh;
-	IBlueObjectProxyPtr m_mediumDetailMesh;
-	IBlueObjectProxyPtr m_lowDetailMesh;
 
 	TriGeometryResPtr m_geometryResFromMesh;
 

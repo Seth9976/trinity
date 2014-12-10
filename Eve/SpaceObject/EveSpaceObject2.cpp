@@ -151,54 +151,7 @@ bool EveSpaceObject2::Initialize()
 	// Disallow LOD selection until it's been established we have LODs.
 	m_allowLodSelection = false;
 
-	// Simplify later dealings with LOD by ensuring that all LODs are set,
-	// even if some of them are repeated.
-	if( !m_highDetailMesh )
-	{
-		if( m_mediumDetailMesh )
-		{
-			m_highDetailMesh = m_mediumDetailMesh;
-		}
-		else if( m_lowDetailMesh )
-		{
-			m_highDetailMesh = m_lowDetailMesh;
-		}
-	}
-	if( !m_mediumDetailMesh )
-	{
-		if( m_highDetailMesh )
-		{
-			m_mediumDetailMesh = m_highDetailMesh;
-		}
-		else if( m_lowDetailMesh )
-		{
-			m_mediumDetailMesh = m_lowDetailMesh;
-		}
-	}
-	if( !m_lowDetailMesh )
-	{
-		if( m_mediumDetailMesh )
-		{
-			m_lowDetailMesh = m_mediumDetailMesh;
-		}
-		else if( m_highDetailMesh )
-		{
-			m_lowDetailMesh = m_highDetailMesh;
-		}
-	}
-
-	if( m_lowDetailMesh )
-	{
-		m_allowLodSelection = true;
-
-		// Mesh is persisted, for backwards compatibility, plus it allows us to have
-		// objects that don't have LODs. The drawback is that we may see objects
-		// that have both LODs and have the mesh set. If so, we assume the mesh is
-		// one of the LODs and null out the mesh here. Can't really compare it to
-		// the LODs as that would pull them into memory.
-		m_mesh = NULL;
-	}
-	else if( m_meshLod )
+	if( m_meshLod )
 	{
 		if( m_meshLod->GetSelectedLod() == TR2_LOD_UNSPECIFIED )
 		{
@@ -507,13 +460,6 @@ void EveSpaceObject2::GetShadowBatches( ITriRenderBatchAccumulator* batches, con
 	if( m_mesh )
 	{
 		mesh = m_mesh;
-	}
-	else
-	{
-		if( m_highDetailMesh )
-		{
-			mesh = dynamic_cast<Tr2MeshBase*>( m_highDetailMesh->GetObject( ) );
-		}
 	}
 
 	if( !mesh || mesh->IsHidden() )
@@ -1154,15 +1100,7 @@ int EveSpaceObject2::GetBoneCount() const
 
 bool EveSpaceObject2::RebuildBoundingSphereInformation()
 {
-	Tr2MeshBase* mesh = NULL;
-	if( m_highDetailMesh )
-	{
-		mesh = dynamic_cast<Tr2MeshBase*>( m_highDetailMesh->GetObject( ) );
-	}
-	else
-	{
-		mesh = m_mesh;
-	}
+	Tr2MeshBase* mesh = m_mesh;
 
 	if( !mesh )
 	{
@@ -1573,59 +1511,8 @@ const Vector3* EveSpaceObject2::GetWorldPosition()
 void EveSpaceObject2::SelectMeshLevelOfDetail()
 {
 	Tr2MeshBase* mesh = NULL;
-	switch( m_lodLevel )
-	{
-	case LOD_HIGH:
-		mesh = GetHighDetailMesh();
-		if( !mesh || mesh->IsLoading() )
-		{
-			if( m_mediumDetailMesh && m_mediumDetailMesh->IsResident() )
-			{
-				mesh = GetMediumDetailMesh();
-			}
-			else if( m_lowDetailMesh && m_lowDetailMesh->IsResident() )
-			{
-				mesh = GetLowDetailMesh();
-			}
-		}
-		break;
-	case LOD_MEDIUM:
-		m_lodLevel = LOD_MEDIUM;
-		mesh = GetMediumDetailMesh();
-		if( !mesh || mesh->IsLoading() )
-		{
-			if( m_highDetailMesh && m_highDetailMesh->IsResident() )
-			{
-				mesh = GetHighDetailMesh();
-			}
-			else if( m_lowDetailMesh && m_lowDetailMesh->IsResident() )
-			{
-				mesh = GetLowDetailMesh();
-			}
-		}
-		break;
-	default:
-		mesh = GetLowDetailMesh();
-		if( !mesh || mesh->IsLoading() )
-		{
-			if( m_mediumDetailMesh && m_mediumDetailMesh->IsResident() )
-			{
-				mesh = GetMediumDetailMesh();
-			}
-			else if( m_highDetailMesh && m_highDetailMesh->IsResident() )
-			{
-				mesh = GetHighDetailMesh();
-			}
-		}
-		break;
-	}
 
-	// if we found a LOD mesh, use this as our "main" mesh
-	if( mesh )
-	{
-		m_mesh = mesh;
-	}
-	else if( m_meshLod )
+	if( m_meshLod )
 	{
 		m_meshLod->SelectLod( static_cast<Tr2Lod>( m_lodLevel ) );
 		m_mesh = m_meshLod;
@@ -1647,20 +1534,7 @@ void EveSpaceObject2::UnloadLodIfNeeded( Be::Time time )
 {
 	if( EveSpaceScene::IsMeshUnloadingEnabled() )
 	{
-		Be::Time timeout = TimeFromDouble( (double)g_eveSpaceObjectResourceUnloadingTimeThreshold );
 		m_mesh = NULL;
-		if( m_highDetailMesh )
-		{
-			m_highDetailMesh->Update( time, timeout );
-		}
-		if( m_mediumDetailMesh )
-		{
-			m_mediumDetailMesh->Update( time, timeout );
-		}
-		if( m_lowDetailMesh )
-		{
-			m_lowDetailMesh->Update( time, timeout );
-		}
 	}
 }
 
@@ -1777,31 +1651,11 @@ void EveSpaceObject2::GetLocalToWorldTransform( Matrix &transform )
 
 void EveSpaceObject2::FreezeHighDetailMesh()
 {
-	bool didIt = false;
-
-	if( m_highDetailMesh )
+	if( m_meshLod )
 	{
-		m_mesh = dynamic_cast<Tr2MeshBase*>( m_highDetailMesh->GetObject( ) );
-		if( m_mesh )
-		{
-			didIt = true;
-
-			m_highDetailMesh.Unlock();
-			m_mediumDetailMesh.Unlock();
-			m_lowDetailMesh.Unlock();
-		}
-	}
-	else if( m_meshLod )
-	{
-		didIt = true;
-
 		m_mesh = m_meshLod;
 		m_meshLod->SelectLod( TR2_LOD_HIGH );
 
-	}
-
-	if( didIt )
-	{
 		m_allowLodSelection = false;
 		m_lodLevel = LOD_HIGH;
 
@@ -1849,18 +1703,7 @@ bool EveSpaceObject2::DisplayDecals() const
 	// if LOD selection is deactivated, it's always highest so decals are on
 	if( !m_allowLodSelection )
 		return true;
-	// LOD selection is active, so check for highest
-	if( m_lodLevel == LOD_HIGH )
-	{
-		// Prevent decals from rebuilding with anything but high-detail mesh
-		const Tr2MeshBase* mesh = GetHighDetailMesh();
-		if( mesh && mesh->IsLoading() )
-		{
-			return false;
-		}
-		return true;
-	}
-	return false;
+	return m_lodLevel == LOD_HIGH;
 }
 
 // --------------------------------------------------------------------------------
@@ -1872,83 +1715,6 @@ bool EveSpaceObject2::DisplayDecals() const
 bool EveSpaceObject2::DisplayChildren() const
 {
 	return true;
-}
-
-void EveSpaceObject2::SetHighDetailMesh( Tr2MeshBase* mesh )
-{
-	if( !m_highDetailMesh )
-	{
-		Be::Clsid clsid;
-		if( BeClasses->FindClsid( clsid, "blue", "BlueObjectProxy" ) )
-		{
-			BeClasses->CreateInstance( clsid, BlueInterfaceIID<IBlueObjectProxy>(), (void**)&m_highDetailMesh );
-		}
-	}
-
-	if( m_highDetailMesh )
-	{
-		m_highDetailMesh->SetObject( mesh->GetRawRoot() );
-	}
-}
-
-void EveSpaceObject2::SetMediumDetailMesh( Tr2MeshBase* mesh )
-{
-	if( !m_mediumDetailMesh )
-	{
-		Be::Clsid clsid;
-		if( BeClasses->FindClsid( clsid, "blue", "BlueObjectProxy" ) )
-		{
-			BeClasses->CreateInstance( clsid, BlueInterfaceIID<IBlueObjectProxy>(), (void**)&m_mediumDetailMesh );
-		}
-	}
-
-	if( m_mediumDetailMesh )
-	{
-		m_mediumDetailMesh->SetObject( mesh->GetRawRoot() );
-	}
-}
-
-void EveSpaceObject2::SetLowDetailMesh( Tr2MeshBase* mesh )
-{
-	if( !m_lowDetailMesh )
-	{
-		Be::Clsid clsid;
-		if( BeClasses->FindClsid( clsid, "blue", "BlueObjectProxy" ) )
-		{
-			BeClasses->CreateInstance( clsid, BlueInterfaceIID<IBlueObjectProxy>(), (void**)&m_lowDetailMesh );
-		}
-	}
-
-	if( m_lowDetailMesh )
-	{
-		m_lowDetailMesh->SetObject( mesh->GetRawRoot() );
-	}
-}
-
-Tr2MeshBase* EveSpaceObject2::GetHighDetailMesh() const
-{
-	if( !m_highDetailMesh )
-	{
-		return NULL;
-	}
-	return dynamic_cast<Tr2MeshBase*>( m_highDetailMesh->GetObject( ) );
-}
-Tr2MeshBase* EveSpaceObject2::GetMediumDetailMesh() const
-{
-	if( !m_mediumDetailMesh )
-	{
-		return NULL;
-	}
-	return dynamic_cast<Tr2MeshBase*>( m_mediumDetailMesh->GetObject( ) );
-}
-
-Tr2MeshBase* EveSpaceObject2::GetLowDetailMesh() const
-{
-	if( !m_lowDetailMesh )
-	{
-		return NULL;
-	}
-	return dynamic_cast<Tr2MeshBase*>( m_lowDetailMesh->GetObject( ) );
 }
 
 void EveSpaceObject2::UpdateDamageLocatorPositions()

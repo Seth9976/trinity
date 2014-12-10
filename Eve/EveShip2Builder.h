@@ -37,7 +37,7 @@ protected:
 	void CopyDecals( const EveSpaceObjectDecalVector* src, EveSpaceObjectDecalVector* dst, const Vector3& offset );
 	void Weld( granny_uint8* referenceVB, int referenceCount, granny_uint8* vb, int count );
 	void InitializeGrannyFile();
-	bool AddMeshToGrannyFile( TriGrannyResPtr* grannies, int ix, Tr2Mesh* mesh, const Vector3& offset, Tr2Mesh* dstMesh );
+	bool AddMeshToGrannyFile( TriGrannyResPtr* grannies, int ix, Tr2Mesh* mesh, const Vector3& offset, Tr2MeshLod* dstMesh );
 	void CalculateBoundingSphere( const Vector3* offsets );
 	void CalculateAudioBooster();
 	void FinalizeGrannyFile( const std::string& outputName );
