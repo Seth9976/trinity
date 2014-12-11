@@ -285,38 +285,36 @@ uint32_t App::GetKeyState( uint32_t vKeyCode )
     return ::GetKeyState( vKeyCode );
 }
 
-bool App::GetKeyName( uint32_t vk, char* buffer, size_t bufferSize )
+bool App::GetKeyName( uint32_t virtualKey, char* buffer, size_t bufferSize )
 {
-	UINT sc = ::MapVirtualKey( vk, 0 );
-    
-	int asc = 0;
-	if( vk > 32 && vk != VK_DIVIDE )
-	{
-		BYTE buf[256];
-		memset(buf, 0, 256);
-		unsigned short int temp;
-		asc = ToAscii(vk, sc, buf, &temp, 1);
-	}
-    
-	sc <<= 16;
-	sc |= 0x1 << 25;  // <- don't care
-	if( asc != 0 )
-	{
-		sc |= 0x1 << 24; // <- extended bit
-	}
-    
-	int result = ::GetKeyNameText( sc, buffer, int( bufferSize ) );
-	// GetKeyNameText is polluting the keyboard buffer whenever it's called with a dead key (for example, RING on 
-	// Icelandic keyboard layouts, so we need to perform a dummy call to prevent that. See issue EVE-97662.
-	// asc < 0 means that the requested key was a dead key.
-	if (asc < 0 && vk != 65)
-	{
-		// 65 == the letter 'A' -- flushing with other values such as 0 or spacebar doesn't seem to work, it seems to need an ascii letter.
-		char dummy[64];
-		App::GetKeyName( 65, dummy, 63 );
-	}
+	unsigned int scanCode = ::MapVirtualKey( virtualKey, MAPVK_VK_TO_VSC ) << 16;
 
-	return result != 0;
+	// Set the extended keyboard bit for the following virtual keys
+    switch( virtualKey )
+    {
+        case VK_LEFT:
+        case VK_UP:
+        case VK_RIGHT:
+        case VK_DOWN:
+        case VK_PRIOR:
+        case VK_NEXT:
+        case VK_END:
+        case VK_HOME:
+        case VK_INSERT:
+        case VK_DELETE:
+        case VK_DIVIDE:
+        case VK_NUMLOCK:
+        {
+            scanCode |= ( 1 << 24 );
+        }
+    }
+
+	// Make no distinction between left and right control keys
+	scanCode |= ( 1 << 25 );
+
+	// Lookup the key name and return true if it succeeds
+	return bool( ::GetKeyNameText( scanCode, buffer, int( bufferSize ) ) );
 }
+
 
 #endif
