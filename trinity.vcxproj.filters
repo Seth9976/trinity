@@ -1405,7 +1405,13 @@
     <ClInclude Include="UI\Tr2PresentParameters.h">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="UI\Tr2SecondaryWindow.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
     <ClInclude Include="UI\UIChoosers.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\WindowIcon.h">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="Utilities\BoundingBox.h">
@@ -3517,7 +3523,16 @@
     <ClCompile Include="UI\Tr2PresentParameters_Blue.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Tr2SecondaryWindow.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Tr2SecondaryWindow_Blue.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
     <ClCompile Include="UI\UIChoosers.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\WindowIcon.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\BoundingBox.cpp">

@@ -3008,7 +3008,9 @@
     <ClInclude Include="UI\Scancodes.h"/>
     <ClInclude Include="UI\Tr2MouseCursor.h"/>
     <ClInclude Include="UI\Tr2PresentParameters.h"/>
+    <ClInclude Include="UI\Tr2SecondaryWindow.h"/>
     <ClInclude Include="UI\UIChoosers.h"/>
+    <ClInclude Include="UI\WindowIcon.h"/>
     <ClInclude Include="Utilities\BoundingBox.h"/>
     <ClInclude Include="Utilities\BoundingSphere.h"/>
     <ClInclude Include="Utilities\Color.h"/>
@@ -3716,7 +3718,10 @@
     <ClCompile Include="UI\Tr2MouseCursor_Blue.cpp"/>
     <ClCompile Include="UI\Tr2PresentParameters.cpp"/>
     <ClCompile Include="UI\Tr2PresentParameters_Blue.cpp"/>
+    <ClCompile Include="UI\Tr2SecondaryWindow.cpp"/>
+    <ClCompile Include="UI\Tr2SecondaryWindow_Blue.cpp"/>
     <ClCompile Include="UI\UIChoosers.cpp"/>
+    <ClCompile Include="UI\WindowIcon.cpp"/>
     <ClCompile Include="Utilities\BoundingBox.cpp"/>
     <ClCompile Include="Utilities\BoundingSphere.cpp"/>
     <ClCompile Include="Utilities\GeometryUtils.cpp"/>
