@@ -238,6 +238,17 @@ namespace Tr2RenderContextEnum
 		COLOR_SPACE_LINEAR,
 		COLOR_SPACE_SRGB,
 	};
+    
+    enum StencilOperation {
+        STENCILOP_KEEP         = 1,
+        STENCILOP_ZERO         = 2,
+        STENCILOP_REPLACE      = 3,
+        STENCILOP_INCRSAT      = 4,
+        STENCILOP_DECRSAT      = 5,
+        STENCILOP_INVERT       = 6,
+        STENCILOP_INCR         = 7,
+        STENCILOP_DECR         = 8,
+    };
 
 	// Rasterization states for backward compatibility
 	enum RenderState
