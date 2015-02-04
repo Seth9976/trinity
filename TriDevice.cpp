@@ -96,6 +96,7 @@ CCP_STATS_DECLARE( deviceOnTick, "Trinity/device/OnTick", true, CST_TIME, "Time 
 
 CCP_STATS_DECLARE( fpsRaw, "FPSRaw", false, CST_COUNTER_LOW, "Frames per second (raw values)");
 CCP_STATS_DECLARE( fps, "FPS", false, CST_COUNTER_LOW, "Frames per second");
+CCP_STATS_DECLARE( smoothedFrameTime, "Trinity/SmoothedFrameTime", false, CST_TIME, "Frame time smoothed over a number of frames");
 CCP_STATS_DECLARE( frameTime, "Trinity/FrameTime", false, CST_TIME, "Frame time");
 CCP_STATS_DECLARE( frameTimeAbove100ms, "Trinity/FrameTimeAbove100ms", false, CST_COUNTER_LOW, "Number of frames where the frame time was above 100ms (but below 200)");
 CCP_STATS_DECLARE( frameTimeAbove200ms, "Trinity/FrameTimeAbove200ms", false, CST_COUNTER_LOW, "Number of frames where the frame time was above 200ms (but below 300)");
@@ -655,7 +656,7 @@ void TriDevice::OnTick( Be::Time realTime, Be::Time simTime, void* cookie )
 
 	// Start with statistics on frame time
 	static BeTimer s_frameTimer;
-	static const int s_fpsValuesCount = 16;
+	static const int s_fpsValuesCount = 64;
 	static double s_frameTimeValues[s_fpsValuesCount] = {0.0};
 	static double s_frameTimeSum = 0.0;
 	static int s_currentFpsValue = 0;
@@ -694,6 +695,17 @@ void TriDevice::OnTick( Be::Time realTime, Be::Time simTime, void* cookie )
 
 	CCP_STATS_SET( fpsRaw, fps );
 
+	if( frameTime > 0.5f )
+	{
+		// If frame time is very high, clear out the values to better show stalls
+		// on fps graphs.
+		s_frameTimeSum = frameTime * s_fpsValuesCount;
+		for( int i = 0; i < s_fpsValuesCount; ++i )
+		{
+			s_frameTimeValues[i] = frameTime;
+		}
+	}
+
 	s_frameTimeSum -= s_frameTimeValues[s_currentFpsValue];
 	s_frameTimeValues[s_currentFpsValue] = frameTime;
 	s_frameTimeSum += frameTime;
@@ -701,12 +713,17 @@ void TriDevice::OnTick( Be::Time realTime, Be::Time simTime, void* cookie )
 	s_currentFpsValue %= s_fpsValuesCount;
 
 	double avgFps = 0.0;
+	double avgFrametime = 0.0;
 	if( frameTime > 0.0 )
 	{
-		avgFps = 1.0 / (s_frameTimeSum / (double)s_fpsValuesCount);
+		avgFrametime = s_frameTimeSum / (double)s_fpsValuesCount;
+		avgFps = 1.0 / avgFrametime;
 	}
 
-	CCP_STATS_SET( fps, avgFps );
+	CCP_STATS_SET( fps, 100.0 * avgFps );
+#if CCP_STATS_ENABLED
+	g_ccpStatistics_smoothedFrameTime.Set( avgFrametime );
+#endif
 
 	s_frameTimer.Reset();
 
