@@ -550,24 +550,11 @@ bool TriTextureRes::CreateFromHostBitmap( Tr2HostBitmap* bitmap )
 		return false;
 	}
 
-	std::vector<Tr2SubresourceData> srd;
-	srd.resize( bitmap->GetTrueMipCount() );
-	for( unsigned i = 0; i != bitmap->GetTrueMipCount(); ++i )
+	uint32_t memoryUse;
+	if( !Tr2ImageIOHelpers::CreateTexture( *bitmap, m_texture, memoryUse, renderContext, USAGE_IMMUTABLE ) )
 	{
-		srd[i].m_sysMem = bitmap->GetMipRawData( i );
-		srd[i].m_sysMemPitch = bitmap->GetMipPitch( i );
-		srd[i].m_sysMemSlicePitch = bitmap->GetMipHeight( i ) * srd[i].m_sysMemPitch;
+		return false;
 	}
-	CR_RETURN_VAL( 
-		m_texture.Create2D(		bitmap->GetWidth(), 
-								bitmap->GetHeight(), 
-								bitmap->GetTrueMipCount(), 
-								bitmap->GetFormat(), 
-								USAGE_IMMUTABLE, 
-								&srd[0], 
-								renderContext )
-		, false );
-
 	m_isTextureResizable = false;
 	SetTexture( m_texture );
 	return true;	
