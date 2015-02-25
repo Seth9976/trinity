@@ -682,10 +682,10 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 	fd.resPathInsert = srcData->m_resPathInsert;
 
 	// material usage ids
-	fd.materialUsageList[0] = srcData->m_materialUsageMain;
-	fd.materialUsageList[1] = srcData->m_materialUsageMask;
-	fd.materialUsageList[2] = 0;
-	fd.materialUsageList[3] = 0;
+	fd.materialUsageList[0] = srcData->m_materialUsageMtl1;
+	fd.materialUsageList[1] = srcData->m_materialUsageMtl2;
+	fd.materialUsageList[2] = srcData->m_materialUsageMtl3;
+	fd.materialUsageList[3] = srcData->m_materialUsageMtl4;
 
 	// sprite set colors
 	fd.spriteSetsColor.clear();

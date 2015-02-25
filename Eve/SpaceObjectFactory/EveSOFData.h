@@ -506,8 +506,10 @@ public:
 	PEveSOFDataFactionDecalVector m_decals;
 
 	// material usage
-	int m_materialUsageMain;
-	int m_materialUsageMask;
+	int m_materialUsageMtl1;
+	int m_materialUsageMtl2;
+	int m_materialUsageMtl3;
+	int m_materialUsageMtl4;
 };
 TYPEDEF_BLUECLASS( EveSOFDataFaction );
 BLUE_DECLARE_VECTOR( EveSOFDataFaction );

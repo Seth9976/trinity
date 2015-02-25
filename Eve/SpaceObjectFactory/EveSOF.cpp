@@ -1003,15 +1003,20 @@ bool EveSOF::GetTurretMaterialParameter( const Vector4* &value, const char* para
 	// find it?
 	if( materialIdx != -1 )
 	{
-		// insert the prefix based on what is set in the faction data's turret materials
-		paramName.insert( 0, genericData->materialPrefixes[ matUsageIdxList[ materialIdx ] ] );
-
-		// try to find this param and use it's value
-		auto paramFinder = areaData->parameters.find( BlueSharedString( paramName ) );
-		if( paramFinder != areaData->parameters.end() )
+		// change the material index into the usage index, which in this case is the turret material index
+		int turretMaterialIdx = matUsageIdxList[ materialIdx ];
+		if( ( turretMaterialIdx >= 0 ) && ( turretMaterialIdx < int(genericData->materialPrefixes.size()) ) )
 		{
-			value = &paramFinder->second;
-			return true;
+			// insert the prefix based on what is set in the faction data's turret materials
+			paramName.insert( 0, genericData->materialPrefixes[ turretMaterialIdx ] );
+
+			// try to find this param and use it's value
+			auto paramFinder = areaData->parameters.find( BlueSharedString( paramName ) );
+			if( paramFinder != areaData->parameters.end() )
+			{
+				value = &paramFinder->second;
+				return true;
+			}
 		}
 	}
 	return false;
