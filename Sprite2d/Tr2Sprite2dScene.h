@@ -84,7 +84,7 @@ public:
 	bool IsInside( const Vector2& point, const Vector2& topLeft, float width, float height, float radius );
 
 	bool IsInsideLineSegment( const Vector2& pointIn, const Vector2& start, const Vector2& end, float lineWidth );
-
+	bool IsInsideTriangle( const Vector2& pointIn, const Vector2& v0, const Vector2& v1, const Vector2& v2 );
 	bool IsInsideClipRect( const Vector2& point );
 
 	bool PrepareSpriteVerts( 
@@ -165,7 +165,7 @@ private:
 	void GrowCaptureVertexBuffer( unsigned int vertexCount );
 
 
-	void TransformPoint( Vector2 &point, Matrix m );
+	void TransformPoint( Vector2& result, const Vector2& point, Matrix m );
 
 private:
 	inline bool TexturesReady() const;

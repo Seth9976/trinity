@@ -1319,7 +1319,7 @@ bool Tr2Sprite2dScene::IsInside( const Vector2& pointIn, const Vector2& topLeft,
 			Matrix inv;
 			D3DXMatrixInverse( &inv, NULL, &transform );
 
-			TransformPoint(point, inv);
+			TransformPoint(point, point, inv);
 		}
 	}
 
@@ -1414,11 +1414,8 @@ bool Tr2Sprite2dScene::IsInsideLineSegment( const Vector2& pointIn, const Vector
 		{
 			const Matrix& transform = topEntry.transform;
 
-			startTransformed = start;
-			TransformPoint( startTransformed, transform );
-
-			endTransformed = end;
-			TransformPoint( endTransformed, transform );
+			TransformPoint(startTransformed, start, transform );
+			TransformPoint(endTransformed, end, transform );
 		}
 	}
 
@@ -1447,6 +1444,62 @@ bool Tr2Sprite2dScene::IsInsideLineSegment( const Vector2& pointIn, const Vector
 	Vector2 pointToCenter = pointIn - centerPoint;
 	float distanceFromCenter = sqrtf( pointToCenter.x*pointToCenter.x + pointToCenter.y*pointToCenter.y );
 	if( distanceFromCenter > den * 0.5f )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+static float Sign( const Vector2& v1, const Vector2& v2, const Vector2& v3 )
+{
+	return (v1.x - v3.x) * (v2.y - v3.y) - (v2.x - v3.x) * (v1.y - v3.y);
+}
+
+bool Tr2Sprite2dScene::IsInsideTriangle( const Vector2& pointIn, const Vector2& v0, const Vector2& v1, const Vector2& v2 )
+{
+	if( !IsInsideClipRect( pointIn ) )
+	{
+		return false;
+	}
+
+	Vector2 vT[3];
+
+	if( m_transformStack->empty() )
+	{
+		vT[0] = v0;
+		vT[1] = v1;
+		vT[2] = v2;
+	}
+	else
+	{
+		const TransformStackEntry& topEntry = m_transformStack->back();
+
+		if( topEntry.isTranslationOnly )
+		{
+			vT[0] = v0 + topEntry.translation;
+			vT[1] = v1 + topEntry.translation;
+			vT[2] = v2 + topEntry.translation;
+		}
+		else
+		{
+			const Matrix& transform = topEntry.transform;
+
+			TransformPoint( vT[0], v0, transform );
+			TransformPoint( vT[1], v1, transform );
+			TransformPoint( vT[2], v2, transform );
+		}
+	}
+
+	if( Sign( pointIn, vT[0], vT[1] ) < 0.0f )
+	{
+		return false;
+	}
+	if( Sign( pointIn, vT[1], vT[2] ) < 0.0f )
+	{
+		return false;
+	}
+	if( Sign( pointIn, vT[2], vT[0] ) < 0.0f )
 	{
 		return false;
 	}
@@ -2454,14 +2507,14 @@ bool Tr2Sprite2dScene::IsInsideClipRect( const Vector2& point )
 	return true;
 }
 
-void Tr2Sprite2dScene::TransformPoint( Vector2 &point, Matrix m )
+void Tr2Sprite2dScene::TransformPoint( Vector2& result, const Vector2& point, Matrix m )
 {
 	Vector4 point4( point.x, point.y, 0, 1 );
 	Vector4 transformed;
 	D3DXVec4Transform( &transformed, &point4, &m );
 
-	point.x = transformed.x;
-	point.y = transformed.y;
+	result.x = transformed.x;
+	result.y = transformed.y;
 }
 
 #if BLUE_WITH_PYTHON

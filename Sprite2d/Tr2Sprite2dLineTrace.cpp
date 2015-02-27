@@ -195,40 +195,26 @@ ITr2SpriteObject* Tr2Sprite2dLineTrace::PickPoint( float x, float y, Tr2Sprite2d
 
 	if( m_pickState == TR2_SPS_ON )
 	{
-		if( m_vertices.size() < 2 )
+		if( m_renderVertices.size() < 2 )
 		{
 			return nullptr;
 		}
 
-		Vector2 fromPos = m_vertices[0]->m_position;
-		float halfWidth = m_lineWidth * 0.5f;
+		Vector2 p( x, y );
 
-		for( auto it = m_vertices.begin() + 1; it != m_vertices.end(); ++it )
+		for( size_t i = 0; i < m_renderIndices.size() / 3; ++i )
 		{
-			const Vector2& toPos = (*it)->m_position;
-			Vector2 d = toPos - fromPos;
-			float len = XMVectorGetX(XMVector2LengthSq( d ));
-			if( len > FLT_EPSILON )
-			{
-				if( renderer->IsInsideLineSegment( Vector2( x, y ), fromPos, toPos, halfWidth ) )
-				{
-					return this;
-				}
-				fromPos = toPos;
-			}
-		}
+			auto ix0 = m_renderIndices[i * 3];
+			auto ix1 = m_renderIndices[i * 3 + 1];
+			auto ix2 = m_renderIndices[i * 3 + 2];
 
-		if( m_isLoop )
-		{
-			const Vector2& toPos =  m_vertices[0]->m_position;
-			Vector2 d = toPos - fromPos;
-			float len = XMVectorGetX(XMVector2LengthSq( d ));
-			if( len > FLT_EPSILON )
+			auto v0 = m_renderVertices[ix0];
+			auto v1 = m_renderVertices[ix1];
+			auto v2 = m_renderVertices[ix2];
+
+			if( renderer->IsInsideTriangle( p, *(Vector2*)&v0.position, *(Vector2*)&v1.position, *(Vector2*)&v2.position ) )
 			{
-				if( renderer->IsInsideLineSegment( Vector2( x, y ), fromPos, toPos, halfWidth ) )
-				{
-					return this;
-				}
+				return this;
 			}
 		}
 	}
