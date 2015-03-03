@@ -42,7 +42,8 @@ public:
 	{
 		Matrix m_world;
 		Matrix m_worldView;
-		Matrix m_worldViewProjectionInv;
+		Matrix m_worldViewInv;
+		Matrix m_projectionInv;
 		Vector4 m_nearPlaneLocal;
 		Vector3 m_eyePosLocal;
 		float m_screenDepth;
@@ -324,9 +325,6 @@ Tr2PerObjectData* EveCloud::GetPerObjectData( ITriRenderBatchAccumulator* accumu
 	D3DXMatrixTranspose( &data->m_data.m_worldView, &worldView );
 
 	Matrix worldViewProjection = m_worldTransform * Tr2Renderer::GetViewTransform() * Tr2Renderer::GetProjectionTransform();
-	D3DXMatrixInverse( &data->m_data.m_worldViewProjectionInv, nullptr, &worldViewProjection );
-	D3DXMatrixTranspose( &data->m_data.m_worldViewProjectionInv, &data->m_data.m_worldViewProjectionInv );
-
 
 	Matrix worldViewTransposed;
 	D3DXMatrixTranspose( &worldViewTransposed, &worldView );
@@ -335,8 +333,14 @@ Tr2PerObjectData* EveCloud::GetPerObjectData( ITriRenderBatchAccumulator* accumu
 
 	Matrix worldViewInv;
 	D3DXMatrixInverse( &worldViewInv, nullptr, &worldView );
+	D3DXMatrixTranspose( &data->m_data.m_worldViewInv, &worldViewInv );
 	Vector3 zero( 0.f, 0.f, 0.f );
 	D3DXVec3TransformCoord( &data->m_data.m_eyePosLocal, &zero, &worldViewInv );
+
+	Matrix projectionInv;
+	D3DXMatrixInverse( &projectionInv, nullptr, &Tr2Renderer::GetProjectionTransform() );
+	D3DXMatrixTranspose( &data->m_data.m_projectionInv, &projectionInv );
+
 
 	Vector3 center;
 	D3DXVec3TransformCoord( &center, &zero, &worldViewProjection );
