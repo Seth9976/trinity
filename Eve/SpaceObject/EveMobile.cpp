@@ -25,6 +25,7 @@ EveMobile::EveMobile( IRoot* lockobj ) :
 	m_playActivationCurve( false ),
 	m_playClipSphereFactorCurve( false ),
 	m_clipSphereFactor( 0.f ),
+	m_clipSphereFactorDelta( 0.f ),
 	m_clipSphereCenter( 0.f, 0.f, 0.f )
 {
 	// ship class needs to know if turrets get added or removed
@@ -581,7 +582,7 @@ void EveMobile::PlayClipSphereFactorCurve()
 // --------------------------------------------------------------------------------
 void EveMobile::ModifyClipSphereCurve( const std::map<std::string, float>& parameters )
 {
-	m_clipSphereFactorDelta = 0;
+	m_clipSphereFactorDelta = 0.f;
 	if( parameters.find( "elapsedTime" ) != parameters.end() )
 	{
 		m_clipSphereFactorDelta = parameters.at( "elapsedTime" );
