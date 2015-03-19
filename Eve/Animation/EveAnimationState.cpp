@@ -49,7 +49,7 @@ void EveAnimationState::UpdateDuration( EveAnimationStateMachine* sm, EveSpaceOb
 	m_startTime = currentAnimationTime;
 	m_animationDuration = 0;
 	auto ac = so->GetAnimationController();
-	if( ac && ac->IsInitialized() )
+	if( ac && ac->IsInitialized() && m_animation )
 	{
 		if( sm->HasTrackMask() )
 		{
@@ -231,7 +231,7 @@ void EveAnimationState::EndAnimation( EveAnimationStateMachine* sm, EveSpaceObje
 
 	float currentAnimationTime = Tr2Renderer::GetAnimationTime();
 	float animationDuration = 0;
-	if( ac && ac->IsInitialized() )
+	if( ac && ac->IsInitialized() && m_animation )
 	{
 		if( sm->HasTrackMask() )
 		{
