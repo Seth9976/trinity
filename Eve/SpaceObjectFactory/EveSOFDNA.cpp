@@ -367,7 +367,7 @@ void EveSOFDNA::ModifyTextureResPath( std::string& resPath, const char* resName 
 	if( !m_factionData->resPathInsert.empty() )
 	{
 		// hardcoded texture param names which'll get an override
-		if( !strcmp( resName, "PgrMap" ) || !strcmp( resName, "PgsMap" ) || !strcmp( resName, "MaterialMap" ) )
+		if( !strcmp( resName, "PgrMap" ) || !strcmp( resName, "PgsMap" ) || !strcmp( resName, "MaterialMap" ) || !strcmp( resName, "PdmgMap" ) )
 		{
 			std::string resPathCopy = resPath;
 
