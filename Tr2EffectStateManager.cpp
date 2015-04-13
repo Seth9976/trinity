@@ -720,11 +720,13 @@ void Tr2EffectStateManager::ApplyIndexBuffer( const Tr2IndexBufferAL & indices )
 	
 	if( m_isManagedRendering )
 	{
+		// we can't really track index buffers on OpenGL as they are reassigned occasionally in TrinityAL
+#if TRINITY_PLATFORM != TRINITY_OPENGLES2
 		if( &indices == m_currentValues.m_indexBuffer )
 		{
 			return;
 		}
-
+#endif
 		m_currentValues.m_indexBuffer = &indices;
 	}
 
