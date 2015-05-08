@@ -263,7 +263,7 @@ void EveTurretFiringFX::StopFiring()
 // Description:
 //   Returns true if any muzzle is not started but is ready to start
 // --------------------------------------------------------------------------------
-bool EveTurretFiringFX::ReadyToFire()
+bool EveTurretFiringFX::ReadyToFire() const
 {
 	for( unsigned int i = 0; i < m_stretch.size(); ++i )
 	{

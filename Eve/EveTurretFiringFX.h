@@ -49,7 +49,7 @@ public:
 	};
 	
 public:
-	bool ReadyToFire();
+	bool ReadyToFire() const;
 	// timing and worldspace positioning
 	bool Update( Be::Time time, float deltaT );
 	// rendering
