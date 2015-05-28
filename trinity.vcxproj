@@ -2812,6 +2812,7 @@
     <ClInclude Include="Eve\SpaceObjectFactory\EveSOFData.h"/>
     <ClInclude Include="Eve\SpaceObjectFactory\EveSOFDataMgr.h"/>
     <ClInclude Include="Eve\SpaceObjectFactory\EveSOFDNA.h"/>
+    <ClInclude Include="Eve\SpaceObjectFactory\EveSOFUtils.h"/>
     <ClInclude Include="Font\Tr2FontManager.h"/>
     <ClInclude Include="Font\Tr2FontMeasurer.h"/>
     <ClInclude Include="Font\Tr2SBit.h"/>
@@ -3434,6 +3435,7 @@
     <ClCompile Include="Eve\SpaceObjectFactory\EveSOFData_Blue.cpp"/>
     <ClCompile Include="Eve\SpaceObjectFactory\EveSOFDNA.cpp"/>
     <ClCompile Include="Eve\SpaceObjectFactory\EveSOFDNA_Blue.cpp"/>
+    <ClCompile Include="Eve\SpaceObjectFactory\EveSOFUtils.cpp"/>
     <ClCompile Include="Eve\SpaceObjectFactory\EveSOF_Blue.cpp"/>
     <ClCompile Include="Font\Tr2FontManager.cpp"/>
     <ClCompile Include="Font\Tr2FontManager_Blue.cpp"/>
