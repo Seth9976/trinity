@@ -31,6 +31,10 @@
 #include "Curves/TriRotationCurve.h"
 #include "TriValueBinding.h"
 #include "Particle/Tr2DynamicEmitter.h"
+#include "TriSettingsRegistrar.h"
+
+bool g_eveSofUseQuadRenderer = true;
+TRI_REGISTER_SETTING( "eveSofUseQuadRenderer", g_eveSofUseQuadRenderer );
 
 
 // --------------------------------------------------------------------------------
@@ -50,10 +54,24 @@ EveSOF::EveSOF( IRoot* lockobj ) :
 	// some shared shaders here
 	m_spriteSetEffect.CreateInstance();
 	m_spriteSetEffect->StartUpdate();
-	m_spriteSetEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/blinkinglightspool.fx" );
+	m_spriteSetEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/blinkinglights.fx" );
 	m_spriteSetEffect->AddParameterFloat( mainIntensity, 1.f );
 	m_spriteSetEffect->AddResourceTexture2D( gradientMap, "res:/texture/particle/whitesharp_gradient.dds" );
 	m_spriteSetEffect->EndUpdate();
+
+	m_spriteSetEffectSkinned.CreateInstance();
+	m_spriteSetEffectSkinned->StartUpdate();
+	m_spriteSetEffectSkinned->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/skinned_blinkinglights.fx" );
+	m_spriteSetEffectSkinned->AddParameterFloat( mainIntensity, 1.f );
+	m_spriteSetEffectSkinned->AddResourceTexture2D( gradientMap, "res:/texture/particle/whitesharp_gradient.dds" );
+	m_spriteSetEffectSkinned->EndUpdate();
+
+	m_spriteSetEffectPool.CreateInstance();
+	m_spriteSetEffectPool->StartUpdate();
+	m_spriteSetEffectPool->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/blinkinglightspool.fx" );
+	m_spriteSetEffectPool->AddParameterFloat( mainIntensity, 1.f );
+	m_spriteSetEffectPool->AddResourceTexture2D( gradientMap, "res:/texture/particle/whitesharp_gradient.dds" );
+	m_spriteSetEffectPool->EndUpdate();
 
 	m_shadowEffect.CreateInstance();
 	m_shadowEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/shadow/shadow.fx" );
@@ -391,8 +409,15 @@ void EveSOF::SetupSpriteSets( EveShip2Ptr ship, const EveSOFDNAPtr dna ) const
 		EveSpriteSetPtr spriteSet;
 		spriteSet.CreateInstance();
 		// set skinned or unskinned shader
-		spriteSet->SetEffect( m_spriteSetEffect );
-		spriteSet->UseQuadRenderer( true, spriteSetData->skinned );
+		if( g_eveSofUseQuadRenderer )
+		{
+			spriteSet->SetEffect( m_spriteSetEffectPool );
+			spriteSet->UseQuadRenderer( true, spriteSetData->skinned );
+		}
+		else
+		{
+			spriteSet->SetEffect( spriteSetData->skinned ? m_spriteSetEffectSkinned : m_spriteSetEffect );
+		}
 		// add all the individual items
 		for( auto ssiit = spriteSetData->m_items.begin(); ssiit != spriteSetData->m_items.end(); ++ssiit )
 		{
@@ -465,8 +490,21 @@ void EveSOF::SetupSpotlightSets( EveShip2Ptr ship, const EveSOFDNAPtr dna ) cons
 		glowEffect.CreateInstance();
 		glowEffect->StartUpdate();
 
-		coneEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/spotlightconepool.fx" );
-		glowEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/spotlightglowpool.fx" );
+		if( g_eveSofUseQuadRenderer )
+		{
+			coneEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/spotlightconepool.fx" );
+			glowEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/spotlightglowpool.fx" );
+		}
+		else if( spotlightSetData->skinned )
+		{
+			coneEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/skinned_spotlightcone.fx" );
+			glowEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/skinned_spotlightglow.fx" );
+		}
+		else
+		{
+			coneEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/spotlightcone.fx" );
+			glowEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/spotlightglow.fx" );
+		}
 
 		// textures
 		BlueSharedString textureMap("TextureMap");
@@ -487,7 +525,10 @@ void EveSOF::SetupSpotlightSets( EveShip2Ptr ship, const EveSOFDNAPtr dna ) cons
 		// set to set
 		spotlightSet->SetConeEffect( coneEffect );
 		spotlightSet->SetGlowEffect( glowEffect );
-		spotlightSet->UseQuadRenderer( true, spotlightSetData->skinned );
+		if( g_eveSofUseQuadRenderer )
+		{
+			spotlightSet->UseQuadRenderer( true, spotlightSetData->skinned );
+		}
 
 		// add all individual items
 		for( auto ssiit = spotlightSetData->items.begin(); ssiit != spotlightSetData->items.end(); ++ssiit )
@@ -833,12 +874,22 @@ void EveSOF::SetupBoosters( EveShip2Ptr ship, const EveSOFDNAPtr dna ) const
 	Tr2EffectPtr glowEffect;
 	glowEffect.CreateInstance();
 	glowEffect->StartUpdate();
-	glowEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/BoosterGlowPool.fx" );
+	if( g_eveSofUseQuadRenderer )
+	{
+		glowEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/BoosterGlowPool.fx" );
+	}
+	else
+	{
+		glowEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/Booster/BoosterGlow.fx" );
+	}
 	glowEffect->AddResourceTexture2D( BlueSharedString("DiffuseMap"), "res:/Texture/Particle/whitesharp.dds" );
 	// finish effect and set it
 	glowEffect->EndUpdate();
 	glow->SetEffect( glowEffect );
-	glow->UseQuadRenderer( true, false );
+	if( g_eveSofUseQuadRenderer )
+	{
+		glow->UseQuadRenderer( true, false );
+	}
 	set->SetGlow( glow );
 
 	if( hdata->hasTrails )

@@ -162,7 +162,7 @@ void Tr2QuadRenderer::UpdateInstanceBuffer( Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	if( !m_vertexBuffer.IsValid() )
+	if( m_bufferSize && !m_vertexBuffer.IsValid() )
 	{
 		m_vertexBuffer.Create( BUFFER_INITIAL_SIZE );
 	}
@@ -170,6 +170,7 @@ void Tr2QuadRenderer::UpdateInstanceBuffer( Tr2RenderContext& renderContext )
 	if( FAILED( m_vertexBuffer.PutData( m_buffer.get(), m_bufferSize, m_vertexBufferOffset, renderContext ) ) )
 	{
 		m_vertexBufferOffset = -1;
+		return;
 	}
 	else
 	{
