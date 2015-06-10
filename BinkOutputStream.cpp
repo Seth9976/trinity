@@ -4,6 +4,13 @@
 
 #include "BinkOutputStream.h"
 
+#if defined(__RAD32__)
+#define PTR4
+#else
+#define PTR4 __far
+#endif
+
+
 unsigned char g_tempChannel = 0;
 unsigned int g_maxAudioSamples = 16384;
 typedef unsigned int (__stdcall * SETAUDIOSTREAMCALL) (float* const data, unsigned int const dataSize, int const input);
