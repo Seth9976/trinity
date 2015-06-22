@@ -107,7 +107,7 @@ void EveShip2::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 
 void EveShip2::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
 {
-	if( !m_isInFrustum )
+	if( !m_isInFrustum || !m_display )
 	{
 		return;
 	}
