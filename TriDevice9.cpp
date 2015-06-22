@@ -107,6 +107,8 @@ void TriDevice::UpdateCursor()
 
 void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
 {
+	AutoTasklet _at( PyOS->GetTaskletTimer(), "TriDevice::HandleRenderTick" );
+
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 
 	if( !renderContext.m_d3dDevice9 || !mDisplay )

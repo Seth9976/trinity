@@ -63,10 +63,11 @@ using std::max;
 #include <blue/include/IBlueEventListener.h>
 #include "blue/include/IBlueObjectProxy.h"
 #include "blue/include/BluePySwrap.h" //simple wrapping
+#include "Blue/Include/ITaskletTimer.h"
 
 // here we define the directInput version we are going to use
-// If this is not defiend here manually there is a build warning
-// which is very veird the dinput.h file should really define 
+// If this is not defined here manually there is a build warning
+// which is very weird the dinput.h file should really define 
 // this, as is done in D3D but I guess we'll just have to do it
 #define DIRECTINPUT_VERSION 0x0800
 
