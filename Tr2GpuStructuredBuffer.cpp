@@ -97,7 +97,7 @@ ALResult Tr2GpuStructuredBuffer::Create( uint32_t count, uint32_t stride, Creati
 // --------------------------------------------------------------------------------------
 Tr2GpuBufferAL* Tr2GpuStructuredBuffer::GetGpuBuffer( unsigned index )
 {
-	return &m_buffer;
+	return m_buffer.IsValid() ? &m_buffer : nullptr;
 }
 
 // --------------------------------------------------------------------------------------
