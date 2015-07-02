@@ -433,17 +433,10 @@ void EveSOF::SetupSpriteSets( EveShip2Ptr ship, const EveSOFDNAPtr dna ) const
 			EveSpriteSetItemPtr spriteSetItem;
 			spriteSetItem.CreateInstance();
 
-			if( factionSpriteData )
-			{
-				spriteSetItem->m_color = factionSpriteData->color;
-			}
-			else
-			{
-				// sprite set doesn't exist for faction
-				spriteSetItem->m_color = Color( 1.f, 0.f, 0.f, 1.f );
-			}
+			// set it up the per-faction data
+			spriteSetItem->m_color = factionSpriteData->color;
 
-			// set it up, first with the per-hull data
+			// set it up the per-hull data
 			spriteSetItem->m_blinkPhase = ssiit->blinkPhase;
 			spriteSetItem->m_blinkRate = ssiit->blinkRate;
 			spriteSetItem->m_boneIndex = ssiit->boneIndex;
@@ -531,30 +524,29 @@ void EveSOF::SetupSpotlightSets( EveShip2Ptr ship, const EveSOFDNAPtr dna ) cons
 		// add all individual items
 		for( auto ssiit = spotlightSetData->items.begin(); ssiit != spotlightSetData->items.end(); ++ssiit )
 		{
-			// crete it
-			EveSpotlightSetItemPtr spotlightSetItem;
-			spotlightSetItem.CreateInstance();
-			// fill it up
-			spotlightSetItem->m_boneIndex = ssiit->boneIndex;
-			spotlightSetItem->m_boosterGainInfluence = ssiit->boosterGainInfluence;
-			
 			// faction data?
 			const EveSOFDataMgr::FactionSpotlightSetColorData* factionSpotlightData = dna->GetFactionSpotlightSetData( ssiit->groupIndex );
-			if( factionSpotlightData )
+			if( !factionSpotlightData )
 			{
-				spotlightSetItem->m_coneColor = ssiit->coneIntensity * factionSpotlightData->coneColor;
-				spotlightSetItem->m_flareColor = ssiit->flareIntensity * factionSpotlightData->flareColor;
-				spotlightSetItem->m_spriteColor = ssiit->spriteIntensity * factionSpotlightData->spriteColor;
-			}
-			else
-			{
-				spotlightSetItem->m_coneColor = Color( 1.f, 1.f, 1.f, 1.f );
-				spotlightSetItem->m_flareColor = Color( 1.f, 1.f, 1.f, 1.f );
-				spotlightSetItem->m_spriteColor = Color( 1.f, 1.f, 1.f, 1.f );
+				// This spotlight item is not used for this faction.
+				continue;
 			}
 
+			// create it
+			EveSpotlightSetItemPtr spotlightSetItem;
+			spotlightSetItem.CreateInstance();
+
+			// set it up the per-faction data
+			spotlightSetItem->m_coneColor = ssiit->coneIntensity * factionSpotlightData->coneColor;
+			spotlightSetItem->m_flareColor = ssiit->flareIntensity * factionSpotlightData->flareColor;
+			spotlightSetItem->m_spriteColor = ssiit->spriteIntensity * factionSpotlightData->spriteColor;
+
+			// set it up the per-hull data
+			spotlightSetItem->m_boneIndex = ssiit->boneIndex;
+			spotlightSetItem->m_boosterGainInfluence = ssiit->boosterGainInfluence;
 			spotlightSetItem->m_spriteScale = ssiit->spriteScale;
 			spotlightSetItem->m_transform = ssiit->transform;
+
 			// add it
 			spotlightSet->AddSpotlightItem( spotlightSetItem );
 		}

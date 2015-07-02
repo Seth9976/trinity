@@ -696,7 +696,6 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 		EveSOFDataFactionSpriteSetPtr spriteSetData = (*sscit);
 
 		FactionSpriteSetColorData sscd;
-		sscd.isVisible = spriteSetData->m_isVisible;
 		sscd.color = spriteSetData->m_color;
 
 		fd.spriteSetsColor[spriteSetData->m_groupIndex] = sscd;
