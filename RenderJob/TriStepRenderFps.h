@@ -20,6 +20,7 @@ private:
 	double m_sumFPSValues; // collects the differnt fps values to create the avrg
 	int m_FPSValuesCount; // counts how many values are collected for the avrg
 	double m_nextFPSCalculationTime; //the timer for the avrg
+	CcpStaticStatisticsEntry* m_dpCount;
 	
 	double m_averageFPS; // average frames per second
 	double m_averageMSPerFrame;  // average milli seconds per frame

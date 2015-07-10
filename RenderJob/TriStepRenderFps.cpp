@@ -13,8 +13,18 @@ TriStepRenderFps::TriStepRenderFps( IRoot* lockobj ) :
 	m_displayX( 0 ),
 	m_displayY( 0 ),
 	m_alignRight( true ),
-	m_alignBottom( true )
+	m_alignBottom( true ),
+	m_dpCount( nullptr )
 {
+	auto& entries = CcpStatistics::GetEntryArray();
+	auto found = std::find_if( 
+		entries.begin(), 
+		entries.end(), 
+		[&]( CcpStaticStatisticsEntry *entry ) { return entry->GetName() == "Trinity/AL/sceneDrawcallCount"; } );
+	if( found != entries.end() )
+	{
+		m_dpCount = *found;
+	}
 }
 
 TriStepRenderFps::~TriStepRenderFps(void)
@@ -94,7 +104,8 @@ TriStepResult TriStepRenderFps::Execute( Be::Time realTime, Be::Time simTime, Tr
 	}
 
 	uint64_t counter = Tr2Renderer::GetCurrentFrameCounter();
-	sprintf_s( fpsBuffer, "%s\n%10.0lld\nfps: %8.2f\nms:  %8.2f", TRINITY_PLATFORM_NAME, counter, m_averageFPS, m_averageMSPerFrame );
+	int dpCount = m_dpCount ? int( m_dpCount->GetValue() ) : 0;
+	sprintf_s( fpsBuffer, "%s\n%10.0lld\nfps: %8.2f\nms:  %8.2f\ndp:  %8.0d", TRINITY_PLATFORM_NAME, counter, m_averageFPS, m_averageMSPerFrame, dpCount );
 
 	uint32_t flags = 0;
 	if( m_alignRight )
