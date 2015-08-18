@@ -812,7 +812,7 @@ void Tr2GPUParticlePool::SpawnParticles(
 		return;
 	}
 
-	m_behaviourUsageTime[behaviourIndex] =  BeOS->GetActualTime();
+	m_behaviourUsageTime[behaviourIndex] = BeOS->GetCurrentFrameTime();
 	m_liveParticles = true;
 	m_lastSpawnTime = BeOS->GetCurrentFrameTime();
 
@@ -1444,7 +1444,7 @@ bool Tr2GPUParticlePool::SetBehaviour( const char *name, const Tr2ParticleBehavi
 		ReleaseTexture( m_behaviours[oldBehaviour].texturePath );
 		unsigned index = (unsigned)oldBehaviour;
 		m_behaviourByName[name] = index;
-		m_behaviourUsageTime[index] =  BeOS->GetActualTime();
+		m_behaviourUsageTime[index] = BeOS->GetCurrentFrameTime();
 		CCP_LOG( "Tr2GPUParticlePool::SetBehaviour - associated behaviour name [%s] with old, unusued index [%d]", name, index );
 		return UpdateBehaviourTexture( index, behaviour );
 	}
