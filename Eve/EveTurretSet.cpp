@@ -612,9 +612,9 @@ void EveTurretSet::UpdateSyncronous( float deltaT, Be::Time time, const Matrix* 
 						if( GetClosestTurretAndLocator( currentClosestTurret, currentClosestLocator ) )
 						{
 							if( ( currentClosestTurret != m_activeTurret ) || ( currentClosestLocator != m_targetLocator ) )
-							{
-								// re-enter firing state, should take care of everything
-								EnterStateFiring();
+							{				
+								// Set up the firing states correctly
+								SetupFiringState( );
 							}
 						}
 						// recheck every 2 seconds
@@ -1868,6 +1868,48 @@ void EveTurretSet::EnterStateTargeting()
 // --------------------------------------------------------------------------------
 void EveTurretSet::EnterStateFiring()
 {
+	if( !SetupFiringState() )
+	{
+		return;
+	}
+	
+	// only if we are in firing mode, call ::StopFiring() on the effect right before
+	// we call ::PrepareFiring(), it'll clean things up in the effect
+	if( m_firingEffect && m_state == STATE_FIRING )
+	{
+		if( m_firingEffect->IsLooping() )
+		{
+			// We don't want to start and stop the curves when the turret is looping and firing
+			return;
+		}
+		m_firingEffect->StopFiring();
+	}
+
+	// We're starting a firing sequence, we need to set up our firing effect time-delays
+	if( m_firingEffect )
+	{
+		if( m_hasCyclingFiringPos )
+		{
+			m_firingEffect->PrepareFiring( m_randomFiringDelay, m_currentCyclingFiresPos );
+		}
+		else 
+		{
+			m_firingEffect->PrepareFiring( m_randomFiringDelay );
+		}
+	}
+
+	// finally, we can set state
+	m_state = STATE_FIRING;
+}
+
+
+// --------------------------------------------------------------------------------
+// Description:
+// Sets up information required for the firing state to render correctly
+// This does not change the state or start/stop the firing effect
+// --------------------------------------------------------------------------------
+bool EveTurretSet::SetupFiringState()
+{
 	// find the best single turret and damage locator pair
 	unsigned int closestTurret = INVALID_TURRET_INDEX;
 	int closestLocator = -1;
@@ -1892,7 +1934,7 @@ void EveTurretSet::EnterStateFiring()
 	// this state change is forbidden!
 	case STATE_DEACTIVE:
 		CCP_LOGERR( "EveTurretSet %s wants to fire but is in deactive state.", m_name.c_str() );
-		return;
+		return false;
 	case STATE_IDLE:
 	case STATE_RELOADING:
 		// and delay the effect until we are facing target
@@ -1918,13 +1960,6 @@ void EveTurretSet::EnterStateFiring()
 		m_activeTurret = closestTurret;
 		break;
 	case STATE_FIRING:
-		// only if we are in firing mode, call ::StopFiring() on the effect right before
-		// we call ::PrepareFiring(), it'll clean things up in the effect
-		if( m_firingEffect )
-		{
-			m_firingEffect->StopFiring();
-		}
-		// attention: no break!
 	case STATE_TARGETING:
 		// directly go into firing loop
 		for( unsigned int i = 0; i < m_singleTurrets.size(); ++i )
@@ -1948,22 +1983,7 @@ void EveTurretSet::EnterStateFiring()
 	default:
 		break;
 	}
-
-	// We're starting a firing sequence, we need to set up our firing effect time-delays
-	if( m_firingEffect )
-	{
-		if( m_hasCyclingFiringPos )
-		{
-			m_firingEffect->PrepareFiring( m_randomFiringDelay, m_currentCyclingFiresPos );
-		}
-		else
-		{
-			m_firingEffect->PrepareFiring( m_randomFiringDelay );
-		}
-	}
-
-	// finally, we can set state
-	m_state = STATE_FIRING;
+	return true;
 }
 
 // --------------------------------------------------------------------------------
