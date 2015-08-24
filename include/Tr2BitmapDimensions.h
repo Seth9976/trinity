@@ -28,6 +28,14 @@ struct Tr2BitmapDimensions
 						 uint32_t depth,
 						 uint32_t mipCount );
 
+	Tr2BitmapDimensions( Tr2RenderContextEnum::TextureType type,
+						 Tr2RenderContextEnum::PixelFormat format,
+						 uint32_t width,
+						 uint32_t height,
+						 uint32_t depth,
+						 uint32_t mipCount,
+						 uint32_t arraySize );
+
 	uint32_t GetWidth() const;
 	uint32_t GetHeight() const;
 	uint32_t GetDepth() const;
@@ -43,6 +51,8 @@ struct Tr2BitmapDimensions
 	uint32_t GetMipPitch( uint32_t level ) const;	
 	uint32_t GetMipSize( uint32_t level ) const;
 
+	uint32_t GetArraySize() const;
+
 	// Number of rows to copy in a mip. For non-compressed formats this is the same as GetMipHeight.
 	// For compressed formats it's that number / 4.
 	uint32_t GetMipNumRows( uint32_t level ) const;
@@ -54,6 +64,7 @@ protected:
 	uint32_t m_height;
 	uint32_t m_volumeDepth;
 	uint32_t m_mipCount;
+	uint32_t m_arraySize;
 	Tr2RenderContextEnum::TextureType m_type;
 	Tr2RenderContextEnum::PixelFormat m_format;
 
@@ -70,6 +81,7 @@ inline Tr2BitmapDimensions::Tr2BitmapDimensions()
 	m_height( 0 ),
 	m_volumeDepth( 0 ),
 	m_mipCount( 0 ),
+	m_arraySize( 1 ),
 	m_type( Tr2RenderContextEnum::TEX_TYPE_INVALID ),
 	m_format( Tr2RenderContextEnum::PIXEL_FORMAT_UNKNOWN )
 {
@@ -84,6 +96,7 @@ inline Tr2BitmapDimensions::Tr2BitmapDimensions(
 	m_height( height ),
 	m_volumeDepth( 1 ),
 	m_mipCount( mipCount ),
+	m_arraySize( 1 ),
 	m_type( Tr2RenderContextEnum::TEX_TYPE_2D ),
 	m_format( format )
 {
@@ -100,6 +113,25 @@ inline Tr2BitmapDimensions::Tr2BitmapDimensions(
 	m_height( height ),
 	m_volumeDepth( depth ),
 	m_mipCount( mipCount ),
+	m_arraySize( type == Tr2RenderContextEnum::TEX_TYPE_CUBE ? 6 : 1 ),
+	m_type( type ),
+	m_format( format )
+{
+}
+
+inline Tr2BitmapDimensions::Tr2BitmapDimensions( 
+	Tr2RenderContextEnum::TextureType type,
+	Tr2RenderContextEnum::PixelFormat format,
+	uint32_t width,
+	uint32_t height,
+	uint32_t depth,
+	uint32_t mipCount,
+	uint32_t arraySize )
+:	m_width( width ),
+	m_height( height ),
+	m_volumeDepth( depth ),
+	m_mipCount( mipCount ),
+	m_arraySize( arraySize ),
 	m_type( type ),
 	m_format( format )
 {
@@ -224,6 +256,11 @@ inline uint32_t Tr2BitmapDimensions::GetMipSize( uint32_t level ) const
 	}
 	
 	return GetMipWidth( level ) * GetMipHeight( level ) * GetBytesPerPixel( m_format );
+}
+
+inline uint32_t Tr2BitmapDimensions::GetArraySize() const
+{
+	return m_arraySize;
 }
 
 inline uint32_t Tr2BitmapDimensions::GetMipNumRows( uint32_t level ) const

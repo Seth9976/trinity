@@ -33,6 +33,19 @@ public:
 					   Tr2SubresourceData* initialData,
 					   Tr2RenderContextAL& renderContext );
 
+	ALResult Create2DArray(	
+		uint32_t width, 
+		uint32_t height, 
+		uint32_t mipLevelCount,
+		uint32_t arrayCount,
+		Tr2RenderContextEnum::PixelFormat format,
+		Tr2RenderContextEnum::BufferUsage usage,
+		Tr2SubresourceData* initialData,
+		Tr2PrimaryRenderContextAL &renderContext )
+	{
+		return E_FAIL;
+	}
+
 	ALResult CreateCube( uint32_t width,
 						 uint32_t height,
 						 uint32_t mipLevelCount,
@@ -90,7 +103,7 @@ public:
 				   uint32_t& pitch,
 				   Tr2RenderContextEnum::LockType,
 				   Tr2RenderContextAL& renderContext );
-	ALResult Lock( Tr2RenderContextEnum::CubemapFace face,
+	ALResult Lock( uint32_t face,
 				   uint32_t mipLevel,
 				   uint32_t* ltrb,
 				   void*& data,
@@ -124,14 +137,14 @@ public:	//DEBUG
 	D3DPOOL m_pool9;
 
 private:
-	ALResult LockReading( Tr2RenderContextEnum::CubemapFace face,
+	ALResult LockReading( uint32_t face,
 						  uint32_t mipLevel,
 						  uint32_t* ltrb,
 						  void*& data,
 						  uint32_t& pitch,
 						  Tr2RenderContextAL& renderContext );
 	ALResult UnlockReading( Tr2RenderContextAL& renderContext );
-	ALResult LockWriting( Tr2RenderContextEnum::CubemapFace face,
+	ALResult LockWriting( uint32_t face,
 						  uint32_t mipLevel,
 						  uint32_t* ltrb,
 						  void*& data,
@@ -139,7 +152,7 @@ private:
 						  Tr2RenderContextAL& renderContext );
 	ALResult UnlockWriting( Tr2RenderContextAL& renderContext );
 
-	ALResult LockImpl( Tr2RenderContextEnum::CubemapFace face,
+	ALResult LockImpl( uint32_t face,
 					   uint32_t mipLevel,
 					   uint32_t* ltrb,
 					   void*& data,
@@ -150,7 +163,7 @@ private:
 	Tr2RenderContextEnum::LockType m_currentLock;
 	uint32_t m_lockedMipLevel;
 	CComPtr<IDirect3DSurface9> m_lockedMipLevelSurf;
-	ALResult GetSurfaceLevel( Tr2RenderContextEnum::CubemapFace face,
+	ALResult GetSurfaceLevel( uint32_t face,
 							  uint32_t mipLevel );
 
 public:	//DEBUG

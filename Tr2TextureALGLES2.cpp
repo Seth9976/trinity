@@ -116,6 +116,7 @@ Tr2TextureAL& Tr2TextureAL::operator=( const Tr2TextureAL& other )
 		m_volumeDepth	= other.m_volumeDepth;
 		m_mipCount		= other.m_mipCount;
 		m_isAlias		= other.m_isAlias;
+		m_arraySize = other.m_arraySize;
 
 		m_internalFormat = other.m_internalFormat;
 		m_targetFormat	= other.m_targetFormat;
@@ -150,6 +151,7 @@ Tr2TextureAL& Tr2TextureAL::operator=( Tr2TextureAL&& other )
 		m_volumeDepth	= other.m_volumeDepth;
 		m_mipCount		= other.m_mipCount;
 		m_isAlias		= other.m_isAlias;
+		m_arraySize = other.m_arraySize;
 
 		m_internalFormat = other.m_internalFormat;
 		m_targetFormat	= other.m_targetFormat;
@@ -272,6 +274,7 @@ ALResult Tr2TextureAL::Create2D( uint32_t width,
 	m_height = height;
 	m_volumeDepth = 1;
 	m_mipCount = mipLevelCount;
+	m_arraySize = 1;
 	m_isAlias = false;
 	ChangeObjectId();
 	float borderColor[4] = { 0.f, 0.f, 0.f, 0.f };
@@ -421,6 +424,7 @@ ALResult Tr2TextureAL::CreateCube( uint32_t width,
 	m_height = height;
 	m_volumeDepth = 1;
 	m_mipCount = mipLevelCount;
+	m_arraySize = 1;
 	m_isAlias = false;
 	ChangeObjectId();
 	float borderColor[4] = { 0.f, 0.f, 0.f, 0.f };
@@ -546,6 +550,7 @@ ALResult Tr2TextureAL::CreateDepthTexture( uint32_t width,
 	m_height = height;
 	m_volumeDepth = 0;
 	m_mipCount = 1;
+	m_arraySize = 1;
 	m_format = PIXEL_FORMAT_D32_FLOAT;
 	m_type = TEX_TYPE_2D;
 	float borderColor[4] = { 0.f, 0.f, 0.f, 0.f };
@@ -668,7 +673,7 @@ ALResult Tr2TextureAL::Lock( uint32_t mipLevel,
 	return Lock( mipLevel, nullptr, data, pitch, lockType, renderContext );
 }
 
-ALResult Tr2TextureAL::Lock( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::Lock( uint32_t face,
 							 uint32_t mipLevel,
 							 uint32_t* ltrb,
 							 void*& data,
@@ -706,7 +711,7 @@ ALResult Tr2TextureAL::Unlock( Tr2RenderContextAL& renderContext )
 	return UnlockWriting( renderContext );
 }
 
-ALResult Tr2TextureAL::LockWriting( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::LockWriting( uint32_t face,
 									uint32_t mipLevel,
 									uint32_t* ltrb,
 									void*& data,

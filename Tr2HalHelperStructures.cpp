@@ -36,8 +36,8 @@ const Tr2ConstantBufferAL	nullCB;
 //   the entire resource.
 // --------------------------------------------------------------------------------------
 Tr2TextureSubresource::Tr2TextureSubresource()
-	: m_startFace( CUBEMAP_FACE_FIRST )
-	, m_endFace( CUBEMAP_FACE_COUNT ),
+	: m_startFace( 0 )
+	, m_endFace( std::numeric_limits<uint32_t>::max() ),
 	m_startMipLevel( 0 ),
 	m_endMipLevel( 0xffffffff ),
 	m_left( 0 ),
@@ -52,49 +52,11 @@ Tr2TextureSubresource::Tr2TextureSubresource()
 // --------------------------------------------------------------------------------------
 // Description:
 //   Tr2TextureSubresource default constructor: construct a subresource range containing
-//   the entire mip chaing for a single cubemap face.
+//   the a single mip level for a single cubemap face / array slice.
 // --------------------------------------------------------------------------------------
-Tr2TextureSubresource::Tr2TextureSubresource( Tr2RenderContextEnum::CubemapFace face )
+Tr2TextureSubresource::Tr2TextureSubresource( uint32_t face, uint32_t mipLevel )
 	:m_startFace( face ),
-	m_endFace( Tr2RenderContextEnum::CubemapFace( face + 1 ) ),
-	m_startMipLevel( 0 ),
-	m_endMipLevel( 0xffffffff ),
-	m_left( 0 ),
-	m_top( 0 ),
-	m_front( 0 ),
-	m_right( 0xffffffff ),
-	m_bottom( 0xffffffff ),
-	m_back( 0xffffffff )
-{
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Tr2TextureSubresource default constructor: construct a subresource range containing
-//   the a single mip level for a single cubemap face.
-// --------------------------------------------------------------------------------------
-Tr2TextureSubresource::Tr2TextureSubresource( Tr2RenderContextEnum::CubemapFace face, uint32_t mipLevel )
-	:m_startFace( face ),
-	m_endFace( Tr2RenderContextEnum::CubemapFace( face + 1 ) ),
-	m_startMipLevel( mipLevel ),
-	m_endMipLevel( mipLevel + 1 ),
-	m_left( 0 ),
-	m_top( 0 ),
-	m_front( 0 ),
-	m_right( 0xffffffff ),
-	m_bottom( 0xffffffff ),
-	m_back( 0xffffffff )
-{
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Tr2TextureSubresource default constructor: construct a subresource range containing
-//   the a single mip level for all cubemap faces.
-// --------------------------------------------------------------------------------------
-Tr2TextureSubresource::Tr2TextureSubresource( uint32_t mipLevel )
-	: m_startFace( CUBEMAP_FACE_FIRST )
-	, m_endFace( CUBEMAP_FACE_COUNT ),
+	m_endFace( face + 1 ),
 	m_startMipLevel( mipLevel ),
 	m_endMipLevel( mipLevel + 1 ),
 	m_left( 0 ),
@@ -114,16 +76,9 @@ Tr2TextureSubresource::Tr2TextureSubresource( uint32_t mipLevel )
 // --------------------------------------------------------------------------------------
 void Tr2TextureSubresource::ClampToTexture( const Tr2BitmapDimensions& texture )
 {
-	if( texture.GetType() != TEX_TYPE_CUBE )
-	{
-		m_startFace = Tr2RenderContextEnum::CubemapFace( 0 );
-		m_endFace = Tr2RenderContextEnum::CubemapFace( 1 );
-	}
-	else
-	{
-		m_startFace = Tr2RenderContextEnum::CubemapFace( std::min( int( m_startFace ), 5 ) );
-		m_endFace = Tr2RenderContextEnum::CubemapFace( std::min( int( m_endFace ), 6 ) );
-	}
+	m_startFace = std::min( m_startFace, texture.GetArraySize() - 1 );
+	m_endFace = std::min( m_endFace, texture.GetArraySize() );
+
 	m_startMipLevel = std::min( m_startMipLevel, texture.GetTrueMipCount() - 1 );
 	m_endMipLevel = std::min( m_endMipLevel, texture.GetTrueMipCount() );
 
@@ -175,12 +130,9 @@ bool Tr2TextureSubresource::IsSubresourceFull( const Tr2BitmapDimensions& textur
 		return false;
 	}
 
-	if( texture.GetType() == TEX_TYPE_CUBE )
+	if( m_startFace > 0 || m_endFace < texture.GetArraySize() )
 	{
-		if( m_startFace > 0 || m_endFace < 6 )
-		{
-			return false;
-		}
+		return false;
 	}
 
 	return true;

@@ -52,9 +52,7 @@ struct Tr2BitmapDimensions;
 struct Tr2TextureSubresource
 {
 	Tr2TextureSubresource();
-	explicit Tr2TextureSubresource( Tr2RenderContextEnum::CubemapFace face );
-	Tr2TextureSubresource( Tr2RenderContextEnum::CubemapFace face, uint32_t mipLevel );
-	explicit Tr2TextureSubresource( uint32_t mipLevel );
+	Tr2TextureSubresource( uint32_t face, uint32_t mipLevel );
 
 	void ClampToTexture( const Tr2BitmapDimensions& texture );
 	bool IsSubresourceFull( const Tr2BitmapDimensions& texture ) const;
@@ -69,9 +67,9 @@ struct Tr2TextureSubresource
 	uint32_t GetFaceCount()	const { return m_endFace - m_startFace; }
 
 	// Starting cubemap face
-	Tr2RenderContextEnum::CubemapFace m_startFace;
+	uint32_t m_startFace;
 	// One past ending cubemap face
-	Tr2RenderContextEnum::CubemapFace m_endFace;
+	uint32_t m_endFace;
 	// Starting mip level (0-based)
 	uint32_t m_startMipLevel;
 	// One past ending mip level

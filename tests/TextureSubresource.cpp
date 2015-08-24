@@ -11,6 +11,7 @@ struct BitmapDimensionsTest: public Tr2BitmapDimensions
 	void SetType( TextureType type )
 	{
 		m_type = type;
+		m_arraySize = type == TEX_TYPE_CUBE ? 6 : 1;
 	}
 	void SetFormat( PixelFormat format )
 	{
@@ -39,44 +40,10 @@ struct BitmapDimensionsTest: public Tr2BitmapDimensions
 TEST( TextureSubresource, TextureSubresourceDefaultConstructorCreatesFullResource )
 {
 	Tr2TextureSubresource ts;
-	EXPECT_GE( CUBEMAP_FACE_FIRST, ts.m_startFace );
-	EXPECT_LE( CUBEMAP_FACE_COUNT, ts.m_endFace );
+	EXPECT_GE( 0u, ts.m_startFace );
+	EXPECT_LE( std::numeric_limits<uint32_t>::max(), ts.m_endFace );
 	EXPECT_EQ( 0, ts.m_startMipLevel );
 	EXPECT_EQ( uint32_t( -1 ), ts.m_endMipLevel );
-	EXPECT_EQ( 0, ts.m_left );
-	EXPECT_EQ( 0, ts.m_top );
-	EXPECT_EQ( 0, ts.m_front );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_right );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_bottom );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_back );
-	EXPECT_TRUE( ts.IsValid() );
-}
-
-TEST( TextureSubresource, TextureSubresourceFaceConstructorCreatesFullFace )
-{
-	const CubemapFace face = CUBEMAP_FACE_NEGATIVE_Y;
-	Tr2TextureSubresource ts( face );
-	EXPECT_GE( face, ts.m_startFace );
-	EXPECT_LE( face + 1, ts.m_endFace );
-	EXPECT_EQ( 0, ts.m_startMipLevel );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_endMipLevel );
-	EXPECT_EQ( 0, ts.m_left );
-	EXPECT_EQ( 0, ts.m_top );
-	EXPECT_EQ( 0, ts.m_front );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_right );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_bottom );
-	EXPECT_EQ( uint32_t( -1 ), ts.m_back );
-	EXPECT_TRUE( ts.IsValid() );
-}
-
-TEST( TextureSubresource, TextureSubresourceMipLevelConstructorCreatesFullMipLevel )
-{
-	const uint32_t mipLevel = 2;
-	Tr2TextureSubresource ts( mipLevel );
-	EXPECT_GE( 0, ts.m_startFace );
-	EXPECT_LE( 1, ts.m_endFace );
-	EXPECT_EQ( mipLevel, ts.m_startMipLevel );
-	EXPECT_EQ( mipLevel + 1, ts.m_endMipLevel );
 	EXPECT_EQ( 0, ts.m_left );
 	EXPECT_EQ( 0, ts.m_top );
 	EXPECT_EQ( 0, ts.m_front );
@@ -91,8 +58,8 @@ TEST( TextureSubresource, TextureSubresourceFaceAndMipLevelConstructorCreatesFul
 	const CubemapFace face = CUBEMAP_FACE_POSITIVE_Z;
 	const uint32_t mipLevel = 2;
 	Tr2TextureSubresource ts( face, mipLevel );
-	EXPECT_GE( face, ts.m_startFace );
-	EXPECT_LE( face + 1, ts.m_endFace );
+	EXPECT_GE( uint32_t( face ), ts.m_startFace );
+	EXPECT_LE( uint32_t( face + 1 ), ts.m_endFace );
 	EXPECT_EQ( mipLevel, ts.m_startMipLevel );
 	EXPECT_EQ( mipLevel + 1, ts.m_endMipLevel );
 	EXPECT_EQ( 0, ts.m_left );
@@ -116,8 +83,8 @@ TEST( TextureSubresource, CanClampTextureSubresourceTo2DTexture )
 
 	ts.ClampToTexture( dim );
 
-	EXPECT_GE( 0, ts.m_startFace );
-	EXPECT_LE( 1, ts.m_endFace );
+	EXPECT_GE( 0u, ts.m_startFace );
+	EXPECT_LE( 1u, ts.m_endFace );
 	EXPECT_EQ( 0, ts.m_startMipLevel );
 	EXPECT_EQ( 3, ts.m_endMipLevel );
 	EXPECT_EQ( 0, ts.m_left );
@@ -140,8 +107,8 @@ TEST( TextureSubresource, CanClampTextureSubresourceToCubeTexture )
 
 	ts.ClampToTexture( dim );
 
-	EXPECT_GE( CUBEMAP_FACE_FIRST, ts.m_startFace );
-	EXPECT_LE( CUBEMAP_FACE_COUNT, ts.m_endFace );
+	EXPECT_GE( 0u, ts.m_startFace );
+	EXPECT_LE( 6u, ts.m_endFace );
 	EXPECT_EQ( 0, ts.m_startMipLevel );
 	EXPECT_EQ( 2, ts.m_endMipLevel );
 	EXPECT_EQ( 0, ts.m_left );
@@ -165,8 +132,8 @@ TEST( TextureSubresource, CanClampTextureSubresourceTo3DTexture )
 
 	ts.ClampToTexture( dim );
 
-	EXPECT_GE( 0, ts.m_startFace );
-	EXPECT_LE( 1, ts.m_endFace );
+	EXPECT_GE( 0u, ts.m_startFace );
+	EXPECT_LE( 1u, ts.m_endFace );
 	EXPECT_EQ( 0, ts.m_startMipLevel );
 	EXPECT_EQ( 3, ts.m_endMipLevel );
 	EXPECT_EQ( 0, ts.m_left );

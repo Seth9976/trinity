@@ -41,6 +41,16 @@ public:
 		Tr2SubresourceData* initialData,
 		Tr2PrimaryRenderContextAL &renderContext );
 
+	ALResult Create2DArray(	
+		uint32_t width, 
+		uint32_t height, 
+		uint32_t mipLevelCount,
+		uint32_t arrayCount,
+		Tr2RenderContextEnum::PixelFormat format,
+		Tr2RenderContextEnum::BufferUsage usage,
+		Tr2SubresourceData* initialData,
+		Tr2PrimaryRenderContextAL &renderContext );
+
 	ALResult CreateCube(
 		uint32_t width, 
 		uint32_t height, 
@@ -110,7 +120,7 @@ public:
 		Tr2RenderContextEnum::LockType, 
 		Tr2RenderContextAL& renderContext );
 	ALResult Lock(	
-		Tr2RenderContextEnum::CubemapFace face, 
+		uint32_t face, 
 		uint32_t mipLevel, 
 		uint32_t* ltrb, 
 		void*& data, 
@@ -151,13 +161,14 @@ private:
 		uint32_t height, 
 		uint32_t mipLevelCount,
 		uint32_t arraySize,
+		uint32_t miscFlags,
 		Tr2RenderContextEnum::PixelFormat format,
 		Tr2RenderContextEnum::BufferUsage usage,
 		Tr2SubresourceData* initialData,
 		Tr2PrimaryRenderContextAL &renderContext );
 
 	ALResult LockReading(	
-		Tr2RenderContextEnum::CubemapFace face, 
+		uint32_t face, 
 		uint32_t mipLevel, 
 		uint32_t* ltrb, 
 		void*& data, 
@@ -165,7 +176,7 @@ private:
 		Tr2RenderContextAL & renderContext );
 	ALResult UnlockReading( Tr2RenderContextAL & renderContext );
 	ALResult LockWriting(	
-		Tr2RenderContextEnum::CubemapFace face, 
+		uint32_t face, 
 		uint32_t mipLevel, 
 		uint32_t* ltrb, 
 		void*& data, 

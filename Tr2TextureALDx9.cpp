@@ -76,6 +76,7 @@ Tr2TextureAL& Tr2TextureAL::operator=( Tr2TextureAL&& other )
 		m_format9		= other.m_format9;
 		m_pool9			= other.m_pool9;
 		m_isAlias		= other.m_isAlias;
+		m_arraySize = other.m_arraySize;
 		ChangeObjectId();
 	}
 
@@ -200,6 +201,7 @@ ALResult Tr2TextureAL::Create2D( uint32_t width,
 	m_volumeDepth = 1;
 	m_mipCount = mipLevelCount;
 	m_isAlias = false;
+	m_arraySize = 1;
 
 
 	if ( initialData )
@@ -399,6 +401,7 @@ ALResult Tr2TextureAL::CreateCube( uint32_t width,
 	m_volumeDepth = 1;
 	m_mipCount = mipLevelCount;
 	m_isAlias = false;
+	m_arraySize = 6;
 	ChangeObjectId();
 
 	return S_OK;
@@ -510,6 +513,7 @@ ALResult Tr2TextureAL::CreateVolume( uint32_t width,
 	m_volumeDepth = depth;
 	m_mipCount = mipLevelCount;
 	m_isAlias = false;
+	m_arraySize = 1;
 
 	m_texture.Attach( tex.Detach() );
 	ChangeObjectId();
@@ -969,7 +973,7 @@ ALResult Tr2TextureAL::CopySubresourceRegion( const Tr2TextureSubresource& destS
 	return S_OK;
 }
 
-ALResult Tr2TextureAL::GetSurfaceLevel( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::GetSurfaceLevel( uint32_t face,
 										uint32_t mipLevel )
 {
 	if ( !m_texture || m_type != TEX_TYPE_2D && m_type != TEX_TYPE_CUBE )
@@ -1019,10 +1023,10 @@ ALResult Tr2TextureAL::Lock( uint32_t mipLevel,
 							 LockType lockType,
 							 Tr2RenderContextAL& renderContext )
 {
-	return Lock( CUBEMAP_FACE_FIRST, mipLevel, ltrb, data, pitch, lockType, renderContext );
+	return Lock( 0, mipLevel, ltrb, data, pitch, lockType, renderContext );
 }
 
-ALResult Tr2TextureAL::Lock( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::Lock( uint32_t face,
 							 uint32_t mipLevel,
 							 uint32_t* ltrb,
 							 void*& data,
@@ -1080,7 +1084,7 @@ ALResult Tr2TextureAL::Unlock( Tr2RenderContextAL& renderContext )
 	return E_FAIL;
 }
 
-ALResult Tr2TextureAL::LockImpl( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::LockImpl( uint32_t face,
 								 uint32_t mipLevel,
 								 uint32_t* ltrb,
 								 void*& data,
@@ -1128,7 +1132,7 @@ ALResult Tr2TextureAL::LockImpl( Tr2RenderContextEnum::CubemapFace face,
 	return hr;
 }
 
-ALResult Tr2TextureAL::LockReading( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::LockReading( uint32_t face,
 									uint32_t mipLevel,
 									uint32_t* ltrb,
 									void*& data,
@@ -1161,7 +1165,7 @@ ALResult Tr2TextureAL::UnlockReading( Tr2RenderContextAL& /*renderContext*/ )
 	return hr;
 }
 
-ALResult Tr2TextureAL::LockWriting( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::LockWriting( uint32_t face,
 									uint32_t mipLevel,
 									uint32_t* ltrb,
 									void*& data,

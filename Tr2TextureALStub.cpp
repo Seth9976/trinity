@@ -30,6 +30,7 @@ void Tr2TextureAL::Destroy()
 	m_data = nullptr;
 	m_usage = 0;
 	m_currentLock = LOCK_INVALID;
+	m_arraySize = 0;
 }
 
 Tr2TextureAL::~Tr2TextureAL()
@@ -49,6 +50,7 @@ Tr2TextureAL& Tr2TextureAL::operator=( Tr2TextureAL&& other )
 		m_mipCount		= other.m_mipCount;
 		m_isValid = other.m_isValid;
 		m_data = std::move(other.m_data);
+		m_arraySize = other.m_arraySize;
 		other.m_isValid = false;
 		ChangeObjectId();
 	}
@@ -70,6 +72,7 @@ Tr2TextureAL& Tr2TextureAL::operator=( Tr2TextureAL& other )
 		m_isValid = other.m_isValid;
 		m_data = other.m_data;
 		other.m_isValid = false;
+		m_arraySize = other.m_arraySize;
 		ChangeObjectId();
 	}
 
@@ -103,10 +106,7 @@ size_t Tr2TextureAL::GetTextureSize()
 			depth = std::max( depth / 2u, 1u );			
 		}
 	}
-	if( m_type == TEX_TYPE_CUBE )
-	{
-		size *= 6;
-	}
+	size *= m_arraySize;
 	return size;
 }
 
@@ -115,10 +115,7 @@ ALResult Tr2TextureAL::LoadInitialData( Tr2SubresourceData* initialData )
 	if( initialData )
 	{
 		unsigned int levelsToCopy = GetTrueMipCount();
-		if( m_type == TEX_TYPE_CUBE )
-		{
-			levelsToCopy *= 6;
-		}
+		levelsToCopy *= m_arraySize;
 		
 		uint8_t* destination = m_data.get();
 		unsigned int offset = 0;
@@ -158,6 +155,43 @@ ALResult Tr2TextureAL::Create2D( uint32_t width,
 	m_type = TEX_TYPE_2D;
 	m_isValid = true;
 	m_usage = usage;
+	m_arraySize = 1;
+
+	size_t size = GetTextureSize();
+
+	m_data.reset( CCP_NEW( "Tr2TextureALStub::m_data" ) uint8_t[size], []( uint8_t* p ) { CCP_DELETE[] p; } );
+	
+	return LoadInitialData(initialData);
+}
+
+ALResult Tr2TextureAL::Create2DArray(	
+	uint32_t width, 
+	uint32_t height, 
+	uint32_t mipLevelCount,
+	uint32_t arrayCount,
+	Tr2RenderContextEnum::PixelFormat format,
+	Tr2RenderContextEnum::BufferUsage usage,
+	Tr2SubresourceData* initialData,
+	Tr2PrimaryRenderContextAL &renderContext )
+{
+	if( !renderContext.IsValid() )
+	{
+		return E_INVALIDARG;
+	}
+	if (usage == USAGE_IMMUTABLE && !initialData )
+	{
+		return E_INVALIDARG;
+	}
+
+	m_width = width;
+	m_height = height;
+	m_volumeDepth = 1;
+	m_mipCount = mipLevelCount;
+	m_format = format;
+	m_type = TEX_TYPE_2D;
+	m_isValid = true;
+	m_usage = usage;
+	m_arraySize = arrayCount;
 
 	size_t size = GetTextureSize();
 
@@ -190,6 +224,7 @@ ALResult Tr2TextureAL::CreateCube( uint32_t width,
 	m_type = TEX_TYPE_CUBE;
 	m_isValid = true;
 	m_usage = usage;
+	m_arraySize = 6;
 
 	size_t size = GetTextureSize();
 
@@ -224,6 +259,7 @@ ALResult Tr2TextureAL::CreateVolume( uint32_t width,
 	m_type = TEX_TYPE_3D;
 	m_isValid = true;
 	m_usage = usage;
+	m_arraySize = 1;
 
 	size_t size = GetTextureSize();
 	m_data.reset( CCP_NEW( "Tr2TextureALStub::m_data" ) uint8_t[size], []( uint8_t* p ) { CCP_DELETE[] p; } );
@@ -305,10 +341,10 @@ ALResult Tr2TextureAL::Lock( uint32_t mipLevel,
 							 LockType lockType,
 							 Tr2RenderContextAL& renderContext )
 {
-	return Lock( CUBEMAP_FACE_FIRST, mipLevel, ltrb, data, pitch, lockType, renderContext );
+	return Lock( 0, mipLevel, ltrb, data, pitch, lockType, renderContext );
 }
 
-ALResult Tr2TextureAL::Lock( Tr2RenderContextEnum::CubemapFace face,
+ALResult Tr2TextureAL::Lock( uint32_t face,
 							 uint32_t mipLevel,
 							 uint32_t* ltrb,
 							 void*& data,

@@ -27,6 +27,7 @@ void Tr2TextureAL::Destroy()
 	m_view[0]		= nullptr;
 	m_view[1]		= nullptr;
 	m_staging		= nullptr;
+	m_arraySize = 0;
 
 	//m_writeStaging.swap( TrackableStdVector<char>() );
 	m_writeStaging.clear();
@@ -66,7 +67,7 @@ Tr2TextureAL& Tr2TextureAL::operator=( Tr2TextureAL&& other )
 		m_volumeDepth	= other.m_volumeDepth;
 		m_mipCount		= other.m_mipCount;
 		m_isAlias		= other.m_isAlias;
-		//m_overrideSrgb	= other.m_overrideSrgb;
+		m_arraySize = other.m_arraySize;
 		ChangeObjectId();
 	}
 
@@ -96,7 +97,8 @@ Tr2TextureAL& Tr2TextureAL::operator=( Tr2TextureAL& other )
 		m_volumeDepth	= other.m_volumeDepth;
 		m_mipCount		= other.m_mipCount;
 		m_isAlias		= other.m_isAlias;
-	
+		m_arraySize = other.m_arraySize;
+
 		m_texture		= other.m_texture;
 		m_view[0]		= other.m_view[0];
 		m_view[1]		= other.m_view[1];
@@ -164,7 +166,27 @@ ALResult Tr2TextureAL::Create2D(
 {
 	AL_FUZZ( OT_TEXTURE );
 
-	HRESULT hr = Create2DImpl( width, height, mipLevelCount, 1, format, usage, initialData, renderContext );
+	HRESULT hr = Create2DImpl( width, height, mipLevelCount, 1, 0, format, usage, initialData, renderContext );
+	if( SUCCEEDED( hr ) )
+	{
+		m_type = TEX_TYPE_2D;
+	}
+	return hr;
+}
+
+ALResult Tr2TextureAL::Create2DArray(	
+	uint32_t width, 
+	uint32_t height, 
+	uint32_t mipLevelCount,
+	uint32_t arrayCount,
+	Tr2RenderContextEnum::PixelFormat format,
+	Tr2RenderContextEnum::BufferUsage usage,
+	Tr2SubresourceData* initialData,
+	Tr2PrimaryRenderContextAL &renderContext )
+{
+	AL_FUZZ( OT_TEXTURE );
+
+	HRESULT hr = Create2DImpl( width, height, mipLevelCount, arrayCount, 0, format, usage, initialData, renderContext );
 	if( SUCCEEDED( hr ) )
 	{
 		m_type = TEX_TYPE_2D;
@@ -189,7 +211,7 @@ ALResult Tr2TextureAL::CreateCube(
 {
 	AL_FUZZ( OT_TEXTURE );
 
-	HRESULT hr = Create2DImpl( width, height, mipLevelCount, 6, format, usage, initialData, renderContext );
+	HRESULT hr = Create2DImpl( width, height, mipLevelCount, 6, D3D11_RESOURCE_MISC_TEXTURECUBE, format, usage, initialData, renderContext );
 	if( SUCCEEDED( hr ) )
 	{
 		m_type = TEX_TYPE_CUBE;
@@ -203,6 +225,7 @@ ALResult Tr2TextureAL::Create2DImpl(
 	uint32_t height, 
 	uint32_t mipLevelCount,
 	uint32_t arraySize,
+	uint32_t miscFlags,
 	PixelFormat format,
 	BufferUsage usage,
 	Tr2SubresourceData* initialData,
@@ -243,7 +266,7 @@ ALResult Tr2TextureAL::Create2DImpl(
 	ConvertUsage( usage, desc.Usage, desc.CPUAccessFlags );
 	
 	desc.SampleDesc.Count = 1;
-	desc.MiscFlags  = arraySize == 6 ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0u;
+	desc.MiscFlags  = miscFlags;
 	if( usage & USAGE_UNORDERED_ACCESS )
 	{
 		desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
@@ -267,7 +290,7 @@ ALResult Tr2TextureAL::Create2DImpl(
 
 	srvDesc.Format	= static_cast<DXGI_FORMAT>( format );
 
-	if( arraySize == 6 )
+	if( miscFlags == D3D11_RESOURCE_MISC_TEXTURECUBE )
 	{
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 
@@ -275,12 +298,10 @@ ALResult Tr2TextureAL::Create2DImpl(
 	}
 	else
 	{
-		srvDesc.ViewDimension = /* is_msaa ? D3D11_SRV_DIMENSION_TEXTURE2DMS :*/ D3D11_SRV_DIMENSION_TEXTURE2D;
-
+		srvDesc.ViewDimension = arraySize > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DARRAY : D3D11_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels		 = desc.MipLevels;
 		srvDesc.Texture2DArray.ArraySize = desc.ArraySize;
 	}
-
 	
 	for( unsigned loop = 0; loop != 2; ++loop )
 	{
@@ -302,6 +323,7 @@ ALResult Tr2TextureAL::Create2DImpl(
 	m_volumeDepth	= 1;
 	m_mipCount		= mipLevelCount;
 	m_isAlias		= false;
+	m_arraySize = arraySize;
 	ChangeObjectId();
 
 	return S_OK;
@@ -388,6 +410,7 @@ ALResult Tr2TextureAL::CreateVolume(
 	m_volumeDepth	= depth;
 	m_mipCount		= trueMipLevelCount;
 	m_isAlias		= false;
+	m_arraySize = 1;
 
 	m_type			= TEX_TYPE_3D;
 	ChangeObjectId();
@@ -628,11 +651,11 @@ ALResult Tr2TextureAL::Lock(
 	LockType lockType, 
 	Tr2RenderContextAL& renderContext )
 {
-	return Lock( CUBEMAP_FACE_FIRST, mipLevel, ltrb, data, pitch, lockType, renderContext );
+	return Lock( 0, mipLevel, ltrb, data, pitch, lockType, renderContext );
 }
 
 ALResult Tr2TextureAL::Lock(	
-	Tr2RenderContextEnum::CubemapFace face, 
+	uint32_t face, 
 	uint32_t mipLevel, 
 	uint32_t* ltrb, 
 	void*& data, 
@@ -691,7 +714,7 @@ ALResult Tr2TextureAL::Unlock( Tr2RenderContextAL & renderContext )
 }
 
 ALResult Tr2TextureAL::LockReading( 
-	Tr2RenderContextEnum::CubemapFace face, 
+	uint32_t face, 
 	uint32_t mipLevel, 
 	uint32_t* ltrb, 
 	void*& data, 
@@ -791,7 +814,7 @@ ALResult Tr2TextureAL::UnlockReading( Tr2RenderContextAL & renderContext )
 }
 
 ALResult Tr2TextureAL::LockWriting( 
-	Tr2RenderContextEnum::CubemapFace face, 
+	uint32_t face, 
 	uint32_t mipLevel, 
 	uint32_t* ltrb, 
 	void*& data, 

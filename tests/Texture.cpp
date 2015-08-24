@@ -60,6 +60,23 @@ TEST_F( WithValidRenderContext, Texture2DIsValidAfterCreation )
 	EXPECT_EQ( TEX_TYPE_2D, tex.GetType() );
 }
 
+#if TRINITY_PLATFORM == TRINITY_DIRECTX11 || TRINITY_PLATFORM == TRINITY_STUB 
+TEST_F( WithValidRenderContext, Texture2DArrayIsValidAfterCreation )
+{
+	Tr2TextureAL tex;
+	ASSERT_HRESULT_SUCCEEDED( tex.Create2DArray( 128, 128, 1, 2, PIXEL_FORMAT_B8G8R8A8_UNORM, 0, nullptr, *renderContext ) );
+	EXPECT_TRUE( tex.IsValid() );
+	EXPECT_EQ( TEX_TYPE_2D, tex.GetType() );
+	EXPECT_EQ( 2, tex.GetArraySize() );
+}
+#else
+TEST_F( WithValidRenderContext, Texture2DArrayFailsOnUnsupportingPlatforms )
+{
+	Tr2TextureAL tex;
+	ASSERT_HRESULT_FAILED( tex.Create2DArray( 128, 128, 1, 2, PIXEL_FORMAT_B8G8R8A8_UNORM, 0, nullptr, *renderContext ) );
+}
+#endif
+
 TEST_F( WithValidRenderContext, TextureCubeIsValidAfterCreation )
 {
 	Tr2TextureAL tex;
@@ -232,6 +249,49 @@ TEST_F( WithValidRenderContext, CanMoveTexture )
 	EXPECT_EQ( 128, tex2.GetWidth() );
 	EXPECT_EQ( 128, tex2.GetHeight() );
 }
+
+#if TRINITY_PLATFORM == TRINITY_DIRECTX11 || TRINITY_PLATFORM == TRINITY_STUB 
+TEST_F( WithValidRenderContext, CanMoveTextureArray )
+{
+	Tr2TextureAL tex1;
+	ASSERT_HRESULT_SUCCEEDED( tex1.Create2DArray( 128, 128, 0, 2, PIXEL_FORMAT_B8G8R8A8_UNORM, 0, nullptr, *renderContext ) );
+
+	Tr2TextureAL tex2;
+	ASSERT_HRESULT_SUCCEEDED( tex2.Create2D( 64, 64, 0, PIXEL_FORMAT_B8G8R8A8_UNORM, USAGE_CPU_WRITE, nullptr, *renderContext ) );
+	tex2 = std::move( tex1 );
+
+	EXPECT_FALSE( tex1.IsValid() );
+	EXPECT_TRUE( tex2.IsValid() );
+	EXPECT_EQ( PIXEL_FORMAT_B8G8R8A8_UNORM, tex2.GetFormat() );
+	EXPECT_EQ( 8, tex2.GetTrueMipCount() );
+	EXPECT_EQ( TEX_TYPE_2D, tex2.GetType() );
+	EXPECT_EQ( 128, tex2.GetWidth() );
+	EXPECT_EQ( 128, tex2.GetHeight() );
+	EXPECT_EQ( 2, tex2.GetArraySize() );
+}
+
+TEST_F( WithValidRenderContext, CanAssignTextureArray )
+{
+	Tr2TextureAL tex1;
+	ASSERT_HRESULT_SUCCEEDED( tex1.Create2DArray( 128, 128, 0, 4, PIXEL_FORMAT_B8G8R8A8_UNORM, 0, nullptr, *renderContext ) );
+
+	Tr2TextureAL tex2;
+	ASSERT_HRESULT_SUCCEEDED( tex2.Create2D( 64, 64, 0, PIXEL_FORMAT_B8G8R8A8_UNORM, USAGE_CPU_WRITE, nullptr, *renderContext ) );
+	tex2 = tex1;
+
+	EXPECT_TRUE( tex1 == tex2 );
+	EXPECT_TRUE( tex2.IsValid() );
+	EXPECT_EQ( tex1.GetFormat(), tex2.GetFormat() );
+	EXPECT_EQ( tex1.GetTrueMipCount(), tex2.GetTrueMipCount() );
+	EXPECT_EQ( tex1.GetType(), tex2.GetType() );
+	EXPECT_EQ( tex1.GetWidth(), tex2.GetWidth() );
+	EXPECT_EQ( tex1.GetHeight(), tex2.GetHeight() );
+	EXPECT_EQ( tex1.GetArraySize(), tex2.GetArraySize() );
+
+	tex1.Destroy();
+	EXPECT_TRUE( tex2.IsValid() );
+}
+#endif
 
 TEST_F( WithValidRenderContext, CanCreateCompressed2DTexture )
 {

@@ -27,6 +27,16 @@ public:
 					   Tr2SubresourceData* initialData,
 					   Tr2RenderContextAL& renderContext );
 
+	ALResult Create2DArray(	
+		uint32_t width, 
+		uint32_t height, 
+		uint32_t mipLevelCount,
+		uint32_t arrayCount,
+		Tr2RenderContextEnum::PixelFormat format,
+		Tr2RenderContextEnum::BufferUsage usage,
+		Tr2SubresourceData* initialData,
+		Tr2PrimaryRenderContextAL &renderContext );
+
 	ALResult CreateCube( uint32_t width,
 						 uint32_t height,
 						 uint32_t mipLevelCount,
@@ -84,7 +94,7 @@ public:
 				   uint32_t& pitch,
 				   Tr2RenderContextEnum::LockType,
 				   Tr2RenderContextAL& renderContext );
-	ALResult Lock( Tr2RenderContextEnum::CubemapFace face,
+	ALResult Lock( uint32_t face,
 				   uint32_t mipLevel,
 				   uint32_t* ltrb,
 				   void*& data,
@@ -117,7 +127,7 @@ private:
 	size_t GetTextureSize();
 	ALResult LoadInitialData( Tr2SubresourceData* initialData );
 
-	Tr2RenderContextEnum::CubemapFace m_lockedFace;
+	uint32_t m_lockedFace;
 
 };
 
