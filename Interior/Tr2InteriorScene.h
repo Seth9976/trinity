@@ -320,7 +320,7 @@ private:
 	void LogNextVisibilityQuery( void );
 
 	// This is a python only wrapper function for just picking an object
-	IRoot* PickObjectOnly( int x, int y, TriProjection* proj, TriView* view, TriViewport* vp )
+	IRoot* PickObjectOnly( int x, int y, TriProjection* proj, TriView* view, TriViewport* vp, Be::Optional<Tr2PickTypes> )
 	{
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 		PickResults results;

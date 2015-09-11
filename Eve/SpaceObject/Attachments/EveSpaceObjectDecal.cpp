@@ -723,6 +723,15 @@ bool EveSpaceObjectDecal::HasStaticIndexBuffer() const
 	return !m_indices.empty();
 }
 
+void EveSpaceObjectDecal::GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData )
+{
+	if( ( pickTypes & PICK_TYPE_ATTACHMENTS ) == 0 )
+	{
+		return;
+	}
+	GetBatches( batches, TRIBATCHTYPE_DECAL, perObjectData );
+}
+
 
 // --------------------------------------------------------------------------------
 // Description:

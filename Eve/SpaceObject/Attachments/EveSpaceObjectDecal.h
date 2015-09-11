@@ -75,6 +75,7 @@ BLUE_CLASS( EveSpaceObjectDecal ) :
 	public ITr2GeometryProvider,
 	public Tr2DeviceResource,
 	public INotify,
+	public ITr2Pickable,
 	public ITr2Renderable
 {
 public:
@@ -111,6 +112,11 @@ public:
 private:
 	bool OnPrepareResources();
 public:
+
+	//////////////////////////////////////////////////////////////////////////
+	// ITr2Pickable
+	virtual IRoot* GetID( uint16_t ) { return this->GetRawRoot(); }
+	virtual void GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData );
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2GeometryProvider

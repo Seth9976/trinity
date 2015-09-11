@@ -126,7 +126,7 @@ void ITr2PickableScene::PickObject( Tr2RenderContext& renderContext, int x, int 
 						if( buffer.objectId < pickableObjects.size() )
 						{
 							ITr2PickablePtr pickedObj( BlueCastPtr( pickableObjects[buffer.objectId] ) );
-							results.object = pickedObj->GetID();
+							results.object = pickedObj->GetID( buffer.areaId );
 						}
 						else
 						{
@@ -228,7 +228,7 @@ std::set<IRoot*> ITr2PickableScene::MarqueePickObjects( int minX, int minY, int 
 		ITr2PickablePtr pickedObj( BlueCastPtr( *it ) );
 		if( pickedObj )
 		{
-			resSet.insert( pickedObj->GetID() );
+			resSet.insert( pickedObj->GetID( 0 ) );
 		}
 	}
 

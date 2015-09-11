@@ -312,10 +312,11 @@ const Be::ClassInfo* Tr2Sprite2dScene::ExposeToBlue()
 			Be::READ
 		)
 
-		MAP_METHOD_AND_WRAP
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(
 			"PickObject",
 			PickObject,
+			1,
 			"Returns the sprite object at the given coordinates (or None)\n\n"
 			"Arguments:\n"
 			" x    - x-coordinate in screen space\n"

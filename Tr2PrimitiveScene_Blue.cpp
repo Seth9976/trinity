@@ -76,9 +76,10 @@ const Be::ClassInfo* Tr2PrimitiveScene::ExposeToBlue()
 		MAP_ATTRIBUTE( "manipulator", m_manipulator, "The active manipulator working for the scene", Be::READWRITE )
 		MAP_ATTRIBUTE( "excludedPickingPrimitives", m_excludedPickingPrimitives, "A list of primitive sets to ignore when picking", Be::READWRITE | Be::PERSIST )
 
-		MAP_METHOD_AND_WRAP( 
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS( 
 			"PickObject", 
-			PickObjectOnly, 
+			PickObjectOnly,
+			1,
 			"Given mouse position and a view setup, returns the object that the mouse is over, as well as the mesh and area indices"
 			"\nreturns <Object> or None if nothing pickable was hit by the ray"
 			"\n"

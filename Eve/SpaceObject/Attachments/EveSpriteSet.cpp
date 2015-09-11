@@ -4,6 +4,7 @@
 #include "TriRenderBatch.h"
 #include "Utilities/MatrixUtils.h"
 #include "Tr2QuadRenderer.h"
+#include "Tr2PickingHelperBatch.h"
 
 CCP_STATS_DECLARED_ELSEWHERE( primitiveCount );
 
@@ -412,4 +413,25 @@ void EveSpriteSet::Rebuild()
 {
 	ReleaseResources( 0 );
 	PrepareResources();
+}
+
+
+void EveSpriteSet::GetPickingBatches( const Matrix& parentTransform, ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData )
+{
+	for( auto it = m_sprites.begin(); it != m_sprites.end(); ++it )
+	{
+		if( auto batch = batches->Allocate<Tr2PickingHelperBatch>() )
+		{
+			batch->SetPerObjectData( perObjectData );
+			batch->AddSphere( 
+				Vector3( XMVector3TransformCoord( ( *it )->m_position, parentTransform ) ), ( *it )->m_maxScale );
+			batch->SetAreaID( areaIDOffset );
+			batches->Commit( batch );
+		}
+		else
+		{
+			break;
+		}
+		++areaIDOffset;
+	}
 }

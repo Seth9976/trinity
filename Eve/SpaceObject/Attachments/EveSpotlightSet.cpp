@@ -11,6 +11,7 @@
 #include "Utilities/BoundingSphere.h"
 #include "Utilities/MatrixUtils.h"
 #include "Tr2QuadRenderer.h"
+#include "Tr2PickingHelperBatch.h"
 
 using namespace Tr2RenderContextEnum;
 
@@ -654,14 +655,23 @@ void EveSpotlightSet::AddSpotlightItem( EveSpotlightSetItemPtr item )
 	m_spotlightItems.Insert( -1, item );
 }
 
-
-
-
-
-
-
-
-
-
-
-
+void EveSpotlightSet::GetPickingBatches( const Matrix& parentTransform, ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData )
+{
+	for( auto it = m_spotlightItems.begin(); it != m_spotlightItems.end(); ++it )
+	{
+		if( auto batch = batches->Allocate<Tr2PickingHelperBatch>() )
+		{
+			batch->SetPerObjectData( perObjectData );
+			batch->AddSphere( 
+				Vector3( XMVector3TransformCoord( ( *it )->m_transform.GetTranslation(), parentTransform ) ),
+				std::max( float( ( *it )->m_spriteScale.x ), std::max( float( ( *it )->m_spriteScale.y ), float( ( *it )->m_spriteScale.z ) ) ) * 0.5f );
+			batch->SetAreaID( areaIDOffset );
+			batches->Commit( batch );
+		}
+		else
+		{
+			break;
+		}
+		++areaIDOffset;
+	}
+}

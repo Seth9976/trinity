@@ -415,6 +415,22 @@ void EveSpherePin::GetBatchWithEffect( ITriRenderBatchAccumulator* accumulator, 
 	}
 }
 
+void EveSpherePin::GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData )
+{
+	if( ( pickTypes & PICK_TYPE_PICKING ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_PICKING, perObjectData );
+	}
+	if( ( pickTypes & PICK_TYPE_OPAQUE ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_OPAQUE, perObjectData );
+	}
+	if( ( pickTypes & PICK_TYPE_TRANSPARENT ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_TRANSPARENT, perObjectData );
+		GetBatches( batches, TRIBATCHTYPE_ADDITIVE, perObjectData );
+	}
+}
 // --------------------------------------------------------------------------------
 // Description:
 //   Copy all the matrices and other data to HW
@@ -430,6 +446,3 @@ void EveSpherePinPerObjectData::SetPerObjectDataToDevice( Tr2ConstantBufferAL** 
 	int psConstantCount = 4 + 6;
 	FillAndSetConstants( *buffers[PIXEL_SHADER], &m_worldMatrix, psConstantCount * 16, PIXEL_SHADER, Tr2Renderer::GetPerObjectPSStartRegister(), renderContext );
 }
-
-
-

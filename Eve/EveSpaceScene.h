@@ -77,8 +77,9 @@ public:
 
 	static bool IsMeshUnloadingEnabled();
 
-	IRoot* PickObject( int x, int y, TriProjection* proj,  TriView* view, TriViewport* viewport );	// for use by python, uses default immediate context
-	IRoot* PickObjectAndArea( int x, int y, TriProjection* proj, TriView* view, TriViewport* viewport, unsigned int& areaID, Tr2RenderContext& renderContext );
+	IRoot* PickObject( int x, int y, TriProjection* proj,  TriView* view, TriViewport* viewport, 
+		Be::OptionalWithDefaultValue<Tr2PickTypes, PICK_TYPE_PICKING | PICK_TYPE_OPAQUE> filter );	// for use by python, uses default immediate context
+	IRoot* PickObjectAndArea( int x, int y, TriProjection* proj, TriView* view, TriViewport* viewport, unsigned int& areaID, Tr2PickTypes pickTypes, Tr2RenderContext& renderContext );
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Scene

@@ -11,6 +11,7 @@
 #include "EvePlaneSetItem.h"
 #include "Utilities/BoundingSphere.h"
 #include "Utilities/ViewDistanceInfo.h"
+#include "Tr2PickingHelperBatch.h"
 
 // vertex layout struct
 struct PlaneVertex
@@ -258,4 +259,26 @@ void EvePlaneSet::AddPlaneItem( EvePlaneSetItemPtr item )
 	m_planes.Insert( -1, item );
 }
 
+void EvePlaneSet::GetPickingBatches( const Matrix& parentTransform, ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData )
+{
+	for( auto it = m_cachedTransforms.begin(); it != m_cachedTransforms.end(); ++it )
+	{
+		if( auto batch = batches->Allocate<Tr2PickingHelperBatch>() )
+		{
+			batch->SetPerObjectData( perObjectData );
+			batch->AddBox( *it * parentTransform );
+			batch->SetAreaID( areaIDOffset );
+			batches->Commit( batch );
+		}
+		else
+		{
+			break;
+		}
+		++areaIDOffset;
+	}
+}
 
+EvePlaneSetItemVector* EvePlaneSet::GetPlanes()
+{
+	return &m_planes;
+}

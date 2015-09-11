@@ -9,6 +9,7 @@
 
 //#include "Tr2DeviceResource.h"
 #include "ITr2GeometryProvider.h"
+#include "ITr2Renderable.h"
 
 #include "EvePlaneSetItem.h"
 
@@ -69,6 +70,10 @@ public:
 	void Rebuild();
 	
 	void UpdateViewDistanceInfo( const TriFrustum& frustum, ViewDistanceInfo& viewDistance, const Matrix& parentTransform ) const;
+
+	void GetPickingBatches( const Matrix& parentTransform, ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData );
+
+	EvePlaneSetItemVector* GetPlanes();
 private:
 	// toggle visibility
 	bool m_display;

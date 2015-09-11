@@ -2313,14 +2313,15 @@ void EveSpaceScene::OnListModified(
 	}
 }
 
-IRoot* EveSpaceScene::PickObject( int x, int y, TriProjection* proj, TriView* view, TriViewport* viewport )
+IRoot* EveSpaceScene::PickObject( int x, int y, TriProjection* proj, TriView* view, TriViewport* viewport,
+								 Be::OptionalWithDefaultValue<Tr2PickTypes, PICK_TYPE_PICKING | PICK_TYPE_OPAQUE> filter )
 {
 	unsigned int id;
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	return PickObjectAndArea( x, y, proj, view, viewport, id, renderContext );
+	return PickObjectAndArea( x, y, proj, view, viewport, id, filter, renderContext );
 }
 
-IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriView* view, TriViewport* viewport, unsigned int& areaID, Tr2RenderContext& renderContext )
+IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriView* view, TriViewport* viewport, unsigned int& areaID, Tr2PickTypes pickTypes, Tr2RenderContext& renderContext )
 {
 	if( !renderContext.IsValid() )
 	{
@@ -2354,7 +2355,7 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 	SetupTransformsForPicking( fx, fy, proj, view, viewport, renderContext );
 
 	// Find objects inside our 1-by-1 pick frustum
-	std::vector<ITr2RenderablePtr> collisionSet;
+	std::vector<std::pair<ITr2Pickable*, ITr2Renderable*>> collisionSet;
 	std::vector<ITr2Renderable*> visibleObjects;
 	GetPickingObjectsToRender( visibleObjects );
 
@@ -2364,7 +2365,7 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 		ITr2PickablePtr pickedObj( BlueCastPtr( *it ) );
 		if( pickedObj )
 		{
-			collisionSet.push_back(*it);
+			collisionSet.push_back( std::make_pair( pickedObj, *it ) );
 		}
 	}
 
@@ -2394,7 +2395,8 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 				// objects in the picked list were rendered on the previous frame and that is tooooo much of an assumption.
 				// <halldor 2008-04-23>
 
-				ITr2Renderable* renderable = collisionSet[i];
+				ITr2Renderable* renderable = collisionSet[i].second;
+				ITr2Pickable* pickable = collisionSet[i].first;
 
 				Tr2PerObjectData* perObjectData = renderable->GetPerObjectData( m_pickingBatches );
 				if( perObjectData )
@@ -2403,11 +2405,16 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 				}
 				
 				// We always pick against the opaque geometry that's rendered
-				renderable->GetBatches( m_opaquePickingBatches, TRIBATCHTYPE_OPAQUE, perObjectData);
-				
+				if( pickTypes != PICK_TYPE_PICKING )
+				{
+					pickable->GetPickingBatches( m_opaquePickingBatches, pickTypes & ~PICK_TYPE_PICKING, perObjectData);
+				}
 				// Additionally, we can pick against geometry that's only rendered for picking,
 				// allowing us to put placeholders in for things that are partly transparent, but still should be pickable
-				renderable->GetBatches( m_pickingBatches, TRIBATCHTYPE_PICKING, perObjectData);
+				if( ( pickTypes & PICK_TYPE_PICKING ) != 0 )
+				{
+					pickable->GetPickingBatches( m_pickingBatches, PICK_TYPE_PICKING, perObjectData);
+				}
 			}
 
 			const Matrix* pCurMatrix = &Tr2Renderer::GetIdentityTransform();
@@ -2446,8 +2453,7 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 
 		if( objId < collisionSet.size() )
 		{
-			ITr2PickablePtr pickedObj( BlueCastPtr( collisionSet[objId] ) );
-			result = pickedObj->GetID();
+			result = collisionSet[objId].first->GetID( aId );
 			areaID = aId;
 		}
 	}

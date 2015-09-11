@@ -485,9 +485,10 @@ const Be::ClassInfo* Tr2InteriorScene::ExposeToBlue()
 			"\nviewport - The TriViewport of the viewport to use to pick into the scene"
 		)
 		
-		MAP_METHOD_AND_WRAP( 
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS( 
 			"PickObject", 
 			PickObjectOnly, 
+			1,
 			"Given mouse position and a view setup, returns the object that the mouse is over, as well as the mesh and area indices"
 			"\nreturns <Object> or None if nothing pickable was hit by the ray"
 			"\n"
@@ -497,6 +498,7 @@ const Be::ClassInfo* Tr2InteriorScene::ExposeToBlue()
 			"\nprojection - The TriProjection to use to pick into the scene"
 			"\nview - The TriView to use to pick into the scene"
 			"\nviewport - The TriViewport of the viewport to use to pick into the scene"
+			"\nfilter - Bitfield of pickable object types"
 		)
 
 		MAP_METHOD_AND_WRAP( 

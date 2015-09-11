@@ -989,3 +989,19 @@ bool Tr2InteriorPlaceable::IsInFrustum( const TriFrustum& frustum, Matrix& objec
 	return frustum.IsBoxVisible( minBounds, maxBounds );
 }
 
+void Tr2InteriorPlaceable::GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData )
+{
+	if( ( pickTypes & PICK_TYPE_PICKING ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_PICKING, perObjectData );
+	}
+	if( ( pickTypes & PICK_TYPE_OPAQUE ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_OPAQUE, perObjectData );
+	}
+	if( ( pickTypes & PICK_TYPE_TRANSPARENT ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_TRANSPARENT, perObjectData );
+		GetBatches( batches, TRIBATCHTYPE_ADDITIVE, perObjectData );
+	}
+}

@@ -61,8 +61,8 @@ PyObject* PyPickObjectAndAreaID( PyObject* self, PyObject* args )
 	PyObject* pyView = NULL;
 	PyObject* pyViewport = NULL;
 
-	int x, y;
-	if (!PyArg_ParseTuple(args, "iiOOO",
+	int x, y, flags = PICK_TYPE_PICKING | PICK_TYPE_OPAQUE;
+	if (!PyArg_ParseTuple(args, "iiOOO|i",
 		&x,
 		&y,
 		&pyProjection,
@@ -93,7 +93,7 @@ PyObject* PyPickObjectAndAreaID( PyObject* self, PyObject* args )
 	unsigned int areaID = 0;
 
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	object = pThis->PickObjectAndArea( x, y, projection, view, viewport, areaID, renderContext );
+	object = pThis->PickObjectAndArea( x, y, projection, view, viewport, areaID, Tr2PickTypes( flags ), renderContext );
 
 	if( object )
 	{
@@ -541,9 +541,10 @@ const Be::ClassInfo* EveSpaceScene::ExposeToBlue()
 			GetPostProcessPSBuffer,
 			"" )
 
-		MAP_METHOD_AND_WRAP(
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS(
 			"PickObject",
 			PickObject,
+			1,
 			"Given mouse position and a view setup, returns the object that the mouse is over"
 			"\nreturns <Object> or None if nothing pickable was hit by the ray"
 			"\n"
@@ -552,7 +553,8 @@ const Be::ClassInfo* EveSpaceScene::ExposeToBlue()
 			"\ny - integer y coordinate of the mouse over the viewport"
 			"\nprojection - The TriProjection to use to pick into the scene"
 			"\nview - The TriView to use to pick into the scene"
-			"\nviewport - The TriViewport of the viewport to use to pick into the scene" )
+			"\nviewport - The TriViewport of the viewport to use to pick into the scene"
+			"\nfilter - Bitfield of pickable object types" )
 
 		MAP_METHOD(
 			"PickObjectAndAreaID",

@@ -273,7 +273,7 @@ void Tr2Sprite2dScene::Render( Tr2RenderContext& renderContext )
 	m_is2dRenderContext = m_is2dRender;
 }
 
-ITr2SpriteObject* Tr2Sprite2dScene::PickObject( int x, int y, const TriProjection* proj, const TriView* view, const TriViewport* vp )
+ITr2SpriteObject* Tr2Sprite2dScene::PickObject( int x, int y, const TriProjection* proj, const TriView* view, const TriViewport* vp, Be::Optional<int> )
 {
 	CCP_ASSERT( m_transformStack->empty() );
 

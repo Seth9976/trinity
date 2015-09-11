@@ -6,6 +6,7 @@
 #include "Tr2DeviceResource.h"
 #include "ITr2GeometryProvider.h"
 #include "EveSpriteSetItem.h"
+#include "ITr2Renderable.h"
 
 
 BLUE_DECLARE( EveSpriteSet );
@@ -61,6 +62,8 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2GeometryProvider
 	void SubmitGeometry( Tr2RenderContext& renderContext );
+
+	void GetPickingBatches( const Matrix& parentTransform, ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData );
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITriDeviceResource

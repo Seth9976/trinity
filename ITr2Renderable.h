@@ -55,9 +55,23 @@ struct ITr2RenderableEntry
 
 typedef std::vector<ITr2RenderableEntry> Tr2RenderableSortList;
 
+enum Tr2PickType
+{
+	PICK_TYPE_PICKING = 1 << 0,
+	PICK_TYPE_OPAQUE = 1 << 1,
+	PICK_TYPE_TRANSPARENT = 1 << 2,
+
+	PICK_TYPE_ATTACHMENTS = 1 << 3,
+	PICK_TYPE_LOCATORS = 1 << 4,
+	PICK_TYPE_EDITOR_HELPERS = 1 << 5,
+};
+
+typedef uint32_t Tr2PickTypes;
+
 BLUE_INTERFACE( ITr2Pickable ) : public IRoot
 {
-    virtual IRoot* GetID() = 0;
+    virtual IRoot* GetID( uint16_t areaId ) = 0;
+	virtual void GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData ) = 0;
 };
 
 BLUE_DECLARE_INTERFACE( ITr2Pickable );

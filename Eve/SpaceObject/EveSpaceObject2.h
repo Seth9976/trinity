@@ -206,7 +206,8 @@ public:
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Pickable
-	virtual IRoot* GetID() { return this->GetRawRoot(); }
+	virtual IRoot* GetID( uint16_t );
+	virtual void GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITriTargetable

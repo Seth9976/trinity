@@ -2202,3 +2202,101 @@ void EveSpaceObject2::GetLights( Tr2LightManager& lightManager ) const
 	}
 }
 
+namespace
+{
+const uint16_t ATTACHMENT_TYPE_OFFSET = 12;
+const uint16_t ATTACHMENT_INDEX_MASK = 0xfff;
+const uint16_t ATTACHMENT_TYPE_SPRITE_SET = 1;
+const uint16_t ATTACHMENT_TYPE_SPOTLIGHT_SET = 2;
+const uint16_t ATTACHMENT_TYPE_PLANE_SET = 3;
+}
+
+IRoot* EveSpaceObject2::GetID( uint16_t areaID )
+{
+	auto areaType = areaID >> ATTACHMENT_TYPE_OFFSET;
+	auto areaIndex = areaID & ATTACHMENT_INDEX_MASK;
+	switch( areaType )
+	{
+	case ATTACHMENT_TYPE_SPRITE_SET:
+		for( auto it = std::begin( m_spriteSets ); it != std::end( m_spriteSets ); ++it )
+		{
+			auto items = ( *it )->GetSprites();
+			if( items->size() > size_t( areaIndex ) )
+			{
+				return items->GetAt( areaIndex );
+			}
+			areaIndex -= items->size();
+		}
+		return GetRawRoot();
+	case ATTACHMENT_TYPE_SPOTLIGHT_SET:
+		for( auto it = std::begin( m_spotlightSets ); it != std::end( m_spotlightSets ); ++it )
+		{
+			auto items = ( *it )->GetSpotlightItems();
+			if( items->size() > size_t( areaIndex ) )
+			{
+				return items->GetAt( areaIndex );
+			}
+			areaIndex -= items->size();
+		}
+		return GetRawRoot();
+	case ATTACHMENT_TYPE_PLANE_SET:
+		for( auto it = std::begin( m_planeSets ); it != std::end( m_planeSets ); ++it )
+		{
+			auto items = ( *it )->GetPlanes();
+			if( items->size() > size_t( areaIndex ) )
+			{
+				return items->GetAt( areaIndex );
+			}
+			areaIndex -= items->size();
+		}
+		return GetRawRoot();
+	default:
+		return GetRawRoot();
+	}
+}
+
+void EveSpaceObject2::GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData )
+{
+	if( ( pickTypes & PICK_TYPE_PICKING ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_PICKING, perObjectData );
+	}
+	if( ( pickTypes & PICK_TYPE_OPAQUE ) != 0 )
+	{
+		GetBatches( batches, TRIBATCHTYPE_OPAQUE, perObjectData );
+	}
+	if( ( pickTypes & PICK_TYPE_TRANSPARENT ) != 0 )
+	{
+		if( !m_mesh || m_mesh->IsHidden() )
+		{
+			return;
+		}
+
+		if( auto areas = m_mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT ) )
+		{
+			m_mesh->GetBatches( batches, areas, perObjectData );
+		}
+		if( auto areas = m_mesh->GetAreas( TRIBATCHTYPE_ADDITIVE ) )
+		{
+			m_mesh->GetBatches( batches, areas, perObjectData );
+		}
+	}
+	if( ( pickTypes & PICK_TYPE_ATTACHMENTS ) != 0 )
+	{
+		uint16_t areaIDOffset = ATTACHMENT_TYPE_SPRITE_SET << ATTACHMENT_TYPE_OFFSET;
+		for( auto it = m_spriteSets.begin(); it != m_spriteSets.end(); ++it )
+		{
+			(*it)->GetPickingBatches( m_worldTransform, batches, areaIDOffset, perObjectData );
+		}
+		areaIDOffset = ATTACHMENT_TYPE_SPOTLIGHT_SET << ATTACHMENT_TYPE_OFFSET;
+		for( auto it = m_spotlightSets.begin(); it != m_spotlightSets.end(); ++it )
+		{
+			(*it)->GetPickingBatches( m_worldTransform, batches, areaIDOffset, perObjectData );
+		}
+		areaIDOffset = ATTACHMENT_TYPE_PLANE_SET << ATTACHMENT_TYPE_OFFSET;
+		for( auto it = m_planeSets.begin(); it != m_planeSets.end(); ++it )
+		{
+			(*it)->GetPickingBatches( m_worldTransform, batches, areaIDOffset, perObjectData );
+		}
+	}
+}
