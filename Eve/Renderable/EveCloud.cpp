@@ -433,3 +433,16 @@ void EveCloud::SubmitGeometry( Tr2RenderContext& renderContext )
 	renderContext.SetTopology( TOP_TRIANGLES );
 	renderContext.DrawIndexedPrimitive( m_vertexBuffer.GetTotalSizeInBytes() / sizeof( Vector2 ), 0, m_indexBuffer.GetNumIndices() / 3 );
 }
+
+IRoot* EveCloud::GetID( uint16_t areaId )
+{
+	return m_volume ? m_volume->GetID( areaId ) : nullptr;
+}
+
+void EveCloud::GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData )
+{
+	if( ( pickTypes & PICK_TYPE_LOCATORS ) != 0 && m_volume )
+	{
+		m_volume->GetPickingBatches( batches, perObjectData );
+	}
+}

@@ -11,7 +11,8 @@
 #include "Tr2HostBitmap.h"
 #include "Tr2Renderer.h"
 #include "Curves/TriCurveSet.h"
-
+#include "Tr2Effect.h"
+#include "Tr2PickingHelperBatch.h"
 
 EveCloudVolumeBall::EveCloudVolumeBall( IRoot* lockobj )
 {
@@ -328,5 +329,33 @@ void EveCloudEditableVolume::RenderDebugInfo( const Matrix& world, Tr2RenderCont
 			( *it )->m_ballData.m_radius * world._11, 
 			10, 
 			( uint32_t( ( *it )->m_ballData.m_opacity * 255 ) << 24 ) | ( *it )->m_ballData.m_selfIllumination );
+	}
+}
+
+IRoot* EveCloudEditableVolume::GetID( uint16_t areaId )
+{
+	if( size_t( areaId ) < m_balls.size() )
+	{
+		return m_balls[areaId]->GetRawRoot();
+	}
+	return nullptr;
+}
+
+void EveCloudEditableVolume::GetPickingBatches( ITriRenderBatchAccumulator* batches, const Tr2PerObjectData* perObjectData )
+{
+	uint16_t index = 0;
+	for( auto it = std::begin( m_balls ); it != std::end( m_balls ); ++it )
+	{
+		if( auto batch = batches->Allocate<Tr2PickingHelperBatch>() )
+		{
+			batch->SetPerObjectData( perObjectData );
+			batch->AddSphere( ( *it )->m_ballData.m_position, ( *it )->m_ballData.m_radius );
+			batch->SetAreaID( index++ );
+			batches->Commit( batch );
+		}
+		else
+		{
+			break;
+		}
 	}
 }

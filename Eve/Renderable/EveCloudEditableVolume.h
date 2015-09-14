@@ -13,6 +13,8 @@ BLUE_DECLARE( Tr2HostBitmap );
 BLUE_DECLARE( EveCloudEditableVolume );
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE_VECTOR( TriCurveSet );
+class ITriRenderBatchAccumulator;
+class Tr2PerObjectData;
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -73,6 +75,9 @@ public:
 		ssize_t key2,
 		IRoot* value,
 		const struct IList* theList );
+
+    IRoot* GetID( uint16_t areaId );
+	void GetPickingBatches( ITriRenderBatchAccumulator* batches, const Tr2PerObjectData* perObjectData );
 
 	void OnVolumeModified();
 

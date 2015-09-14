@@ -25,6 +25,7 @@ BLUE_DECLARE_INTERFACE( ITriQuaternionFunction );
 BLUE_CLASS( EveCloud ) :
 	public IEveSpaceObject2,
 	public ITr2Renderable,
+	public ITr2Pickable,
 	public ITr2GeometryProvider,
 	public Tr2DeviceResource,
 	public IInitialize,
@@ -72,6 +73,10 @@ public:
 	// ITriDeviceResource
 	virtual void ReleaseResources( TriStorage s );
 
+	//////////////////////////////////////////////////////////////////////////////////////
+	// ITr2Pickable
+    virtual IRoot* GetID( uint16_t areaId );
+	virtual void GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr2PickTypes pickTypes, const Tr2PerObjectData* perObjectData );
 
 private:
 	bool OnPrepareResources();
