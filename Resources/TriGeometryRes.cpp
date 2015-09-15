@@ -52,7 +52,12 @@ struct MeshBoundsInfo
 	BoundingBox bounds;
 	granny_int32 areaCount;
 	AreaBoundsInfo* areaInfos;
-};
+}
+#ifndef _WIN32
+// On non-windows x64 platforms areaInfos maybe 64bit aligned
+__attribute__((packed))
+#endif
+;
 
 granny_data_type_definition BoundingBoxType[] =
 {

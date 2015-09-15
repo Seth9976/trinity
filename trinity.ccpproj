@@ -475,7 +475,25 @@ Configurations:
     - ../blue/uses_blue_27.yaml
     - ../../../../../../sdk/python/Python_2.7.yaml
     - ../../../../../../sdk/tbb/tbb40_233oss/tbb40_233oss.yaml
-    - ../../../../../../sdk/freetype/2.4.6/freetype_2.4.6.yaml
+    - ../../../../../../sdk/Granny/2.9.24.0/granny_2.9.24.0.yaml
+    General:
+      TargetName: _trinity_gles2_internal
+    ClCompile:
+      PreprocessorDefinitions:
+      - PORTING_TO_LINUX
+      - PORTING_MP
+      - _MACOSX
+      - EVALUATION_SDKS_ENABLED=0
+      - IME_ENABLED=0
+      - TBB_ENABLED=1
+
+  ReleaseGLES2|Mac64:
+    BaseConfigurations:
+    - ReleaseBase
+    - GLES2
+    Imports:
+    - ../blue/uses_blue.yaml
+    - ../../../../../../sdk/tbb/tbb40_233oss/tbb40_233oss.yaml
     - ../../../../../../sdk/Granny/2.9.24.0/granny_2.9.24.0.yaml
     General:
       TargetName: _trinity_gles2_internal
