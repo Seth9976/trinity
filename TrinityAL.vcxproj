@@ -432,9 +432,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_Stub|Win32'">
     <ClCompile>
@@ -459,9 +463,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_GLES2|Win32'">
     <ClCompile>
@@ -486,9 +494,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\glew\1.7.0\lib;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\glew\1.7.0\lib;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;CcpCore_d.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;CcpCore_d.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_D3D11|x64'">
     <ClCompile>
@@ -513,9 +525,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore_d.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore_d.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_GLES2|Win32'">
     <ClCompile>
@@ -540,9 +556,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\glew\1.7.0\lib;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\glew\1.7.0\lib;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_D3D11|Win32'">
     <ClCompile>
@@ -567,9 +587,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_D3D11|Win32'">
     <ClCompile>
@@ -596,9 +620,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_D3D11|Win32'">
     <ClCompile>
@@ -623,9 +651,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore_d.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore_d.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_GLES2|x64'">
     <ClCompile>
@@ -650,9 +682,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore_d.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore_d.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_D3D9|Win32'">
     <ClCompile>
@@ -677,9 +713,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Stub|x64'">
     <ClCompile>
@@ -704,9 +744,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>CcpCore_d.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CcpCore_d.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_GLES2|x64'">
     <ClCompile>
@@ -733,9 +777,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_D3D11|x64'">
     <ClCompile>
@@ -762,9 +810,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_GLES2|x64'">
     <ClCompile>
@@ -789,9 +841,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_D3D11|x64'">
     <ClCompile>
@@ -816,9 +872,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev_D3D9|x64'">
     <ClCompile>
@@ -843,9 +903,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_D3D9|x64'">
     <ClCompile>
@@ -872,9 +936,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_D3D9|Win32'">
     <ClCompile>
@@ -899,9 +967,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\directx\february2010\Lib\x86;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore_d.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x86.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x86.lib;CcpCore_d.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Stub|x64'">
     <ClCompile>
@@ -928,9 +1000,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>CcpCore.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CcpCore.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Stub|Win32'">
     <ClCompile>
@@ -955,9 +1031,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>CcpCore_d.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CcpCore_d.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_D3D9|x64'">
     <ClCompile>
@@ -982,9 +1062,13 @@
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <AdditionalLibraryDirectories>$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\directx\february2010\Lib\x64;$(CcpSdkPath)\nvidia\NVAPI\R265\Lib\$(Platform);$(CcpSdkPath)\ATI\CrossFire Detect;$(CcpSdkPath)\telemetry\2.1A3\lib;../../../carbon/autobuild/CcpCore/$(Platform)/$(PlatformToolset)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore_d.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9d.lib;atimgpud_s_x64.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9d.lib;nvapi.lib;atimgpud_s_x64.lib;CcpCore_d.lib;psapi.lib;telemetry64.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Stub|Win32'">
     <ClCompile>
@@ -1011,9 +1095,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_GLES2|Win32'">
     <ClCompile>
@@ -1040,9 +1128,13 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalAppleFrameworks>CoreFoundation;%(AdditionalAppleFrameworks)</AdditionalAppleFrameworks>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;CcpCore.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;dxguid.lib;dxerr.lib;nvapi.lib;d3dx9.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;d3d9.lib;dxguid.lib;dxerr.lib;d3dx9.lib;nvapi.lib;atimgpud_s_x86.lib;opengl32.lib;glew32.lib;CcpCore.lib;psapi.lib;telemetry32.link.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile/>
+    <Manifest/>
+    <PreBuildEvent/>
+    <PreLinkEvent/>
+    <PostBuildEvent/>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ALLog.h"/>
