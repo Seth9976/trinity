@@ -86,6 +86,8 @@ struct Tr2EffectResource
 	const char* name;
 	// Texture type
 	Type type;
+	// Initial count for buffer list UAVs (default -1 means the counter is not reset)
+	uint32_t initialCount;
 	// Is texture requested to be converted from sRGB to linear
 	bool isSRGB;
 	// Autoregister annotation value

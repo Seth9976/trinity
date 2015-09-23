@@ -950,6 +950,7 @@ void Tr2Effect::MapPassResources( const Tr2EffectResourceMap& resources, Tr2Effe
 			param.m_sourceName = ss.name;
 			param.m_registerIndex = it->first;
 			param.m_registerCount = resourceFlags | ( it->second.isSRGB ? ITr2EffectValue::RESOURCE_FLAG_SRGB : 0 );
+			param.m_initialCount = it->second.initialCount;
 
 			pv.push_back( param );
 		}
@@ -1245,10 +1246,12 @@ void ApplyShaderInputs( Tr2EffectPassParameters& pp,
 		}
 	}
 
+	unsigned char destHandle[8] = { 0 };
+
 	samplersChanged = false;
 	for( auto it = input.m_textures.cbegin(); it != input.m_textures.cend(); ++it )
 	{
-		unsigned char destHandle[2] = { static_cast<unsigned char>( it->m_registerIndex ), 0 };
+		destHandle[0] = static_cast<unsigned char>( it->m_registerIndex );
 		it->m_sourceValue->CopyValueToEffect( shaderType, destHandle, it->m_registerCount, renderContext );
 		if( destHandle[1] )
 		{
@@ -1263,7 +1266,8 @@ void ApplyShaderInputs( Tr2EffectPassParameters& pp,
 
 	for( auto it = input.m_uavs.cbegin(); it != input.m_uavs.cend(); ++it )
 	{
-		unsigned char destHandle[2] = { static_cast<unsigned char>( it->m_registerIndex ), 0 };
+		destHandle[0] = static_cast<unsigned char>( it->m_registerIndex );
+		reinterpret_cast<uint32_t*>( destHandle )[1] = it->m_initialCount;
 		it->m_sourceValue->CopyValueToEffect( shaderType, destHandle, it->m_registerCount, renderContext );
 	}
 }

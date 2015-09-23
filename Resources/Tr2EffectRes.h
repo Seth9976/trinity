@@ -27,6 +27,8 @@ public:
 	unsigned int m_registerIndex;
 	// Size of parameter value in bytes
 	unsigned int m_registerCount;
+	// Initial count for buffer list UAVs (default -1 means the counter is not reset)
+	uint32_t m_initialCount;
 };
 
 struct Tr2SamplerOverrideData

@@ -39,6 +39,13 @@ const Be::ClassInfo* Tr2GeometryBufferParameter::ExposeToBlue()
 			"Mesh index in granny file", 
 			Be::READWRITE | Be::NOTIFY | Be::PERSIST
 		)
+		MAP_ATTRIBUTE
+		(
+			"initialCount",
+			m_initialCount,
+			"Initial count for append/consume UAVs",
+			Be::READWRITE | Be::PERSIST
+		)
 		MAP_PROPERTY_READONLY
 		(
 			"isValid",

@@ -58,6 +58,9 @@ public:
 	bool IsValid() const;
 
 	std::string m_name;
+
+	// Initial count for append/consume UAVs
+	uint32_t m_initialCount;
 protected:
 	// Path to geometry resource
 	std::wstring m_resourcePath;
