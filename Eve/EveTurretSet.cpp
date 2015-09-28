@@ -268,9 +268,9 @@ void EveTurretSet::InitializeFiringEffect()
 				// find all the granny bone indices and store them
 				for( unsigned int i = 0; i < m_firingEffect->GetPerMuzzleEffectCount(); ++i )
 				{
-					if( i == 99 )
+					if( i == EveTurretFiringFX::MUZZLECOUNT_MAX )
 					{
-						CCP_LOGERR("Upper limit of firing bones is 99, this turret has %d", m_firingEffect->GetPerMuzzleEffectCount());
+						CCP_LOGERR("Upper limit of firing bones is %d, this turret has %d", EveTurretFiringFX::MUZZLECOUNT_MAX, m_firingEffect->GetPerMuzzleEffectCount());
 						break;
 					}
 
