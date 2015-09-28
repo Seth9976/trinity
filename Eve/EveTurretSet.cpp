@@ -270,14 +270,14 @@ void EveTurretSet::InitializeFiringEffect()
 				{
 					if( i == EveTurretFiringFX::MUZZLECOUNT_MAX )
 					{
-						CCP_LOGERR("Upper limit of firing bones is %d, this turret has %d", EveTurretFiringFX::MUZZLECOUNT_MAX, m_firingEffect->GetPerMuzzleEffectCount());
+						CCP_LOGERR( "Upper limit of firing bones is %d, this turret has %d", EveTurretFiringFX::MUZZLECOUNT_MAX, m_firingEffect->GetPerMuzzleEffectCount() );
 						break;
 					}
 
 					// firing bones should always be on the format Pos_FireXX where XX can range form 01 to 99
 					char boneNameBuffer[11];
 					unsigned int boneNameIndex = i+1;
-					sprintf_s(boneNameBuffer, "Pos_Fire%.2d", boneNameIndex);
+					sprintf_s( boneNameBuffer, "Pos_Fire%.2d", boneNameIndex );
 					
 					// in case we don't find positional bone, ::FindJoint() returns 0xffffffff
 					m_firingEffect->SetMuzzleBoneID( i, skeletonData->FindJoint( boneNameBuffer ) );
