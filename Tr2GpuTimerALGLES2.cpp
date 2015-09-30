@@ -17,6 +17,11 @@ void Tr2GpuTimerAL::Destroy()
 {
 }
 
+bool Tr2GpuTimerAL::IsValid() const
+{
+	return false;
+}
+
 bool Tr2GpuTimerAL::Begin( Tr2RenderContextAL& )
 {
 	return false;
