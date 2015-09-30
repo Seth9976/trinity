@@ -101,6 +101,21 @@
     <ClInclude Include="Tr2GpuTelemetry.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tr2GpuTimerALContext.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tr2GpuTimerALDx11.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tr2GpuTimerALDx9.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tr2GpuTimerALGLES2.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tr2GpuTimerALStub.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="Tr2Hal.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -357,6 +372,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tr2GpuTelemetry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tr2GpuTimerALDx11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tr2GpuTimerALDx9.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tr2GpuTimerALGLES2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tr2GpuTimerALStub.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tr2HalHelperStructures.cpp">

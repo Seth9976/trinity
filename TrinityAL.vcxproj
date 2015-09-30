@@ -1169,6 +1169,11 @@
     <ClInclude Include="Tr2GpuBufferALGLES2.h"/>
     <ClInclude Include="Tr2GpuBufferALStub.h"/>
     <ClInclude Include="Tr2GpuTelemetry.h"/>
+    <ClInclude Include="Tr2GpuTimerALContext.h"/>
+    <ClInclude Include="Tr2GpuTimerALDx11.h"/>
+    <ClInclude Include="Tr2GpuTimerALDx9.h"/>
+    <ClInclude Include="Tr2GpuTimerALGLES2.h"/>
+    <ClInclude Include="Tr2GpuTimerALStub.h"/>
     <ClInclude Include="Tr2Hal.h"/>
     <ClInclude Include="Tr2HalHelperStructures.h"/>
     <ClInclude Include="Tr2IndexBufferALDx11.h"/>
@@ -1259,6 +1264,10 @@
     <ClCompile Include="Tr2FragmentOpSettings.cpp"/>
     <ClCompile Include="Tr2GpuBufferALDx11.cpp"/>
     <ClCompile Include="Tr2GpuTelemetry.cpp"/>
+    <ClCompile Include="Tr2GpuTimerALDx11.cpp"/>
+    <ClCompile Include="Tr2GpuTimerALDx9.cpp"/>
+    <ClCompile Include="Tr2GpuTimerALGLES2.cpp"/>
+    <ClCompile Include="Tr2GpuTimerALStub.cpp"/>
     <ClCompile Include="Tr2HalHelperStructures.cpp"/>
     <ClCompile Include="Tr2IndexBufferALDx11.cpp"/>
     <ClCompile Include="Tr2IndexBufferALDx9.cpp"/>
