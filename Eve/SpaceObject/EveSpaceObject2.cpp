@@ -2091,15 +2091,6 @@ void EveSpaceObject2::SetDnaString( const char* dna )
 
 // -----------------------------------------------------------------------------
 // Description:
-//   Set the dirt level of this spaceobject from the outside
-// -----------------------------------------------------------------------------
-void EveSpaceObject2::SetDirtLevel( float lvl )
-{
-	m_dirtLevel = lvl;
-}
-
-// -----------------------------------------------------------------------------
-// Description:
 //   Create a shield impact effect on this object
 // -----------------------------------------------------------------------------
 int EveSpaceObject2::CreateShieldImpact( const Vector3& position, const Vector3& direction )

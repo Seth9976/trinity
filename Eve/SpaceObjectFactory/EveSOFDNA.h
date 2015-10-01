@@ -33,7 +33,6 @@ public:
 	{
 		CMD_INVALID = 0,
 		CMD_MESH,
-		CMD_DIRTLEVEL,
 		CMD_RESPATHINSERT,
 		CMD_MAX
 	}; 
@@ -85,7 +84,6 @@ public:
 
 	// get dna data
 	const char* GetDnaString() const;
-	float GetDirtLevel() const;
 	const Vector4* GetMeshAreaParameter( const BlueSharedString& areaDesignation, const BlueSharedString& parameterName, const std::map<BlueSharedString, Vector4>* hullParameters = nullptr, unsigned int blockededMaterials = 0 ) const;
 
 

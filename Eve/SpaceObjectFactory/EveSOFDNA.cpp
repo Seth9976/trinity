@@ -25,7 +25,6 @@ static char s_dnaSeperatorList = ';';
 static std::string s_dnaCommands[] = {
 	"invalid",				// CMD_INVALID
 	"mesh",					// CMD_MESH
-	"dirtlevel",			// CMD_DIRTLEVEL
 	"respathinsert",		// CMD_RESPATHINSERT
 };
 
@@ -117,13 +116,6 @@ bool EveSOFDNA::ValidateContent()
 				}
 			}
 			break;
-		case CMD_DIRTLEVEL:
-			// has one argument
-			if( cit->second.size() != 1 )
-			{
-				return false;
-			}
-			break;
 		case CMD_RESPATHINSERT:
 			// has one argument
 			if( cit->second.size() != 1 )
@@ -211,25 +203,6 @@ void EveSOFDNA::Setup( const char* dnaString, EveSOFDataMgrPtr dataMgr )
 	}
 	// generics
 	m_genericData = m_dataMgr->GetGenericData();
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Return dirt level from DNA
-// --------------------------------------------------------------------------------
-float EveSOFDNA::GetDirtLevel() const
-{
-	// there is a dna command for the dirt level
-	std::vector<std::string> dirtLevelCommandArgs;
-	if( GetDnaCommandArgs( CMD_DIRTLEVEL, dirtLevelCommandArgs ) )
-	{
-		// has only one parameter: a float!
-		if( dirtLevelCommandArgs.size() == 1 )
-		{
-			return float( atof( dirtLevelCommandArgs[0].c_str() ) );
-		}
-	}
-	return EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT;
 }
 
 // --------------------------------------------------------------------------------

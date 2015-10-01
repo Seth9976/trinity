@@ -239,9 +239,6 @@ void EveSOF::SetupConsts( EveSpaceObject2Ptr ship, const EveSOFDNAPtr dna ) cons
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	// dirt level
-	ship->SetDirtLevel( dna->GetDirtLevel() );
-
 	// dna dirt
 	ship->SetDnaString( dna->GetDnaString() );
 }

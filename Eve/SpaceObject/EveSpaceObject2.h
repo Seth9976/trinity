@@ -286,9 +286,6 @@ public:
 	// access to dna
 	void SetDnaString( const char* dna );
 
-	// access to dirt level
-	void SetDirtLevel( float lvl );
-
 	// access to impacts
 	int CreateShieldImpact( const Vector3& position, const Vector3& direction );
 	bool GetShieldImpactPosition( Vector3& out, int shieldImpactIndex ) const;
