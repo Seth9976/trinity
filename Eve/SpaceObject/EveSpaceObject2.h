@@ -287,9 +287,10 @@ public:
 	void SetDnaString( const char* dna );
 
 	// access to impacts
-	int CreateShieldImpact( const Vector3& position, const Vector3& direction, float lifeTime );
+	int CreateShieldImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime );
+	bool UpdateShieldImpact( const Vector3& direction, int shieldImpactIndex );
 	bool GetShieldImpactPosition( Vector3& out, int shieldImpactIndex ) const;
-	int CreateArmorImpact( const Vector3& position );
+	int CreateArmorImpact( int damageLocatorIndex );
 
 	uint32_t GetPerObjectDataSize( Tr2RenderContextEnum::ShaderType shaderType ) const;
 	void UpdatePerObjectBuffer( Tr2RenderContextEnum::ShaderType shaderType, uint32_t size, void* );
@@ -305,7 +306,7 @@ protected:
 	Vector3 GetDamageLocator( unsigned index ) const;
 	Vector3 GetTransformedDamageLocator( unsigned index ) const;
 	void UpdateDamageLocatorPositions();
-	void UpdateImpactDirections();
+	void UpdateDamageLocatorDirections();
 
 	void PrepareForAnimation();
 	void FreeAnimationData();

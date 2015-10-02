@@ -27,10 +27,15 @@ public:
 	EveImpactOverlay( IRoot* lockobj = NULL );
 	~EveImpactOverlay();
 
+	enum
+	{
+		IMPACT_DATA_ROW_COUNT = 2
+	};
+
 	// shield impacts
 	struct ShieldImpactData
 	{
-		Vector3 targetPosition;
+		int damageLocatorIndex;
 		Vector3 interceptPosition;
 		Vector3 direction;
 		float lifeTime;
@@ -40,20 +45,20 @@ public:
 	// shield texture data
 	struct ShieldTexelData
 	{
-		Vector4 row0;
+		Vector4 rows[IMPACT_DATA_ROW_COUNT];
 	};
 	
 	// armor impacts
 	struct ArmorImpactData
 	{
-		Vector3 impactPosition;
+		int damageLocatorIndex;
 		float timeLeft;
 	};
 
 	// armor texture data
 	struct ArmorTexelData
 	{
-		Vector4 row0;
+		Vector4 rows[IMPACT_DATA_ROW_COUNT];
 	};
 	
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -81,12 +86,12 @@ public:
 	Tr2EffectPtr GetArmorDamageShader( TriBatchType batchType ) const;
 
 	// control shield impacts
-	int CreateShieldImpact( const Vector3& position, const Vector3& direction, float lifeTime );
+	int CreateShieldImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime );
+	bool UpdateShieldImpact( const Vector3& direction, int shieldImpactIndex );
 	bool GetShieldImpactPosition( Vector3& out, int shieldImpactIndex ) const;
 
 	// control armor impacts
-	int CreateArmorImpact( const Vector3& position );
-	bool GetArmorImpactPosition( Vector3& out, int shieldImpactIndex ) const;
+	int CreateArmorImpact( int damageLocatorIndex );
 
 private:
 	// general data

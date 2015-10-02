@@ -174,7 +174,13 @@ Vector3* EveLocalPositionCurve::GetDamageLocatorShieldImpact( Vector3* in, Be::T
 		// create a shield impact on the target object
 		if( m_impactEffectIndex == -1 )
 		{
-			m_impactEffectIndex = spaceObject->CreateShieldImpact( locatorPos, parentPos - locatorPos, 2.f );
+			m_impactEffectIndex = spaceObject->CreateShieldImpact( m_damageLocatorIndex, parentPos - locatorPos, 2.f );
+		}
+
+		// update shield impact effect
+		if( m_impactEffectIndex != -1 )
+		{
+			spaceObject->UpdateShieldImpact( parentPos - locatorPos, m_impactEffectIndex );
 		}
 
 		// get the position from that shield impact effect
@@ -231,11 +237,11 @@ Vector3* EveLocalPositionCurve::GetDamageLocatorArmorImpact( Vector3* in, Be::Ti
 		// create a armor impact on the target object
 		if( m_impactEffectIndex == -1 )
 		{
-			m_impactEffectIndex = spaceObject->CreateArmorImpact( locatorPos );
+			m_impactEffectIndex = spaceObject->CreateArmorImpact( m_damageLocatorIndex );
 		}
 
-		// that is then armor impact effect pos
-		if( m_impactEffectIndex != -1 )
+		// now use the pos as output
+		if( m_damageLocatorIndex != -1 )
 		{
 			in->x = locatorPos.x;
 			in->y = locatorPos.y;

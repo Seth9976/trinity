@@ -21,6 +21,7 @@ EveImpactOverlay::EveImpactOverlay( IRoot* lockobj ):
 	m_shieldImpactDataNextIdx( 1 ),
 	m_armorImpactDataNextIdx( 1 )
 {
+	GlobalStore().RegisterVariable( "ImpactShieldDataMap", &m_shieldDataTexture );
 
 	PrepareResources();
 }
@@ -68,9 +69,9 @@ bool EveImpactOverlay::OnPrepareResources()
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 
 	// create the shield impact data texture here, prefill it with zeros
-	std::vector<Vector4> prefillData( m_maxShieldImpacts * 2, Vector4( 0.f, 0.f, 0.f, 0.f ) );
-	Tr2SubresourceData init = { &prefillData, m_maxShieldImpacts * uint32_t(sizeof(Vector4)), 2 * m_maxShieldImpacts * uint32_t(sizeof(Vector4)) };
-	if( FAILED( m_shieldDataTexture.Create2D( m_maxShieldImpacts, 2, 1, Tr2RenderContextEnum::PIXEL_FORMAT_R32G32B32A32_FLOAT, Tr2RenderContextEnum::USAGE_CPU_WRITE, &init, renderContext ) ) )
+	std::vector<Vector4> prefillData( m_maxShieldImpacts * 2 * IMPACT_DATA_ROW_COUNT, Vector4( 0.f, 0.f, 0.f, 0.f ) );
+	Tr2SubresourceData init = { &prefillData, m_maxShieldImpacts * uint32_t(sizeof(Vector4)), 2 * IMPACT_DATA_ROW_COUNT * m_maxShieldImpacts * uint32_t(sizeof(Vector4)) };
+	if( FAILED( m_shieldDataTexture.Create2D( m_maxShieldImpacts, 2 * IMPACT_DATA_ROW_COUNT, 1, Tr2RenderContextEnum::PIXEL_FORMAT_R32G32B32A32_FLOAT, Tr2RenderContextEnum::USAGE_CPU_WRITE, &init, renderContext ) ) )
 	{
 		return false;
 	}
@@ -94,51 +95,57 @@ void EveImpactOverlay::UpdateSyncronous( EveUpdateContext& updateContext, EveSpa
 		uint8_t* mem = (uint8_t*)data;
 
 		// shield info in first lines
-		uint32_t y = 0;
 		for( uint32_t x = 0; x < m_shieldDataTexture.GetWidth(); ++x )
 		{
-			Vector4* texel = (Vector4*)&mem[pitch * y + 16 * x];
+			Vector4* texelRow0 = (Vector4*)&mem[pitch * 0 + 16 * x];
+			Vector4* texelRow1 = (Vector4*)&mem[pitch * 1 + 16 * x];
 
 			// first one is special
 			if( x == 0 )
 			{
-				texel->x = float( m_shieldTexelData.size() );
-				texel->y = texel->z = texel->w = 0.f;
+				texelRow0->x = float( m_shieldTexelData.size() );
+				texelRow0->y = texelRow0->z = texelRow0->w = 0.f;
+				memset( texelRow1, 0, sizeof(Vector4) );
 			}
 			else
 			{
 				if( x - 1 < m_shieldTexelData.size() )
 				{
-					*texel = m_shieldTexelData[ x - 1 ].row0;
+					*texelRow0 = m_shieldTexelData[ x - 1 ].rows[0];
+					*texelRow1 = m_shieldTexelData[ x - 1 ].rows[1];
 				}
 				else
 				{
-					texel->x = texel->y = texel->z = texel->w = 0.f;
+					memset( texelRow0, 0, sizeof(Vector4) );
+					memset( texelRow1, 0, sizeof(Vector4) );
 				}
 			}
 		}
 
 		// armor data on second line
-		y = 1;
 		for( uint32_t x = 0; x < m_shieldDataTexture.GetWidth(); ++x )
 		{
-			Vector4* texel = (Vector4*)&mem[pitch * y + 16 * x];
+			Vector4* texelRow0 = (Vector4*)&mem[pitch * ( IMPACT_DATA_ROW_COUNT + 0 ) + 16 * x];
+			Vector4* texelRow1 = (Vector4*)&mem[pitch * ( IMPACT_DATA_ROW_COUNT + 1 ) + 16 * x];
 
 			// first one is special
 			if( x == 0 )
 			{
-				texel->x = float( m_armorTexelData.size() );
-				texel->y = texel->z = texel->w = 0.f;
+				texelRow0->x = float( m_armorTexelData.size() );
+				texelRow0->y = texelRow0->z = texelRow0->w = 0.f;
+				memset( texelRow1, 0, sizeof(Vector4) );
 			}
 			else
 			{
 				if( x - 1 < m_armorTexelData.size() )
 				{
-					*texel = m_armorTexelData[ x - 1 ].row0;
+					*texelRow0 = m_armorTexelData[ x - 1 ].rows[0];
+					*texelRow1 = m_armorTexelData[ x - 1 ].rows[1];
 				}
 				else
 				{
-					texel->x = texel->y = texel->z = texel->w = 0.f;
+					memset( texelRow0, 0, sizeof(Vector4) );
+					memset( texelRow1, 0, sizeof(Vector4) );
 				}
 			}
 		}
@@ -161,48 +168,58 @@ void EveImpactOverlay::UpdateAsyncronous( EveUpdateContext& updateContext, EveSp
 	{
 		m_shieldEllipsoidRadii = 0.5f * TRI_SQRT3 * ( parentBBoxMax - parentBBoxMin );
 		m_shieldEllipsoidCenter = parentBBoxMin + 0.5f * ( parentBBoxMax - parentBBoxMin );
+	}
 
-		// need the inverse world matrix
-		Matrix parentWorldTransform, parentInverseWorldTransform;
-		parent->GetLocalToWorldTransform( parentWorldTransform );
-		if( !D3DXMatrixInverse( &parentInverseWorldTransform, nullptr, &parentWorldTransform ) )
-		{
-			parentInverseWorldTransform = parentWorldTransform;
-		}
+	// need the inverse world matrix
+	Matrix parentWorldTransform, parentInverseWorldTransform;
+	parent->GetLocalToWorldTransform( parentWorldTransform );
+	if( !D3DXMatrixInverse( &parentInverseWorldTransform, nullptr, &parentWorldTransform ) )
+	{
+		parentInverseWorldTransform = parentWorldTransform;
+	}
 
-		m_shieldTexelData.resize( m_shieldImpactData.size() );
-		size_t i = 0;
-		for( auto sidit = m_shieldImpactData.begin(); sidit != m_shieldImpactData.end(); ++sidit )
-		{
-			ShieldImpactData* shieldData = &sidit->second;
-			ShieldTexelData* texelData = &m_shieldTexelData[i];
+	m_shieldTexelData.resize( m_shieldImpactData.size() );
+	size_t i = 0;
+	for( auto sidit = m_shieldImpactData.begin(); sidit != m_shieldImpactData.end(); ++sidit )
+	{
+		ShieldImpactData* shieldData = &sidit->second;
+		ShieldTexelData* texelData = &m_shieldTexelData[i];
 
-			// convert position and direction into object space
-			Vector3 tgtPosOS, dirOS;
-			D3DXVec3TransformCoord( &tgtPosOS, &shieldData->targetPosition, &parentInverseWorldTransform );
-			D3DXVec3TransformNormal( &dirOS, &shieldData->direction, &parentInverseWorldTransform );
-			// intersections
-			Vector3 p( 0.f, 0.f, 0.f );
-			IntersectEllipsoidRay( p, m_shieldEllipsoidCenter, m_shieldEllipsoidRadii, tgtPosOS, dirOS );
-			// "encode" it in texels
-			texelData->row0 = Vector4( p, shieldData->timeLeft );
-			// also need this intercept position in WS
-			D3DXVec3TransformCoord( &shieldData->interceptPosition, &p, &parentWorldTransform );
+		// get worldpos of damagelocator from parent
+		Vector3 tgtPosWS( 0.f, 0.f, 0.f );
+		parent->GetDamageLocatorPosition( &tgtPosWS, shieldData->damageLocatorIndex );
+		// convert position and direction into object space
+		Vector3 tgtPosOS, dirOS;
+		D3DXVec3TransformCoord( &tgtPosOS, &tgtPosWS, &parentInverseWorldTransform );
+		D3DXVec3TransformNormal( &dirOS, &shieldData->direction, &parentInverseWorldTransform );
+		// intersections
+		Vector3 p( 0.f, 0.f, 0.f );
+		IntersectEllipsoidRay( p, m_shieldEllipsoidCenter, m_shieldEllipsoidRadii, tgtPosOS, dirOS );
+		// "encode" it in texels
+		texelData->rows[0] = Vector4( p, shieldData->timeLeft );
+		texelData->rows[1] = Vector4( 0.f, 0.f, 0.f, shieldData->lifeTime );
+		// also need this intercept position in WS
+		D3DXVec3TransformCoord( &shieldData->interceptPosition, &p, &parentWorldTransform );
 	
-			++i;
-		}
+		++i;
 	}
 
 	// armor
 	m_armorTexelData.resize( m_armorImpactData.size() );
-	size_t i = 0;
+	i = 0;
 	for( auto aidit = m_armorImpactData.begin(); aidit != m_armorImpactData.end(); ++aidit )
 	{
 		ArmorImpactData* armorData = &aidit->second;
 		ArmorTexelData* texelData = &m_armorTexelData[i];
 
-		// convert position
-		texelData->row0 = Vector4( armorData->impactPosition, 0.f );
+		// get position from damage locator
+		Vector3 tgtPosWS( 0.f, 0.f, 0.f );
+		parent->GetDamageLocatorPosition( &tgtPosWS, armorData->damageLocatorIndex );
+		// convert position and direction into object space
+		Vector3 tgtPosOS;
+		D3DXVec3TransformCoord( &tgtPosOS, &tgtPosWS, &parentInverseWorldTransform );
+		texelData->rows[0] = Vector4( tgtPosOS, 0.f );
+		texelData->rows[1] = Vector4( 0.f, 0.f, 0.f, 0.f );
 
 		++i;
 	}
@@ -240,18 +257,34 @@ void EveImpactOverlay::GetBatches( ITriRenderBatchAccumulator* accumulator, TriB
 // Description:
 //   Use this method to add a new shield impact
 // --------------------------------------------------------------------------------
-int EveImpactOverlay::CreateShieldImpact( const Vector3& position, const Vector3& direction, float lifeTime )
+int EveImpactOverlay::CreateShieldImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime )
 {
 	// fill our struct, but keep it in world space
 	ShieldImpactData sid;
 	sid.direction = direction;
 	D3DXVec3Normalize( &sid.direction, &sid.direction );
-	sid.targetPosition = position;
+	sid.damageLocatorIndex = damageLocatorIndex;
 	sid.interceptPosition = Vector3( 0.f, 0.f, 0.f );
 	sid.lifeTime = lifeTime;
 	sid.timeLeft = 2.f * lifeTime;
 	m_shieldImpactData[ m_shieldImpactDataNextIdx ] = sid;
 	return m_shieldImpactDataNextIdx++;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Shield impacts are special, they need constant updating with the direction
+//   to the target
+// --------------------------------------------------------------------------------
+bool EveImpactOverlay::UpdateShieldImpact( const Vector3& direction, int shieldImpactIndex )
+{
+	auto finder = m_shieldImpactData.find( shieldImpactIndex );
+	if( finder == m_shieldImpactData.end() )
+	{
+		return false;
+	}
+	D3DXVec3Normalize( &finder->second.direction, &direction );
+	return true;
 }
 
 // --------------------------------------------------------------------------------
@@ -273,29 +306,14 @@ bool EveImpactOverlay::GetShieldImpactPosition( Vector3& out, int shieldImpactIn
 // Description:
 //   Use this method to add a new armor impact
 // --------------------------------------------------------------------------------
-int EveImpactOverlay::CreateArmorImpact( const Vector3& position )
+int EveImpactOverlay::CreateArmorImpact( int damageLocatorIndex )
 {
 	// fill our struct, but keep it in world space
 	ArmorImpactData aid;
-	aid.impactPosition = position;
+	aid.damageLocatorIndex = damageLocatorIndex;
 	aid.timeLeft = 0.f;
 	m_armorImpactData[ m_armorImpactDataNextIdx ] = aid;
 	return m_armorImpactDataNextIdx++;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Hand out the intercept position of a given impact
-// --------------------------------------------------------------------------------
-bool EveImpactOverlay::GetArmorImpactPosition( Vector3& out, int armorImpactIndex ) const
-{
-	auto finder = m_armorImpactData.find( armorImpactIndex );
-	if( finder == m_armorImpactData.end() )
-	{
-		return false;
-	}
-	out = finder->second.impactPosition;
-	return true;
 }
 
 // --------------------------------------------------------------------------------

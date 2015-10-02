@@ -1572,7 +1572,7 @@ int EveSpaceObject2::GetGoodDamageLocatorIndex( const Vector3& position )
 		}
 		if( !m_impactDirectionsUpdatedThisFrame )
 		{
-			UpdateImpactDirections();
+			UpdateDamageLocatorDirections();
 		}
 	}
 
@@ -1934,7 +1934,7 @@ void EveSpaceObject2::UpdateDamageLocatorPositions()
 	}
 }
 
-void EveSpaceObject2::UpdateImpactDirections()
+void EveSpaceObject2::UpdateDamageLocatorDirections()
 {
 	if( !m_transformedImpactDirections )
 	{
@@ -2093,13 +2093,26 @@ void EveSpaceObject2::SetDnaString( const char* dna )
 // Description:
 //   Create a shield impact effect on this object
 // -----------------------------------------------------------------------------
-int EveSpaceObject2::CreateShieldImpact( const Vector3& position, const Vector3& direction, float lifeTime )
+int EveSpaceObject2::CreateShieldImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime )
 {
 	if( m_impactOverlay )
 	{
-		return m_impactOverlay->CreateShieldImpact( position, direction, lifeTime );
+		return m_impactOverlay->CreateShieldImpact( damageLocatorIndex, direction, lifeTime );
 	}
 	return -1;
+}
+
+// -----------------------------------------------------------------------------
+// Description:
+//   Update the shield effec on this object
+// -----------------------------------------------------------------------------
+bool EveSpaceObject2::UpdateShieldImpact( const Vector3& direction, int shieldImpactIndex )
+{
+	if( m_impactOverlay )
+	{
+		return m_impactOverlay->UpdateShieldImpact( direction, shieldImpactIndex );
+	}
+	return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -2119,11 +2132,11 @@ bool EveSpaceObject2::GetShieldImpactPosition( Vector3& out, int shieldImpactInd
 // Description:
 //   Create an armor impact effect on this object
 // -----------------------------------------------------------------------------
-int EveSpaceObject2::CreateArmorImpact( const Vector3& position )
+int EveSpaceObject2::CreateArmorImpact( int damageLocatorIndex )
 {
 	if( m_impactOverlay )
 	{
-		return m_impactOverlay->CreateArmorImpact( position );
+		return m_impactOverlay->CreateArmorImpact( damageLocatorIndex );
 	}
 	return -1;
 }
