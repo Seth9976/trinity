@@ -9,6 +9,10 @@ class Tr2VertexDefinition;
 class Tr2VertexLayoutAL : public Tr2TrackedALObject<Tr2RenderContextEnum::OT_VERTEX_LAYOUT>
 {
 public:
+	Tr2VertexLayoutAL()
+	{
+	}
+
 	ALResult Create( const Tr2VertexDefinition& definition,
 					 Tr2RenderContextAL& renderContext );
 	bool IsValid() const
