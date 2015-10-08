@@ -35,9 +35,19 @@ struct InitializeWantsEXDevice
 			if ( arg.find( L"/enableExDevice" ) == 0 )
 			{
 				g_wantsEXDevice = true;
-				break;
+				return;
 			}
 		}
+
+#ifdef _WIN32
+		char env[64];
+		size_t size = 0;
+		getenv_s( &size, env, "TRINITYEXDEVICE" );
+		if( size != 0 && strcmp( env, "0" ) != 0 )
+		{
+			g_wantsEXDevice = true;
+		}
+#endif
 	}
 };
 
