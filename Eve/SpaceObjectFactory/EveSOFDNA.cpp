@@ -250,6 +250,17 @@ const char* EveSOFDNA::GetShaderPrefix( bool isAnimated ) const
 
 // --------------------------------------------------------------------------------
 // Description:
+//   Return complete shader path with appropriate prefixes
+// --------------------------------------------------------------------------------
+std::string EveSOFDNA::GetCompleteShaderPath( const char* path ) const
+{
+	std::string shaderPath = std::string( "/" ) + std::string( path );
+	StringInsertStubAfter( shaderPath, "/", GetShaderPrefix( IsHullAnimated() ) );
+	return GetAreaShaderLocationResPath() + shaderPath;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Return the generic textures for a given area shader
 // --------------------------------------------------------------------------------
 const EveSOFDataMgr::GenericShaderData* EveSOFDNA::GetGenericAreaShaderData( const BlueSharedString& shaderName ) const

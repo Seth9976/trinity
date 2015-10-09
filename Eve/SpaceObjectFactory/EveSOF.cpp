@@ -335,10 +335,7 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 			newShader->StartUpdate();
 
 			// construct res path of the shader
-			std::string shaderPath = std::string( "/" ) + std::string( area->shader.c_str() );
-			StringInsertStubAfter( shaderPath, "/", dna->GetShaderPrefix( dna->IsHullAnimated() ) );
-			shaderPath = dna->GetAreaShaderLocationResPath() + shaderPath;
-			newShader->SetEffectPathName( shaderPath.c_str() );
+			newShader->SetEffectPathName( dna->GetCompleteShaderPath( area->shader.c_str() ).c_str() );
 
 			// parameters
 			for( auto shaderParamIt = shaderData->parameters.begin(); shaderParamIt != shaderData->parameters.end(); ++shaderParamIt )
@@ -905,16 +902,12 @@ void EveSOF::SetupInstancedMeshes( EveSpaceObject2Ptr newObj, const EveSOFDNAPtr
 			newShader->StartUpdate();
 
 			// construct res path of the shader
-			// TODO: construct shader path in dna
-			std::string shaderPath = std::string( "/" ) + std::string( him.shader.c_str() );
-			StringInsertStubAfter( shaderPath, "/", dna->GetShaderPrefix( dna->IsHullAnimated() ) );
-			shaderPath = dna->GetAreaShaderLocationResPath() + shaderPath;
-			newShader->SetEffectPathName( shaderPath.c_str() );
+			newShader->SetEffectPathName( dna->GetCompleteShaderPath( him.shader.c_str() ).c_str() );
 
 			// parameters
 			for( auto shaderParamIt = shaderData->parameters.begin(); shaderParamIt != shaderData->parameters.end(); ++shaderParamIt )
 			{
-				const Vector4* paramValue = dna->GetMeshAreaParameter( him.areaName, *shaderParamIt );
+				const Vector4* paramValue = dna->GetMeshAreaParameter( BlueSharedString( "hull" ), *shaderParamIt );
 				if( paramValue )
 				{
 					newShader->AddParameterVector4( *shaderParamIt, paramValue );
@@ -940,15 +933,12 @@ void EveSOF::SetupInstancedMeshes( EveSpaceObject2Ptr newObj, const EveSOFDNAPtr
 			// new mesharea
 			Tr2MeshAreaPtr newMeshArea;
 			newMeshArea.CreateInstance();
-			newMeshArea->SetName( him.areaName.c_str() );
+			newMeshArea->SetName( "hull" );
 			newMeshArea->SetMaterial( newShader );
-			newMeshArea->SetIndex( him.areaIndex );
-			newMeshArea->SetCount( him.areaCount );
 			areas->Append( newMeshArea );
 		}
 		EveChildMeshPtr childMesh;
 		childMesh.CreateInstance();
-		childMesh->SetName( him.areaName.c_str() );
 		childMesh->SetMesh( (Tr2MeshBase*)mesh );
 		newObj->AddToEffectChildrenList( (IEveSpaceObjectChild*)childMesh );
 	}

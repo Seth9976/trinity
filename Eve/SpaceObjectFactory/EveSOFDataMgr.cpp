@@ -625,9 +625,6 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 		him.name = (*imit)->m_name;
 		him.geometryResPath = (*imit)->m_geometryResPath;
 		him.instanceGeometryResPath = (*imit)->m_instanceGeometryResPath;
-		him.areaName = (*imit)->m_areaName;
-		him.areaIndex = (*imit)->m_areaIndex;
-		him.areaCount = (*imit)->m_areaCount;
 		him.shader = (*imit)->m_shader;
 		for( auto tit = (*imit)->m_textures.begin(); tit != (*imit)->m_textures.end(); ++tit )
 		{

@@ -144,10 +144,7 @@ public:
 		BlueSharedString name;
 		std::string geometryResPath;
 		std::string instanceGeometryResPath;
-		BlueSharedString areaName;
 		BlueSharedString shader;
-		int areaIndex;
-		int areaCount;
 		std::map<BlueSharedString, TextureData> textures;
 	};
 

@@ -62,9 +62,7 @@ public:
 	void UpdatePerObjectBuffer( Tr2RenderContextEnum::ShaderType shaderType, uint32_t size, void* );
 	uint32_t GetPerObjectDataSize( Tr2RenderContextEnum::ShaderType shaderType ) const;
 
-
 	void SetMesh( Tr2MeshBase* mesh );
-	void SetName( const char* name ) { m_name = BlueSharedString( name ); }
 
 protected:
 	BlueSharedString m_name;

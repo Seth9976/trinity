@@ -56,10 +56,7 @@ public:
 	BlueSharedString m_name;
 	std::string m_geometryResPath;
 	std::string m_instanceGeometryResPath;
-	BlueSharedString m_areaName;
 	BlueSharedString m_shader;
-	int m_areaIndex;
-	int m_areaCount;
 	PEveSOFDataTextureVector m_textures;
 };
 TYPEDEF_BLUECLASS( EveSOFDataInstancedMesh );

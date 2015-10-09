@@ -48,10 +48,7 @@ EveSOFDataTexture::EveSOFDataTexture( IRoot* lockobj )
 
 
 EveSOFDataInstancedMesh::EveSOFDataInstancedMesh( IRoot* lockobj ) :
-	PARENTLOCK( m_textures ),
-	m_areaName( "hull" ),
-	m_areaCount( 1 ),
-	m_areaIndex( 0 )
+	PARENTLOCK( m_textures )
 {}
 
 
