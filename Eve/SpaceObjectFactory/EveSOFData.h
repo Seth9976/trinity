@@ -351,16 +351,16 @@ public:
 	~EveSOFDataHullDecal() {}
 
 	// decal type
-	enum Type
+	enum Usage
 	{
-		TYPE_STANDARD = 0,
-		TYPE_KILLCOUNTER,
-		TYPE_LOGO,
+		USAGE_STANDARD = 0,
+		USAGE_KILLCOUNTER,
+		USAGE_LOGO,
 	};
 
 	// per-hull data of a hull decal
 	std::string m_name;
-	Type m_type;
+	Usage m_usage;
 	Vector3 m_position, m_scaling;
 	Quaternion m_rotation;
 	std::string m_shader;

@@ -119,7 +119,7 @@ public:
 
 	struct HullDecalData
 	{
-		EveSOFDataHullDecal::Type type;
+		EveSOFDataHullDecal::Usage usage;
 		Vector3 position;
 		Quaternion rotation;
 		Vector3 scaling;

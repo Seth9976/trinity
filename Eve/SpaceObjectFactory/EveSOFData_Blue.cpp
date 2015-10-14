@@ -497,30 +497,30 @@ const Be::ClassInfo* EveSOFDataFactionDecal::ExposeToBlue()
 
 BLUE_DEFINE( EveSOFDataHullDecal );
 
-Be::VarChooser EveSOFDecalTypeChooser[] =
+Be::VarChooser EveSOFDecalUsageChooser[] =
 {
 	{
 		"Standard",
-		BeCast( EveSOFDataHullDecal::TYPE_STANDARD ),
+		BeCast( EveSOFDataHullDecal::USAGE_STANDARD ),
 		"Standard decal"
 	},
 	{
 		"KillCounter",
-		BeCast( EveSOFDataHullDecal::TYPE_KILLCOUNTER ),
+		BeCast( EveSOFDataHullDecal::USAGE_KILLCOUNTER ),
 		"The killcounter decal"
 	},
 	{
 		"Logo",
-		BeCast( EveSOFDataHullDecal::TYPE_LOGO ),
+		BeCast( EveSOFDataHullDecal::USAGE_LOGO ),
 		"tbd"
 	},
 	{ 0 }
 };
 
 BLUE_REGISTER_ENUM_EX( 
-	"DecalType",
-	EveSOFDataHullDecal::Type,
-	EveSOFDecalTypeChooser,
+	"DecalUsage",
+	EveSOFDataHullDecal::Usage,
+	EveSOFDecalUsageChooser,
 	ENUM_REG_ENUM_OBJECT_ON_MODULE
 );
 
@@ -530,7 +530,7 @@ const Be::ClassInfo* EveSOFDataHullDecal::ExposeToBlue()
         MAP_INTERFACE( EveSOFDataHullDecal )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE_WITH_CHOOSER("type", m_type, "Choose the type of this decal", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFDecalTypeChooser )
+		MAP_ATTRIBUTE_WITH_CHOOSER("usage", m_usage, "Choose the usage of this decal", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFDecalUsageChooser )
 		MAP_ATTRIBUTE( "position", m_position, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "rotation", m_rotation, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "scaling", m_scaling, "", Be::READWRITE | Be::PERSIST )
