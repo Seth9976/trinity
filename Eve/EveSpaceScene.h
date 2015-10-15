@@ -321,9 +321,6 @@ protected:
 	void DecodeBufferPixel( const void* pBuffer, unsigned short& objId, unsigned short& areaId,
 		                    float& depth ) const;
 
-	// lighting
-	void PrepareLighting();
-
 	// Batch gathering and preparation	
 	void GetAllBatchesFromRenderables( std::vector<ITr2Renderable*>& objectRenderables, Tr2RenderableSortList& objectsWithTransparencies, BatchMap& batches );
 	void GetOpaqueBatchesFromRenderables( std::vector<ITr2Renderable*>& objectRenderables, BatchMap& batches );
@@ -401,9 +398,6 @@ protected:
 	ITriRenderBatchAccumulator* m_shadowBatches;
 	ITriRenderBatchAccumulator* m_opaquePickingBatches;
 	ITriRenderBatchAccumulator* m_pickingBatches;
-
-	// lights manager of this scene
-	EveSpaceSceneLightMgrPtr m_sceneLightMgr;
 
 	Tr2EffectPtr m_backgroundEffect;
 

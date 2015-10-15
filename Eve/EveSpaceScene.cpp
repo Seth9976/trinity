@@ -1189,8 +1189,6 @@ void EveSpaceScene::BeginRender( Tr2RenderContext& renderContext )
 	}
 
 
-	PrepareLighting();
-
 	renderContext.m_esm.BeginManagedRendering();
 	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_OPAQUE );
 	Tr2GPUParticlePoolManager* manager = m_updateContext.GetParticlePoolManager();
@@ -1402,31 +1400,6 @@ void EveSpaceScene::UpdateQuadRenderer(
 Tr2QuadRenderer* EveSpaceScene::GetQuadRenderer() const
 {
 	return Tr2QuadRenderer::Instance();
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   x
-// Returns:
-//   x
-// --------------------------------------------------------------------------------------
-void EveSpaceScene::PrepareLighting()
-{
-	// nothing to do here if we don't have any lighting
-	if( !m_sceneLightMgr )
-	{
-		return;
-	}
-
-	// run over all objects in scene and tell them about lighting
-	for( IEveSpaceObject2Vector::iterator it = m_objects.begin(); it != m_objects.end(); ++it )
-	{
-		IEveLightReceiverPtr lightReceiver;
-		if( (*it)->QueryInterface( BlueInterfaceIID<IEveLightReceiver>(), (void**)&lightReceiver, BEQI_SILENT ) )
-		{
-			lightReceiver->SetLights( m_sceneLightMgr );
-		}
-	}
 }
 
 // --------------------------------------------------------------------------------------

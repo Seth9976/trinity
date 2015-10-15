@@ -5,7 +5,6 @@
 #include "TriDevice.h"
 #include "TriSettingsRegistrar.h"
 #include "EveUpdateContext.h"
-#include "Eve/EveSpaceSceneLightMgr.h"
 
 const float EvePlanet::SCALE = 1000000.0f;
 static int s_evePlanetTextureQuality = 0;

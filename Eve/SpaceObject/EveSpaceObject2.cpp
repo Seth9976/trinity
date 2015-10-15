@@ -96,7 +96,6 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_lastCurveUpdateTime( 0 ),
 	m_previousPosition( UNINITIALIZED_POSITION, UNINITIALIZED_POSITION, UNINITIALIZED_POSITION ),
 	m_spaceObjectMiscData( 1.f, 1.f, EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT, 1.f ),
-	m_psPointLightCount( 0 ),
 	m_displayChildren( true ),
 	m_dirtLevel( EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT ),
 	m_isAnimated( false )
@@ -1755,27 +1754,6 @@ void EveSpaceObject2::UpdateWorldTransform( Be::Time time )
 bool EveSpaceObject2::IsShadowReceiveEnabled()
 {
 	return m_enableShadow && m_shadowEffect;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Nothing here atm
-// --------------------------------------------------------------------------------
-void EveSpaceObject2::SetLights( EveSpaceSceneLightMgrPtr lightMgr )
-{
-	m_lightManager = lightMgr;
-	m_psPointLightCount = 0;
-	if( m_lightManager )
-	{
-		for( unsigned int i = 0; i < m_lightManager->GetStaticPointlightCount(); ++i )
-		{
-			const EveSpaceScenePointLightPtr pointLight = m_lightManager->GetStaticPointlight( i );
-			if( pointLight && pointLight->IsDisplay() )
-			{
-				++m_psPointLightCount;
-			}
-		}
-	}
 }
 
 void EveSpaceObject2::GetCurrentModelCenterWorldPosition( Vector3 &position )

@@ -8,8 +8,6 @@
 #include "TriRenderBatch.h"
 
 #include "Eve/IEveShadowCaster.h"
-#include "Eve/IEveLightReceiver.h"
-#include "Eve/EveSpaceSceneLightMgr.h"
 #include "Tr2PerObjectData.h"
 #include "ITr2Renderable.h"
 #include "Eve/IEveSpaceObject2.h"
@@ -116,7 +114,6 @@ BLUE_CLASS( EveSpaceObject2 ):
 	public ITr2Renderable,
 	public IEveSpaceObject2,
 	public IEveShadowCaster,
-	public IEveLightReceiver,
 	public IBlueAsyncResNotifyTarget,
     public ITr2Pickable,
 	public ITriTargetable,
@@ -180,10 +177,6 @@ public:
 	// IEveShadowCaster
 	virtual bool GetRenderablesCastingShadow( bool isSelf, const TriFrustumOrtho& frustum, std::vector<ITr2Renderable*>& renderables );
 	virtual bool IsShadowReceiveEnabled();
-
-	//////////////////////////////////////////////////////////////////////////////////////
-	// IEveLightReceiver
-	virtual void SetLights( EveSpaceSceneLightMgrPtr lightMgr );
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
@@ -342,8 +335,6 @@ protected:
 	// per-object data
 	Tr2PersistentPerObjectData<EveSpaceObject2> m_perObjectDataVs;
 	Tr2PersistentPerObjectData<EveSpaceObject2> m_perObjectDataPs;
-	EveSpaceSceneLightMgrPtr m_lightManager;
-	unsigned m_psPointLightCount;
 	Vector4 m_spaceObjectMiscData;
 	EveSpaceObjectPSData m_psData;
 	EveSpaceObjectVSData m_vsData;

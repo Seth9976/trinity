@@ -373,7 +373,6 @@ const Be::ClassInfo* EveSpaceScene::ExposeToBlue()
 			"Value of EnvMap3 shader variable.",
 			Be::READ
 		)
-		MAP_ATTRIBUTE( "sceneLightMgr", m_sceneLightMgr, "Manages lights and lighting for this scene", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE
 		(
 			"depthTexture",

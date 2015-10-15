@@ -9,7 +9,6 @@
 
 
 #include "EveSpaceObject2.h"
-#include "Eve/EveSpaceSceneLightMgr.h"
 
 // forwards
 BLUE_DECLARE( EveMissileWarhead );
