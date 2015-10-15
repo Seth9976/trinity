@@ -5,7 +5,6 @@
     <Filter Include="Source Files"/>
     <Filter Include="Source Files\Apex"/>
     <Filter Include="Source Files\Curves"/>
-    <Filter Include="Source Files\EffectParameter"/>
     <Filter Include="Source Files\Eve"/>
     <Filter Include="Source Files\Eve\Animation"/>
     <Filter Include="Source Files\Eve\Renderable"/>
@@ -21,6 +20,8 @@
     <Filter Include="Source Files\Particle"/>
     <Filter Include="Source Files\RenderJob"/>
     <Filter Include="Source Files\Resources"/>
+    <Filter Include="Source Files\Shader"/>
+    <Filter Include="Source Files\Shader\Parameter"/>
     <Filter Include="Source Files\Sprite2d"/>
     <Filter Include="Source Files\UI"/>
     <Filter Include="Source Files\Utilities"/>
@@ -148,15 +149,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Tr2DynamicRingBuffer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2Effect.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2EffectDescription.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2EffectStateManager.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Tr2FileExportInfo.h">
@@ -316,21 +308,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Tr2ScalingTool.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2ShaderBuffer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2ShaderManager.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2ShaderMaterial.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2ShaderParameterDescription.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tr2ShaderPermuteTag.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Tr2ShLightingManager.h">
@@ -605,39 +582,6 @@
     </ClInclude>
     <ClInclude Include="Curves\TriVectorScaler.h">
       <Filter>Source Files\Curves</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2FloatParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2GeometryBufferParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2Matrix4Parameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2Texture2dLodParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2Vector2Parameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2Vector3Parameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\Tr2Vector4Parameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\TriFloatArrayParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\TriTextureParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\TriTransformParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectParameter\TriVariableParameter.h">
-      <Filter>Source Files\EffectParameter</Filter>
     </ClInclude>
     <ClInclude Include="Eve\EveCamera.h">
       <Filter>Source Files\Eve</Filter>
@@ -1311,6 +1255,63 @@
     <ClInclude Include="Resources\TriTextureRes.h">
       <Filter>Source Files\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="Shader\Tr2Effect.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2EffectDescription.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2EffectStateManager.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2ShaderBuffer.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2ShaderManager.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2ShaderMaterial.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2ShaderParameterDescription.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Tr2ShaderPermuteTag.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2FloatParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2GeometryBufferParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2Matrix4Parameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2Texture2dLodParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2Vector2Parameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2Vector3Parameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\Tr2Vector4Parameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\TriFloatArrayParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\TriTextureParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\TriTransformParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Parameter\TriVariableParameter.h">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClInclude>
     <ClInclude Include="Sprite2d\ITr2Sprite2dRenderer.h">
       <Filter>Source Files\Sprite2d</Filter>
     </ClInclude>
@@ -1528,18 +1529,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tr2DynamicRingBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2Effect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2EffectDescription.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2EffectStateManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2Effect_Blue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tr2FileExportInfo.cpp">
@@ -1804,36 +1793,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tr2ScalingTool_Blue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderBuffer_Blue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderManager_blue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderMaterial_Blue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderParameterDescription.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderParameterDescription_Blue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderPermuteTag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tr2ShaderPermuteTag_Blue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tr2ShLightingManager.cpp">
@@ -2318,72 +2277,6 @@
     </ClCompile>
     <ClCompile Include="Curves\TriVectorScaler_Blue.cpp">
       <Filter>Source Files\Curves</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2FloatParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2FloatParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2GeometryBufferParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2GeometryBufferParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Matrix4Parameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Matrix4Parameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Texture2dLodParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Texture2dLodParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Vector2Parameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Vector2Parameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Vector3Parameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Vector3Parameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Vector4Parameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\Tr2Vector4Parameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriFloatArrayParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriFloatArrayParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriTextureParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriTextureParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriTransformParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriTransformParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriVariableParameter.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectParameter\TriVariableParameter_Blue.cpp">
-      <Filter>Source Files\EffectParameter</Filter>
     </ClCompile>
     <ClCompile Include="Eve\EveCamera.cpp">
       <Filter>Source Files\Eve</Filter>
@@ -3347,6 +3240,114 @@
     </ClCompile>
     <ClCompile Include="Resources\TriTextureRes_Blue.cpp">
       <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2Effect.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2EffectDescription.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2EffectStateManager.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2Effect_Blue.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderBuffer.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderBuffer_Blue.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderManager.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderManager_blue.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderMaterial.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderMaterial_Blue.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderParameterDescription.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderParameterDescription_Blue.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderPermuteTag.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Tr2ShaderPermuteTag_Blue.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2FloatParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2FloatParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2GeometryBufferParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2GeometryBufferParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Matrix4Parameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Matrix4Parameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Texture2dLodParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Texture2dLodParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Vector2Parameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Vector2Parameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Vector3Parameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Vector3Parameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Vector4Parameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\Tr2Vector4Parameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriFloatArrayParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriFloatArrayParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriTextureParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriTextureParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriTransformParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriTransformParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriVariableParameter.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Parameter\TriVariableParameter_Blue.cpp">
+      <Filter>Source Files\Shader\Parameter</Filter>
     </ClCompile>
     <ClCompile Include="Sprite2d\Tr2Sprite2d.cpp">
       <Filter>Source Files\Sprite2d</Filter>
