@@ -39,7 +39,7 @@ const Be::ClassInfo* EveTurretFiringFX::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "stretch", m_stretch, "A list of stretch effects for this firing effect", Be::READWRITE | Be::PERSIST )
 
-		MAP_ATTRIBUTE( "endPosition", m_endPosition, "Destination or end position", Be::READ )
+		MAP_ATTRIBUTE( "endPosition", m_endPosition, "Destination or end position", Be::READWRITE )
 		
 		MAP_ATTRIBUTE( "scaleEffectTarget", m_scaleEffectTarget, "Toggle whether the firing effect target object is scaled by the target object", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "minRadius", m_minRadius, "Used for scaling the firing effect", Be::READWRITE | Be::PERSIST )
