@@ -3055,6 +3055,9 @@
     <ClInclude Include="Particle\Tr2DynamicEmitter.h"/>
     <ClInclude Include="Particle\Tr2ElementBlendConstraint.h"/>
     <ClInclude Include="Particle\Tr2ForceSphereVolume.h"/>
+    <ClInclude Include="Particle\Tr2GpuParticleSystem.h"/>
+    <ClInclude Include="Particle\Tr2GpuSharedEmitter.h"/>
+    <ClInclude Include="Particle\Tr2GpuUniqueEmitter.h"/>
     <ClInclude Include="Particle\Tr2ParticleAttractorForce.h"/>
     <ClInclude Include="Particle\Tr2ParticleDirectForce.h"/>
     <ClInclude Include="Particle\Tr2ParticleDragForce.h"/>
@@ -3646,6 +3649,12 @@
     <ClCompile Include="Particle\Tr2ElementBlendConstraint_Blue.cpp"/>
     <ClCompile Include="Particle\Tr2ForceSphereVolume.cpp"/>
     <ClCompile Include="Particle\Tr2ForceSphereVolume_Blue.cpp"/>
+    <ClCompile Include="Particle\Tr2GpuParticleSystem.cpp"/>
+    <ClCompile Include="Particle\Tr2GpuParticleSystem_Blue.cpp"/>
+    <ClCompile Include="Particle\Tr2GpuSharedEmitter.cpp"/>
+    <ClCompile Include="Particle\Tr2GpuSharedEmitter_Blue.cpp"/>
+    <ClCompile Include="Particle\Tr2GpuUniqueEmitter.cpp"/>
+    <ClCompile Include="Particle\Tr2GpuUniqueEmitter_Blue.cpp"/>
     <ClCompile Include="Particle\Tr2ParticleAttractorForce.cpp"/>
     <ClCompile Include="Particle\Tr2ParticleAttractorForce_Blue.cpp"/>
     <ClCompile Include="Particle\Tr2ParticleDirectForce.cpp"/>

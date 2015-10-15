@@ -1021,6 +1021,15 @@
     <ClInclude Include="Particle\Tr2ForceSphereVolume.h">
       <Filter>Source Files\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="Particle\Tr2GpuParticleSystem.h">
+      <Filter>Source Files\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle\Tr2GpuSharedEmitter.h">
+      <Filter>Source Files\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle\Tr2GpuUniqueEmitter.h">
+      <Filter>Source Files\Particle</Filter>
+    </ClInclude>
     <ClInclude Include="Particle\Tr2ParticleAttractorForce.h">
       <Filter>Source Files\Particle</Filter>
     </ClInclude>
@@ -2780,6 +2789,24 @@
       <Filter>Source Files\Particle</Filter>
     </ClCompile>
     <ClCompile Include="Particle\Tr2ForceSphereVolume_Blue.cpp">
+      <Filter>Source Files\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle\Tr2GpuParticleSystem.cpp">
+      <Filter>Source Files\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle\Tr2GpuParticleSystem_Blue.cpp">
+      <Filter>Source Files\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle\Tr2GpuSharedEmitter.cpp">
+      <Filter>Source Files\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle\Tr2GpuSharedEmitter_Blue.cpp">
+      <Filter>Source Files\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle\Tr2GpuUniqueEmitter.cpp">
+      <Filter>Source Files\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle\Tr2GpuUniqueEmitter_Blue.cpp">
       <Filter>Source Files\Particle</Filter>
     </ClCompile>
     <ClCompile Include="Particle\Tr2ParticleAttractorForce.cpp">
