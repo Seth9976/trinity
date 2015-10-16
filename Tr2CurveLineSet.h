@@ -165,6 +165,7 @@ private:
 		Vector4 lineDir;				// [xyz] = offset to next/previous line segment, [w] = width (incl. -1.f to indicate direction)
 		Vector4 beginEnd;				// [x] = 0 or 1 for begin/end, [y] = uniform scalar from 0 to 1 across length of line segment, [z] = override color border, [w] = length of vert in uniform scalar
 		Vector3 animationData;			// [x] = animation speed, [y] = animation scale, [z] = lineID
+		Vector3 nextLineDir;			// one after next/previous line segment position
 		unsigned int color;				// [xyzw] = main color
 		unsigned int overrideColor;		// [xyzw] = override color
 		unsigned int overlayColor;		// [xyzw] = overlay color
@@ -182,7 +183,17 @@ private:
 	// fill vertex buffer
 	bool FillVertexBuffer();
 	// helper
-	void WriteLineVerticesToBuffer( const Vector3& pos1, const Color& col1, float length1, const Vector3& pos2, const Color& col2, float length2, unsigned int lineID, LineVertex* buffer );
+	void WriteLineVerticesToBuffer( 
+		const Vector3& pos1, 
+		const Color& col1, 
+		float length1, 
+		const Vector3& pos2, 
+		const Color& col2, 
+		float length2, 
+		const Vector3& posPrev, 
+		const Vector3& posNext, 
+		unsigned int lineID, 
+		LineVertex* buffer );
 	void WriteParticleVerticesToBuffer( const Vector3& pos1, const Color& col1, float length1, const Vector3& pos2, const Color& col2, float length2, unsigned int lineID, LineVertex* buffer );
 
 	bool m_additive;

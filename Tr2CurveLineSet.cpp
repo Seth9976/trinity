@@ -91,6 +91,7 @@ bool Tr2CurveLineSet::OnPrepareResources()
 			tvd.Add( tvd.FLOAT32_4, tvd.TEXCOORD, 0 );
 			tvd.Add( tvd.FLOAT32_4, tvd.TEXCOORD, 1 );
 			tvd.Add( tvd.FLOAT32_3, tvd.TEXCOORD, 2 );
+			tvd.Add( tvd.FLOAT32_3, tvd.TEXCOORD, 3 );
 
 			tvd.Add( tvd.UBYTE_4_NORM, tvd.COLOR, 0 );
 			tvd.Add( tvd.UBYTE_4_NORM, tvd.COLOR, 1 );
@@ -175,9 +176,21 @@ inline unsigned SwizzleColor( unsigned color )
 //   col2 - end color of segment
 //   length2 - ow far along the line does this segment end
 //   lineID - the line's id
+//   posPrev - start position of the previous segment
+//   posNext - end position of the next segment
 //   buffer - the vertex buffer
 // ------------------------------------------------------------------------------------------------------
-void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Color& col1, float length1, const Vector3& pos2, const Color& col2, float length2, unsigned int lineID, LineVertex* buffer )
+void Tr2CurveLineSet::WriteLineVerticesToBuffer( 
+	const Vector3& pos1, 
+	const Color& col1, 
+	float length1, 
+	const Vector3& pos2, 
+	const Color& col2, 
+	float length2, 
+	const Vector3& posPrev, 
+	const Vector3& posNext, 
+	unsigned int lineID, 
+	LineVertex* buffer )
 {
 	// line info
 	const LineData* lineData = &m_lines[lineID];
@@ -197,6 +210,7 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 	v0.position = pos1;
 	v0.lineDir = Vector4( dirOffset, -1.f * m_lineWidthFactor * lineData->width );
 	v0.beginEnd = Vector4( 0.f, length1, lineData->multiColorBorder, length2 - length1 );
+	v0.nextLineDir = posPrev;
 	v0.color = col1Swizzled;
 	v0.overrideColor = multiColorSwizzled;
 	v0.overlayColor = overlayColorSwizzled;
@@ -206,6 +220,7 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 	v1.position = pos1;
 	v1.lineDir = Vector4( dirOffset, m_lineWidthFactor * lineData->width );
 	v1.beginEnd = Vector4( 0.f, length1, lineData->multiColorBorder, length2 - length1 );
+	v1.nextLineDir = posPrev;
 	v1.color = col1Swizzled;
 	v1.overrideColor = multiColorSwizzled;
 	v1.overlayColor = overlayColorSwizzled;
@@ -215,6 +230,7 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 	v2.position = pos2;
 	v2.lineDir = Vector4( -1.f * dirOffset, -1.f * m_lineWidthFactor * lineData->width );
 	v2.beginEnd = Vector4( 1.f, length2, lineData->multiColorBorder, length2 - length1 );
+	v2.nextLineDir = posNext;
 	v2.color = col2Swizzled;
 	v2.overrideColor = multiColorSwizzled;
 	v2.overlayColor = overlayColorSwizzled;
@@ -224,6 +240,7 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 	v3.position = pos1;
 	v3.lineDir = Vector4( dirOffset, m_lineWidthFactor * lineData->width );
 	v3.beginEnd = Vector4( 0.f, length1, lineData->multiColorBorder, length2 - length1 );
+	v3.nextLineDir = posPrev;
 	v3.color = col1Swizzled;
 	v3.overrideColor = multiColorSwizzled;
 	v3.overlayColor = overlayColorSwizzled;
@@ -233,6 +250,7 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 	v4.position = pos2;
 	v4.lineDir = Vector4( -1.f * dirOffset, m_lineWidthFactor * lineData->width );
 	v4.beginEnd = Vector4( 1.f, length2, lineData->multiColorBorder, length2 - length1 );
+	v4.nextLineDir = posNext;
 	v4.color = col2Swizzled;
 	v4.overrideColor = multiColorSwizzled;
 	v4.overlayColor = overlayColorSwizzled;
@@ -242,6 +260,7 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 	v5.position = pos2;
 	v5.lineDir = Vector4( -1.f * dirOffset, -1.f * m_lineWidthFactor * lineData->width );
 	v5.beginEnd = Vector4( 1.f, length2, lineData->multiColorBorder, length2 - length1 );
+	v5.nextLineDir = posNext;
 	v5.color = col2Swizzled;
 	v5.overrideColor = multiColorSwizzled;
 	v5.overlayColor = overlayColorSwizzled;
@@ -261,7 +280,15 @@ void Tr2CurveLineSet::WriteLineVerticesToBuffer( const Vector3& pos1, const Colo
 //   lineID - the line's id
 //   buffer - the vertex buffer
 // ------------------------------------------------------------------------------------------------------
-void Tr2CurveLineSet::WriteParticleVerticesToBuffer( const Vector3& pos1, const Color& col1, float length1, const Vector3& pos2, const Color& col2, float length2, unsigned int lineID, LineVertex* buffer )
+void Tr2CurveLineSet::WriteParticleVerticesToBuffer( 
+	const Vector3& pos1, 
+	const Color& col1, 
+	float length1, 
+	const Vector3& pos2, 
+	const Color& col2, 
+	float length2, 
+	unsigned int lineID, 
+	LineVertex* buffer )
 {
 	// line info
 	const LineData* lineData = &m_lines[lineID];
@@ -376,7 +403,17 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 			case LINETYPE_STRAIGHT:
 				{
 					// put some verts into buffer
-					WriteLineVerticesToBuffer( m_lines[i].position1, m_lines[i].color1, 0.f, m_lines[i].position2, m_lines[i].color2, 1.f, i, vertexBuffer );
+					WriteLineVerticesToBuffer( 
+						m_lines[i].position1, 
+						m_lines[i].color1, 
+						0.f, 
+						m_lines[i].position2, 
+						m_lines[i].color2, 
+						1.f, 
+						m_lines[i].position1 - ( m_lines[i].position2 - m_lines[i].position1 ),
+						m_lines[i].position2 + ( m_lines[i].position2 - m_lines[i].position1 ),
+						i, 
+						vertexBuffer );
 					vertexBuffer += 6;
 
 					// add to bounding sphere
@@ -405,11 +442,19 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 					D3DXVec3Cross( &rotationAxis, &startDir, &endDir );
 					float fullAngle = acosf( D3DXVec3Dot( &startDirNrm, &endDirNrm ) );
 					float segmentAngle = fullAngle / (float)m_lines[i].numOfSegments;
-					D3DXMatrixRotationAxis( &rotationMatrix, &rotationAxis, segmentAngle );
 
 					// run through all segmens and create lines
+					D3DXMatrixRotationAxis( &rotationMatrix, &rotationAxis, -segmentAngle );
+
+					Vector3 dir0 = startDir;
+					D3DXVec3TransformNormal( &dir0, &startDir, &rotationMatrix );
+
+					D3DXMatrixRotationAxis( &rotationMatrix, &rotationAxis, segmentAngle );
+
 					Vector3 dir1 = startDir;
 					Vector3 dir2 = startDir;
+					Vector3 dir3 = startDir;
+					D3DXVec3TransformNormal( &dir2, &dir1, &rotationMatrix );
 					// also interpolate color across all the segments
 					Color col1 = m_lines[i].color1;
 					Color col2 = m_lines[i].color2;
@@ -418,7 +463,7 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 						float segmentFactor = (float)( s + 1 ) / (float)m_lines[i].numOfSegments;
 
 						// rotate end dir of this segment
-						D3DXVec3TransformNormal( &dir2, &dir1, &rotationMatrix );
+						D3DXVec3TransformNormal( &dir3, &dir2, &rotationMatrix );
 
 						// interpolate color
 						D3DXColorLerp( &col2, &m_lines[i].color1, &m_lines[i].color2, segmentFactor );
@@ -431,6 +476,8 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 							dir2 + m_lines[i].intermediatePosition,
 							col2,
 							segmentFactor,
+							dir0 + m_lines[i].intermediatePosition,
+							dir3 + m_lines[i].intermediatePosition,
 							i,
 							vertexBuffer );
 
@@ -444,7 +491,9 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 						BoundingBoxUpdate( m_minBounds, m_maxBounds, m_lines[i].intermediatePosition );
 
 						// next segment
+						dir0 = dir1;
 						dir1 = dir2;
+						dir2 = dir3;
 						col1 = col2;
 					}
 
@@ -460,8 +509,12 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 					Vector3 tangent2 = m_lines[i].intermediatePosition - m_lines[i].position2;
 					tangent2 *= -1.f;
 					// run through all segmens and create lines
+					Vector3 pos0 = m_lines[i].position1;
 					Vector3 pos1 = m_lines[i].position1;
 					Vector3 pos2 = m_lines[i].position1;
+					Vector3 pos3 = m_lines[i].position1;
+					D3DXVec3Hermite( &pos0, &m_lines[i].position1, &tangent1, &m_lines[i].position2, &tangent2, -1.0f / m_lines[i].numOfSegments );
+					D3DXVec3Hermite( &pos2, &m_lines[i].position1, &tangent1, &m_lines[i].position2, &tangent2, 1.0f / m_lines[i].numOfSegments );
 					// also interpolate color across all the segments
 					Color col1 = m_lines[i].color1;
 					Color col2 = m_lines[i].color2;
@@ -469,13 +522,24 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 					{
 						// use d3dx helper to calc spline
 						float segmentFactor = (float)( s + 1 ) / (float)m_lines[i].numOfSegments;
-						D3DXVec3Hermite( &pos2, &m_lines[i].position1, &tangent1, &m_lines[i].position2, &tangent2, segmentFactor );
+						float segmentFactor2 = (float)( s + 2 ) / (float)m_lines[i].numOfSegments;
+						D3DXVec3Hermite( &pos3, &m_lines[i].position1, &tangent1, &m_lines[i].position2, &tangent2, segmentFactor2 );
 
 						// interpolate color
 						D3DXColorLerp( &col2, &m_lines[i].color1, &m_lines[i].color2, segmentFactor );
 
 						// put some verts into buffer
-						WriteLineVerticesToBuffer( pos1, col1, (float)s / (float)m_lines[i].numOfSegments, pos2, col2, segmentFactor, i, vertexBuffer );
+						WriteLineVerticesToBuffer( 
+							pos1, 
+							col1, 
+							(float)s / (float)m_lines[i].numOfSegments, 
+							pos2, 
+							col2, 
+							segmentFactor, 
+							pos0,
+							pos3,
+							i, 
+							vertexBuffer );
 						vertexBuffer += 6;
 
 						// add to bounding sphere
@@ -486,7 +550,9 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 						BoundingBoxUpdate( m_minBounds, m_maxBounds, pos2 );
 
 						// next segment
+						pos0 = pos1;
 						pos1 = pos2;
+						pos2 = pos3;
 						col1 = col2;
 					}
 
