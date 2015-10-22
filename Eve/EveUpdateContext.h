@@ -9,6 +9,8 @@ BLUE_DECLARE( Tr2DataTextureManager );
 
 static const double UNINITIALIZED_ORIGIN = std::numeric_limits<double>::infinity();
 
+BLUE_DECLARE( Tr2GpuParticleSystem );
+
 class EveUpdateContext
 {
 public:
@@ -60,7 +62,16 @@ public:
 	{
 		m_gpuParticleManager = manager;
 	}
-	
+
+	Tr2GpuParticleSystem* GetGpuParticleSystem() const
+	{
+		return m_gpuParticleSystem;
+	}
+	void SetGpuParticleSystem( Tr2GpuParticleSystem* ps )
+	{
+		m_gpuParticleSystem = ps;
+	}
+
 	// World origin change
 	void UpdateOrigin( IEveBallpark* ballpark )
 	{
@@ -97,6 +108,7 @@ private:
 	// extra stuff
 	Tr2GPUParticlePoolManagerPtr m_gpuParticleManager;
 	Tr2DataTextureManagerPtr m_dataTextureManager;
+	Tr2GpuParticleSystemPtr m_gpuParticleSystem;
 
 	// For tracking world origin
 	Vector3d m_origin;

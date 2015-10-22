@@ -106,9 +106,9 @@ bool Tr2DynamicEmitter::IsValid() const
 //   Implements ITr2GenericEmitter interface. Spawns particles every frame at a constant
 //   rate.  
 // Arguments:
-//   time - Current system time
+//   arguments - Update arguments
 // --------------------------------------------------------------------------------------
-void Tr2DynamicEmitter::Update( Be::Time time )
+void Tr2DynamicEmitter::Update( const UpdateArguments& arguments )
 {
 	if( !m_isValid || m_particleSystem == nullptr )
 	{
@@ -116,10 +116,10 @@ void Tr2DynamicEmitter::Update( Be::Time time )
 	}
 	if( m_lastUpdate == 0 )
 	{
-		m_lastUpdate = time;
+		m_lastUpdate = arguments.time;
 	}
-	float dt = std::min( TimeAsFloat( time - m_lastUpdate ), 0.3f );
-	m_lastUpdate = time;
+	float dt = std::min( TimeAsFloat( arguments.time - m_lastUpdate ), 0.3f );
+	m_lastUpdate = arguments.time;
 
 	UpdateSimulation( dt );
 }
@@ -132,13 +132,14 @@ void Tr2DynamicEmitter::Update( Be::Time time )
 // --------------------------------------------------------------------------------------
 void Tr2DynamicEmitter::UpdateSimulation( float dt )
 {
-	SpawnParticles( nullptr, nullptr, dt );
+	SpawnParticles( UpdateArguments(), nullptr, nullptr, dt );
 }
 
 // --------------------------------------------------------------------------------------
 // Description:
 //   Implements ITr2GenericEmitter interface. Spawns particles.  
 // Arguments:
+//   arguments - Update arguments
 //   position - Position of the "parent" particle (if the emitter owning this generator
 //		is "emit during life" or "emit on death" emitter and parent particle has
 //		position element); otherwise is nullptr.
@@ -148,7 +149,8 @@ void Tr2DynamicEmitter::UpdateSimulation( float dt )
 //   rateModifier - Modifies the number of particles spawned as opposed to emitter's
 //		defined rate value.
 // --------------------------------------------------------------------------------------
-void Tr2DynamicEmitter::SpawnParticles( const Vector3* position, 
+void Tr2DynamicEmitter::SpawnParticles( const UpdateArguments& arguments,
+									    const Vector3* position, 
 										const Vector3* velocity, 
 										float rateModifier )
 {
@@ -205,11 +207,12 @@ void Tr2DynamicEmitter::SpawnParticles( const Vector3* position,
 }
 
 
-void Tr2DynamicEmitter::SpawnParticles( const Vector3 *positionStart, const Vector3 *positionEnd,
+void Tr2DynamicEmitter::SpawnParticles( const UpdateArguments& arguments,
+						const Vector3 *positionStart, const Vector3 *positionEnd,
 						const Vector3 *velocityStart, const Vector3 *velocityEnd,
 						float deltaTime )
 {
-	SpawnParticles( positionEnd, velocityEnd, deltaTime );
+	SpawnParticles( arguments, positionEnd, velocityEnd, deltaTime );
 }
 
 // --------------------------------------------------------------------------------------

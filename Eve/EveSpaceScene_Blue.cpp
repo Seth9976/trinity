@@ -10,6 +10,7 @@
 #include "Tr2RuntimeInstanceData.h"
 #include "TriDevice.h"
 #include "Shader/Tr2ShaderBuffer.h"
+#include "Particle/Tr2GpuParticleSystem.h"
 
 BLUE_DEFINE( EveSpaceScene );
 BLUE_DEFINE_INTERFACE( IEveReferencePoint );
@@ -589,6 +590,7 @@ const Be::ClassInfo* EveSpaceScene::ExposeToBlue()
 			GetQuadRenderer,
 			"Quad renderer used for batch-rendering of space object attachments" )
 
+		MAP_PROPERTY( "gpuParticleSystem", GetGpuParticleSystem, SetGpuParticleSystem, "" );
     EXPOSURE_END()
 }
 

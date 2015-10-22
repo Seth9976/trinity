@@ -668,7 +668,7 @@ void Tr2GpuParticleSystem::UpdateEmitterParams( Tr2RenderContext& renderContext 
 		}
 		else
 		{
-			emitterBufferDirty = found->second.hash != it->hash;
+			emitterBufferDirty |= found->second.hash != it->hash;
 			found->second.hash = it->hash;
 			found->second.lifetime = it->params.maxLifeTime;
 			index = uint32_t( found->second.index );

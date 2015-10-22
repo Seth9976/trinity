@@ -25,12 +25,13 @@ Tr2ElementBlendConstraint::Tr2ElementBlendConstraint( IRoot* lockobj )
 //   Implements ITr2GenericParticleConstraint interface. Applies the constraint to the
 //   particle. Blends particle element value with the constant value.
 // Arguments:
+//   arguments - Child emitters update arguments
 //   particles - Particle data buffers
 //   strides - Sizes of particle data in each of "particles" arrays (in floats).
 //   count - Number of particles.
 //   dt - (unused) Frame time
 // --------------------------------------------------------------------------------------
-void Tr2ElementBlendConstraint::ApplyConstraint( float** particles, unsigned* strides, unsigned count, float dt )
+void Tr2ElementBlendConstraint::ApplyConstraint( const ITr2GenericEmitter::UpdateArguments& arguments, float** particles, unsigned* strides, unsigned count, float dt )
 {
 	if( !m_isValid )
 	{

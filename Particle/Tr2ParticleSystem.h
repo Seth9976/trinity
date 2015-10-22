@@ -10,13 +10,12 @@
 #include "Tr2DeviceResource.h"
 #include "include/ITr2InstanceData.h"
 #include "include/ITr2GpuBuffer.h"
+#include "ITr2GenericEmitter.h"
 
 BLUE_DECLARE_INTERFACE( ITr2ParticleForce );
 BLUE_DECLARE_IVECTOR( ITr2ParticleForce );
 BLUE_DECLARE_INTERFACE( ITr2GenericParticleConstraint );
 BLUE_DECLARE_IVECTOR( ITr2GenericParticleConstraint );
-BLUE_DECLARE_INTERFACE( ITr2GenericEmitter );
-BLUE_DECLARE_IVECTOR( ITr2GenericEmitter );
 
 // --------------------------------------------------------------------------------------
 // Description:
@@ -86,6 +85,7 @@ public:
 	Tr2GpuBufferAL* GetGpuBuffer( unsigned index );
 
 	void UpdateViewDependentData( const Matrix& worldTransform );
+	void UpdateTransform( const Matrix& worldTransform );
 
 	void UpdateElementDeclaration();
 	const Tr2ParticleElementDataMap& GetElementDeclaration() const;
@@ -105,7 +105,7 @@ public:
 
 	void SetThreadSafeFlag();
 
-	static void UpdateAllSystems( Be::Time time );
+	static void UpdateAllSystems( const ITr2GenericEmitter::UpdateArguments& arguments );
 
 
 	// ----------------------------------------------------------------------------------
@@ -146,8 +146,9 @@ public:
 		return float( r ) / float( 0x7FFFFFFF );
 	}
 private:
-	void Update( Be::Time time );
-	void UpdateSimulation( float dt );
+	void Update( const ITr2GenericEmitter::UpdateArguments& arguments );
+	void UpdateSimulation( const ITr2GenericEmitter::UpdateArguments& arguments, float dt );
+	void UpdateSimulationScript( float dt ) { UpdateSimulation( ITr2GenericEmitter::UpdateArguments(), dt ); }
 	void BuildBuffers();
 	void DestroyBuffers();
 	void RebuildDeclaration();
@@ -243,6 +244,8 @@ private:
 
 	// Peak live particles
 	unsigned m_peakAliveCount;
+
+	Matrix m_worldTransform;
 
 	bool m_useSimTimeRebase;
 	bool m_isUsingSimTimeRebase;

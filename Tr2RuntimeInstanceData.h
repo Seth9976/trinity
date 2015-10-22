@@ -57,11 +57,19 @@ public:
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2GenericEmitter
-	void Update( Be::Time time );
-	void SpawnParticles( const Vector3* position = nullptr, const Vector3* velocity = nullptr, float rateModifier = 1.0f );
-	void SpawnParticles( const Vector3 *positionStart, const Vector3 *positionEnd,
-						 const Vector3 *velocityStart, const Vector3 *velocityEnd,
-						 float deltaTime );
+	void Update( const UpdateArguments& arguments );
+	void SpawnParticles( 
+		const UpdateArguments& arguments,
+		const Vector3* position = nullptr, 
+		const Vector3* velocity = nullptr, 
+		float rateModifier = 1.0f );
+	void SpawnParticles( 
+		const UpdateArguments& arguments,
+		const Vector3 *positionStart, 
+		const Vector3 *positionEnd,
+		const Vector3 *velocityStart, 
+		const Vector3 *velocityEnd,
+		float deltaTime );
 	void SetThreadSafeFlag();
 
 	unsigned GetCount() const;

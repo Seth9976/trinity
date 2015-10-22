@@ -479,7 +479,7 @@ void Tr2InteriorParticleObject::PostPhysicsUpdate( Be::Time time, Tr2ApexScene *
 
 	for( auto it = m_emitters.begin(); it != m_emitters.end(); ++it )
 	{
-		( *it )->Update( time );
+		( *it )->Update( ITr2GenericEmitter::UpdateArguments( time, nullptr, Tr2Renderer::GetIdentityTransform(), Vector3( 0.f, 0.f, 0.f ) ) );
 	}
 
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); ++it )

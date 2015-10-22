@@ -257,10 +257,9 @@ Tr2GpuBufferAL* Tr2RuntimeInstanceData::GetGpuBuffer( unsigned bufferIndex )
 //   Implements ITr2GenericEmitter interface. Does nothing as this emitter only emits 
 //   particles on demand.
 // Arguments:
-//   time - (unused) current time
-//   parentTransform - (unused) partent transform
+//   arguments - (unused) update arguments
 // --------------------------------------------------------------------------------------
-void Tr2RuntimeInstanceData::Update( Be::Time time )
+void Tr2RuntimeInstanceData::Update( const UpdateArguments& arguments )
 {
 }
 
@@ -269,12 +268,13 @@ void Tr2RuntimeInstanceData::Update( Be::Time time )
 //   Implements ITr2GenericEmitter interface. Does nothing as this emitter only emits 
 //   particles on demand.
 // Arguments:
+//   arguments - (unused) update arguments
 //   position - (unused) parent position
 //   velocity - (unused) parent velocity
 //   rateModifier - (unused) emit rate modifier
-//   parentTransform - (unused) partent transform
 // --------------------------------------------------------------------------------------
-void Tr2RuntimeInstanceData::SpawnParticles( const Vector3* position, 
+void Tr2RuntimeInstanceData::SpawnParticles( const UpdateArguments& arguments,
+											 const Vector3* position, 
 											 const Vector3* velocity, 
 											 float rateModifier )
 {
@@ -285,13 +285,15 @@ void Tr2RuntimeInstanceData::SpawnParticles( const Vector3* position,
 //   Implements ITr2GenericEmitter interface. Does nothing as this emitter only emits 
 //   particles on demand.
 // Arguments:
+//   arguments - (unused) update arguments
 //   positionStart - (unused) parent position at the start of the frame
 //   positionEnd - (unused) parent position at the end of the frame
 //   velocityStart - (unused) parent velocity at the start of the frame
 //   velocityStart - (unused) parent velocity at the end of the frame
 //   deltaTime - (unused) frame time
 // --------------------------------------------------------------------------------------
-void Tr2RuntimeInstanceData::SpawnParticles( const Vector3 *positionStart, 
+void Tr2RuntimeInstanceData::SpawnParticles( const UpdateArguments& arguments,
+											 const Vector3 *positionStart, 
 											 const Vector3 *positionEnd,
 											 const Vector3 *velocityStart, 
 											 const Vector3 *velocityEnd,

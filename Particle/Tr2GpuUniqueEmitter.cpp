@@ -18,13 +18,13 @@ void Tr2GpuUniqueEmitter::GenerateID()
 {
 }
 
-void Tr2GpuUniqueEmitter::Update( Be::Time time, Tr2GpuParticleSystem& system, const Matrix& parentTransform, const Vector3& originShift )
+void Tr2GpuUniqueEmitter::Update( const UpdateArguments& arguments )
 {
 	if( m_params.attractorStrength != 0.f )
 	{
-		m_params.attractorPosition = XMVector3TransformCoord( m_attractorPosition, parentTransform );
-		m_params.attractorPosition -= originShift;
+		m_params.attractorPosition = XMVector3TransformCoord( m_attractorPosition, arguments.parentTransform );
+		m_params.attractorPosition -= arguments.originShift;
 		UpdateHash();
 	}
-	Tr2GpuSharedEmitter::Update( time, system, parentTransform, originShift );
+	Tr2GpuSharedEmitter::Update( arguments );
 }

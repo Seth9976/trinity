@@ -10,6 +10,8 @@
 
 BLUE_DECLARE( Tr2ParticleSystem );
 
+#include "ITr2GenericEmitter.h"
+
 // --------------------------------------------------------------------------------------
 // Description:
 //   ITr2GenericParticleConstraint is a particle constraint type for Tr2ParticleSystem.
@@ -25,13 +27,14 @@ BLUE_INTERFACE( ITr2GenericParticleConstraint ) : public IRoot
 	//   Generates data for new particle component (element). This method can be called
 	//	 asyncronously.
 	// Arguments:
+	//   arguments - arguments for child emitters
 	//   paticles - Particle data stream: Tr2ParticleElementData::COUNT of float arrays. 
 	//		The constraint can modify any data element of a particle.
 	//   strides - Sizes of particle data in each of "particles" arrays (in floats).
 	//   count - Number of particles.
 	//   dt - Frame time.
 	// ----------------------------------------------------------------------------------
-	virtual void ApplyConstraint( float** particles, unsigned* strides, unsigned count, float dt ) = 0;
+	virtual void ApplyConstraint( const ITr2GenericEmitter::UpdateArguments& arguments, float** particles, unsigned* strides, unsigned count, float dt ) = 0;
 
 	// ----------------------------------------------------------------------------------
 	// Description:

@@ -130,8 +130,20 @@ void EveChildParticleSystem::UpdateAsyncronous( EveUpdateContext& updateContext,
 		BoundingSphereFromBox( m_boundingSphere, minBounds, maxBounds, &m_worldTransform );
 	}
 
-	for( auto it = m_particleEmitters.begin(); it != m_particleEmitters.end(); ++it )
+	for( auto it = m_particleSystems.begin(); it != m_particleSystems.end(); ++it )
 	{
-		(*it)->Update( updateContext.GetTime() );
+		(*it)->UpdateTransform( m_worldTransform );
+	}
+	if( !m_particleEmitters.empty() )
+	{
+		ITr2GenericEmitter::UpdateArguments args( 
+			updateContext.GetTime(), 
+			updateContext.GetGpuParticleSystem(), 
+			m_worldTransform, 
+			updateContext.GetOriginShift() );
+		for( auto it = m_particleEmitters.begin(); it != m_particleEmitters.end(); ++it )
+		{
+			(*it)->Update( args );
+		}
 	}
 }

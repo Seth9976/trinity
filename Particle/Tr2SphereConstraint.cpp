@@ -85,13 +85,14 @@ void Tr2SphereConstraint::OnListModified(
 //   applies physical response to particle position and/or velocity and run generators
 //   to re-generate particle data components. This method can be called asyncronously.
 // Arguments:
+//   arguments - Child emitter update arguments
 //   particles - Particle data: Tr2ParticleElementData::COUNT of float arrays. The 
 //		constraint can modify any data element of a particle. 
 //   strides - Sizes of particle data in each of "particles" arrays (in floats).
 //   count - Number of particles.
 //   dt - Frame time.
 // --------------------------------------------------------------------------------------
-void Tr2SphereConstraint::ApplyConstraint( float** particles, unsigned* strides, unsigned count, float dt )
+void Tr2SphereConstraint::ApplyConstraint( const ITr2GenericEmitter::UpdateArguments& arguments, float** particles, unsigned* strides, unsigned count, float dt )
 {
 	if( !m_isValid )
 	{
@@ -253,7 +254,7 @@ void Tr2SphereConstraint::ApplyConstraint( float** particles, unsigned* strides,
 			}
 			for( auto it = m_onCollisionEmitters.begin(); it != m_onCollisionEmitters.end(); ++it )
 			{
-				( *it )->SpawnParticles( reinterpret_cast<Vector3*>( position.Get() ), 
+				( *it )->SpawnParticles( arguments, reinterpret_cast<Vector3*>( position.Get() ), 
 										 m_velocityElement.m_offset != -1 ? reinterpret_cast<Vector3*>( velocity.Get() ) : nullptr );
 			}
 		}

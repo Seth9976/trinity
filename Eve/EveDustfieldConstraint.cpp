@@ -135,12 +135,13 @@ void EveDustfieldConstraint::Update( const EveUpdateContext& updateContext, IEve
 //   particle. Updates particle velocities based on ego ball velocity and lifetime based
 //   on distance to camera.
 // Arguments:
+//   arguments - (unused) update arguments
 //   particles - Particle data buffers
 //   strides - Sizes of particle data in each of "particles" arrays (in floats).
 //   count - Number of particles.
 //   dt - (unused) Frame time
 // --------------------------------------------------------------------------------------
-void EveDustfieldConstraint::ApplyConstraint( float** particles, unsigned* strides, unsigned count, float dt )
+void EveDustfieldConstraint::ApplyConstraint( const ITr2GenericEmitter::UpdateArguments& arguments, float** particles, unsigned* strides, unsigned count, float dt )
 {
 	if( !m_isValid )
 	{

@@ -140,7 +140,7 @@ const Be::ClassInfo* Tr2ParticleSystem::ExposeToBlue()
 		MAP_METHOD_AND_WRAP( "RebindConstraints", RebindConstraints, "Rebinds all system constraints." )
 		MAP_METHOD_AND_WRAP( 
 			"UpdateSimulation", 
-			UpdateSimulation, 
+			UpdateSimulationScript, 
 			"Updates particle system manually.\n" 
 			"Arguments:\n"
 			"dt - time inteval (in seconds)" )

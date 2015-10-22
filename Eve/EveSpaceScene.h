@@ -58,6 +58,7 @@ BLUE_DECLARE_VECTOR( EveDistanceField );
 BLUE_DECLARE( EveSceneStaticParticles );
 BLUE_DECLARE( Tr2ShaderBuffer );
 BLUE_DECLARE( Tr2DataTextureManager );
+BLUE_DECLARE( Tr2GpuParticleSystem );
 
 enum TAASampling { TAA_NONE=0, TAA_RANDOM=1, TAA_2X=2, TAA_3X=3, TAA_4X=4 };
 
@@ -438,6 +439,15 @@ private:
 	void SetParticlePoolManager(Tr2GPUParticlePoolManager* manager){ return m_updateContext.SetParticlePoolManager(manager);}
 	void UpdateStatefulParticles( Be::Time time, const Vector3 &, Tr2RenderContext &, Tr2GPUParticlePoolManager* manager );
 	void RenderStatefulParticles( const Tr2GPUParticleRenderMode mode, Tr2RenderContext& context, Tr2GPUParticlePoolManager* manager );
+
+	Tr2GpuParticleSystem* GetGpuParticleSystem() const
+	{
+		return m_updateContext.GetGpuParticleSystem();
+	}
+	void SetGpuParticleSystem( Tr2GpuParticleSystem* ps )
+	{
+		m_updateContext.SetGpuParticleSystem( ps );
+	}
 
 	bool m_egoPositionInit;
 	Vector3d m_egoPosition;

@@ -256,7 +256,7 @@ void Tr2GPUParticleEmitter::UpdateTransform( const Vector3 &parentPosition, cons
 
 
 
-void Tr2GPUParticleEmitter::SpawnParticles( const Vector3* position, const Vector3* velocity, float externalDeltaTime )
+void Tr2GPUParticleEmitter::SpawnParticles( const UpdateArguments& arguments, const Vector3* position, const Vector3* velocity, float externalDeltaTime )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	const Vector3 pos(position ? *position : Vector3(0,0,0));
@@ -310,9 +310,10 @@ void Tr2GPUParticleEmitter::SpawnParticles( const Vector3* position, const Vecto
 }
 
 
-void Tr2GPUParticleEmitter::SpawnParticles( const Vector3 *positionStart, const Vector3 *positionEnd,
-											     const Vector3 *velocityStart, const Vector3 *velocityEnd,
-												 float deltaTime )
+void Tr2GPUParticleEmitter::SpawnParticles( const UpdateArguments& arguments,
+										    const Vector3 *positionStart, const Vector3 *positionEnd,
+											const Vector3 *velocityStart, const Vector3 *velocityEnd,
+											float deltaTime )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	const Vector3 translation( *positionEnd - *positionStart );
@@ -374,15 +375,15 @@ void Tr2GPUParticleEmitter::SetThreadSafeFlag()
 {
 }
 
-void Tr2GPUParticleEmitter::Update( Be::Time time )
+void Tr2GPUParticleEmitter::Update( const UpdateArguments& arguments )
 {
 	
 	CCP_STATS_ZONE( __FUNCTION__ );
 	if( m_lastUpdateTimeValid )
 	{
-		if( m_lastUpdateTime != time  )
+		if( m_lastUpdateTime != arguments.time  )
 		{
-			m_deltaTime = (float)TimeAsDouble( time - m_lastUpdateTime );
+			m_deltaTime = (float)TimeAsDouble( arguments.time - m_lastUpdateTime );
 		} 
 	}
 	else
@@ -391,7 +392,7 @@ void Tr2GPUParticleEmitter::Update( Be::Time time )
 	}
 
 	m_lastUpdateTimeValid = true;
-	m_lastUpdateTime = time;
+	m_lastUpdateTime = arguments.time;
 }
 
 void Tr2GPUParticleEmitter::UpdateVisibilityBasedDensity( float density ) 

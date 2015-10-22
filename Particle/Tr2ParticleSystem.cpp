@@ -61,7 +61,8 @@ Tr2ParticleSystem::Tr2ParticleSystem( IRoot* lockobj )
 	m_updatePeriodClock( 0 ),
 	m_peakAliveCount( 0 ),
 	m_useSimTimeRebase( false ),
-	m_isUsingSimTimeRebase( false )
+	m_isUsingSimTimeRebase( false ),
+	m_worldTransform( Tr2Renderer::GetIdentityTransform() )
 {
 	for( unsigned i = 0; i < Tr2ParticleElementData::COUNT; ++i )
 	{
@@ -509,11 +510,14 @@ void Tr2ParticleSystem::OnSimClockRebase( Be::Time oldTime, Be::Time newTime )
 // Description:
 //   Per-frame update method for the system. Updates particle system state.
 // Arguments:
-//   time - Current system time
+//   globalArguments - Child emitter update arguments
 // --------------------------------------------------------------------------------------
-void Tr2ParticleSystem::Update( Be::Time time )
+void Tr2ParticleSystem::Update( const ITr2GenericEmitter::UpdateArguments& globalArguments )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
+
+	auto arguments = globalArguments;
+	arguments.parentTransform = m_worldTransform;
 
 	// if we're offscreen or very small, we can tick less frequently
 	if( m_updatePeriod > 1 )
@@ -528,10 +532,10 @@ void Tr2ParticleSystem::Update( Be::Time time )
 
 	if( m_lastUpdate == 0 )
 	{
-		m_lastUpdate = time;
+		m_lastUpdate = arguments.time;
 	}
-	float dt = std::min( TimeAsFloat( time - m_lastUpdate ), 1.0f / 3.0f );
-	m_lastUpdate = time;
+	float dt = std::min( TimeAsFloat( arguments.time - m_lastUpdate ), 1.0f / 3.0f );
+	m_lastUpdate = arguments.time;
 
 	//include considerable hysteresis in toggling sorting.
 	//Things to consider: 
@@ -546,7 +550,7 @@ void Tr2ParticleSystem::Update( Be::Time time )
 		m_sortingAllowed = true;
 	}
 
-	UpdateSimulation( dt );
+	UpdateSimulation( arguments, dt );
 }
 
 // --------------------------------------------------------------------------------------
@@ -555,9 +559,10 @@ void Tr2ParticleSystem::Update( Be::Time time )
 //   particles with "emit during lifetime" and  "emit on death" emitters. This function 
 //   can be called asyncronously.
 // Arguments:
+//   arguments - Child emitter update arguments
 //   dt - simulation time interval
 // --------------------------------------------------------------------------------------
-void Tr2ParticleSystem::UpdateSimulation( float dt )
+void Tr2ParticleSystem::UpdateSimulation( const ITr2GenericEmitter::UpdateArguments& arguments, float dt )
 {
 	// Update lifetime and remove dead particles
 	if( m_applyAging && HasElement( Tr2ParticleElementDeclarationName::LIFETIME ) )
@@ -586,7 +591,8 @@ void Tr2ParticleSystem::UpdateSimulation( float dt )
 			{
 				if( m_emissionOnDeathEmitter )
 				{
-					m_emissionOnDeathEmitter->SpawnParticles( reinterpret_cast<Vector3*>( position ), 
+					m_emissionOnDeathEmitter->SpawnParticles( arguments, 
+															  reinterpret_cast<Vector3*>( position ), 
 															  reinterpret_cast<Vector3*>( velocity ) );
 				}				
 
@@ -700,6 +706,7 @@ void Tr2ParticleSystem::UpdateSimulation( float dt )
 					if( m_emissionWhileAliveEmitter != nullptr )
 					{
 						m_emissionWhileAliveEmitter->SpawnParticles( 
+							arguments,
 							reinterpret_cast<Vector3*>( &particlePosition ),
 							reinterpret_cast<Vector3*>( position ), 
 							reinterpret_cast<Vector3*>( &particleVelocity ),
@@ -720,7 +727,7 @@ void Tr2ParticleSystem::UpdateSimulation( float dt )
 	{
 		for( auto constraint = m_constraints.begin(); constraint != m_constraints.end(); ++constraint )
 		{
-			( *constraint )->ApplyConstraint( m_buffers, m_vertexSizes, m_aliveCount, dt );
+			( *constraint )->ApplyConstraint( arguments, m_buffers, m_vertexSizes, m_aliveCount, dt );
 		}
 		m_bufferDirty = true;
 	}
@@ -788,6 +795,7 @@ void Tr2ParticleSystem::UpdateSimulation( float dt )
 					if( m_emissionWhileAliveEmitter != nullptr )
 					{
 						m_emissionWhileAliveEmitter->SpawnParticles( 
+							arguments,
 							reinterpret_cast<Vector3*>( position ), 
 							reinterpret_cast<Vector3*>( velocity ),
 							dt );
@@ -836,9 +844,9 @@ bool Tr2ParticleSystem::CompareParticles( unsigned particle1, unsigned particle2
 //   Per-frame update method for all created Tr2ParticleSystem objects. Calls Update 
 //   method of each system asyncronously.
 // Arguments:
-//   time - Current system time
+//   arguments - Child emitter update arguments
 // --------------------------------------------------------------------------------------
-void Tr2ParticleSystem::UpdateAllSystems( Be::Time time )
+void Tr2ParticleSystem::UpdateAllSystems( const ITr2GenericEmitter::UpdateArguments& arguments )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -847,7 +855,7 @@ void Tr2ParticleSystem::UpdateAllSystems( Be::Time time )
 	s_aliveParticleCount = 0;
 	s_updatedParticleCount = 0;
 
-	if( previousUpdateTime != -1 && previousUpdateTime == time )
+	if( previousUpdateTime != -1 && previousUpdateTime == arguments.time )
 	{
 		return;
 	}
@@ -856,7 +864,7 @@ void Tr2ParticleSystem::UpdateAllSystems( Be::Time time )
 
 	Tr2ParallelDo( allSystems.begin(), 
 				   allSystems.end(), 
-				   [=]( Tr2ParticleSystem* system ) { system->Update( time ); } );
+				   [=]( Tr2ParticleSystem* system ) { system->Update( arguments ); } );
 
 	CCP_STATS_SET( statAliveParticleCount, s_aliveParticleCount );
 	CCP_STATS_SET( statUpdatedParticleCount, s_updatedParticleCount );
@@ -1101,6 +1109,11 @@ void Tr2ParticleSystem::UpdateViewDependentData( const Matrix& worldTransform )
 		}
 	}
 	m_bufferDirty = false;
+}
+
+void Tr2ParticleSystem::UpdateTransform( const Matrix& worldTransform )
+{
+	m_worldTransform = worldTransform;
 }
 
 // --------------------------------------------------------------------------------------

@@ -23,7 +23,8 @@
 // --------------------------------------------------------------------------------------
 BLUE_CLASS( Tr2GpuSharedEmitter ): 
 	public IInitialize,
-	public INotify
+	public INotify,
+	public ITr2GenericEmitter
 {
 public:
 	Tr2GpuSharedEmitter( IRoot* lockObj = nullptr );
@@ -34,10 +35,25 @@ public:
 
 	virtual bool OnModified( Be::Var* value );
 
-	virtual void Update( Be::Time time, Tr2GpuParticleSystem& system, const Matrix& parentTransform, const Vector3& originShift );
+	virtual void Update( const UpdateArguments& arguments );
+	virtual void SpawnParticles( const UpdateArguments& arguments,
+								 const Vector3* position = nullptr, 
+								 const Vector3* velocity = nullptr, 
+								 float rateModifier = 1.0f );
+	virtual void SpawnParticles( const UpdateArguments& arguments,
+								 const Vector3 *positionStart, const Vector3 *positionEnd,
+								 const Vector3 *velocityStart, const Vector3 *velocityEnd,
+								 float deltaTime );
+	virtual void SetThreadSafeFlag() {}
 protected:
 	virtual void GenerateID();
 	void UpdateHash();
+	float SpawnParticles( 
+		const UpdateArguments& arguments,
+		const Vector3& positionStart, const Vector3& positionEnd,
+		const Vector3& velocityStart, const Vector3& velocityEnd,
+		float carryOverCount,
+		float deltaTime );
 
 	std::string m_name;
 	Be::Time m_previousTime;
@@ -54,6 +70,7 @@ protected:
 	Vector3 m_prevDirection;
 	Tr2GpuParticleSystem::Emitter m_emitter;
 	Tr2GpuParticleSystem::EmitterParams m_params;
+	bool m_continiousEmitter;
 };
 
 TYPEDEF_BLUECLASS( Tr2GpuSharedEmitter );

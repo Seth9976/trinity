@@ -220,9 +220,9 @@ void Tr2StaticEmitter::DoSpawn()
 //   Implements ITr2GenericEmitter interface. Spawns particles from geometry resource
 //   if resource is loaded and particles were not alread spawned.  
 // Arguments:
-//   time - Current system time
+//   arguments - Update arguments
 // --------------------------------------------------------------------------------------
-void Tr2StaticEmitter::Update( Be::Time time )
+void Tr2StaticEmitter::Update( const ITr2GenericEmitter::UpdateArguments& arguments )
 {
 	if( !m_hasSpawnedParticles )
 	{
@@ -235,22 +235,25 @@ void Tr2StaticEmitter::Update( Be::Time time )
 //   Implements ITr2GenericEmitter interface. Does nothing since this emitter only spawns 
 //   particles once during Update method.
 // Arguments:
+//   arguments - Update arguments
 //   position - Position of the "parent" particle (unused).
 //   velocity - Velocity of the "parent" particle (unused).
 //   rateModifier - Modifies the number of particles spawned as opposed to emitter's
 //		defined rate value (unused).
 // --------------------------------------------------------------------------------------
-void Tr2StaticEmitter::SpawnParticles( const Vector3* position, 
+void Tr2StaticEmitter::SpawnParticles( const ITr2GenericEmitter::UpdateArguments& arguments, 
+									   const Vector3* position, 
 									   const Vector3* velocity, 
 									   float rateModifier )
 {
 }
 
-void Tr2StaticEmitter::SpawnParticles( const Vector3 *positionStart, const Vector3 *positionEnd,
+void Tr2StaticEmitter::SpawnParticles( const ITr2GenericEmitter::UpdateArguments& arguments, 
+						const Vector3 *positionStart, const Vector3 *positionEnd,
 						const Vector3 *velocityStart, const Vector3 *velocityEnd,
 						float deltaTime )
 {
-	SpawnParticles( positionEnd, velocityEnd, deltaTime );
+	SpawnParticles( arguments, positionEnd, velocityEnd, deltaTime );
 }
 
 // --------------------------------------------------------------------------------------

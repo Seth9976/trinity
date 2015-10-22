@@ -25,7 +25,7 @@ public:
 
 	EXPOSE_TO_BLUE();
 
-	virtual void Update( Be::Time time, Tr2GpuParticleSystem& system, const Matrix& parentTransform, const Vector3& originShift );
+	virtual void Update( const UpdateArguments& arguments );
 protected:
 	virtual void GenerateID();
 

@@ -34,7 +34,7 @@ public:
 
 	/////////////////////////////////////////////////////////////
 	// ITr2ParticleConstraint
-	virtual void ApplyConstraint( float** particle, unsigned* strides, unsigned count, float dt );
+	virtual void ApplyConstraint( const ITr2GenericEmitter::UpdateArguments& arguments, float** particle, unsigned* strides, unsigned count, float dt );
 	virtual void Bind( Tr2ParticleSystem* system );
 
 	void Update( const EveUpdateContext& updateContext, IEveBallparkPtr ballpark );

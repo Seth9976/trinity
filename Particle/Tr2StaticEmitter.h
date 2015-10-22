@@ -45,9 +45,11 @@ public:
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2GenericEmitter
-	void Update( Be::Time time );
-	void SpawnParticles( const Vector3* position = nullptr, const Vector3* velocity = nullptr, float rateModifier = 1.0f );
-	void SpawnParticles( const Vector3 *positionStart, const Vector3 *positionEnd,
+	void Update( const ITr2GenericEmitter::UpdateArguments& arguments );
+	void SpawnParticles( const ITr2GenericEmitter::UpdateArguments& arguments, 
+						 const Vector3* position = nullptr, const Vector3* velocity = nullptr, float rateModifier = 1.0f );
+	void SpawnParticles( const ITr2GenericEmitter::UpdateArguments& arguments, 
+						 const Vector3 *positionStart, const Vector3 *positionEnd,
 						 const Vector3 *velocityStart, const Vector3 *velocityEnd,
 						 float deltaTime );
 	void SetThreadSafeFlag();

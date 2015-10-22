@@ -30,6 +30,7 @@
 #include "Renderable/EveSceneStaticParticles.h"
 #include "Shader/Utils/Tr2DataTextureManager.h"
 #include "Shader/Tr2ShaderBuffer.h"
+#include "Particle/Tr2GpuParticleSystem.h"
 
 using namespace Tr2RenderContextEnum;
 
@@ -386,7 +387,12 @@ void EveSpaceScene::Update( Be::Time realTime, Be::Time simTime )
 	// every space scene has a reference position
 	Vector3d sceneReferencePoint = m_updateContext.GetOrigin();
 
-	Tr2ParticleSystem::UpdateAllSystems( simTime );
+	ITr2GenericEmitter::UpdateArguments args( 
+		m_updateContext.GetTime(), 
+		m_updateContext.GetGpuParticleSystem(), 
+		Tr2Renderer::GetIdentityTransform(), 
+		m_updateContext.GetOriginShift() );
+	Tr2ParticleSystem::UpdateAllSystems( args );
 	
 	//GPU particles need to perform rendering calls in order to update,
 	// but we set some state here needed to allow 'global' particle behaviour
@@ -1088,8 +1094,8 @@ void EveSpaceScene::UpdatePostProcessPSData()
 	double currentViewProjD[16];
 	Matrix currentProj;
 	
-	currentProj = m_frameData.projection;
-	currentProj = EveCamera::AddCenterOffset( currentProj, -m_xProjOffset, -m_yProjOffset, Tr2Renderer::GetFrontClip(), Tr2Renderer::GetBackClip() );
+		currentProj = m_frameData.projection;
+		currentProj = EveCamera::AddCenterOffset( currentProj, -m_xProjOffset, -m_yProjOffset, Tr2Renderer::GetFrontClip(), Tr2Renderer::GetBackClip() );
 
 	// Find the current inverse view projection
 	double viewTransform[16];
@@ -1600,7 +1606,7 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 
 	TriFrustum& frustum = m_frameData.frustum;
 	std::vector<ITr2Renderable*> objectRenderables;
-
+	
 	if( auto lightManager = Tr2LightManager::GetInstance() )
 	{
 		CCP_STATS_SCOPED_TIME( updateDynamicLightLists );
@@ -1656,6 +1662,12 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 
 	//GPU particles
 	Tr2GPUParticlePoolManager* manager = m_updateContext.GetParticlePoolManager();
+	if( GetGpuParticleSystem() )
+	{
+		GetGpuParticleSystem()->Update( m_updateTime, m_updateContext.GetOriginShift(), renderContext );
+		GetGpuParticleSystem()->Render( renderContext );
+	}
+
 	if( manager )
 	{	
 		RenderStatefulParticles( GPUPRM_Transparent, renderContext, manager );
@@ -1789,8 +1801,8 @@ void EveSpaceScene::EndRender( Tr2RenderContext& renderContext )
 	TAAOffset();
 
 	Matrix currentProj = Tr2Renderer::GetReversedDepthProjectionTransform();
-	currentProj = m_frameData.projection;
-	currentProj = EveCamera::AddCenterOffset( currentProj, m_xProjOffset-xOffset, m_yProjOffset-yOffset, Tr2Renderer::GetFrontClip(), Tr2Renderer::GetBackClip() );
+		currentProj = m_frameData.projection;
+		currentProj = EveCamera::AddCenterOffset( currentProj, m_xProjOffset-xOffset, m_yProjOffset-yOffset, Tr2Renderer::GetFrontClip(), Tr2Renderer::GetBackClip() );
 
 	m_viewProjectLast = Tr2Renderer::GetViewTransform() * currentProj; 
 	ClearVariableStore();

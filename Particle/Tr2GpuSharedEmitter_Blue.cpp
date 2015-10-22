@@ -16,9 +16,16 @@ const Be::ClassInfo* Tr2GpuSharedEmitter::ExposeToBlue()
         MAP_INTERFACE( Tr2GpuSharedEmitter )
         MAP_INTERFACE( IInitialize )
         MAP_INTERFACE( INotify )
+		MAP_INTERFACE( ITr2GenericEmitter )
 
         MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
 
+        MAP_ATTRIBUTE( 
+            "continiousEmitter", 
+            m_continiousEmitter, 
+            "Emit particles continiously while in parent emitter list", 
+            Be::READWRITE | Be::PERSIST )
+		
         MAP_ATTRIBUTE( 
             "rate", 
             m_rate, 

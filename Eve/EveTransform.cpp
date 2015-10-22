@@ -151,9 +151,17 @@ void EveTransform::UpdateAsyncronous( EveUpdateContext& updateContext )
 		return;
 	}
 
-	for( auto it = m_particleEmitters.begin(); it != m_particleEmitters.end(); ++it )
+	for( auto it = m_particleSystems.begin(); it != m_particleSystems.end(); ++it )
 	{
-		(*it)->Update( time );
+		(*it)->UpdateTransform( m_worldTransform );
+	}
+	if( !m_particleEmitters.empty() )
+	{
+		ITr2GenericEmitter::UpdateArguments args( time, updateContext.GetGpuParticleSystem(), m_worldTransform, updateContext.GetOriginShift() );
+		for( auto it = m_particleEmitters.begin(); it != m_particleEmitters.end(); ++it )
+		{
+			(*it)->Update( args );
+		}
 	}
 
 	m_isVisible = false;

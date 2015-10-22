@@ -8,6 +8,9 @@
 #ifndef ITr2GenericEmitter_H
 #define ITr2GenericEmitter_H
 
+
+BLUE_DECLARE( Tr2GpuParticleSystem );
+
 // --------------------------------------------------------------------------------------
 // Description:
 //   ITr2GenericEmitter is an interface for particle emitters used with 
@@ -18,13 +21,42 @@
 BLUE_INTERFACE( ITr2GenericEmitter ): 
 	public IRoot
 {
+	// Arguments passed to Update method
+	struct UpdateArguments
+	{
+		UpdateArguments()
+			:time( 0 ),
+			system( nullptr ),
+			parentTransform( XMMatrixIdentity() ),
+			originShift( 0.f, 0.f, 0.f )
+		{
+		}
+
+		UpdateArguments( Be::Time t, Tr2GpuParticleSystem* gpuSystem, const Matrix& transform, const Vector3& shift )
+			:time( t ),
+			system( gpuSystem ),
+			parentTransform( transform ),
+			originShift( shift )
+		{
+		}
+
+		// current system time
+		Be::Time time;
+		// Scene's GPU particle system
+		Tr2GpuParticleSystem* system;
+		// Parent object world transform
+		Matrix parentTransform;
+		// World origin shift since previous frame
+		Vector3 originShift;
+	};
+
 	// --------------------------------------------------------------------------------------
 	// Description:
 	//   Per-frame update method for emitter.
 	// Arguments:
 	//   time - Current system time.
 	// --------------------------------------------------------------------------------------
-	virtual void Update( Be::Time time ) = 0;
+	virtual void Update( const UpdateArguments& arguments ) = 0;
 
 	// --------------------------------------------------------------------------------------
 	// Description:
@@ -40,7 +72,8 @@ BLUE_INTERFACE( ITr2GenericEmitter ):
 	//   rateModifier - Modifies the number of particles spawned as opposed to emitter's
 	//		defined value.
 	// --------------------------------------------------------------------------------------
-	virtual void SpawnParticles( const Vector3* position = nullptr, 
+	virtual void SpawnParticles( const UpdateArguments& arguments,
+								 const Vector3* position = nullptr, 
 								 const Vector3* velocity = nullptr, 
 								 float rateModifier = 1.0f ) = 0;
 
@@ -57,7 +90,8 @@ BLUE_INTERFACE( ITr2GenericEmitter ):
 	//   velocityEnd - velocity of the parent particle at t=dt
 	//   deltaTime - particle simulation delta-time
 	// --------------------------------------------------------------------------------------
-	virtual void SpawnParticles( const Vector3 *positionStart, const Vector3 *positionEnd,
+	virtual void SpawnParticles( const UpdateArguments& arguments,
+								 const Vector3 *positionStart, const Vector3 *positionEnd,
 								 const Vector3 *velocityStart, const Vector3 *velocityEnd,
 								 float deltaTime ) = 0;
 
