@@ -251,11 +251,15 @@ void EveImpactOverlay::PlayCurveSet( const std::string& name )
 // Description:
 //   Easy-to-use access to the internal animation curves
 // --------------------------------------------------------------------------------
-void EveImpactOverlay::StopAllCurveSets()
+void EveImpactOverlay::StopCurveSet( const std::string& name )
 {
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 	{
-		(*it)->Stop();
+		if( (*it)->GetName() == name )
+		{
+			(*it)->Play();
+			(*it)->StopOnNextFrame();
+		}
 	}
 }
 

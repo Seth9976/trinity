@@ -2060,6 +2060,25 @@ void EveSpaceObject2::SetImpactConfiguration( EveImpactOverlay::ImpactConfigurat
 	}
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Toggle an animation on the impacts: for boosters, hardeners, et.c
+// --------------------------------------------------------------------------------
+void EveSpaceObject2::SetImpactAnimation( const std::string& name, bool enable )
+{
+	if( m_impactOverlay )
+	{
+		if( enable )
+		{
+			m_impactOverlay->PlayCurveSet( name );
+		}
+		else
+		{
+			m_impactOverlay->StopCurveSet( name );
+		}
+	}
+}
+
 // -----------------------------------------------------------------------------
 // Description:
 //   Create an impact effect on this object

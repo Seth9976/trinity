@@ -89,7 +89,7 @@ public:
 
 	// control animation
 	void PlayCurveSet( const std::string& name );
-	void StopAllCurveSets();
+	void StopCurveSet( const std::string& name );
 
 	// set the configuration
 	void SetConfiguration( ImpactConfiguration cfg );
