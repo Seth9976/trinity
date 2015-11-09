@@ -111,8 +111,11 @@ void EveImpactOverlay::UpdateAsyncronous( EveUpdateContext& updateContext, EveSp
 	// then check if the impact count goal is less than what we have
 	if( m_armorImpactGoalCount < m_armorImpactData.size() )
 	{
+		// close up only the excess holes, so get am "advanced" map iterator
+		auto aidit = m_armorImpactData.begin();
+		std::advance( aidit, m_armorImpactGoalCount );
 		// ok, we want to have less impacts, so close the holes
-		for( auto aidit = m_armorImpactData.begin(); aidit != m_armorImpactData.end(); )
+		while( aidit != m_armorImpactData.end() )
 		{
 			aidit->second.size -= 0.1f * updateContext.GetDeltaT();
 			if( aidit->second.size <= 0.f )
