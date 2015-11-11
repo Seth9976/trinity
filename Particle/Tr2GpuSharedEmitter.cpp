@@ -7,6 +7,10 @@
 #include "StdAfx.h"
 #include "Tr2GpuSharedEmitter.h"
 
+namespace
+{
+const float MAXIMUM_FRAME_TIME = 1.f / 15.f;
+}
 
 Tr2GpuSharedEmitter::Tr2GpuSharedEmitter( IRoot* lockObj )
 	:m_rate( 0 ),
@@ -15,6 +19,8 @@ Tr2GpuSharedEmitter::Tr2GpuSharedEmitter( IRoot* lockObj )
 	m_previousTime( -1 ),
 	m_carryOver( 0 ),
 	m_emissionDensity( 0.f ),
+	m_maxDensity( 10000.f ),
+	m_maxDisplacement( 1000.f ),
 	m_inheritVelocity( 1.f ),
 	m_position( 0.f, 0.f, 0.f ),
 	m_direction( 0.f, 1.f, 0.f ),
@@ -59,7 +65,7 @@ void Tr2GpuSharedEmitter::Update( const UpdateArguments& arguments )
 		return;
 	}
 	const bool firstUpdate = m_previousTime == Be::Time( -1 );
-	const float dt = firstUpdate ? 0 : TimeAsFloat( arguments.time - m_previousTime );
+	float dt = firstUpdate ? 0 : TimeAsFloat( arguments.time - m_previousTime );
 	m_previousTime = arguments.time;
 
 	Vector3 position( XMVector3TransformCoord( m_position, arguments.parentTransform ) );
@@ -71,7 +77,7 @@ void Tr2GpuSharedEmitter::Update( const UpdateArguments& arguments )
 
 	if( m_continiousEmitter )
 	{
-		m_carryOver = SpawnParticles( arguments, m_prevPosition, position, m_prevVelocity, velocity, m_carryOver, dt );
+		m_carryOver = SpawnParticles( arguments, m_prevPosition + arguments.originShift, position, m_prevVelocity, velocity, m_carryOver, std::min( dt, MAXIMUM_FRAME_TIME ) );
 	}
 
 	m_prevPosition = position;
@@ -115,7 +121,7 @@ void Tr2GpuSharedEmitter::SpawnParticles(
 	{
 		velStart = velEnd = Vector3( 0.f, 0.f, 0.f );
 	}
-	m_carryOver = SpawnParticles( arguments, posStart, posEnd, velStart, velEnd, m_carryOver, deltaTime );
+	m_carryOver = SpawnParticles( arguments, posStart, posEnd, velStart, velEnd, m_carryOver, std::min( deltaTime, MAXIMUM_FRAME_TIME ) );
 }
 
 float Tr2GpuSharedEmitter::SpawnParticles( 
@@ -129,10 +135,18 @@ float Tr2GpuSharedEmitter::SpawnParticles(
 
 	float total = carryOverCount + deltaTime * m_rate;
 	carryOverCount = total - std::floor( total );
+
+	Vector3 move = m_emitter.position - positionStart;
+	float moveLength = XMVectorGetX( XMVector3Length( move ) );
+	if( moveLength > m_maxDisplacement )
+	{
+		return 0;
+	}
+
 	if( m_emissionDensity > 0 )
 	{
 		Vector3 move = m_emitter.position - positionStart;
-		total += XMVectorGetX( XMVector3Length( move ) ) * m_emissionDensity;
+		total += std::min( m_maxDensity, moveLength * m_emissionDensity );
 	}
 	m_emitter.count = int( total );
 

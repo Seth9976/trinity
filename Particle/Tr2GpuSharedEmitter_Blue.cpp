@@ -37,6 +37,16 @@ const Be::ClassInfo* Tr2GpuSharedEmitter::ExposeToBlue()
             "Number of particles emitted per one meter movement of the emitter", 
             Be::READWRITE | Be::PERSIST )
         MAP_ATTRIBUTE( 
+            "maxEmissionDensity", 
+            m_maxDensity, 
+            "Maximum number of particles emitted per one meter movement of the emitter in a single frame", 
+            Be::READWRITE | Be::PERSIST )
+        MAP_ATTRIBUTE( 
+            "maxDisplacement", 
+            m_maxDisplacement, 
+            "Maximum emitter displacement in a single frame that turns the emitter off", 
+            Be::READWRITE | Be::PERSIST )
+        MAP_ATTRIBUTE( 
             "position", 
             m_position, 
             "Emitter position", 

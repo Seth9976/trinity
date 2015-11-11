@@ -63,6 +63,8 @@ protected:
 	float m_carryOver;
 	float m_inheritVelocity;
 	float m_emissionDensity;
+	float m_maxDensity;
+	float m_maxDisplacement;
 	Vector3 m_position;
 	Vector3 m_direction;
 	Vector3 m_prevPosition;
