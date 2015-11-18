@@ -120,10 +120,15 @@ void EveImpactOverlay::UpdateSyncronous( EveUpdateContext& updateContext, EveSpa
 					Vector3 impactDirWS( 0.f, 1.f, 0.f );
 					parent->GetDamageLocatorDirection( &impactDirWS, aidit->second.damageLocatorIndex );
 					m_armorImpactEmitter->SetDirection( &impactDirWS );
+					// velocity?
+					Vector3 parentVelocityWS;
+					parent->GetWorldVelocity( parentVelocityWS );
+					// scaling?
+					float scale = aidit->second.size * m_armorImpactParentSize / ( IMPACT_ARMOR_SIZE_MAX / IMPACT_ARMOR_SIZE_FACTOR );
 					// put together particle update info
 					ITr2GenericEmitter::UpdateArguments args( updateContext.GetTime(), updateContext.GetGpuParticleSystem(), Tr2Renderer::GetIdentityTransform(), updateContext.GetOriginShift() );
 					// do the spawn here once!
-					m_armorImpactEmitter->SpawnOnce( args, Vector3( 0.f, 0.f, 0.f ) );
+					m_armorImpactEmitter->SpawnOnce( args, parentVelocityWS, scale );
 					aidit->second.requestSpawnDebris = false;
 				}
 			}
@@ -406,7 +411,7 @@ void EveImpactOverlay::SetDamageState( float shield, float armor, float hull, bo
 	{
 		for( int i = 0; i < (int)m_armorImpactGoalCount; ++i )
 		{
-			CreateArmorImpact( i, 0.2f + 0.8f * TriRand() );
+			CreateArmorImpact( i, 0.2f + 0.8f * TriRand(), false );
 		}
 	}
 }
@@ -430,7 +435,7 @@ int EveImpactOverlay::CreateImpact( int damageLocatorIndex, const Vector3& direc
 	case IMPACT_SHIELD:
 		return CreateShieldImpact( damageLocatorIndex, direction, lifeTime );
 	case IMPACT_ARMOR:
-		return CreateArmorImpact( damageLocatorIndex, size );
+		return CreateArmorImpact( damageLocatorIndex, size, true );
 	case IMPACT_HULL:
 		// todo
 		return -1;
@@ -528,7 +533,7 @@ int EveImpactOverlay::CreateShieldImpact( int damageLocatorIndex, const Vector3&
 // Description:
 //   Use this method to add a new armor impact
 // --------------------------------------------------------------------------------
-int EveImpactOverlay::CreateArmorImpact( int damageLocatorIndex, float size )
+int EveImpactOverlay::CreateArmorImpact( int damageLocatorIndex, float size, bool spawnEffects )
 {
 	// be carefull: try to find an already existing impact at this index
 	for( auto it = m_armorImpactData.begin(); it != m_armorImpactData.end(); ++it )
@@ -545,7 +550,7 @@ int EveImpactOverlay::CreateArmorImpact( int damageLocatorIndex, float size )
 	ArmorImpactData aid;
 	aid.damageLocatorIndex = damageLocatorIndex;
 	aid.size = size;
-	aid.requestSpawnDebris = true;
+	aid.requestSpawnDebris = spawnEffects;
 	m_armorImpactData[ m_impactDataNextIdx ] = aid;
 	return m_impactDataNextIdx++;
 }

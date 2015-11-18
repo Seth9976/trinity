@@ -102,6 +102,7 @@ private:
 
 	// impact effect time
 	float m_impactDuration;
+	float m_impactSize;
 
 	// state of this warhead
 	State m_state;

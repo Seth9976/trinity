@@ -324,7 +324,7 @@ private:
 	bool m_laserMissBehaviour, m_projectileMissBehaviour;
 
 	// impacts
-	bool m_impactEnabled;
+	float m_impactSize;
 
 	// tracking
 	float m_trackingInfluence;

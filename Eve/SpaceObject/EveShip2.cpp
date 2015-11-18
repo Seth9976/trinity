@@ -43,13 +43,10 @@ void EveShip2::UpdateSyncronous( EveUpdateContext& updateContext )
 	Be::Time time = updateContext.GetTime();
 	float deltaT = updateContext.GetDeltaT();
 
-	// can get the speed from destiny's position ball
-	if( m_ballPosition )
-	{
-		Vector3 velocity;
-		m_ballPosition->GetValueDotAt( &velocity, time );
-		m_speed->m_value = D3DXVec3Length( &velocity );
-	}
+	// need the speed!
+	Vector3 v;
+	GetWorldVelocity( v );
+	m_speed->m_value = D3DXVec3Length( &v );
 
 	UpdateShipSpeedForAudio();
 

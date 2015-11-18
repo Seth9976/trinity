@@ -110,7 +110,7 @@ public:
 private:
 	// helper functions to create the different types of impacts
 	int CreateShieldImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime );
-	int CreateArmorImpact( int damageLocatorIndex, float size );
+	int CreateArmorImpact( int damageLocatorIndex, float size, bool spawnEffects );
 
 	// general data
 	BlueSharedString m_name;

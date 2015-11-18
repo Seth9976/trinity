@@ -244,6 +244,7 @@ public:
 	ITriVectorFunctionPtr GetPositionFunction();
 
 	Vector3 GetModelWorldPosition() const;
+	void GetWorldVelocity( Vector3& velocity ) const;
 	Tr2GrannyAnimationPtr GetAnimationController() { return m_animationUpdater; }
 
 	// bounding sphere
@@ -330,6 +331,7 @@ protected:
 
 	Matrix m_worldTransform;
 	Vector3 m_worldPosition; // used to expose the position of the object to python
+	Vector3 m_worldVelocity;
 	float m_modelScale;
 
 	Tr2MeshBasePtr m_mesh;

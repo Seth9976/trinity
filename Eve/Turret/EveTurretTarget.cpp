@@ -29,7 +29,7 @@ EveTurretTarget::EveTurretTarget( IRoot* lockobj ) :
 	m_laserMissBehaviour( false ),
 	m_projectileMissBehaviour( false ),
 	m_readyToFireEffect( false ),
-	m_impactEnabled( false ),
+	m_impactSize( 0.f ),
 	m_randomMissDistanceOffset( 0.5f ),
 	m_randomMissPositionOffset( 0.f, 0.f, 0.f )
 {
@@ -103,7 +103,7 @@ void EveTurretTarget::StartFireAtLocator( int l, float delay, float length )
 	TriVectorSpherical( &m_randomMissPositionOffset, phi, theta, 3.f );
 
 	// pop a miss/hit from the queue
-	if( !PopShotMissed() )
+	if( !PopShotMissed() && m_impactSize > 0.f )
 	{
 		// ok, we assume we hit! create an impact
 		if( m_object )
@@ -159,24 +159,21 @@ void EveTurretTarget::Update( float deltaT, const Vector3* source )
 			m_positionMiss += direction * ( dist + 5000.f) * ( 1.f + 0.5f * m_randomMissDistanceOffset );
 		}
 
-		if( m_impactEnabled )
+		// what about delayed impact creation?
+		if( m_impactDelay > 0.f )
 		{
-			// what about delayed impact creation?
-			if( m_impactDelay > 0.f )
+			m_impactDelay -= deltaT;
+			if( m_impactDelay < 0.f )
 			{
-				m_impactDelay -= deltaT;
-				if( m_impactDelay < 0.f )
-				{
-					m_impactID = m_object->CreateImpact( m_locator, dirToSource, m_impactLength, 1.f );
-					m_impactDelay = -1.f;
-				}
+				m_impactID = m_object->CreateImpact( m_locator, dirToSource, m_impactLength, m_impactSize );
+				m_impactDelay = -1.f;
 			}
+		}
 
-			// update the impacts
-			if( m_impactID != -1 )
-			{
-				m_object->UpdateImpact( m_position, dirToSource, m_impactID );
-			}
+		// update the impacts
+		if( m_impactID != -1 )
+		{
+			m_object->UpdateImpact( m_position, dirToSource, m_impactID );
 		}
 	}
 
@@ -231,11 +228,11 @@ int EveTurretTarget::FindClosestLocator( const Vector3* source, Vector3* positio
 // Description:
 //   Set the internal behaviour of the hit/miss functionality
 // --------------------------------------------------------------------------------
-void EveTurretTarget::SetBehaviour( bool laserMiss, bool projectileMiss, bool impactEnabled )
+void EveTurretTarget::SetBehaviour( bool laserMiss, bool projectileMiss, float impactSize)
 {
 	m_laserMissBehaviour = laserMiss;
 	m_projectileMissBehaviour = projectileMiss;
-	m_impactEnabled = impactEnabled;
+	m_impactSize = impactSize;
 }
 
 // --------------------------------------------------------------------------------

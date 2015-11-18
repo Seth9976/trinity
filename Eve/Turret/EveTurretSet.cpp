@@ -96,7 +96,7 @@ EveTurretSet::EveTurretSet( IRoot* lockobj ) :
 	m_recheckTimeLeft( -1.f ),
 	m_laserMissBehaviour( false ),
 	m_projectileMissBehaviour( false ),
-	m_impactEnabled( false ),
+	m_impactSize( 0.f ),
 	m_firingEffectMuzzlePosSet( false ),
 	m_slotNumber( -1 ),
 	m_parentShLighting( nullptr ),
@@ -149,7 +149,7 @@ EveTurretSet::~EveTurretSet()
 bool EveTurretSet::Initialize()
 {
 	// pass down some user-defined data into sub-modules we don't save out
-	m_target->SetBehaviour( m_laserMissBehaviour, m_projectileMissBehaviour, m_impactEnabled );
+	m_target->SetBehaviour( m_laserMissBehaviour, m_projectileMissBehaviour, m_impactSize );
 
 	// geom path is here, so load it
 	InitializeGeometryResource();
@@ -173,9 +173,9 @@ bool EveTurretSet::OnModified( Be::Var* value )
 		// attached firing effect has changed -> relink!
 		InitializeFiringEffect();
 	}
-	else if( IsMatch( value, m_laserMissBehaviour ) || IsMatch( value, m_projectileMissBehaviour ) || IsMatch( value, m_impactEnabled ) )
+	else if( IsMatch( value, m_laserMissBehaviour ) || IsMatch( value, m_projectileMissBehaviour ) || IsMatch( value, m_impactSize ) )
 	{
-		m_target->SetBehaviour( m_laserMissBehaviour, m_projectileMissBehaviour, m_impactEnabled );
+		m_target->SetBehaviour( m_laserMissBehaviour, m_projectileMissBehaviour, m_impactSize );
 	}
 	return true;
 }

@@ -200,14 +200,17 @@ void Tr2GpuSharedEmitter::SpawnOnce( const UpdateArguments& arguments, const Vec
 	if( emitter.count )
 	{
 		emitter.radius *= scale;
+		emitter.minSpeed *= scale;
+		emitter.maxSpeed *= scale;
+
 		emitter.position = XMVector3TransformCoord( m_position, arguments.parentTransform );
-		emitter.positionPrevious = m_emitter.position;
+		emitter.positionPrevious = emitter.position;
 
 		emitter.velocity = velocity;
-		emitter.velocityPrevious = m_emitter.velocity;
+		emitter.velocityPrevious = emitter.velocity;
 
 		emitter.direction = XMVector3TransformNormal( m_direction, arguments.parentTransform );
-		emitter.directionPrevious = m_emitter.direction;
+		emitter.directionPrevious = emitter.direction;
 
 		auto id = m_id;
 		auto hash = m_paramsHash;
@@ -215,6 +218,8 @@ void Tr2GpuSharedEmitter::SpawnOnce( const UpdateArguments& arguments, const Vec
 		if( scale != 1.0f )
 		{
 			params.sizes *= scale;
+			params.turbulenceAmplitude *= scale;
+			params.turbulenceFrequency = (uint32_t)( (float)params.turbulenceFrequency / scale );
 
 			hash = GetHash( params );
 			id = GetID( hash );

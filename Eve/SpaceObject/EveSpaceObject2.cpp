@@ -82,6 +82,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_albedoColor( 0.f, 0.f, 0.f, 1.f ),
 	m_secondaryLightingSphereRadius( 0.f ),
 	m_modelScale( 1.f ),
+	m_worldVelocity( 0.f, 0.f, 0.f ),
 	m_lodLevel( TR2_LOD_UNSPECIFIED ),
 	m_lodLevelWithChildren( TR2_LOD_UNSPECIFIED ),
 	m_debugShowBoundingBox( true ),
@@ -1697,6 +1698,11 @@ Vector3 EveSpaceObject2::GetModelWorldPosition() const
 	return Vector3( m_boundingSphereWorld.x, m_boundingSphereWorld.y, m_boundingSphereWorld.z );
 }
 
+void EveSpaceObject2::GetWorldVelocity( Vector3& velocity ) const
+{
+	velocity = m_worldVelocity;
+}
+
 void EveSpaceObject2::GetMissPosition( const Vector3* hit, const Vector3* source, Vector3* out )
 {
 	if( m_boundingSphereRadius > 0.0f )
@@ -1766,10 +1772,12 @@ void EveSpaceObject2::UpdateWorldTransform( Be::Time time )
 	if( m_ballPosition )
 	{
 		m_ballPosition->Update( &m_worldPosition, time );
+		m_ballPosition->GetValueDotAt( &m_worldVelocity, time );
 	}
 	else
 	{
 		m_worldPosition = Vector3( 0.0f, 0.0f, 0.0f );
+		m_worldVelocity = Vector3( 0.f, 0.f , 0.f );
 	}
 
 	if( m_ballRotation )

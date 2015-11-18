@@ -24,6 +24,7 @@ EveMissileWarhead::EveMissileWarhead( IRoot* lockobj ) :
 	m_state( STATE_DELAYED ),
 	m_flyingTime( 0.f ),
 	m_impactDuration( 0.6f ),
+	m_impactSize( 0.f ),
 	m_posLastFrame( 0.f, 0.f, 0.f ),
 	m_currentStartOffset( 0.f, 0.f, 0.f ),
 	m_startOrientation( 0.f, 0.f, 0.f, 1.f ),
@@ -361,7 +362,10 @@ EveMissileWarhead::StateChangeEvent EveMissileWarhead::CheckImpact( float deltaT
 			{
 				m_explosionPosition = posNow;
 			}
-			target->CreateImpact( m_targetLocator, -m_movement, m_impactDuration, 1.f );
+			if( m_impactSize > 0.f )
+			{
+				target->CreateImpact( m_targetLocator, -m_movement, m_impactDuration, m_impactSize );
+			}
 		}
 	}
 	return evt;
