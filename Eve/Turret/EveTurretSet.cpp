@@ -2172,9 +2172,13 @@ void EveTurretSet::SetTargetObject( IRoot* target )
 	SetTargetScale();
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Sets the target object. This is part of the targetObject property.
+// --------------------------------------------------------------------------------
 ITriTargetablePtr EveTurretSet::GetTargetObject()
 {
-	return nullptr;
+	return m_target->GetTargetable();
 }
 
 // --------------------------------------------------------------------------------
