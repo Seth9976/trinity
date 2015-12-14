@@ -383,11 +383,8 @@ void EveSpaceObject2::PrepareShaderData( EveUpdateContext& updateContext )
 		m_boundingSphereWorld.w = m_modelScale * m_boundingSphereRadius;
 	}
 
-	// if we have an impact overlay it can modify the activation strength
-	if( m_impactOverlay )
-	{
-		m_spaceObjectShipData.y = m_impactOverlay->GetActivationStrength( updateContext );
-	}
+	// if we have an impact overlay it can modify the activation strength, otherwise just full on
+	m_spaceObjectShipData.y = m_impactOverlay ? m_impactOverlay->GetActivationStrength( updateContext ) : 1.f;
 
 	// shader needs to know size of this object for some surface-scaling issues
 	m_spaceObjectShipData.w = GetBoundingSphereRadius();
