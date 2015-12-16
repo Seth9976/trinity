@@ -165,7 +165,9 @@ void EveSpaceObject2::UpdateSyncronous( EveUpdateContext& updateContext )
 {
 	Be::Time time = updateContext.GetTime();
 	D3DXMatrixTranspose( &m_vsData.worldTransformLast, &m_worldTransform );
-	D3DXMatrixInverse( &m_invWorldTransform, NULL, &m_worldTransform );
+	
+	//is this done in a parent class/subclass anywhere else?
+	D3DXMatrixInverse( &m_invWorldTransform, nullptr, &m_worldTransform );
 
 	UpdateWorldTransform( time );
 
@@ -435,7 +437,7 @@ void EveSpaceObject2::RenderDebugInfo( Tr2RenderContext& renderContext )
 
 	if( m_debugShowDamageLocators )
 	{
-		for( unsigned i = 0; i < m_persistedDamageLocatorCount; i++ )
+		for( unsigned i = 0; i < m_persistedDamageLocators.size(); i++ )
 		{
 			Vector3 pos;
 			GetDamageLocatorPosition( &pos, i );
@@ -1417,7 +1419,7 @@ int EveSpaceObject2::GetClosestDamageLocatorIndex( const Vector3* position )
 
 	Vector3 posInObjectSpace = ( Vector3 )XMVector3Transform( *position, m_invWorldTransform );
 
-	for( unsigned int i = 0; i < m_persistedDamageLocatorCount; ++i )
+	for( unsigned int i = 0; i < m_persistedDamageLocators.size(); ++i )
 	{
 		XMVECTOR thisLength = Vector3( posInObjectSpace );
 		thisLength = GetObjectSpaceDamageLocatorPosition( i ) - thisLength;
@@ -1472,7 +1474,7 @@ int EveSpaceObject2::GetGoodDamageLocatorIndex( const Vector3& position )
 	std::vector<Vector3> damageLocatorPositions;
 	Vector3 v;
 
-	for( unsigned i = 0; i < m_persistedDamageLocatorCount; ++i )
+	for( unsigned i = 0; i < m_persistedDamageLocators.size(); ++i )
 	{
 		Vector3 damageLocatorPosition = GetObjectSpaceDamageLocatorPosition(i);
 		damageLocatorPositions.push_back(damageLocatorPosition);
@@ -1489,7 +1491,7 @@ int EveSpaceObject2::GetGoodDamageLocatorIndex( const Vector3& position )
 	float bestFit = 1.0f;
 	
 	int bestLocator = GetClosestDamageLocatorIndex( &posInObjectSpace );
-	for( unsigned i = 0; i < m_persistedDamageLocatorCount; ++i )
+	for( unsigned i = 0; i < m_persistedDamageLocators.size(); ++i )
 	{
 		Vector3 damageLocatorPos = damageLocatorPositions[i];
 		Vector3 damageLocatorDir = GetObjectSpaceDamageLocatorDirection(i);
@@ -1515,7 +1517,7 @@ float EveSpaceObject2::GetRadius() const
 bool EveSpaceObject2::GetDamageLocatorPosition( Vector3* out, int index )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
-	if( (index < 0) || ((unsigned int)index >= m_persistedDamageLocatorCount) )
+	if( (index < 0) || ((unsigned int)index >= m_persistedDamageLocators.size()) )
 	{
 		*out = m_worldTransform.GetTranslation();
 		return false;
@@ -1567,7 +1569,7 @@ void EveSpaceObject2::GetImpactPosition( Vector3& out, int damageLocatorIndex, c
 
 bool EveSpaceObject2::GetDamageLocatorDirection( Vector3* out, int index )
 {
-	if( index < 0 || (unsigned int)index >= m_persistedDamageLocatorCount )
+	if( index < 0 || (unsigned int)index >= m_persistedDamageLocators.size() )
 	{
 		*out = Vector3( 0.f, 1.f, 0.f );
 		return false;
@@ -1914,7 +1916,6 @@ void EveSpaceObject2::SetDamageLocators( const EveDamageLocator* damageLocators,
 	// is a structured list, so we can copy this in one big block
 	m_persistedDamageLocators.Resize( damageLocatorCount );
 	memcpy( &m_persistedDamageLocators[0], damageLocators, damageLocatorCount * sizeof( EveDamageLocator ) );
-	m_persistedDamageLocatorCount = damageLocatorCount;
 }
 
 // --------------------------------------------------------------------------------
@@ -2037,23 +2038,27 @@ bool EveSpaceObject2::UpdateImpact( Vector3& out, const Vector3& direction, int 
 //GPU ship explosion test
 unsigned EveSpaceObject2::GetDamageLocatorCount() const 
 {
-	return m_persistedDamageLocatorCount;
+	return m_persistedDamageLocators.size();
 }
 
-Vector3 EveSpaceObject2::GetDamageLocator( unsigned index ) const 
+Vector3 EveSpaceObject2::GetDamageLocator( uint32_t index ) const
 {
-	if( index > m_persistedDamageLocatorCount )
-		return Vector3(0,0,0);
-	return Vector3( (float*)&m_persistedDamageLocators[index].m_position );
+	if( size_t( index ) > m_persistedDamageLocators.size() )
+		return Vector3( 0, 0, 0 );
+	return GetObjectSpaceDamageLocatorPosition( index );
 }
 
-Vector3 EveSpaceObject2::GetTransformedDamageLocator( unsigned index )
+// --------------------------------------------------------------------------------
+// Description:
+//   Returns the damage locator positionin worldspace
+// --------------------------------------------------------------------------------
+Vector3 EveSpaceObject2::GetTransformedDamageLocator( uint32_t index )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	if( index > m_persistedDamageLocatorCount )
+	if( size_t( index ) > m_persistedDamageLocators.size() )
 	{
-		return Vector3(0,0,0);
+		return Vector3( 0, 0, 0 );
 	}
 			
 	Vector3 transformedDamageLocator = GetObjectSpaceDamageLocatorPosition( index );
@@ -2062,7 +2067,11 @@ Vector3 EveSpaceObject2::GetTransformedDamageLocator( unsigned index )
 	return transformedDamageLocator;	
 }
 
-Vector3 EveSpaceObject2::GetObjectSpaceDamageLocatorPosition( int index )
+// --------------------------------------------------------------------------------
+// Description:
+//   Returns the damage locator position in objectspace
+// --------------------------------------------------------------------------------
+Vector3 EveSpaceObject2::GetObjectSpaceDamageLocatorPosition( uint32_t index ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	EveDamageLocator damageLocator = m_persistedDamageLocators[index];
@@ -2092,7 +2101,11 @@ Vector3 EveSpaceObject2::GetObjectSpaceDamageLocatorPosition( int index )
 	return damageLocatorPosition;
 }
 
-Vector3 EveSpaceObject2::GetObjectSpaceDamageLocatorDirection( unsigned index )
+// --------------------------------------------------------------------------------
+// Description:
+//   Returns the damage locator direction in object space
+// --------------------------------------------------------------------------------
+Vector3 EveSpaceObject2::GetObjectSpaceDamageLocatorDirection( uint32_t index ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	EveDamageLocator damageLocator = m_persistedDamageLocators[index];
@@ -2127,9 +2140,16 @@ Vector3 EveSpaceObject2::GetObjectSpaceDamageLocatorDirection( unsigned index )
 	return damagelocatorDirection;
 }
 
-
-Vector3 EveSpaceObject2::GetTransformedDamageLocatorDirection( unsigned index )
+// --------------------------------------------------------------------------------
+// Description:
+//   Returns the damage locator direction in worldspace
+// --------------------------------------------------------------------------------
+Vector3 EveSpaceObject2::GetTransformedDamageLocatorDirection( uint32_t index )
 {
+	if( size_t( index ) > m_persistedDamageLocators.size() )
+	{
+		return Vector3( 0, 1, 0 );
+	}
 	Vector3 transformedImpactDirection;
 	transformedImpactDirection = GetObjectSpaceDamageLocatorDirection( index );
 	transformedImpactDirection = XMVector3TransformNormal( transformedImpactDirection, m_worldTransform );

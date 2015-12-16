@@ -306,11 +306,9 @@ protected:
 
 	// damage locators
 	unsigned GetDamageLocatorCount() const;
-	Vector3 GetDamageLocator( unsigned index ) const;
-	Vector3 GetTransformedDamageLocator( unsigned index );
-	Vector3 GetTransformedDamageLocatorDirection( unsigned index );
-	Vector3 GetObjectSpaceDamageLocatorPosition( int index );
-	Vector3 GetObjectSpaceDamageLocatorDirection( unsigned index );
+	Vector3 GetDamageLocator( uint32_t index ) const;
+	Vector3 GetTransformedDamageLocator( uint32_t index );
+	Vector3 GetTransformedDamageLocatorDirection( uint32_t index );
 
 	void PrepareForAnimation();
 	void FreeAnimationData();
@@ -318,9 +316,7 @@ protected:
 	void GetSortedBatchesFromMeshAreaVector( const Tr2MeshAreaVector* areas, ITriRenderBatchAccumulator* batches, const Tr2PerObjectData* perObjectData ) const;
 	void GetBatchesFromOverlayVector( ITriRenderBatchAccumulator* batches, const Tr2PerObjectData* perObjectData, TriBatchType batchType );
 
-	CcpMutex& GetObjectMutex();
 	void UpdateWorldTransform( Be::Time time );
-protected:
 	friend class EveShip2Builder;
 
 	std::string m_name;
@@ -440,14 +436,8 @@ protected:
 	ITriQuaternionFunctionPtr m_modelRotation;
 	ITriVectorFunctionPtr m_modelTranslation;
 
-	// Damage locators are positions, relative to the origin of the object. They are persisted
-	// as a list of Vector3 and copied to an array of XMVECTORs on load time for more
-	// efficient per-frame calculations of transformed damage locator positions.
-
 	PEveDamageLocatorStructureList m_persistedDamageLocators;
-	unsigned m_persistedDamageLocatorCount;
-
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Dynamic lighting
 	PTr2PointLightVector m_lights;
@@ -499,6 +489,11 @@ protected:
 private:
 	bool m_isAnimated;
 	EveAnimationSequencerPtr m_animationSequencer;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Object space damage locator information
+	Vector3 GetObjectSpaceDamageLocatorPosition( uint32_t index ) const;
+	Vector3 GetObjectSpaceDamageLocatorDirection( uint32_t index ) const;
 };
 
 TYPEDEF_BLUECLASS( EveSpaceObject2 );
