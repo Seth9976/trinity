@@ -83,6 +83,30 @@ bool EveMissile::GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query )
 
 // --------------------------------------------------------------------------------
 // Description:
+//   Implements IEveSpaceObject2. Registers warheads with quad renderer.
+// --------------------------------------------------------------------------------
+void EveMissile::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	for( auto it = m_warheads.begin(); it != m_warheads.end(); ++it )
+	{
+		( *it )->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Implements IEveSpaceObject2. Adds warhead sprites to quad renderer.
+// --------------------------------------------------------------------------------
+void EveMissile::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	for( auto it = m_warheads.begin(); it != m_warheads.end(); ++it )
+	{
+		( *it )->AddQuadsToQuadRenderer( quadRenderer );
+	}
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Main update method called every frame. Here we do all sorts of things: get
 //   the position/orientation of the underlying ball and the target ball (if there
 //   is any: bombs don't have targets!), update each warheads state and position

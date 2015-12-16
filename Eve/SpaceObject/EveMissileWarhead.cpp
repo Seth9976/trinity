@@ -8,6 +8,7 @@
 
 #include "EveMissileWarhead.h"
 #include "Eve/EveUpdateContext.h"
+#include "Eve/SpaceObject/Attachments/EveSpriteSet.h"
 #include "Tr2Mesh.h"
 #include "include/TriMath.h"
 
@@ -51,7 +52,8 @@ EveMissileWarhead::EveMissileWarhead( IRoot* lockobj ) :
 	m_maxExplosionDistance( 40.0f ),
 	m_explosionPosition( 0.f, 0.f, 0.f ),
 	m_bombFlightpath( false ),
-	m_doSpread( true )
+	m_doSpread( true ),
+	m_lastPositionValid( false )
 {
 	D3DXMatrixIdentity( &m_currentOffsetTransform );
 	m_speedModifier = 1.04f - TriRand() * 0.08f;
@@ -64,6 +66,53 @@ EveMissileWarhead::EveMissileWarhead( IRoot* lockobj ) :
 // --------------------------------------------------------------------------------
 EveMissileWarhead::~EveMissileWarhead()
 {
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Implements IInitialize. Sets up sprite set to use quad renderer.
+// --------------------------------------------------------------------------------
+bool EveMissileWarhead::Initialize()
+{
+	if( m_spriteSet )
+	{
+		m_spriteSet->UseQuadRenderer( true, false );
+	}
+	return EveTransform::Initialize();
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Implements IEveSpaceObject2. Registers sprite set with quad renderer.
+// --------------------------------------------------------------------------------
+void EveMissileWarhead::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	if( m_spriteSet )
+	{
+		m_spriteSet->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Implements IEveSpaceObject2. Adds sprites to quad renderer.
+// --------------------------------------------------------------------------------
+void EveMissileWarhead::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	if( !m_startDataValid )
+	{
+		return;
+	}
+
+	if( m_state == STATE_DEAD )
+	{
+		return;
+	}
+
+	if( m_spriteSet )
+	{
+		m_spriteSet->AddToQuadRenderer( quadRenderer, m_worldTransform, 1.0f, nullptr, 0 );
+	}
 }
 
 // --------------------------------------------------------------------------------
@@ -160,6 +209,13 @@ void EveMissileWarhead::EnableParticleEmitting( bool enable )
 			}
 		}
 	}
+	for( auto emIt = m_particleEmitters.begin(); emIt != m_particleEmitters.end(); ++emIt )
+	{
+		if( auto emitter = dynamic_cast<Tr2GpuSharedEmitter*>( *emIt ) )
+		{
+			emitter->Enable( enable );
+		}
+	}
 }
 
 // --------------------------------------------------------------------------------
@@ -224,6 +280,7 @@ void EveMissileWarhead::Launch( const Matrix& startTransform )
 
 	// now we have start data, so we are good and armed and ready to go!
 	m_startDataValid = true;
+	m_lastPositionValid = false;
 }
 
 // --------------------------------------------------------------------------------
@@ -470,37 +527,30 @@ void EveMissileWarhead::UpdateWarhead( float deltaT, float estimatedTotalAliveTi
 		m_currentOffset *= bombTrackBall;
 	}
 
-	// find a way better warhead orientation, that exactly fits the flying path in worldspace
-	// simplify: the attached gpu global particlesystem does know this facing direction, so get that!
-	for( PIEveTransformVector::const_iterator it = m_children.begin(); it != m_children.end(); ++it )
+	Vector3 relativePosition = m_worldTransform.GetTranslation();
+	Vector3 translation = m_lastRelativePosition - relativePosition;
+	m_lastRelativePosition = relativePosition;
+	if( m_lastPositionValid )
 	{
-		EveTransformPtr child;
-		if( (*it)->QueryInterface( BlueInterfaceIID<EveTransform>(), (void**)&child, BEQI_SILENT ) )
+		if( m_startDataValid )
 		{
-			// do we have an attached GPU system?
-			if( !child->m_particleEmittersGPU.empty() )
+			if( D3DXVec3LengthSq( &translation ) > 1.f )
 			{
-				Tr2GPUParticleEmitterPtr trailEmitter = child->m_particleEmittersGPU[0];
-				// does it know what we need?
-				if( trailEmitter->IsLastTranslationValid() )
-				{
-					Vector3 moveDirection = -1.f * trailEmitter->GetLastTranslation();
-					// length must be at least something otherwise it's not worth using it
-					if( D3DXVec3LengthSq( &moveDirection ) > 1.f )
-					{
-						// move/facing direction is in global world-space, we need it in "ball"-space
-						D3DXVec3TransformNormal( &moveDirection, &moveDirection, invBallRotation );
-						// turn facing vector into a rotation
-						TriQuaternionArcFromForward( &m_currentOrientation, &moveDirection );
-					}
-					else
-					{
-						// backup
-						m_currentOrientation = m_startOrientation;
-					}
-				}
+				// move/facing direction is in global world-space, we need it in "ball"-space
+				D3DXVec3TransformNormal( &translation, &translation, invBallRotation );
+				// turn facing vector into a rotation
+				TriQuaternionArcFromForward( &m_currentOrientation, &translation );
+			}
+			else
+			{
+				// backup
+				m_currentOrientation = m_startOrientation;
 			}
 		}
+	}
+	else
+	{
+		m_lastPositionValid = true;
 	}
 
 	// put it all together into a single transform matrix
@@ -540,6 +590,19 @@ uint32_t EveMissileWarhead::GetPerObjectDataSize( Tr2RenderContextEnum::ShaderTy
 			64 +				// m_vsWorldMatrix
 			16 +				// m_vsSpaceObjectData
 			16; 				// m_spaceObjectClipData
+	}
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Implements IRenderable. Adds batches to the batch accumulator.
+// --------------------------------------------------------------------------------
+void EveMissileWarhead::GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData )
+{
+	EveTransform::GetBatches( batches, batchType, perObjectData );
+	if( batchType == TRIBATCHTYPE_ADDITIVE && m_spriteSet )
+	{
+		m_spriteSet->GetBatches( batches, perObjectData );
 	}
 }
 

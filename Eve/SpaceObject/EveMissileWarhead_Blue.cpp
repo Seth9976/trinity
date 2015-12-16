@@ -26,6 +26,7 @@ const Be::ClassInfo* EveMissileWarhead::ExposeToBlue()
 		MAP_ATTRIBUTE( "explosionPosition", m_explosionPosition, "Position in world space where the missile exploded", Be::READ )
 		MAP_ATTRIBUTE( "doSpread", m_doSpread, "The warhead should(possibly) switch to a new damage locator if appropriate mid flight.", Be::READWRITE )
 		MAP_ATTRIBUTE( "targetLocatorID", m_targetLocator, "The target locator id that the warhead is aiming for.", Be::READ )
+		MAP_ATTRIBUTE( "spriteSet", m_spriteSet, "Sprites for the warhead.", Be::READWRITE | Be::PERSIST )
 
 		MAP_METHOD_AND_WRAP(
 			"PrepareLaunch",

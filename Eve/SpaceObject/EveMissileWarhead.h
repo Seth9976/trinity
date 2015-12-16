@@ -12,6 +12,8 @@
 #include "include/ITriTargetable.h"
 
 
+BLUE_DECLARE( EveSpriteSet );
+
 // --------------------------------------------------------------------------------
 // Description:
 //   This class holds an Eve missile warhead. Multiple warheads can be hold by an
@@ -27,6 +29,10 @@ public:
 
 	EveMissileWarhead( IRoot* lockobj = NULL );
 	~EveMissileWarhead();
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	// IInitialize
+	bool Initialize();
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IEveSpaceObject2
@@ -36,6 +42,11 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Renderable - overriding EveTransform implementations
 	virtual Tr2PerObjectData* GetPerObjectData( ITriRenderBatchAccumulator* accumulator );
+	virtual void GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData );
+
+	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
+
 
 	// access to relative data
 	const Matrix& GetCurrentOffsetTransform() const;
@@ -97,6 +108,8 @@ protected:
 	Tr2PersistentPerObjectData<EveMissileWarhead> m_perObjectDataPs;
 
 private:
+	EveSpriteSetPtr m_spriteSet;
+
 	// timing
 	float m_flyingTime;
 
@@ -157,6 +170,7 @@ private:
 
 	//bombs
 	bool m_bombFlightpath;
+	bool m_lastPositionValid;
 };
 
 TYPEDEF_BLUECLASS( EveMissileWarhead );

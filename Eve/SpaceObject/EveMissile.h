@@ -43,6 +43,8 @@ public:
 	virtual void GetRenderables( const TriFrustum& frustum, std::vector<ITr2Renderable*>& renderables, const Matrix& parentTransform );
 	virtual void RenderDebugInfo( Tr2RenderContext& renderContext );
 	virtual bool GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query=EVE_BOUNDS_NORMAL ) const;
+	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	virtual void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Renderable - overriding EveSpaceObject2 implementations
