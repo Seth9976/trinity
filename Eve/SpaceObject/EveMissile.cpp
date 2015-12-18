@@ -198,7 +198,7 @@ void EveMissile::UpdateSyncronous( EveUpdateContext& updateContext )
 			// update warhead position, orientation, etc. if enabled
 			if( m_updateWarheads )
 			{
-				wh->UpdateWarhead( deltaT, m_estimatedTotalAliveTime, &myVelocity, &m_inheritedVelocity, &invBallRotationMatrix );
+				wh->UpdateWarhead( deltaT, m_estimatedTotalAliveTime, &myVelocity, &m_inheritedVelocity, &invBallRotationMatrix, m_worldTransform, updateContext.GetOriginShift() );
 			}
 
 			// standard update method, goes straight into EveTransform::Update()

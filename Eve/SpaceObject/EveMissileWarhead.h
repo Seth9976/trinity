@@ -55,7 +55,7 @@ public:
 	bool GetLocalBoundingSphere( Vector4& sphere ) const;
 
 	// calc relative positions of this warhead
-	void UpdateWarhead( float deltaT, float estimatedTotalAliveTime, const Vector3* currentBallVelocity, const Vector3* currentInheritedVelocity, const Matrix* invBallRotation );
+	void UpdateWarhead( float deltaT, float estimatedTotalAliveTime, const Vector3* currentBallVelocity, const Vector3* currentInheritedVelocity, const Matrix* invBallRotation, const Matrix& missileTransform, const Vector3& egoTranslation );
 	// update warhead's final position/orientation
 	void UpdateEndTransform( const Matrix& endTransform, bool switchLocators );
 

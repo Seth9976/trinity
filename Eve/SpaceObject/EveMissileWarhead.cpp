@@ -457,7 +457,7 @@ void EveMissileWarhead::Update( EveUpdateContext& updateContext )
 //   currentInheritedVelocity - launching ship's velocity at the time of launch
 //   invBallRotation - inverse ball rotation to transform the ball velocity
 // --------------------------------------------------------------------------------
-void EveMissileWarhead::UpdateWarhead( float deltaT, float estimatedTotalAliveTime, const Vector3* currentBallVelocity, const Vector3* currentInheritedVelocity, const Matrix* invBallRotation )
+void EveMissileWarhead::UpdateWarhead( float deltaT, float estimatedTotalAliveTime, const Vector3* currentBallVelocity, const Vector3* currentInheritedVelocity, const Matrix* invBallRotation, const Matrix& missileTransform, const Vector3& egoTranslation )
 {
 	// Per object data
 	m_perObjectDataVs.InvalidateBufferData();
@@ -527,8 +527,10 @@ void EveMissileWarhead::UpdateWarhead( float deltaT, float estimatedTotalAliveTi
 		m_currentOffset *= bombTrackBall;
 	}
 
-	Vector3 relativePosition = m_worldTransform.GetTranslation();
-	Vector3 translation = m_lastRelativePosition - relativePosition;
+	Vector3 relativePosition( 0.f, 0.f, 0.f );
+	Matrix worldTransform = missileTransform;
+	D3DXVec3TransformCoord( &relativePosition, &m_currentOffset, &worldTransform );
+	Vector3 translation = m_lastRelativePosition - relativePosition + egoTranslation;
 	m_lastRelativePosition = relativePosition;
 	if( m_lastPositionValid )
 	{
