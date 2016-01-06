@@ -45,7 +45,7 @@ BLUE_DECLARE_IVECTOR( ITriQuaternionFunction );
 
 BLUE_DECLARE_INTERFACE( ITriTransform );
 
-class TriScalarSequencer :
+BLUE_CLASS( TriScalarSequencer ) :
 	public ITriScalarFunction,
 	public ITriCurveLength
 {
@@ -111,10 +111,10 @@ private:
  
 public:
 };
-TYPEDEF_BLUECLASS(TriScalarSequencer);
+TYPEDEF_BLUECLASS( TriScalarSequencer );
 
 
-class TriVectorSequencer :
+BLUE_CLASS( TriVectorSequencer ) :
 	public ITriVectorFunction
 {
 public:
@@ -188,7 +188,7 @@ public:
     PyObject* PyGetValueDoubleDotAt( PyObject* args );
 #endif
 };
-TYPEDEF_BLUECLASS(TriVectorSequencer);
+TYPEDEF_BLUECLASS( TriVectorSequencer );
 
 
 
@@ -196,7 +196,7 @@ TYPEDEF_BLUECLASS(TriVectorSequencer);
 
 
 
-class TriQuaternionSequencer :
+BLUE_CLASS( TriQuaternionSequencer ) :
 	public ITriQuaternionFunction,
 	public ITriCurveLength
 {
@@ -266,7 +266,7 @@ public:
 	float Length();
 public:
 };
-TYPEDEF_BLUECLASS(TriQuaternionSequencer);
+TYPEDEF_BLUECLASS( TriQuaternionSequencer );
 
 
 
@@ -274,7 +274,7 @@ TYPEDEF_BLUECLASS(TriQuaternionSequencer);
 
 
 
-class TriColorSequencer :
+BLUE_CLASS( TriColorSequencer ) :
     public ITriColorFunction,
     public ITriCurveLength
 {
@@ -326,13 +326,13 @@ private:
     Color* GetValueAtMult(Color* in, Be::Time now);
     Color* GetValueAtAdd(Color* in, Be::Time now);
 };
-TYPEDEF_BLUECLASS(TriColorSequencer);
+TYPEDEF_BLUECLASS( TriColorSequencer );
 
 
 
 
 
-class TriXYZScalarSequencer :
+BLUE_CLASS( TriXYZScalarSequencer ) :
     public ITriVectorFunction,
     public ITriCurveLength
 {
@@ -409,12 +409,12 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	float Length();
 };
-TYPEDEF_BLUECLASS(TriXYZScalarSequencer);
+TYPEDEF_BLUECLASS( TriXYZScalarSequencer );
 
 
 
 
-class TriYPRSequencer :
+BLUE_CLASS( TriYPRSequencer ) :
     public ITriQuaternionFunction
 {
 public:
@@ -486,13 +486,13 @@ public:
 
 public:
 };
-TYPEDEF_BLUECLASS(TriYPRSequencer);
+TYPEDEF_BLUECLASS( TriYPRSequencer );
 
 
 //////////////////////////////////////////
 
 
-class TriRGBAScalarSequencer :
+BLUE_CLASS( TriRGBAScalarSequencer ) :
     public ITriColorFunction,
     public ITriCurveLength
 {
@@ -565,7 +565,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////
     float Length();
 };
-TYPEDEF_BLUECLASS(TriRGBAScalarSequencer);
+TYPEDEF_BLUECLASS( TriRGBAScalarSequencer );
 
 
 
@@ -573,7 +573,7 @@ TYPEDEF_BLUECLASS(TriRGBAScalarSequencer);
 
 
 
-class TriPerlinCurve :
+BLUE_CLASS( TriPerlinCurve ) :
     public ITriScalarFunction
 {
 public:
@@ -626,12 +626,12 @@ public:
 
 public:
 };
-TYPEDEF_BLUECLASS(TriPerlinCurve);
+TYPEDEF_BLUECLASS( TriPerlinCurve );
 
 
 ////
 
-class TriScalarDistanceCurve :
+BLUE_CLASS( TriScalarDistanceCurve ) :
     public ITriScalarFunction
 {
 public:
@@ -679,13 +679,11 @@ public:
 
     TriScalarDistanceCurve(IRoot* lockobj = NULL);
     ~TriScalarDistanceCurve();
-
-public:
 };
-TYPEDEF_BLUECLASS(TriScalarDistanceCurve);
+TYPEDEF_BLUECLASS( TriScalarDistanceCurve );
 
 
-class TriSineCurve :
+BLUE_CLASS( TriSineCurve ) :
     public ITriScalarFunction
 {
 public:
@@ -729,13 +727,11 @@ public:
 
     TriSineCurve(IRoot* lockobj = NULL);
     ~TriSineCurve();
-
-public:
 };
-TYPEDEF_BLUECLASS(TriSineCurve);
+TYPEDEF_BLUECLASS( TriSineCurve );
 
 
-class TriRandomConstantCurve :
+BLUE_CLASS( TriRandomConstantCurve ) :
     public ITriScalarFunction
 {
 public:
@@ -779,10 +775,8 @@ public:
 
     TriRandomConstantCurve(IRoot* lockobj = NULL);
     ~TriRandomConstantCurve();
-
-public:
 };
-TYPEDEF_BLUECLASS(TriRandomConstantCurve);
+TYPEDEF_BLUECLASS( TriRandomConstantCurve );
 
 #endif
 

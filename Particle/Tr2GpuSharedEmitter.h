@@ -50,6 +50,7 @@ public:
 	virtual void SetThreadSafeFlag() {}
 
 	// access
+	void Setup( float rate, const Tr2GpuParticleSystem::Emitter* emitterData, const Tr2GpuParticleSystem::EmitterParams* paramsData );
 	void SetDirection( const Vector3* direction );
 	void SetPosition( const Vector3* position );
 

@@ -1455,8 +1455,6 @@ int EveSpaceObject2::GetGoodDamageLocatorIndex( const Vector3& position )
 	float bestDirectionFit = 0.0f;
 		
 	Vector3 posInObjectSpace = (Vector3) XMVector3Transform( position, m_invWorldTransform );
-	std::vector<Vector3> damageLocatorPositions, damageLocatorDirections;
-	Vector3 v;
 
 	for( unsigned i = 0; i < m_persistedDamageLocators.size(); ++i )
 	{
@@ -1465,7 +1463,7 @@ int EveSpaceObject2::GetGoodDamageLocatorIndex( const Vector3& position )
 			Vector3 damageLocatorPosition = GetObjectSpaceDamageLocatorPosition(i);
 			Vector3 damageLocatorDirection = GetObjectSpaceDamageLocatorDirection(i);
 
-			v = XMVectorSubtract( damageLocatorPosition, posInObjectSpace );
+			Vector3 v( XMVectorSubtract( damageLocatorPosition, posInObjectSpace ) );
 			float length = D3DXVec3Length( &v );
 			minDistance = min( minDistance, length );
 			maxDistance = max( maxDistance, length );
@@ -1486,7 +1484,7 @@ int EveSpaceObject2::GetGoodDamageLocatorIndex( const Vector3& position )
 			Vector3 damageLocatorPosition = GetObjectSpaceDamageLocatorPosition(i);
 			Vector3 damageLocatorDirection = GetObjectSpaceDamageLocatorDirection(i);
 
-			v = XMVectorSubtract( damageLocatorPosition, posInObjectSpace );
+			Vector3 v( XMVectorSubtract( damageLocatorPosition, posInObjectSpace ) );
 			float fitValue = GetDistanceFit( minDistance, maxDistance - minDistance, v );
 			D3DXVec3Normalize( &v, &v );
 			fitValue *= GetDirectionFit( damageLocatorDirection, v );
@@ -2030,8 +2028,19 @@ unsigned EveSpaceObject2::GetDamageLocatorCount() const
 Vector3 EveSpaceObject2::GetDamageLocator( uint32_t index ) const
 {
 	if( size_t( index ) > m_persistedDamageLocators.size() )
+	{
 		return Vector3( 0, 0, 0 );
+	}
 	return GetObjectSpaceDamageLocatorPosition( index );
+}
+
+Vector3 EveSpaceObject2::GetDamageLocatorDirection( uint32_t index ) const
+{
+	if( size_t( index ) > m_persistedDamageLocators.size() )
+	{
+		return Vector3( 0, 0, 0 );
+	}
+	return GetObjectSpaceDamageLocatorDirection( index );
 }
 
 // --------------------------------------------------------------------------------

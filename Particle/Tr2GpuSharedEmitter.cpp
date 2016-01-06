@@ -95,6 +95,21 @@ void Tr2GpuSharedEmitter::SetPosition( const Vector3* position )
 	m_position = *position;
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Setup the parameters of this emitter from the "outside" via structs
+// --------------------------------------------------------------------------------
+void Tr2GpuSharedEmitter::Setup( float rate, const Tr2GpuParticleSystem::Emitter* emitterData, const Tr2GpuParticleSystem::EmitterParams* paramsData )
+{
+	// just copy and and update hash and id
+	m_rate = rate;
+	memcpy( &m_emitter, emitterData, sizeof( Tr2GpuParticleSystem::Emitter ) );
+	memcpy( &m_params, paramsData, sizeof( Tr2GpuParticleSystem::EmitterParams ) );
+
+	UpdateHash();
+	GenerateID();
+}
+
 void Tr2GpuSharedEmitter::Update( const UpdateArguments& arguments )
 {
 	if( !arguments.system )

@@ -271,6 +271,9 @@ public:
 	void AddCurveSet( TriCurveSetPtr newCurveSet );
 	void AddLocator( EveLocator2* newLocator );
 	void SetDamageLocators( const EveDamageLocator* damageLocators, size_t damageLocatorCount );
+	unsigned GetDamageLocatorCount() const;
+	Vector3 GetDamageLocator( uint32_t index ) const;
+	Vector3 GetDamageLocatorDirection( uint32_t index ) const;
 
 	// access to shadows
 	void SetShadowEffect( Tr2EffectPtr newShadowEffect );
@@ -305,8 +308,6 @@ protected:
 	void FreezeHighDetailMesh();
 
 	// damage locators
-	unsigned GetDamageLocatorCount() const;
-	Vector3 GetDamageLocator( uint32_t index ) const;
 	Vector3 GetTransformedDamageLocator( uint32_t index );
 	Vector3 GetTransformedDamageLocatorDirection( uint32_t index );
 	bool IsDamageLocatorFacingPosition( uint32_t index, const Vector3& posInObjectSpace );
