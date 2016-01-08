@@ -19,7 +19,8 @@ CCP_STATS_DECLARE( eveShipsRendered, "Trinity/EveShip2/ShipsRendered", true, CST
 // --------------------------------------------------------------------------------
 EveShip2::EveShip2( IRoot* lockobj ) :
 	m_maxSpeed( 0.f ),
-	m_displayKillCounterValue( 0 )
+	m_displayKillCounterValue( 0 ),
+	m_acceleration( 0.f, 0.f, 0.f )
 {
 	m_speed.CreateInstance();
 
@@ -53,8 +54,14 @@ void EveShip2::UpdateSyncronous( EveUpdateContext& updateContext )
 	// update the attached boosters
 	if( m_boosters )
 	{
-		// call update with this ship's transform
-		m_boosters->Update( deltaT, time, &m_worldTransform, m_ballPosition, m_ballRotation );
+		if( m_ballPosition )
+		{
+			m_ballPosition->GetValueDoubleDotAt( &m_acceleration, time );
+		}
+		else
+		{
+			m_acceleration = Vector3( 0.f, 0.f, 0.f );
+		}
 	}
 }
 
@@ -69,6 +76,7 @@ void EveShip2::UpdateAsyncronous( EveUpdateContext& updateContext )
 	{
 		Be::Time time = updateContext.GetTime();
 		float deltaT = updateContext.GetDeltaT();
+		m_boosters->Update( deltaT, time, m_worldTransform, m_speed->m_value, m_acceleration, m_worldRotation );
 		m_boosters->UpdateTrails( deltaT, time );
 	}
 }

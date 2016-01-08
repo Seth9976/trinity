@@ -219,13 +219,13 @@ bool EveBoosterSet2::OnModified( Be::Var* val )
 //   ball and the given time. How it calculates this comes from the early days
 //   of EVE and is "just" some black magic...
 // Arguments:
-//   ball - ball holding all the physical movement data of the ship
+//   acceleration - parent acceleration
 //   t - global time
 // Return value:
 //   Returns the intensity of the booster (from 0.f to something a little bit
 //   higher than 1.f (because of afterburners and microwarps)
 // --------------------------------------------------------------------------------
-float EveBoosterSet2::CalculateIntensity( ITriVectorFunctionPtr ball, Be::Time t )
+float EveBoosterSet2::CalculateIntensity( const Vector3& acceleration, Be::Time t )
 {
 	// if we want the boosters to be permanently visible
 	if( m_alwaysOn )
@@ -233,26 +233,9 @@ float EveBoosterSet2::CalculateIntensity( ITriVectorFunctionPtr ball, Be::Time t
 		return m_alwaysOnIntensity;
 	}
 
-	// no ball, no gain! Cause we don't have data to build on...
-	if( !ball )
-	{
-		return 0.f;
-	}
-
-	Vector3 velocity = Vector3( 0.f, 0.f, 0.f );
-	Vector3 acceleration = Vector3( 0.f, 0.f, 0.f );
-	Quaternion rotation = Quaternion( 0.f, 0.f, 0.f, 1.f );
-
-	ball->GetValueDotAt( &velocity, t );
-	ball->GetValueDoubleDotAt( &acceleration, t );
-	ITriQuaternionFunctionPtr getQ( BlueCastPtr( ball ) );
-	if( getQ )
-	{
-		getQ->GetValueAt( &rotation, t );
-	}
 	Vector3 backwd;
-	TriVectorRotatedBasisQuaternion( &backwd, TRITA_Z, &rotation );
-	float speedRatio = m_maxVel ? ( D3DXVec3Length( &velocity ) / m_maxVel ) : 0.f;
+	TriVectorRotatedBasisQuaternion( &backwd, TRITA_Z, &m_parentRotation );
+	float speedRatio = m_maxVel ? ( m_parentSpeed / m_maxVel ) : 0.f;
 	float accFactor = D3DXVec3Dot( &acceleration, &backwd );
 	accFactor *= max( 0.3f, speedRatio );
 	if( accFactor < 0.f )
@@ -291,21 +274,16 @@ float EveBoosterSet2::CalculateIntensity( ITriVectorFunctionPtr ball, Be::Time t
 //   deltaT - time since last frame
 //   t - global time
 //   parentMatrix - world matrix of the parent holding this booster (aka a ship!)
-//   ballPosition - destiny object for translation
-//   ballRotation - destiny object for rotation
+//   parentSpeed - parent object speed
+//   parentAcceleration - parent object acceleration
+//   parentRotation - parent object rotation
 // --------------------------------------------------------------------------------
-void EveBoosterSet2::Update( float deltaT, Be::Time t, const Matrix* parentMatrix, ITriVectorFunctionPtr ballPosition, ITriQuaternionFunctionPtr ballRotation )
+void EveBoosterSet2::Update( float deltaT, Be::Time t, const Matrix& parentMatrix, float parentSpeed, const Vector3& parentAcceleration, const Quaternion& parentRotation )
 {
 	// can(!) get the speed from destiny's position ball
 	if( m_destinyUpdate )
 	{
-		// ask destiny ball for speed
-		if( ballPosition )
-		{
-			Vector3 velocity;
-			ballPosition->GetValueDotAt( &velocity, t );
-			m_parentSpeed = D3DXVec3Length( &velocity );
-		}
+		m_parentSpeed = parentSpeed;
 	}
 	else
 	{
@@ -313,24 +291,17 @@ void EveBoosterSet2::Update( float deltaT, Be::Time t, const Matrix* parentMatri
 		if( deltaT != 0.f )
 		{
 			// rely on actual position data
-			Vector3 oldPos( m_parentTransform._41, m_parentTransform._42, m_parentTransform._43 );
-			Vector3 newPos( parentMatrix->_41, parentMatrix->_42, parentMatrix->_43 );
-			Vector3 dir( newPos - oldPos );
+			Vector3 dir = parentMatrix.GetTranslation() - m_parentTransform.GetTranslation();
 			m_parentSpeed = D3DXVec3Length( &dir ) / deltaT;
 		}
 	}
 
 	// keep the transform of the parent (aka ship) around
-	m_parentTransform = *parentMatrix;
-
-	// can get the rotational speed from destiny's rotation ball
-	if( ballRotation )
-	{
-		ballRotation->GetValueAt( &m_parentRotation, t );
-	}
+	m_parentTransform = parentMatrix;
+	m_parentRotation = parentRotation;
 
 	// update the intensity, which is based on ship's movement
-	m_overallIntensity = CalculateIntensity( ballPosition, t );
+	m_overallIntensity = CalculateIntensity( parentAcceleration, t );
 }
 
 // --------------------------------------------------------------------------------

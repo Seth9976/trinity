@@ -56,6 +56,7 @@ public:
 private:
 	// keep track of some ship's speed (in m/s)
 	TriFloatPtr m_speed;
+	Vector3 m_acceleration;
 
 	// For Audio
 	IRootPtr m_audioSpeedParameter;

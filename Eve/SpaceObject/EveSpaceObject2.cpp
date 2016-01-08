@@ -83,6 +83,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_secondaryLightingSphereRadius( 0.f ),
 	m_modelScale( 1.f ),
 	m_worldVelocity( 0.f, 0.f, 0.f ),
+	m_worldRotation( 0.f, 0.f, 0.f, 1.f ),
 	m_lodLevel( TR2_LOD_UNSPECIFIED ),
 	m_lodLevelWithChildren( TR2_LOD_UNSPECIFIED ),
 	m_debugShowBoundingBox( true ),
@@ -1669,14 +1670,18 @@ void EveSpaceObject2::UpdateWorldTransform( Be::Time time )
 
 	if( m_ballRotation )
 	{
-		m_ballRotation->Update( &rotation, time );
+		m_ballRotation->Update( &m_worldRotation, time );
+	}
+	else
+	{
+		m_worldRotation = Quaternion( 0.f, 0.f, 0.f, 1.f );
 	}
 
 	if( m_modelRotation )
 	{
 		Quaternion modelRotation;
 		m_modelRotation->Update( &modelRotation, time );
-		D3DXQuaternionMultiply( &rotation, &modelRotation, &rotation);
+		D3DXQuaternionMultiply( &rotation, &modelRotation, &m_worldRotation);
 	}
 
 	// This makes the assumption that the EveShip is at the bottom level of scene models list

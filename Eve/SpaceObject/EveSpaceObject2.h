@@ -339,6 +339,7 @@ protected:
 	Matrix m_invWorldTransform;
 	Vector3 m_worldPosition; // used to expose the position of the object to python
 	Vector3 m_worldVelocity;
+	Quaternion m_worldRotation;
 	float m_modelScale;
 
 	Tr2MeshBasePtr m_mesh;

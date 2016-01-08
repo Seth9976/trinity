@@ -149,7 +149,7 @@ public:
 	};
 
 	// timing
-	void Update( float deltaT, Be::Time t, const Matrix* parentMatrix, ITriVectorFunctionPtr ballPosition, ITriQuaternionFunctionPtr ballRotation );
+	void Update( float deltaT, Be::Time t, const Matrix& parentMatrix, float parentSpeed, const Vector3& parentAcceleration, const Quaternion& parentRotation );
 	void UpdateTrails( float deltaT, Be::Time t );
 	// manage individual exhaust points
 	void Clear();
@@ -188,7 +188,7 @@ private:
 	// re-alloc and init the instance vertex buffers
 	void RebuildInstanceData( Tr2RenderContext& renderContext );
 	// calculated the booster intensity (=gain) from ship's ball
-	float CalculateIntensity( ITriVectorFunctionPtr ball, Be::Time t );
+	float CalculateIntensity( const Vector3& acceleration, Be::Time t );
 	// calculate the spline's tangents (based on catmull-rom)
 	void CalculateSplineData( float deltaT );
 
