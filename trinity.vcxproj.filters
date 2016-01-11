@@ -709,6 +709,9 @@
     <ClInclude Include="Eve\SpaceObject\EveStation2.h">
       <Filter>Source Files\Eve\SpaceObject</Filter>
     </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\EveSwarm.h">
+      <Filter>Source Files\Eve\SpaceObject</Filter>
+    </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Attachments\EveBoosterSet2.h">
       <Filter>Source Files\Eve\SpaceObject\Attachments</Filter>
     </ClInclude>
@@ -2489,6 +2492,12 @@
       <Filter>Source Files\Eve\SpaceObject</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\EveStation2_Blue.cpp">
+      <Filter>Source Files\Eve\SpaceObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\EveSwarm.cpp">
+      <Filter>Source Files\Eve\SpaceObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\EveSwarm_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Attachments\EveBoosterSet2.cpp">
