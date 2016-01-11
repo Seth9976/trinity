@@ -1655,8 +1655,6 @@ void EveSpaceObject2::UnloadLodIfNeeded( Be::Time time )
 
 void EveSpaceObject2::UpdateWorldTransform( Be::Time time )
 {
-	Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
-
 	if( m_ballPosition )
 	{
 		m_ballPosition->Update( &m_worldPosition, time );
@@ -1681,11 +1679,14 @@ void EveSpaceObject2::UpdateWorldTransform( Be::Time time )
 	{
 		Quaternion modelRotation;
 		m_modelRotation->Update( &modelRotation, time );
+		Quaternion rotation;
 		D3DXQuaternionMultiply( &rotation, &modelRotation, &m_worldRotation);
+		D3DXMatrixRotationQuaternion(&m_worldTransform, &rotation);
 	}
-
-	// This makes the assumption that the EveShip is at the bottom level of scene models list
-	D3DXMatrixRotationQuaternion(&m_worldTransform, &rotation);
+	else
+	{
+		D3DXMatrixRotationQuaternion(&m_worldTransform, &m_worldRotation);
+	}
 
 	// scaling: as of now: ONLY FOR ASTEROIDS!
 	if(m_modelScale != 1.f)
