@@ -11,11 +11,17 @@
 #include "Eve/SpaceObject/Attachments/EveSpriteSet.h"
 #include "Tr2Mesh.h"
 #include "include/TriMath.h"
+#include "TriFrustum.h"
+#include "Tr2MeshLod.h"
 
 #include "Particle/Tr2GpuSharedEmitter.h"
 
 // keep track of missiles
 CCP_STATS_DECLARE( eveVisibleWarheadObjects, "Trinity/Missiles/visibleWarheadObjects", true, CST_COUNTER_LOW, "Number of individual warheads visible in this frame.");
+
+extern float g_eveSpaceSceneLowDetailThreshold;
+extern float g_eveSpaceSceneMediumDetailThreshold;
+
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -138,8 +144,55 @@ void EveMissileWarhead::GetRenderables( const TriFrustum& frustum, std::vector<I
 		return;
 	}
 
-	// all that this warhead is, is managed by the EveTransform
-	EveTransform::GetRenderables( frustum, renderables, parentTransform );
+
+	m_lodLevel = TR2_LOD_LOW;
+
+	// is this one here enabled?
+	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
+	{
+		return;
+	}
+
+	if( !m_display )
+	{
+		return;
+	}
+	
+	m_isVisible = true;
+	UpdateViewDependentData( parentTransform );
+	
+	if( m_mesh )
+	{
+		Vector4 boundingSphere;
+		if( GetBoundingSphere( boundingSphere ) )
+		{
+			// check visibility with camera or, if threshold set to negative, no culling
+			if( frustum.IsSphereVisible( &boundingSphere ) || ( m_visibilityThreshold < 0.f ) )
+			{
+				float estimatedSize = frustum.GetPixelSizeAccross( &boundingSphere );
+				if( estimatedSize >= g_eveSpaceSceneMediumDetailThreshold )
+				{
+					m_lodLevel = TR2_LOD_HIGH;
+				}
+				else if( estimatedSize >= g_eveSpaceSceneLowDetailThreshold )
+				{
+					m_lodLevel = TR2_LOD_MEDIUM;
+				}
+
+				if( m_meshLod )
+				{
+					m_meshLod->SelectLod( static_cast<Tr2Lod>( m_lodLevel ) );
+				}
+
+				if( estimatedSize > m_visibilityThreshold )
+				{
+					renderables.push_back( this );
+					CCP_STATS_INC( eveVisibleWarheadObjects );
+				}
+			}
+			
+		}
+	}
 
 	// update stats if we see it
 	if( m_isVisible )
