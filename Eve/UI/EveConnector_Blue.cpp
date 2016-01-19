@@ -37,7 +37,7 @@ Be::VarChooser EveConnectorTypeChooser[] =
 };
 
 BLUE_REGISTER_ENUM_EX( 
-	"BuildClass",
+	"EveConnectorStyle",
 	EveConnector::ConnectorType,
 	EveConnectorTypeChooser,
 	ENUM_REG_ENUM_OBJECT_ON_MODULE
