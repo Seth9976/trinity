@@ -230,6 +230,8 @@ Tr2ShLightingManager::Tr2ShLightingManager( IRoot* lockobj )
 	m_primaryIntensity( 1.f ),
 	m_secondaryIntensity( 1.f ),
 	m_quality( L2 ),
+	m_sunColor( 0.f, 0.f, 0.f ),
+	m_sunDirection( 0.f, 1.f, 0.f ),
 	PARENTLOCK( m_lights )
 {
 }
@@ -289,9 +291,9 @@ void Tr2ShLightingManager::UpdateWithDirectionalLight( const Vector3& direction,
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	UpdateSourceData();
-	D3DXVec3Normalize( &m_sunDirection, &direction );
 	m_sunColor = color;
+	D3DXVec3Normalize( &m_sunDirection, &direction );
+	UpdateSourceData();
 }
 
 // --------------------------------------------------------------------------------------
