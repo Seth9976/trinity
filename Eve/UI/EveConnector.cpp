@@ -6,7 +6,7 @@
 #include "StdAfx.h"
 #include "include/TriMath.h"
 #include "EveConnector.h"
-#include "Eve/EveCurveLineSet.h"
+#include "EveCurveLineSet.h"
 
 EveConnector::EveConnector( IRoot* lockobj ) :
 	m_type( PointToPoint ),

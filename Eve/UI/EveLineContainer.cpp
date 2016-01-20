@@ -5,7 +5,7 @@
 //
 #include "StdAfx.h"
 #include "EveLineContainer.h"
-#include "Eve/EveCurveLineSet.h"
+#include "EveCurveLineSet.h"
 #include "EveConnector.h"
 #include "Eve/EveUpdateContext.h"
 #include "TriFrustum.h"
