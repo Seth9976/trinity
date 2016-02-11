@@ -1406,8 +1406,11 @@ void EveSOF::SetupLocators( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) con
 	}
 
 	// set whole block of damage locators, they are a structered list
-	const std::vector<EveSOFDataMgr::LocatorDirectionData>& damageLocators = dna->GetHullDamageLocators();
-	obj->SetDamageLocators( (const EveDamageLocator*)&damageLocators[0], damageLocators.size() );
+	const std::vector<EveSOFDataMgr::LocatorDirectionData>* damageLocators = dna->GetHullLocators( "damage" );
+	if( damageLocators )
+	{
+		obj->SetDamageLocators( (const EveDamageLocator*)&(*damageLocators)[0], damageLocators->size() );
+	}
 
 	// create and setup the audio locator
 	EveLocator2Ptr loc;
