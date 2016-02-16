@@ -34,5 +34,15 @@ EveLocatorSets::~EveLocatorSets()
 {
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Setutp from the outisde
+// --------------------------------------------------------------------------------
+void EveLocatorSets::Set( const char* name, const Locator* locators, size_t count )
+{
+	m_name = BlueSharedString( name );
+	m_locators.Resize( count );
+	memcpy( &m_locators[0], locators, count * sizeof( Locator ) );
+}
 
 

@@ -29,6 +29,9 @@ public:
 
 	EveLocatorSets( IRoot* lockobj = NULL );
 	~EveLocatorSets();
+
+	// access
+	void Set( const char* name, const Locator* locators, size_t count );
 	
 private:
 	// name to identify set

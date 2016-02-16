@@ -68,6 +68,7 @@ struct granny_skeleton;
 
 class TriFrustum;
 class EveSpaceObjectDecalCache;
+struct Locator;
 
 
 struct EveDamageLocator
@@ -280,7 +281,7 @@ public:
 	void AddLocator( EveLocator2* newLocator );
 	void AddOverlayEffect( EveMeshOverlayEffect* newOverlayEffect );
 	void RemoveOverlayEffect( EveMeshOverlayEffect* newOverlayEffect );
-
+	void AddLocatorSet( const char* name, const Locator* locators, size_t locatorCount );
 	void SetDamageLocators( const EveDamageLocator* damageLocators, size_t damageLocatorCount );
 	Vector3 GetDamageLocator( uint32_t index ) const;
 	Vector3 GetDamageLocatorDirection( uint32_t index ) const;

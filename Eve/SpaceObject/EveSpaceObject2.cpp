@@ -14,6 +14,7 @@
 #include "EveSpaceObject2.h"
 #include "Eve/EveSpaceScene.h"
 #include "Utils/EveLocator2.h"
+#include "Eve/SpaceObject/Utils/EveLocatorSets.h"
 #include "Eve/SpaceObject/Attachments/Sets/EveSpriteSet.h"
 #include "Eve/SpaceObject/Attachments/Sets/EveSpotlightSet.h"
 #include "Eve/SpaceObject/Attachments/Sets/EvePlaneSet.h"
@@ -1953,13 +1954,28 @@ void EveSpaceObject2::RemoveOverlayEffect( EveMeshOverlayEffect* overlayEffectTo
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Add a new locator to this object from the outside
+//   Set a whole new set of damage locators
 // --------------------------------------------------------------------------------
 void EveSpaceObject2::SetDamageLocators( const EveDamageLocator* damageLocators, size_t damageLocatorCount )
 {
 	// is a structured list, so we can copy this in one big block
 	m_persistedDamageLocators.Resize( damageLocatorCount );
 	memcpy( &m_persistedDamageLocators[0], damageLocators, damageLocatorCount * sizeof( EveDamageLocator ) );
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Add a whole new set of locators, id'ed by name
+// --------------------------------------------------------------------------------
+void EveSpaceObject2::AddLocatorSet( const char* name, const Locator* locators, size_t locatorCount )
+{
+	// make and setup a new set of locators
+	EveLocatorSetsPtr newSet;
+	newSet.CreateInstance();
+	newSet->Set( name, locators, locatorCount );
+
+	// add it to the list WITHOUT checking if this name already exists
+	m_locatorSets.Append( newSet );
 }
 
 // --------------------------------------------------------------------------------

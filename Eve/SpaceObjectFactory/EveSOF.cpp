@@ -1402,6 +1402,13 @@ void EveSOF::SetupLocators( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) con
 		obj->SetDamageLocators( (const EveDamageLocator*)&(*damageLocators)[0], damageLocators->size() );
 	}
 
+	// set a special block of optional locators (this will be more generic when we have moved over the damage locators!!!)
+	const std::vector<EveSOFDataMgr::LocatorDirectionData>* pdbLocators = dna->GetHullLocators( "defensebattery" );
+	if( pdbLocators )
+	{
+		obj->AddLocatorSet( "defensebattery", (const Locator*)&( *pdbLocators )[0], pdbLocators->size() );
+	}
+
 	// create and setup the audio locator
 	EveLocator2Ptr loc;
 	loc.CreateInstance();
