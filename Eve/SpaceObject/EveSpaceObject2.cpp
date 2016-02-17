@@ -14,7 +14,6 @@
 #include "EveSpaceObject2.h"
 #include "Eve/EveSpaceScene.h"
 #include "Utils/EveLocator2.h"
-#include "Eve/SpaceObject/Utils/EveLocatorSets.h"
 #include "Eve/SpaceObject/Attachments/Sets/EveSpriteSet.h"
 #include "Eve/SpaceObject/Attachments/Sets/EveSpotlightSet.h"
 #include "Eve/SpaceObject/Attachments/Sets/EvePlaneSet.h"
@@ -1554,6 +1553,23 @@ bool EveSpaceObject2::HasImpactConfigurationShield() const
 {
 	return m_impactOverlay && ( m_impactOverlay->GetImpactConfiguration() == EveImpactOverlay::IMPACT_SHIELD );
 }
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Try to find the specified locator set and return a pointer to it
+// --------------------------------------------------------------------------------
+const LocatorStructureList* EveSpaceObject2::GetLocatorsForSet( const char* setName ) const
+{
+	for( auto it = m_locatorSets.cbegin(); it != m_locatorSets.cend(); ++it )
+	{
+		if( (*it)->HasName( setName ) )
+		{
+			return (*it)->GetLocators();
+		}
+	}
+	return nullptr;
+}
+
 
 void EveSpaceObject2::GetImpactPosition( Vector3& out, int damageLocatorIndex, const Vector3& direction )
 {

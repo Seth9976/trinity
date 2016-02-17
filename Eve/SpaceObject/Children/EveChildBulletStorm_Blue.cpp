@@ -22,6 +22,7 @@ const Be::ClassInfo* EveChildBulletStorm::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "objectCount", m_objectCount, "", Be::READ )
 		MAP_ATTRIBUTE( "multiplier", m_multiplier, "", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
+		MAP_ATTRIBUTE( "sourceLocatorSet", m_sourceLocatorSet, "", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 
 		MAP_ATTRIBUTE( "sourceObject", m_sourceObject, "", Be::READWRITE | Be::NOTIFY )
 		MAP_ATTRIBUTE( "targetObjects", m_targetObjects, "", Be::READWRITE | Be::NOTIFY )

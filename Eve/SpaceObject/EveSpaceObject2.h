@@ -22,6 +22,7 @@
 #include "Eve/SpaceObject/Attachments/EveSpaceObjectDecal.h"
 #include "Eve/SpaceObject/Attachments/EveImpactOverlay.h"
 #include "Eve/SpaceObject/Children/IEveSpaceObjectChild.h"
+#include "Eve/SpaceObject/Utils/EveLocatorSets.h"
 
 // consts
 #define EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT (0.f)
@@ -285,6 +286,7 @@ public:
 	void SetDamageLocators( const EveDamageLocator* damageLocators, size_t damageLocatorCount );
 	Vector3 GetDamageLocator( uint32_t index ) const;
 	Vector3 GetDamageLocatorDirection( uint32_t index ) const;
+	const LocatorStructureList* GetLocatorsForSet( const char* setName ) const;
 
 	// access to shadows
 	void SetShadowEffect( Tr2EffectPtr newShadowEffect );

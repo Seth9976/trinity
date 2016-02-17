@@ -45,4 +45,20 @@ void EveLocatorSets::Set( const char* name, const Locator* locators, size_t coun
 	memcpy( &m_locators[0], locators, count * sizeof( Locator ) );
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Compare names
+// --------------------------------------------------------------------------------
+bool EveLocatorSets::HasName( const char* name ) const
+{
+	return ( m_name == BlueSharedString( name ) );
+}
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Give out pointer to list
+// --------------------------------------------------------------------------------
+const LocatorStructureList* EveLocatorSets::GetLocators() const
+{
+	return &m_locators;
+}

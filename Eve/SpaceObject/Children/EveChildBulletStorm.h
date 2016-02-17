@@ -101,9 +101,10 @@ private:
 	// bullets data
 	unsigned int m_objectCount;
 	unsigned int m_multiplier;
+	std::string m_sourceLocatorSet;
 
 	// source
-	ITriTargetablePtr m_sourceObject;
+	EveSpaceObject2Ptr m_sourceObject;
 
 	// targets
 	PIEveSpaceObject2Vector m_targetObjects;

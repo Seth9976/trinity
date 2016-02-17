@@ -67,7 +67,7 @@ bool EveChildBulletStorm::Initialize()
 // --------------------------------------------------------------------------------
 bool EveChildBulletStorm::OnModified( Be::Var* val )
 {
-	if( IsMatch( val, m_multiplier ) || IsMatch( val, m_sourceObject ) )
+	if( IsMatch( val, m_multiplier ) || IsMatch( val, m_sourceObject ) || IsMatch( val, m_sourceLocatorSet ) )
 	{
 		Rebuild();
 	}
@@ -160,19 +160,27 @@ void EveChildBulletStorm::Rebuild()
 		return;
 	}
 
+	// get the specified locator set from the sourceobject, if it has it
+	const LocatorStructureList* locatorList = m_sourceObject->GetLocatorsForSet( m_sourceLocatorSet.c_str() );
+	if( !locatorList )
+	{
+		return;
+	}
+
 	// re-build the per-instance buffer here
-	m_objectCount = m_multiplier * m_sourceObject->GetDamageLocatorCount();
+	m_objectCount = m_multiplier * (unsigned int)locatorList->size();
 	if( m_objectCount > 0 )
 	{
 		// put all locators from parent into mem
 		std::vector<PerInstanceVertex> verts( m_objectCount );
 		PerInstanceVertex* v = &verts[0];
-		for( unsigned int i = 0; i < m_sourceObject->GetDamageLocatorCount(); ++i )
+		for( unsigned int i = 0; i < (unsigned int)locatorList->size(); ++i )
 		{
+			const Locator& locator = (*locatorList)[i];
+
 			// per stream start
-			Vector3 startPosOS, startDirOS;
-			m_sourceObject->GetDamageLocatorPosition( &startPosOS, i, false );
-			m_sourceObject->GetDamageLocatorDirection( &startDirOS, i, false );
+			Vector3 startPosOS = locator.position;
+			Vector3 startDirOS = (Vector3)XMVector3Rotate( Vector3( 0.f, 1.f, 0.f ), locator.direction );
 			// per stream rnds
 			float rndf = TriRand();
 			for( unsigned int j = 0; j < m_multiplier; ++j )

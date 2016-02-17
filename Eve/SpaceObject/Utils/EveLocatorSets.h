@@ -8,7 +8,7 @@
 #ifndef EveLocatorSets_H
 #define EveLocatorSets_H
 
-// forwards
+// decalre structured list here
 struct Locator
 {
 	Vector3 position;
@@ -32,6 +32,8 @@ public:
 
 	// access
 	void Set( const char* name, const Locator* locators, size_t count );
+	bool HasName( const char* name ) const;
+	const LocatorStructureList* GetLocators() const;
 	
 private:
 	// name to identify set
@@ -40,7 +42,7 @@ private:
 	// the locators
 	PLocatorStructureList m_locators;
 };
-
 TYPEDEF_BLUECLASS( EveLocatorSets );
+
 
 #endif
