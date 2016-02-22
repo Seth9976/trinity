@@ -15,8 +15,19 @@
 #define Tr2BlockedRange tbb::blocked_range
 #define Tr2ParallelSort tbb::parallel_sort
 #define Tr2EnumerableThreadSpecific tbb::enumerable_thread_specific
+#define Tr2SpinMutex tbb::spin_mutex
 
 #else
+
+struct Tr2SpinMutex
+{
+	struct scoped_lock
+	{
+		scoped_lock( Tr2SpinMutex& )
+		{
+		}
+	};
+};
 
 #define Tr2ParallelDo std::for_each
 #define Tr2ParallelSort std::sort

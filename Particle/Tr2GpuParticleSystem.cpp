@@ -1018,10 +1018,11 @@ void Tr2GpuParticleSystem::Emit( const Emitter& emitter, uintptr_t id, uintptr_t
 	EmitRequest request;
 #if GPU_PARTICLES_METHOD == GPU_PARTICLES_BUFFER_METHOD
 	request.emitter = emitter;
+	request.emitter.count = std::min( request.emitter.count, m_maxParticles );
 	request.emitter.emitterSeed = rand() << 16;
 #else
 	auto start = ( m_emitIndex += emitter.count ) - emitter.count;
-	request.emitter.positionCount = Vector4( emitter.position, float( emitter.count ) );
+	request.emitter.positionCount = Vector4( emitter.position, float( std::min( emitter.count, m_maxParticles ) ) );
 	request.emitter.positionPreviousRadius = Vector4( emitter.positionPrevious, emitter.radius );
 	request.emitter.directionAngle = Vector4( emitter.direction, emitter.angle );
 	request.emitter.directionPreviousEmitter = Vector4( emitter.directionPrevious, float( emitter.emitterSeed & 0xffff ) );

@@ -2,6 +2,7 @@
 #ifndef Tr2AddSafeGrowableBuffer_H
 #define Tr2AddSafeGrowableBuffer_H
 
+#include "TbbStub.h"
 
 // --------------------------------------------------------------------------------------
 // Description:
@@ -28,9 +29,9 @@ public:
 	T* end();
 private:
 	CcpMallocBuffer m_data;
-	CcpAtomic<uint32_t> m_count;
-	CcpAtomic<uint32_t> m_capacity;
-	CcpAtomic<uint32_t> m_dataUsed;
+	Tr2SpinMutex m_mutex;
+	uint32_t m_count;
+	uint32_t m_capacity;
 };
 
 template <typename T>
@@ -64,8 +65,7 @@ T* end( Tr2AddSafeGrowableBuffer<T>& buffer )
 template<typename T>
 Tr2AddSafeGrowableBuffer<T>::Tr2AddSafeGrowableBuffer( uint32_t initialCount, const char* allocationName )
 	:m_capacity( initialCount ),
-	m_count( 0 ),
-	m_dataUsed( 0 )
+	m_count( 0 )
 {
 	m_data.resize( allocationName, m_capacity * sizeof( T ) );
 }
@@ -79,31 +79,20 @@ void Tr2AddSafeGrowableBuffer<T>::Clear()
 template<typename T>
 bool Tr2AddSafeGrowableBuffer<T>::Add( const T& element, const char* allocationName )
 {
+	Tr2SpinMutex::scoped_lock lock( m_mutex );
+
 	uint32_t index = m_count++;
-	while( true )
+	if( index == m_capacity )
 	{
-		if( index == m_capacity )
-		{
-			while( m_dataUsed )
-			{
-			}
-			m_data.resize( allocationName, m_capacity * 2 * sizeof( T ) );
-			m_capacity = m_capacity * 2;
-		}
-		else if( index < m_capacity )
-		{
-			break;
-		}
+		m_data.resize( allocationName, m_capacity * 2 * sizeof( T ) );
+		m_capacity = m_capacity * 2;
 	}
 
-	m_dataUsed = 1;
 	if( !m_data.get() )
 	{
-		m_dataUsed = 0;
 		return false;
 	}
 	reinterpret_cast<T*>( m_data.get() )[index] = element;
-	m_dataUsed = 0;
 	return true;
 }
 
