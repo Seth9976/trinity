@@ -23,6 +23,31 @@ const Be::ClassInfo* EveChildParticleSystem::ExposeToBlue()
 		MAP_ATTRIBUTE( "worldTransform", m_worldTransform, "", Be::READ )
 		MAP_ATTRIBUTE( "useSRT", m_useSRT, "Should local transform be built from scaling, rotation and translation attributes.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "staticTransform", m_staticTransform, "Does local transform need to be rebuilt every frame.", Be::READWRITE | Be::PERSIST )
+		
+		MAP_ATTRIBUTE
+		( 
+				"useDynamicLod",
+				m_useDynamicLod,
+				"Dynamically change the max particle count \n"
+				":jessica-group: LOD",
+				Be::READWRITE | Be::PERSIST
+		)
+		MAP_ATTRIBUTE
+		(
+				"particleLodClampLow",
+				m_particleLodClampLow,
+				"Amount of particles when the LOD is on Low \n"
+				":jessica-group: LOD",
+				Be::READWRITE | Be::PERSIST
+		)
+		MAP_ATTRIBUTE
+		( 
+				"particleLodFactorMedium",
+				m_particleLodFactorMedium,
+				"Max particle division factor when the LOD is medium \n"
+				":jessica-group: LOD",
+				Be::READWRITE | Be::PERSIST
+		)
 		MAP_METHOD_AND_WRAP( "RebuildLocalTransform", RebuildLocalTransform, "Rebuilds local transform if useSRT is set." )
 
     EXPOSURE_END()

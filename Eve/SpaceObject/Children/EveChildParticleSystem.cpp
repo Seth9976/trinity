@@ -23,7 +23,10 @@ EveChildParticleSystem::EveChildParticleSystem( IRoot* lockobj ):
 	PARENTLOCK( m_particleEmitters ),
 	PARENTLOCK( m_particleSystems ),
 	m_boundingSphere( 0, 0, 0, -1 ),
-	m_display( true )
+	m_display( true ),
+	m_useDynamicLod( false ),
+	m_particleLodFactorMedium( 4 ),
+	m_particleLodClampLow( 5 )
 {
 }
 
@@ -166,4 +169,30 @@ void EveChildParticleSystem::UpdateAsyncronous( EveUpdateContext& updateContext,
 void EveChildParticleSystem::GetLocalToWorldTransform( Matrix& transform ) const
 {
 	transform = m_worldTransform;
+}
+
+void EveChildParticleSystem::SetLOD( Tr2Lod lod )
+{
+	if ( !m_useDynamicLod )
+	{
+		return;
+	}
+
+	for ( auto it = m_particleSystems.begin(); it != m_particleSystems.end(); ++it )
+	{
+		unsigned original = (*it)->GetOriginalMaxParticles();
+
+		if ( lod == TR2_LOD_LOW )
+		{
+			(*it)->SetMaxParticleCount( m_particleLodClampLow );
+		}
+		else if ( lod == TR2_LOD_MEDIUM && m_particleLodFactorMedium != 0 )
+		{
+			(*it)->SetMaxParticleCount( original / m_particleLodFactorMedium );
+		}
+		else //high
+		{
+			(*it)->SetMaxParticleCount( original );
+		}
+	}
 }

@@ -105,6 +105,9 @@ public:
 
 	void SetThreadSafeFlag();
 
+	void SetMaxParticleCount( unsigned maxParticleCount );
+	unsigned GetOriginalMaxParticles() { return m_originalMaxParticles; };
+
 	static void UpdateAllSystems( const ITr2GenericEmitter::UpdateArguments& arguments );
 
 
@@ -183,7 +186,6 @@ private:
 
 	// Maximum number of particles in the system
 	unsigned m_maxParticleCount;
-	void SetMaxParticleCount( unsigned maxParticleCount );
 	unsigned GetMaxParticleCount() const;
 
 	// Number of alive particles in the system
@@ -249,6 +251,9 @@ private:
 
 	bool m_useSimTimeRebase;
 	bool m_isUsingSimTimeRebase;
+
+	// Used for lodding
+	unsigned m_originalMaxParticles;
 };
 
 TYPEDEF_BLUECLASS( Tr2ParticleSystem );

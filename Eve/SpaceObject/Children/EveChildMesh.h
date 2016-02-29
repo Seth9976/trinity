@@ -39,6 +39,7 @@ public:
 	void UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent );
 	void UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent );
 	void GetLocalToWorldTransform( Matrix& transform ) const;
+	void SetLOD( Tr2Lod lod ) {};
 
 	virtual void PlayCurveSet( const std::string& name ) {};
 	virtual void StopCurveSet( const std::string& name ) {};

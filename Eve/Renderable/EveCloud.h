@@ -69,6 +69,7 @@ public:
 	virtual void StopCurveSet( const std::string& name );
 	virtual float GetCurveSetDuration( const std::string& name ) const; 
 	virtual void Transform( const Vector3* scale, const Quaternion* rotation, const Vector3* translation ) {}
+	virtual void SetLOD( Tr2Lod lod ) {};
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Renderable

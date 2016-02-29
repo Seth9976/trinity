@@ -78,6 +78,10 @@ protected:
 
 	// PlacementObservers
 	PTriObserverLocalVector m_observers;
+
+	// Lods
+	bool m_dynamicLODSelection;
+	Tr2Lod m_lodLevel;
 	
 	PTr2PointLightVector m_lights;
 

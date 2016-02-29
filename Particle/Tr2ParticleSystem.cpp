@@ -43,6 +43,7 @@ Tr2ParticleSystem::Tr2ParticleSystem( IRoot* lockobj )
 	m_declarationHash( 0 ),
 	m_indexes( nullptr ),
 	m_maxParticleCount( 0 ),
+	m_originalMaxParticles( 0 ),
 	m_aliveCount( 0 ),
 	m_bufferDirty( true ),
 	m_insertDeleteMutex( nullptr ),
@@ -124,6 +125,9 @@ bool Tr2ParticleSystem::Initialize()
 	{
 		m_emissionWhileAliveEmitter->SetThreadSafeFlag();
 	}
+
+	m_originalMaxParticles = m_maxParticleCount;
+
 	return true;
 }
 

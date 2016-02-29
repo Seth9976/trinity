@@ -93,6 +93,14 @@ void EveChildContainer::GetLocalToWorldTransform( Matrix& transform ) const
 	transform = m_worldTransform;
 }
 
+void EveChildContainer::SetLOD( Tr2Lod lod )
+{
+	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
+	{
+		(*it)->SetLOD( lod );
+	}
+}
+
 void EveChildContainer::PlayCurveSet( const std::string& name )
 {
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )

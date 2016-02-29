@@ -23,7 +23,7 @@ EveEffectRoot2::EveEffectRoot2( IRoot* lockobj ) :
 	m_startTime( 0 ),
 	m_effectDuration( -1 )
 {
-
+	m_lodLevel = TR2_LOD_HIGH;
 }
 
 bool EveEffectRoot2::Initialize()
@@ -72,6 +72,37 @@ void EveEffectRoot2::GetRenderables( const TriFrustum& frustum, std::vector<ITr2
 	{
 		return;
 	}
+
+	if( m_dynamicLODSelection )
+	{
+		Vector4 boundingSphere;
+		GetBoundingSphere( boundingSphere );
+		BoundingSphereTransform( m_worldTransform, boundingSphere );
+		
+		Tr2Lod oldLod = m_lodLevel;
+		m_lodLevel = TR2_LOD_LOW;
+		if( frustum.IsSphereVisible( &boundingSphere ) )
+		{
+			m_estimatedSize = frustum.GetPixelSizeAccross( &boundingSphere );
+			if( m_estimatedSize >= g_eveSpaceSceneMediumDetailThreshold )
+			{
+				m_lodLevel = TR2_LOD_HIGH;
+			}
+			else if( m_estimatedSize >= g_eveSpaceSceneLowDetailThreshold )
+			{
+				m_lodLevel = TR2_LOD_MEDIUM;
+			}
+		}
+
+		if ( oldLod != m_lodLevel )
+		{
+			for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt ) 
+			{
+				(*ecIt)->SetLOD( m_lodLevel );
+			}
+		}
+	}
+
 
 	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt )
 	{

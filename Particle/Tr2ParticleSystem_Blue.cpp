@@ -117,6 +117,12 @@ const Be::ClassInfo* Tr2ParticleSystem::ExposeToBlue()
 			"The maximum number of particles to spawn",
 			Be::PERSISTONLY )
 
+		MAP_ATTRIBUTE(
+			"originalMaxParticles",
+			m_originalMaxParticles,
+			"The original max particle value. Used for Lodding",
+			Be::READ )
+
 		MAP_PROPERTY( 
 			"maxParticleCount", 
 			GetMaxParticleCount,

@@ -30,6 +30,7 @@ public:
 	void UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent );
 	void UpdateAsyncronous( EveUpdateContext& updateContext, Matrix& parentTransform );
 	void GetLocalToWorldTransform( Matrix& transform ) const;
+	void SetLOD( Tr2Lod lod );
 
 	void Transform( const Vector3* scale, const Quaternion* rotation, const Vector3* translation );
 

@@ -35,6 +35,22 @@ const Be::ClassInfo* EveEffectRoot2::ExposeToBlue()
 		)
 
 		MAP_ATTRIBUTE
+		(
+			"lodLevel",
+			m_lodLevel,
+			"",
+			Be::READ
+		)
+
+		MAP_ATTRIBUTE
+		(
+			"dynamicLOD",
+			m_dynamicLODSelection,
+			"",
+			Be::READWRITE | Be::PERSIST
+		)
+
+		MAP_ATTRIBUTE
 		(    
 			"translationCurve",
 			m_ballPosition,
