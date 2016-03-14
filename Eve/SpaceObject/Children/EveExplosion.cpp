@@ -5,7 +5,7 @@
 //
 
 #include "StdAfx.h"
-#include "EveExplosion.h"
+#include "EveChildExplosion.h"
 #include "Eve/EveUpdateContext.h"
 #include "Particle/Tr2SphereShapeAttributeGenerator.h"
 

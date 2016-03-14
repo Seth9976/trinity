@@ -5,7 +5,7 @@
 //
 
 #include "StdAfx.h"
-#include "EveExplosion.h"
+#include "EveChildExplosion.h"
 
 
 BLUE_DEFINE( EveExplosion );
