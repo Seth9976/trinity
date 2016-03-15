@@ -2607,6 +2607,12 @@
     <ClCompile Include="Eve\SpaceObject\Children\EveChildContainer_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
     </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildExplosion.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildExplosion_Blue.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\EveChildLink.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
     </ClCompile>
@@ -2626,12 +2632,6 @@
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\EveChildTransform.cpp">
-      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
-    </ClCompile>
-    <ClCompile Include="Eve\SpaceObject\Children\EveExplosion.cpp">
-      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
-    </ClCompile>
-    <ClCompile Include="Eve\SpaceObject\Children\EveExplosion_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Utils\EveCustomMask.cpp">
