@@ -182,11 +182,11 @@ Matrix EveSwarm::GetObserverTransform() const
 // --------------------------------------------------------------------------------
 const Matrix* EveSwarm::GetTurretTransform() const
 {
-	if( m_count < 1 )
+	if( m_count < 1 || m_renderables.size() < 1 )
 	{
 		return &m_worldTransform;
 	}
-	if( (unsigned)m_firingIndex > m_renderables.size() )
+	if( (unsigned)m_firingIndex >= m_renderables.size() )
 	{
 		return m_renderables[0]->GetWorldTransform();
 	}
