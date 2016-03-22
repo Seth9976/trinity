@@ -9,11 +9,14 @@
 #include "Utilities/BoundingSphere.h"
 #include "Curves/TriCurveSet.h"
 #include "Eve/EveUpdateContext.h"
+#include "TriObserverLocal.h"
+
 
 EveChildContainer::EveChildContainer( IRoot* lockobj ):
 	EveChildTransform(),
 	PARENTLOCK( m_objects ),
 	PARENTLOCK( m_curveSets ),
+	PARENTLOCK( m_observers ),
 	m_display( true )
 {
 }
@@ -54,6 +57,10 @@ void EveChildContainer::UpdateSyncronous( EveUpdateContext& updateContext, IEveS
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
 		(*it)->UpdateSyncronous( updateContext, nullptr, this );
+	}
+	for( auto it = m_observers.begin(); it != m_observers.end(); it++ )
+	{
+		(*it)->Update( m_worldTransform );
 	}
 }
 

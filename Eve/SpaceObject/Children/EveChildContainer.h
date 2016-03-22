@@ -12,6 +12,8 @@
 
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE_VECTOR( TriCurveSet );
+BLUE_DECLARE( TriObserverLocal );
+BLUE_DECLARE_VECTOR( TriObserverLocal );
 
 BLUE_CLASS( EveChildContainer ) :
 	public IEveSpaceObjectChild,
@@ -43,6 +45,7 @@ protected:
 	bool m_display;
 	PIEveSpaceObjectChildVector m_objects;
 	PTriCurveSetVector m_curveSets;
+	PTriObserverLocalVector m_observers;
 };
 
 TYPEDEF_BLUECLASS( EveChildContainer );
