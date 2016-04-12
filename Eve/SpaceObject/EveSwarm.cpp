@@ -152,6 +152,7 @@ EveSwarm::EveSwarm( IRoot* lockobj ) :
 
 	m_origin( UNINITIALIZED_ORIGIN, UNINITIALIZED_ORIGIN, UNINITIALIZED_ORIGIN ),
 	m_timeLast( 0 ),
+	m_lodUpdateTime( 1.f ),
 
 	m_swarmingEnabled( false ),
 	m_debugSize( 24.f ),
@@ -161,6 +162,8 @@ EveSwarm::EveSwarm( IRoot* lockobj ) :
 	m_debugShowVehicle( true ),
 	m_debugShowForces( false )
 {
+	// Stagger update time a little to avoid all fighters updating at the same time
+	m_lodUpdateTime = 1.1f - TriRand() * 0.2f;
 }
 
 EveSwarm::~EveSwarm()
@@ -310,6 +313,7 @@ void EveSwarm::UpdateAsyncronous( EveUpdateContext& context )
 
 void EveSwarm::UpdateSwarm( Be::Time t )
 {
+	CCP_STATS_ZONE( __FUNCTION__ );
 	if( t == m_timeLast )
 	{
 		return;
@@ -319,12 +323,41 @@ void EveSwarm::UpdateSwarm( Be::Time t )
 		m_timeLast = t;
 	}
 	
+	Vector3 worldTransformLast = m_worldPosition;
 	UpdateWorldTransform( t );
+
+	if( !m_started )
+	{
+		// Set initial position
+		for( unsigned i = 0; i < m_vehicles.size(); i++ )
+		{
+			m_vehicles[i].position = m_worldPosition;
+		}
+	}
+	
 	float timeDelta = TimeAsFloat( t - m_timeLast );
 	float timeSeconds = TimeAsFloat( t - m_timeLast ) * m_behavior.m_timeMultiplier;
 	if( timeSeconds > m_behavior.m_maxTime )
 	{
 		timeSeconds = m_behavior.m_maxTime;
+	}
+	
+	bool updateNow = m_isVisible || timeDelta >= m_lodUpdateTime;
+	if( !updateNow )
+	{
+		if( m_started )
+		{
+			Vector3 movement = m_worldPosition - worldTransformLast;
+			// Update velocities and positions
+			for( unsigned i = 0; i < m_vehicles.size(); i++ )
+			{
+				m_vehicles[i].position += movement;
+			}
+			m_squadBoundsMax += movement;
+			m_squadBoundsMin += movement;
+		}
+		m_started = true;
+		return;
 	}
 	m_timeLast = t;
 
@@ -342,27 +375,21 @@ void EveSwarm::UpdateSwarm( Be::Time t )
 		m_origin = originNow;
 	}
 
-
-	if( !m_started )
-	{
-		// Set initial position
-		for( unsigned i = 0; i < m_vehicles.size(); i++ )
-		{
-			m_vehicles[i].position = m_worldPosition;
-		}
-		m_started = true;
-	}
-	else
+	if( m_started )
 	{
 		for( unsigned i = 0; i < m_vehicles.size(); i++ )
 		{
 			m_vehicles[i].position += originShift;
 		}
 	}
+	else
+	{
+		m_started = true;
+	}
 	
 	Vector3 center( 0, 0, 0 );
 	Vector3 alignment( 0, 0, 0 );
-	if( m_isVisible )
+	if( updateNow )
 	{
 		BoundingBoxInitialize( m_squadBoundsMin, m_squadBoundsMax );
 		// Calculate average velocity direction(alignment and center position(pre update)

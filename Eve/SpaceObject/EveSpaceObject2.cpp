@@ -957,11 +957,15 @@ void EveSpaceObject2::PushRenderables( const TriFrustum& frustum, std::vector<IT
 		}
 	}
 
-	for( IEveTransformVector::const_iterator it = m_children.begin(); it != m_children.end(); ++it )
+	if( DisplayChildren() )
 	{
-		IEveTransform* p = *it;
-		p->GetRenderables( frustum, renderables, m_worldTransform );
+		for( IEveTransformVector::const_iterator it = m_children.begin(); it != m_children.end(); ++it )
+		{
+			IEveTransform* p = *it;
+			p->GetRenderables( frustum, renderables, m_worldTransform );
+		}
 	}
+	
 	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt )
 	{
 		(*ecIt)->GetRenderables( frustum, renderables, m_worldTransform, m_lodLevelWithChildren );
@@ -1338,7 +1342,7 @@ bool EveSpaceObject2::GetBoundingSphere( Vector4& sphere, BoundingSphereQuery qu
 	}
 
 	sphere = m_boundingSphereWorld;
-	if( query == EVE_BOUNDS_NORMAL )
+	if( query == EVE_BOUNDS_NORMAL || !DisplayChildren())
 	{
 		return true;
 	}
@@ -1866,6 +1870,16 @@ bool EveSpaceObject2::DisplayDecals() const
 	return m_lodLevel >= TR2_LOD_HIGH;
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Determines if we render this object's children or not.
+// SeeAlso:
+//   EveTransform
+// --------------------------------------------------------------------------------
+bool EveSpaceObject2::DisplayChildren() const
+{
+	return true;
+}
 
 ITriVectorFunctionPtr EveSpaceObject2::GetPositionFunction() 
 { 
@@ -2111,11 +2125,11 @@ int EveSpaceObject2::CreateImpact( int damageLocatorIndex, const Vector3& direct
 //   Create an impact effect on this object by getting the closest damage locator from the position
 // -----------------------------------------------------------------------------
 int EveSpaceObject2::CreateImpactFromPosition( const Vector3& position, const Vector3& direction, float lifeTime, float size )
-{
+{																		                                     
 	int closestDamageLocator = GetClosestDamageLocatorIndex( &position );
 	return CreateImpact( closestDamageLocator, direction, lifeTime, size );
 }
-
+  
 
 // -----------------------------------------------------------------------------
 // Description:
@@ -2127,7 +2141,7 @@ bool EveSpaceObject2::UpdateImpact( Vector3& out, const Vector3& direction, int 
 	{
 		return m_impactOverlay->UpdateImpact( out, direction, impactIndex );
 	}
-	return false;
+	return false;   
 }
 
 

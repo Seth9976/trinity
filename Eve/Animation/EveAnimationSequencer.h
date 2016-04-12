@@ -45,7 +45,7 @@ private:
 	BlueSharedString m_trackMask;
 	BlueSharedString m_name;
 	
-	EveAnimationStatePtr GetAnimationState( const std::string& name, const PEveAnimationStateVector& states );
+	EveAnimationStatePtr GetAnimationState( const std::string& name, PEveAnimationStateVector& states );
 	bool CheckCompletionAndChangeStates( EveSpaceObject2* owner );
 };
 TYPEDEF_BLUECLASS( EveAnimationStateMachine );

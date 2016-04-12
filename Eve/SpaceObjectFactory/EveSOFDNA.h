@@ -71,6 +71,7 @@ public:
 	const char* GetHullGeometryResPath() const;
 	const char* GetModelRotationCurvePath() const;
 	const char* GetModelTranslationCurvePath() const;
+	EveSOFDataHull::ImpactEffectType GetImpactEffectType() const;
 	const std::vector<EveSOFDataMgr::HullAreas>* GetHullMeshAreas( TriBatchType type ) const;
 	const std::vector<EveSOFDataMgr::HullChild>& GetHullChildren() const;
 	const std::vector<EveSOFDataMgr::HullInstancedMesh>& GetHullInstancedMeshes() const;

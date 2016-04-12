@@ -540,6 +540,16 @@ void EveMobile::ResetTurretLocatorCounter( bool updateTotal )
 	}
 }
 
+//   Determines if we render this object's children or not.
+// SeeAlso:
+//   EveTransform
+// --------------------------------------------------------------------------------
+bool EveMobile::DisplayChildren() const
+{
+	// if it is more than .5 -> render the children!
+	return ( m_activationStrenght > 0.5f );
+}
+
 // --------------------------------------------------------------------------------
 // Description:
 //   Play the objects activationStrengthCurve from the beginning.
@@ -664,7 +674,6 @@ bool EveMobile::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, co
 			PlayClipSphereFactorCurve();
 		}
 		return true;
-
 	case ANIM_CMD_STOP_CLIPSPHERE:
 		m_clipSphereFactor = 0.0f;
 		m_playClipSphereFactorCurve = false;
@@ -682,4 +691,3 @@ bool EveMobile::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, co
 	}
 	return false;
 }
-

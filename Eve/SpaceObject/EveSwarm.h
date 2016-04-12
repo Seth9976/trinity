@@ -113,7 +113,7 @@ public:
 			m_maxDistance0( 500.f ),
 			m_maxDistance1( 125.f ),
 			m_timeMultiplier( 1.f ),
-			m_maxTime( 1.f ),
+			m_maxTime( 0.2f ),
 			m_speed0( 700.f ),
 			m_speed1( 1000.f ),
 
@@ -230,6 +230,7 @@ private:
 	void UpdateSwarm( Be::Time t );
 	Vector3d m_origin;
 	Be::Time m_timeLast;
+	float m_lodUpdateTime;
 
 	// Which fighter is being shot
 	int m_targetIndex;

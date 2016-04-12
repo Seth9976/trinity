@@ -198,7 +198,7 @@ public:
 		std::vector<HullSpotlightSetData> spotlightSets;
 		std::vector<HullPlaneSetData> planeSets;
 		std::vector<HullSpriteLineSetData> spriteLineSets;
-		bool hasImpactEffect;
+		EveSOFDataHull::ImpactEffectType impactEffectType;
 		std::vector<HullAreas> opaqueAreas;
 		std::vector<HullAreas> decalAreas;
 		std::vector<HullAreas> transparentAreas;

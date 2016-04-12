@@ -23,13 +23,13 @@ EveAnimationStateMachine::~EveAnimationStateMachine()
 // Description:
 //   Get the animation state with the name provided(or nullptr if it doesn't exist)
 // --------------------------------------------------------------------------------
-EveAnimationStatePtr EveAnimationStateMachine::GetAnimationState( const std::string& name, const PEveAnimationStateVector& states )
+EveAnimationStatePtr EveAnimationStateMachine::GetAnimationState( const std::string& name, PEveAnimationStateVector& states )
 {
-	for( auto it = states.begin(); it != states.end(); it++ )
+	for( size_t i = 0; i < states.size(); i++ )
 	{
-		if( (*it)->GetName() == name )
+		if( states[i]->GetName() == name )
 		{
-			return *it;
+			return states[i];
 		}
 	}
 	return nullptr;

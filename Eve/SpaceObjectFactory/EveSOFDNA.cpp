@@ -837,13 +837,16 @@ const EveSOFDataMgr::RaceBoosterData* EveSOFDNA::GetRaceBoosterData() const
 // --------------------------------------------------------------------------------
 const EveSOFDataMgr::RaceDamageData* EveSOFDNA::GetRaceDamageData() const
 {
-	// enabled?
-	if( !m_hullData->hasImpactEffect )
-	{
-		return nullptr;
-	}
-
 	return &m_raceData->damage;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Return the impact effect type for this hull
+// --------------------------------------------------------------------------------
+EveSOFDataHull::ImpactEffectType EveSOFDNA::GetImpactEffectType() const
+{
+	return m_hullData->impactEffectType;
 }
 
 // --------------------------------------------------------------------------------

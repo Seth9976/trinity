@@ -430,6 +430,14 @@ public:
 		BUILDCLASS_SWARM,
 	};
 
+	// impact effect type
+	enum ImpactEffectType
+	{
+		IMPACTEFFECT_NONE = 0,
+		IMPACTEFFECT_ELLIPSOID,
+		IMPACTEFFECT_HULL,
+	};
+
 	// hull name
 	std::string m_name;
 
@@ -459,7 +467,7 @@ public:
 	PEveSOFDataHullSpotlightSetVector m_spotlightSets;
 	PEveSOFDataHullPlaneSetVector m_planeSets;
 	PEveSOFDataHullSpriteLineSetVector m_spriteLineSets;
-	bool m_hasImpactEffect;
+	ImpactEffectType m_hasImpactEffect;
 
 	// decals
 	PEveSOFDataHullDecalVector m_hullDecals;

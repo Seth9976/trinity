@@ -133,7 +133,7 @@ void EveShip2::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
 bool EveShip2::DisplayBoosters() const
 {
 	// if it is more than .5 -> render the children!
-	return m_boosters && ( m_activationStrenght > 0.5f );
+	return m_boosters && DisplayChildren();
 }
 
 // --------------------------------------------------------------------------------

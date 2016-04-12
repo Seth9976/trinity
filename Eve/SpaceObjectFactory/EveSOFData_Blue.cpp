@@ -431,35 +431,22 @@ BLUE_DEFINE( EveSOFDataHull );
 
 Be::VarChooser EveSOFBuildClassChooser[] =
 {
-	{
-		"EveShip2",
-		BeCast( EveSOFDataHull::BUILDCLASS_SHIP ),
-		"Build an EveShip2"
-	},
-	{
-		"EveMobile",
-		BeCast( EveSOFDataHull::BUILDCLASS_MOBILE ),
-		"Build an EveMobile"
-	},
-	{
-		"EveStation2",
-		BeCast( EveSOFDataHull::BUILDCLASS_STATIONARY ),
-		"Build an EveStation2"
-	},
-	{
-		"EveSwarm",
-		BeCast( EveSOFDataHull::BUILDCLASS_SWARM ),
-		"Build an EveSwarm"
-	},
+	{	"EveShip2", BeCast( EveSOFDataHull::BUILDCLASS_SHIP ), "Build an EveShip2" },
+	{	"EveMobile", BeCast( EveSOFDataHull::BUILDCLASS_MOBILE ), "Build an EveMobile" },
+	{	"EveStation2", BeCast( EveSOFDataHull::BUILDCLASS_STATIONARY ), "Build an EveStation2" },
+	{	"EveSwarm", BeCast( EveSOFDataHull::BUILDCLASS_SWARM ), "Build an EveSwarm" },
 	{ 0 }
 };
+BLUE_REGISTER_ENUM_EX( "BuildClass", EveSOFDataHull::BuildClass, EveSOFBuildClassChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
 
-BLUE_REGISTER_ENUM_EX( 
-	"BuildClass",
-	EveSOFDataHull::BuildClass,
-	EveSOFBuildClassChooser,
-	ENUM_REG_ENUM_OBJECT_ON_MODULE
-);
+Be::VarChooser EveSOFImpactEffectTypeChooser[] =
+{
+	{ "None", BeCast( EveSOFDataHull::IMPACTEFFECT_NONE ), "No impact effects" },
+	{ "Ellipsoid", BeCast( EveSOFDataHull::IMPACTEFFECT_ELLIPSOID ), "Use ellipsoid for shield" },
+	{ "Hull", BeCast( EveSOFDataHull::IMPACTEFFECT_HULL), "Use ellipsoid for hull" },
+	{ 0 }
+};
+BLUE_REGISTER_ENUM_EX( "ImpactEffectType", EveSOFDataHull::ImpactEffectType, EveSOFImpactEffectTypeChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
 
 const Be::ClassInfo* EveSOFDataHull::ExposeToBlue()
 {
@@ -489,7 +476,7 @@ const Be::ClassInfo* EveSOFDataHull::ExposeToBlue()
 		MAP_ATTRIBUTE( "spotlightSets", m_spotlightSets, "The spotlightsets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "planeSets", m_planeSets, "The planesets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "spriteLineSets", m_spriteLineSets, "The spritelinesets", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "hasImpactEffect", m_hasImpactEffect, "Does this hull get an impact effect?", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE_WITH_CHOOSER( "hasImpactEffect", m_hasImpactEffect, "Type of impact effect on this hull", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFImpactEffectTypeChooser )
 
 		MAP_ATTRIBUTE( "hullDecals", m_hullDecals, "The hull decals", Be::READWRITE | Be::PERSIST )
 
