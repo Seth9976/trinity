@@ -17,6 +17,7 @@ const Be::ClassInfo* EveDustfieldConstraint::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "cameraView", m_cameraView, "na", Be::READWRITE )
 		MAP_ATTRIBUTE( "referencePosition", m_referencePosition, "Center of the dustfield sphere", Be::READ )
+		MAP_ATTRIBUTE( "applyMovement", m_applyMovement, "Apply reference velocity and movement scale", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "velocityStretch", m_velocityStretch, "Velocity stretch effect parameter", Be::READ )
 
 		MAP_ATTRIBUTE( "radius", m_radius, "Effect sphere radius", Be::READWRITE | Be::NOTIFY | Be::PERSIST )

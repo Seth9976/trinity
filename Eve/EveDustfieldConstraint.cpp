@@ -21,6 +21,7 @@
 // --------------------------------------------------------------------------------------
 EveDustfieldConstraint::EveDustfieldConstraint( IRoot* lockobj )
 	:m_isValid( false ),
+	m_applyMovement( true ),
 	m_radius( 512.0f ),
 	m_stretch( 0.05f ),
 	m_maxStretch( 15.0f ),
@@ -101,15 +102,19 @@ void EveDustfieldConstraint::Update( const EveUpdateContext& updateContext, IEve
 	float delta = updateContext.GetDeltaT();
 	
 	m_originShift = updateContext.GetOriginShift();
-	if( m_maxSpeed != 0.f && D3DXVec3Length( &m_originShift ) > m_maxSpeed * delta )
+	if( m_applyMovement )
 	{
-		D3DXVec3Normalize( &m_originShift, &m_originShift );
-		D3DXVec3Scale( &m_originShift, &m_originShift, m_maxSpeed * delta );
+		if( m_maxSpeed != 0.f && D3DXVec3Length( &m_originShift ) > m_maxSpeed * delta )
+		{
+			D3DXVec3Normalize( &m_originShift, &m_originShift );
+			D3DXVec3Scale( &m_originShift, &m_originShift, m_maxSpeed * delta );
+		}
+		m_originShift *= m_movementScale;
 	}
-	m_originShift *= m_movementScale;
 
-	m_referencePosition = m_cameraView->GetTransform().GetTranslation();
-
+	Matrix inverseView;
+    D3DXMatrixInverse( &inverseView, NULL, &m_cameraView->GetTransform() );
+	m_referencePosition = inverseView.GetTranslation();
 
 	Vector3 direction;
 	Vector3 velocity;
@@ -117,7 +122,11 @@ void EveDustfieldConstraint::Update( const EveUpdateContext& updateContext, IEve
 	float speed = D3DXVec3Length( &velocity );
 	D3DXVec3Normalize( &m_velocity, &velocity );
 
-	m_velocityStretch = min( speed * m_stretch, m_maxStretch );
+	m_velocityStretch = 0.f;
+	if( m_applyMovement )
+	{
+		m_velocityStretch = min( speed * m_stretch, m_maxStretch );
+	}
 	if( m_speedFunction )
 	{
 		m_speedFunction->UpdateValue( (double)speed );

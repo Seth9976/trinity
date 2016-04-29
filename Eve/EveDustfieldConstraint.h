@@ -74,6 +74,8 @@ private:
 
 	// Amount that particles move is scaled by this value
 	float m_movementScale;
+	// Apply reference velocity and movement scale
+	bool m_applyMovement;
 	// Reference movement is clamped at this speed
 	float m_maxSpeed;
 };
