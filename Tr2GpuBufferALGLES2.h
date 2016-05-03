@@ -3,7 +3,7 @@
 #ifndef Tr2GpuBufferALGLES2_h_
 #define Tr2GpuBufferALGLES2_h_
 
-#if( TRINITY_PLATFORM==TRINITY_OPENGL4 )
+#if( TRINITY_PLATFORM==TRINITY_OPENGLES2 )
 
 class Tr2RenderContextAL;
 
