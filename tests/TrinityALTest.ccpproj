@@ -191,7 +191,7 @@ Configurations:
     General: 
       TargetName: TrinityALTestGL4_dev
 
-  Release_GL4|Win32,x64,Mac64:
+  Release_GL4|Win32,x64:
     BaseConfigurations:
     - Release
     - GL4
