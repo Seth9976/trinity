@@ -617,8 +617,10 @@ void Tr2GpuParticleSystem::RunSimulation( float dt, const Vector3& originShift, 
 		float dt;
 		float width;
 		float height;
+		// cppcheck-suppress unusedStructMember
 		float padding0;
 		Vector3 originShift;
+		// cppcheck-suppress unusedStructMember
 		float padding1;
 	} updateCB;
 	updateCB.dt = dt;
@@ -838,6 +840,7 @@ void Tr2GpuParticleSystem::EmitParticles( Tr2RenderContext& renderContext )
 		float width;
 		float height;
 		float count;
+		// cppcheck-suppress unusedStructMember
 		float padding0;
 	};
 

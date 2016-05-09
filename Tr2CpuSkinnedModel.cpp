@@ -180,7 +180,6 @@ void Tr2CpuSkinnedModel::GetBatchesForAreaDynamic( Tr2MeshAreaVector* areas, Tr2
 		// Note that this can fail if the accumulator can't add more batches!
 		if( batch )
 		{
-			batch->SetTransform( pm );
 			batch->SetShaderMaterial( material );
 			batch->SetPerObjectData( data );
 			batch->SetGeometryResource( geomRes );

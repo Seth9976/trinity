@@ -104,6 +104,11 @@ private:
 class Tr2InteriorFullScreenLightBatch: public TriRenderBatch
 {
 public:
+	Tr2InteriorFullScreenLightBatch()
+		:m_vertexDecl( Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
+	{
+	}
+
 	//---------------------------------------------------------------------------------------
 	// Description:
 	//   Sets vertex declaration handle. 

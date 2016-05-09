@@ -70,6 +70,11 @@ template <typename T>
 class Tr2EnumerableThreadSpecific
 {
 public:
+	Tr2EnumerableThreadSpecific()
+		:m_data()
+	{
+	}
+
 	T& local()
 	{
 		return m_data;

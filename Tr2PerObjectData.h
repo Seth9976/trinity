@@ -8,6 +8,13 @@
 class Tr2PerObjectData
 {
 public:
+	Tr2PerObjectData()
+		:m_userData( 0 )
+	{
+	}
+
+	virtual ~Tr2PerObjectData() = 0;
+
 	virtual void SetPerObjectDataToDevice( Tr2ConstantBufferAL** buffers, unsigned constantTypeMask, Tr2RenderContext& renderContext ) const;
 
 	unsigned int GetUserData() const { return m_userData; }

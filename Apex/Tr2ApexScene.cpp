@@ -230,7 +230,6 @@ void Tr2ApexScene::FetchResults( float& lodResourceBudgetConsumed )
 
 		if ( m_debugVisualize ) // only if debug visualization is enabled.
 		{
-			const NxDebugRenderable* apexDebugRenderable = m_apexScene->getDebugRenderable();
 			if( g_debugRenderer )
 			{
 				RenderDebugRenderables( m_physXScene->getDebugRenderable() );

@@ -90,7 +90,7 @@ long Tr2RenderTarget::CreateEx(	unsigned width, unsigned height, unsigned mipLev
 									format, 
 									msaaType, 
 									msaaQuality, 
-									flags & Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS ? Tr2RenderContextEnum::USAGE_UNORDERED_ACCESS : 0,
+									( flags & Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS ) ? Tr2RenderContextEnum::USAGE_UNORDERED_ACCESS : 0,
 									flags,
 									renderContext ).GetResult();
 }

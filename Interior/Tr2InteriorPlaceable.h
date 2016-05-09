@@ -230,7 +230,7 @@ private:
 	// Bounding box overrides
 	Vector3 m_minBounds;
 	Vector3 m_maxBounds;
-	float m_isBoundingBoxModified;
+	bool m_isBoundingBoxModified;
 
 	// Per-cell reflection maps
 	TriTextureResPtr m_cellReflectionMaps[2];

@@ -977,7 +977,7 @@ bool App::CallEventHandler( uint32_t messageID, uintptr_t wParam, uintptr_t lPar
 
 int App::IsKeyPressed( uint32_t vKeyCode )
 {
-    return GetKeyState( vKeyCode ) & 0x8000 ? 1 : 0;
+    return ( GetKeyState( vKeyCode ) & 0x8000 ) ? 1 : 0;
 }
 
 bool App::ProcessMessages()

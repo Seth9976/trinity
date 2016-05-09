@@ -80,6 +80,17 @@ struct WodStencilBatchParams
 class Tr2InteriorStencilMaskBatch : public TriGeometryBatch
 {
 public:
+	Tr2InteriorStencilMaskBatch()
+		:m_stencilWrite( 0 ),
+		m_stencilTest( 0 ),
+		m_doDepthClear( false ),
+		m_setStencilTestOnly( false ),
+		m_stencilPassState( 0 ),
+		m_disableStencil( false ),
+		m_colorWrite( false )
+	{
+	}
+
 	// Destructor
 	virtual ~Tr2InteriorStencilMaskBatch() {}
 

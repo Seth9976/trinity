@@ -115,7 +115,6 @@ void Tr2SkinnedModel::GetBatchesForArea( Tr2MeshAreaVector* areas, Tr2Mesh* mesh
 			}
 			areaData->SetPerObjectData( *skinnedData );
 
-			batch->SetTransform( pm );
 			batch->SetShaderMaterial( shader );
 			batch->SetPerObjectData( areaData );
 			batch->SetGeometryResource( geomRes );

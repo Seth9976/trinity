@@ -485,7 +485,6 @@ void Tr2IntSkinnedObject::GetBatches( ITriRenderBatchAccumulator* batches,
 							}
 						}
 
-						batch->SetTransform( pm );
 						batch->SetShaderMaterial( shader );
 						batch->SetPerObjectData( perAreaData );
 						batch->SetGeometryResource( geomRes );

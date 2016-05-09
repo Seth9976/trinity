@@ -348,10 +348,10 @@ bool ITr2PickableScene::RenderPicking( ITriRenderBatchAccumulator* pOpaquePickin
 	// We can't use situations here because the flags might change during a single
 	// frame.
 	Vector4 componentsParam = Vector4( 
-		pass & PICK_OBJECT ? 1.0f : 0.0f, 
-		pass & PICK_AREA ? 1.0f : 0.0f, 
-		pass & PICK_POSITION ? 1.0f : 0.0f, 
-		pass & PICK_UV ? 1.0f : 0.0f );
+		( pass & PICK_OBJECT ) ? 1.0f : 0.0f, 
+		( pass & PICK_AREA ) ? 1.0f : 0.0f, 
+		( pass & PICK_POSITION ) ? 1.0f : 0.0f, 
+		( pass & PICK_UV ) ? 1.0f : 0.0f );
 
 	GlobalStore().RegisterVariable( "PickingComponents", componentsParam );
 

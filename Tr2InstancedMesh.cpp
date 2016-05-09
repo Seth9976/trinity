@@ -32,6 +32,14 @@ extern CcpStaticStatisticsEntry * g_ccpStatistics_drawcallCount;
 class Tr2InstancedMesh::Batch: public TriRenderBatch
 {
 public:
+	Batch()
+		:m_mesh( nullptr ),
+		m_areaIndex( 0 ),
+		m_areaCount( 0 ),
+		m_reversed( false )
+	{
+	}
+
 	// --------------------------------------------------------------------------------------
 	// Description:
 	//   Assigns Tr2InstancedMesh to the batch.

@@ -391,20 +391,13 @@ private:
 	{
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 
-		unsigned int size = m_indexByteSize * m_indexCount;
-
 		// Buffer might exist, if we're coming back from a lost device state
 		// and the buffer was created in the managed pool.
 		if( !m_indexBuffer.IsValid() )
 		{
 			APEX_LOG( "Creating Apex index buffer: %d indices, %d bytes per index", m_indexCount, m_indexByteSize )
 			USE_MAIN_THREAD_RENDER_CONTEXT();
-			HRESULT hr = m_indexBuffer.Create( 
-								m_indexCount, 
-								m_usage, 
-								m_use16Bit ? IB_16BIT : IB_32BIT, 
-								nullptr, 
-								renderContext );
+			m_indexBuffer.Create( m_indexCount, m_usage, m_use16Bit ? IB_16BIT : IB_32BIT, nullptr, renderContext );
 		}
 
 		return true;
@@ -501,6 +494,7 @@ public:
 };
 
 class Tr2ApexMesh;
+// cppcheck-suppress noConstructor
 class Tr2ApexBatch : public TriRenderBatch
 {
 public:
@@ -564,8 +558,6 @@ public:
 	{
 		m_vertexBufferCount = desc.numVertexBuffers;
 		m_vertexBuffers = CCP_NEW( "Tr2ApexMesh/m_vertexBuffers" ) Tr2ApexVertexBuffer*[m_vertexBufferCount];
-
-		int curDescIx = 0;
 
 		for( unsigned int i = 0; i < m_vertexBufferCount; ++i )
 		{

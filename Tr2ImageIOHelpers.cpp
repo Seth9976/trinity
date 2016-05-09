@@ -542,7 +542,7 @@ bool RasterizeCairoScript( const char* script, size_t length, uint32_t width, ui
 	{
 		cairo_surface_destroy( data->surface );
 	}
-	return true;
+	return success;
 }
 
 ImageIO::Result RasterizeCairoScript( IBlueStream* stream, const BlueAsyncRes::QueryArguments& arguments, ImageIO::HostBitmap& bitmap )

@@ -117,7 +117,8 @@ Tr2Sprite2dScene::Tr2Sprite2dScene( IRoot* lockobj ) :
 	m_dotVectorVar( "g_DotVector", Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) ),
 	m_maxSpriteCount( 1024 ),
 	m_setLockFrequentlyFlag( true ),
-	m_tileMode( S2D_TS_NONE )
+	m_tileMode( S2D_TS_NONE ),
+	m_drawCallStartIndex( 0 )
 {
 	m_transformStack = CCP_NEW( "Tr2Sprite2dScene/m_transformStack" ) TransformStack_t( "Tr2Sprite2dScene/m_transformStack" );
 	m_depthStack = CCP_NEW( "Tr2Sprite2dScene/m_depthStack" ) DepthStack_t( "Tr2Sprite2dScene/m_depthStack" );

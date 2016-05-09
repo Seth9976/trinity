@@ -58,7 +58,6 @@ void Tr2RuntimeInstanceData::SaveToGranny( const char* resPath ) const
 	}
 	vertexData->VertexComponentNameCount = (granny_int32)m_layout.m_items.size();
 
-	unsigned totalSize = m_stride;
 	if( m_count )
 	{
 		char* vertices = CCP_NEW( "Tr2RuntimeInstanceData::SaveToGranny" ) char[m_stride * m_count];

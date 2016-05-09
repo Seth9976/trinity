@@ -34,18 +34,15 @@ class TriRenderBatch
 public:
 	// Constructor
 	TriRenderBatch()
+		:m_next( nullptr ),
+		m_objectData( nullptr ),
+		m_userData( 0 ),
+		m_depth( 0 ),
+		m_renderingMode( Tr2EffectStateManager::RM_ANY )
 	{ 
-		m_renderingMode = Tr2EffectStateManager::RM_ANY;
-		m_userData = 0;
-		m_depth = 0;
 	}
 	// Destructor
     virtual ~TriRenderBatch();
-
-	// Get batch transformation
-    const Matrix* GetTransform() const { return m_transform; }
-	// Set batch transformation
-    void SetTransform( const Matrix* val ) { m_transform = val; }
 
 	// Get batch per-object data
 	const Tr2PerObjectData* GetPerObjectData() const { return m_objectData; }
@@ -103,7 +100,6 @@ public:
 	TriRenderBatch* m_next;
 
 protected:
-    const Matrix* m_transform;
 	const Tr2PerObjectData* m_objectData;
 
 private:

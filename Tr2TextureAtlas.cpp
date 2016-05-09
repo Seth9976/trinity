@@ -968,7 +968,6 @@ void Tr2TextureAtlas::PaintEmptyArea( Tr2TextureAtlasArea* area )
 		const uint32_t blockSize = GetBlockByteSize( m_format );
 
 		const uint32_t blocksX = width / 4;
-		const uint32_t blocksY = height / 4;
 
 		// Have to copy one line at a time since the target area is not linearly laid out.
 		for( uint32_t line = 0; line < height; line += 4 )

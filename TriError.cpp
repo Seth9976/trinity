@@ -26,12 +26,15 @@ void ReportErrorV(
 #ifdef _WIN32
 		estr = DXGetErrorString(hr);
 		edsc = DXGetErrorDescription(hr);
-#endif
 
 		if (!estr)
 			estr = "unknown error";
 		if (!edsc)
 			edsc = "unknown description";
+#else
+		estr = "unknown error";
+		edsc = "unknown description";
+#endif
 	}
 	sprintf_s(buff, "HRES:%X - %s(%s)\n", unsigned( hr ), estr, edsc);
 	size_t idx = strlen(buff);

@@ -1556,8 +1556,6 @@ std::pair<float, Vector3> TriGeometryRes::GetClosestVertex( const Vector3& pos )
 
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 
-	float minDist = FLT_MAX;
-	float maxDist = FLT_MIN;
 	std::pair<float, Vector3> result = std::make_pair( -1.f, Vector3( 0.f, 0.f, 0.f ) );
 	float currentDist = FLT_MAX;
 	Vector3 currentPos = Vector3( 0.f, 0.f, 0.f );
@@ -3196,7 +3194,6 @@ BlueStdResult TriGeometryRes::GetMeshVertexElements( size_t meshIndex, std::vect
 		return BlueStdResult( BLUE_STD_RESULT_RUNTIME_ERROR, "could not retrieve vertex declaration" );
 	}
 
-	PyObject *result =  PyTuple_New( decl.m_items.size() );
 	for( auto it = std::begin( decl.m_items ); it != std::end( decl.m_items ); ++it )
 	{
 		elements.push_back( std::make_pair( it->m_usage, it->m_usageIndex ) );

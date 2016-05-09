@@ -4,6 +4,10 @@
 using namespace Tr2RenderContextEnum;
 
 
+Tr2PerObjectData::~Tr2PerObjectData()
+{
+}
+
 // --------------------------------------------------------------------------------------
 // Description:
 //   Set the perObject data to the device.

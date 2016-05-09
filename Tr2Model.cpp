@@ -188,7 +188,6 @@ void Tr2Model::GetBatchesFromMesh( Tr2Mesh* mesh,
 		// Note that this can fail if the accumulator can't add more batches!
 		if( batch )
 		{
-			batch->SetTransform( pm );
 			batch->SetShaderMaterial( shader );
 			batch->SetPerObjectData( data );
 			batch->SetGeometryResource( geomRes );

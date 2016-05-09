@@ -19,6 +19,12 @@ using namespace Tr2RenderContextEnum;
 class Tr2InteriorFlare::FlareBatch : public TriRenderBatch
 {
 public:
+	FlareBatch()
+		:m_flare( nullptr ),
+		m_type( OCCLUSION_FLARE )
+	{
+	}
+
 	// --------------------------------------------------------------------------------------
 	// Description:
 	//   Sets light source pointer and flare rendering type.

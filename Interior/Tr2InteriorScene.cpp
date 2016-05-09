@@ -2024,7 +2024,6 @@ bool Tr2InteriorScene::UpdateShadowMap(
 						{
 							if( textures[i] )
 							{
-								Tr2AtlasTexture *srcTexture = item.lightSource->GetShadowAtlasTexture( i );
 								item.lightSource->SetShadowAtlasTexture( i, textures[i] );
 							}
 						}
@@ -3463,7 +3462,6 @@ void Tr2InteriorScene::UpdateDynamics( void )
 		if( ( *dit )->IsDirty() && ( *dit )->IsBoundingBoxReady() )
 		{
 			bool cellsReady = true;
-			bool added = false;
 			// Test intersection with each cell
 			for( Tr2InteriorCellVector::iterator cit = m_cells.begin(); cit != m_cells.end(); ++cit )
 			{
@@ -3473,7 +3471,6 @@ void Tr2InteriorScene::UpdateDynamics( void )
 					if( ( *dit )->TestCellIntersectionAndAdd( *cit ) )
 					{
 						( *cit )->MarkShadowsDirtyForDynamic( *dit );
-						added = true;
 					}
 				}
 				// Otherwise bail out

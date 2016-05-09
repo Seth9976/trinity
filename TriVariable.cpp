@@ -71,7 +71,10 @@ void TriVariable::CopyValueToEffect(	Tr2RenderContextEnum::ShaderType inputType,
 		{
 			size_t ts = GetTypeSize();
 			// column_major for shaders, pay attention to size of registers
-			TriMatrixTranspose( (Matrix*)destHandle, (Matrix*)m_value, (unsigned int)(size < ts ? size : ts) );
+			TriMatrixTranspose( 
+				reinterpret_cast<Matrix*>( destHandle ), 
+				reinterpret_cast<const Matrix*>( m_value ), 
+				(unsigned int)(size < ts ? size : ts) );
 			break;
 		}
 	case TRIVARIABLE_TEXTURE_AL:

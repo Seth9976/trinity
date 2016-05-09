@@ -116,6 +116,14 @@ bool Tr2EffectRes::DoPrepare()
 	const uint8_t* buffer = reinterpret_cast<const uint8_t*>( m_data );
 	const uint8_t* bufferEnd = buffer + m_dataSize;
 
+#define SKIP( storeType )																	\
+	if( buffer + sizeof( storeType ) > bufferEnd )											\
+	{																						\
+		CCP_LOGERR( "Unexpected end of file while reading effect \"%S\"", GetPath() );		\
+		return false;																		\
+	}																						\
+	buffer += sizeof( storeType );
+
 #define READ( storeType, valueType, value )													\
 	if( buffer + sizeof( storeType ) > bufferEnd )											\
 	{																						\
@@ -150,8 +158,7 @@ bool Tr2EffectRes::DoPrepare()
 	}
 
 	// Get the first permutation from the file
-	uint32_t permutation;
-	READ( uint32_t, uint32_t, permutation );
+	SKIP( uint32_t );
 
 	uint32_t offset;
 	READ( uint32_t, uint32_t, offset );
