@@ -558,7 +558,6 @@ void Tr2Sprite2dLineTrace::AddMiterJoint(
 	// calculate joint angle
 	float startAngle = atan2( normal.y, normal.x );
 	float endAngle = startAngle + capAngleTo;
-	float angleDiff = endAngle - startAngle;
 
 	// Create vertexes
 	Tr2Sprite2dVertexBase* fanVerts = static_cast<Tr2Sprite2dVertexBase*>( CCP_MALLOC( 
