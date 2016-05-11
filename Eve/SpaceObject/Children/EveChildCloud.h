@@ -5,8 +5,8 @@
 //
 
 #pragma once
-#ifndef EveCloud_H
-#define EveCloud_H
+#ifndef EveChildCloud_H
+#define EveChildCloud_H
 
 #include "ITr2Renderable.h"
 #include "ITr2GeometryProvider.h"
