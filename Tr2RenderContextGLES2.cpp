@@ -1200,6 +1200,7 @@ ALResult Tr2RenderContextAL::InternalBlitToBackBuffer( Tr2TextureAL& source )
 	}
 	ALResult result = m_blitter->Blit( source );
 
+	m_boundProgramObject = nullptr;
 	m_currentActiveTexture = 0;
 	if( m_renderStates[RS_ZENABLE] )
 	{

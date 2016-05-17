@@ -435,9 +435,45 @@ ALResult Tr2TextureAL::CreateVolume( uint32_t width,
 		}
 		else if ( initialData )
 		{
-			GL_FAIL( glCompressedTexImage3D( GL_TEXTURE_3D, i, m_internalFormat, levelWidth, levelHeight, levelDepth, 0,
-											 initialData[i].m_sysMemSlicePitch,
-											 initialData[i].m_sysMem ) );
+			if( GL_NV_texture_compression_vtc )
+			{
+				std::unique_ptr<uint8_t[]> level( new uint8_t[initialData[i].m_sysMemSlicePitch * levelDepth] );
+				int blockSize = m_targetFormat == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT ? 16 : 8;
+				int cw = int( levelWidth + 3 ) / 4;
+				int ch = int( levelHeight + 3 ) / 4;
+				int d = ( levelDepth & ~0x3 );
+				for( int z = 0; z < int( levelDepth ); ++z )
+				{
+					const uint8_t* src = static_cast<const uint8_t*>( initialData[i].m_sysMem ) + initialData[i].m_sysMemSlicePitch * z;
+					for( int y = 0; y < ch; ++y )
+					{
+						for( int x = 0; x < cw; ++x )
+						{
+							int blockOffset;
+							if( z >= d )
+							{
+								blockOffset = blockSize * ( cw * ch * d + x + cw * ( y + ch * ( z - d ) ) );
+							}
+							else
+							{
+								blockOffset = blockSize * 4 * ( x + cw * ( y + ch * ( z / 4 ) ) );
+							}
+							blockOffset += ( z % 4 ) * blockSize;
+							memcpy( level.get() + blockOffset, src, blockSize );
+							src += blockSize;
+						}
+					}
+				}
+				GL_FAIL( glCompressedTexImage3D( GL_TEXTURE_3D, i, m_internalFormat, levelWidth, levelHeight, levelDepth, 0,
+												 initialData[i].m_sysMemSlicePitch * levelDepth,
+												 level.get() ) );
+			}
+			else
+			{
+				GL_FAIL( glCompressedTexImage3D( GL_TEXTURE_3D, i, m_internalFormat, levelWidth, levelHeight, levelDepth, 0,
+												 initialData[i].m_sysMemSlicePitch * levelDepth,
+												 initialData[i].m_sysMem ) );
+			}
 		}
 		else
 		{
