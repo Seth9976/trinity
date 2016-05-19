@@ -141,11 +141,13 @@ void EveChildContainer::ChangeLOD( Tr2Lod lod )
 void EveChildContainer::GetLights( Tr2LightManager& lightManager ) const
 {
 	XMMATRIX worldTransform = m_worldTransform;
+	float scaling = XMVectorGetX( XMVectorAdd( XMVector3LengthEst( m_worldTransform.GetX() ), 
+		XMVectorAdd( XMVector3LengthEst( m_worldTransform.GetY() ), XMVector3LengthEst( m_worldTransform.GetZ() ) ) ) ) / 3.f;
 	for( auto it = std::begin( m_lights ); it != std::end( m_lights ); ++it )
 	{
 		lightManager.AddPointLight( 
 			Vector3( XMVector3TransformCoord( (* it )->m_position, worldTransform ) ), 
-			( *it )->m_radius, 
+			( *it )->m_radius * scaling, 
 			( *it )->m_color );
 	}
 	for( auto it = m_objects.begin(); it != m_objects.end(); ++it )
