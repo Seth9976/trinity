@@ -15,10 +15,11 @@ const Be::ClassInfo* TriStepResolve::ExposeToBlue()
 		MAP_ATTRIBUTE( "destination",	m_destination,		"Target of the resolve", Be::READWRITE )
 		MAP_ATTRIBUTE( "generateMipmap", m_generateMipmap,	"Generate mipmaps in destination after the resolve?", Be::READWRITE )
 
-		MAP_METHOD_AND_WRAP
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(
 			"__init__", 
 			py__init__, 
+			2,
 			"Creates a render step that resolves source into destination rendertargets. If source is not MSAA,"
 			"\nthis is a copy (but formats and dimensions must still match exactly)."
 			"\n"

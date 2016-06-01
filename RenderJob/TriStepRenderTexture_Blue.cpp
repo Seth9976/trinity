@@ -47,10 +47,12 @@ static PyObject* py__init__( PyObject* self, PyObject* args )
 			pThis->SetTexture( atlasTexture );
 			Py_RETURN_NONE;
 		}
+
+		PyErr_SetString( PyExc_TypeError, "Expected a Tr2RenderTarget, Tr2AtlasTexture, or TriTextureRes" );
+		return NULL;
 	}
 
-	PyErr_SetString( PyExc_TypeError, "Expected a Tr2RenderTarget, Tr2AtlasTexture, or TriTextureRes" );
-	return NULL;
+	Py_RETURN_NONE;
 }
 #endif
 
