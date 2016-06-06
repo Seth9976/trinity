@@ -90,6 +90,8 @@ public:
 		std::string layer1MapResPath;
 		std::string layer2MapResPath;
 		std::string maskMapResPath;
+		std::string imageMapResPath;
+		std::string effectResPath;
 		Vector4 planeData;
 		std::vector<HullPlaneSetItemData> items;
 	};

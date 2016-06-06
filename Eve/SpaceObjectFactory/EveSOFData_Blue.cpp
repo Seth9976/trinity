@@ -145,6 +145,8 @@ const Be::ClassInfo* EveSOFDataHullPlaneSet::ExposeToBlue()
 		MAP_ATTRIBUTE( "layer1MapResPath", m_layer1MapResPath, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "layer2MapResPath", m_layer2MapResPath, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "maskMapResPath", m_maskMapResPath, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "imageMapResPath", m_imageMapResPath, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "overrideEffectResPath", m_overrideEffectResPath, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "planeData", m_planeData, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "skinned", m_skinned, "", Be::READWRITE | Be::PERSIST )
 

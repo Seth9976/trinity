@@ -159,6 +159,8 @@ public:
 	std::string m_layer1MapResPath;
 	std::string m_layer2MapResPath;
 	std::string m_maskMapResPath;
+	std::string m_imageMapResPath;
+	std::string m_overrideEffectResPath;
 	Vector4 m_planeData;
 	// items
 	PEveSOFDataHullPlaneSetItemVector m_items;

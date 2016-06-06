@@ -647,21 +647,19 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 		Tr2EffectPtr planeEffect;
 		planeEffect.CreateInstance();
 		planeEffect->StartUpdate();
-
-		// set skinned or unskinned shader
-		if( planeSetData->skinned )
-		{
-			planeEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx" );
-		}
-		else
-		{
-			planeEffect->SetEffectPathName( "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx" );
-		}
+		planeEffect->SetEffectPathName( planeSetData->effectResPath.c_str() );
 
 		// textures
 		planeEffect->AddResourceTexture2D( BlueSharedString("Layer1Map"), planeSetData->layer1MapResPath.c_str() );
 		planeEffect->AddResourceTexture2D( BlueSharedString("Layer2Map"), planeSetData->layer2MapResPath.c_str() );
 		planeEffect->AddResourceTexture2D( BlueSharedString("MaskMap"), planeSetData->maskMapResPath.c_str() );
+
+		// Only add this if the resPath is specified, currently only used on sovereignty claim markers
+		// - Oli (June 2016)
+		if( !planeSetData->imageMapResPath.empty() )
+		{
+			planeEffect->AddResourceTexture2D( BlueSharedString("ImageMap"), planeSetData->imageMapResPath.c_str() );
+		}
 
 		// parameters
 		planeEffect->AddParameterVector4( BlueSharedString("PlaneData"), &planeSetData->planeData );
