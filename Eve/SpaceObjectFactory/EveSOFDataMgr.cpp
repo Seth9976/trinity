@@ -489,22 +489,9 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 		hpsd.layer1MapResPath = planeSetData->m_layer1MapResPath;
 		hpsd.layer2MapResPath = planeSetData->m_layer2MapResPath;
 		hpsd.maskMapResPath = planeSetData->m_maskMapResPath;
-		hpsd.imageMapResPath = planeSetData->m_imageMapResPath;
 		hpsd.planeData = planeSetData->m_planeData;
 		hpsd.skinned = planeSetData->m_skinned;
-				
-		if( !planeSetData->m_overrideEffectResPath.empty() )
-		{
-			hpsd.effectResPath = planeSetData->m_overrideEffectResPath;
-		}
-		else if(hpsd.skinned)
-		{
-			hpsd.effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx";
-		}
-		else 
-		{
-			hpsd.effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
-		}
+		hpsd.usage = planeSetData->m_usage;
 				
 		for( auto psiit = planeSetData->m_items.begin(); psiit != planeSetData->m_items.end(); ++psiit )
 		{

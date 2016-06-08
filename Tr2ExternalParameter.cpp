@@ -117,6 +117,21 @@ bool Tr2ExternalParameter::OnModified( Be::Var* )
 	return true;
 }
 
+void Tr2ExternalParameter::SetName( const std::string name )
+{
+	m_name = name;
+}
+
+void Tr2ExternalParameter::SetDestinationObject( IRoot* destinationObject )
+{
+	m_destinationObject = destinationObject;
+}
+
+void Tr2ExternalParameter::SetDestinationAttribute( const std::string attributeName )
+{
+	m_destinationAttribute = attributeName;
+}
+
 BlueStdResult Tr2ExternalParameter::SetValue( BlueScriptValue value )
 {
 #if BLUE_WITH_PYTHON

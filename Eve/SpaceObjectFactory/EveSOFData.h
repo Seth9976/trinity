@@ -153,14 +153,20 @@ public:
 	EveSOFDataHullPlaneSet( IRoot* lockobj = NULL );
 	~EveSOFDataHullPlaneSet() {}
 
+	// decal type
+	enum Usage
+	{
+		USAGE_STANDARD = 0,
+		USAGE_HOLOGRAM,
+	};
+
 	// data
 	std::string m_name;
 	bool m_skinned;
 	std::string m_layer1MapResPath;
 	std::string m_layer2MapResPath;
 	std::string m_maskMapResPath;
-	std::string m_imageMapResPath;
-	std::string m_overrideEffectResPath;
+	Usage m_usage;
 	Vector4 m_planeData;
 	// items
 	PEveSOFDataHullPlaneSetItemVector m_items;

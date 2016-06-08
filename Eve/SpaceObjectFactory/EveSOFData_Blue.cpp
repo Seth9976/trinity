@@ -134,8 +134,30 @@ const Be::ClassInfo* EveSOFDataHullPlaneSetItem::ExposeToBlue()
 }
 
 
-
 BLUE_DEFINE( EveSOFDataHullPlaneSet );
+
+Be::VarChooser EveSOFDataHullPlaneSetUsageChooser[] =
+{
+	{
+		"Standard",
+			BeCast( EveSOFDataHullPlaneSet::USAGE_STANDARD ),
+			"Standard planeset"
+	},
+	{
+		"Hologram",
+			BeCast( EveSOFDataHullPlaneSet::USAGE_HOLOGRAM),
+			"Hologram planeset"
+		},
+		{ 0 }
+};
+
+BLUE_REGISTER_ENUM_EX( 
+	"HullPlanesetUsage",
+	EveSOFDataHullPlaneSet::Usage,
+	EveSOFDataHullPlaneSetUsageChooser,
+	ENUM_REG_ENUM_OBJECT_ON_MODULE
+	);
+
 const Be::ClassInfo* EveSOFDataHullPlaneSet::ExposeToBlue()
 {
     EXPOSURE_BEGIN( EveSOFDataHullPlaneSet, "" )
@@ -145,8 +167,7 @@ const Be::ClassInfo* EveSOFDataHullPlaneSet::ExposeToBlue()
 		MAP_ATTRIBUTE( "layer1MapResPath", m_layer1MapResPath, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "layer2MapResPath", m_layer2MapResPath, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "maskMapResPath", m_maskMapResPath, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "imageMapResPath", m_imageMapResPath, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "overrideEffectResPath", m_overrideEffectResPath, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE_WITH_CHOOSER("usage", m_usage, "Choose the usage of this planeSet", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFDataHullPlaneSetUsageChooser)
 		MAP_ATTRIBUTE( "planeData", m_planeData, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "skinned", m_skinned, "", Be::READWRITE | Be::PERSIST )
 

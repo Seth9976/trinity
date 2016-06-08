@@ -339,6 +339,9 @@ public:
 	void UpdatePerObjectBuffer( Tr2RenderContextEnum::ShaderType shaderType, uint32_t size, void* );
 
 	void GetPerObjectStructs( EveSpaceObjectVSData& vsData, EveSpaceObjectPSData& psData ) const;
+
+	// external parameters
+	void AddExternalParameter( Tr2ExternalParameter* externalParameter );
 protected:
 	// LODing
 	void UnloadLodIfNeeded( Be::Time time );

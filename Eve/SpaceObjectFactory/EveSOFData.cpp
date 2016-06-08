@@ -290,6 +290,7 @@ EveSOFDataHullSpotlightSetItem::EveSOFDataHullSpotlightSetItem( IRoot* lockobj )
 EveSOFDataHullPlaneSet::EveSOFDataHullPlaneSet( IRoot* lockobj ) :
 	PARENTLOCK( m_items ),
 	m_skinned( false ),
+	m_usage( USAGE_STANDARD ),
 	m_planeData( 1.f, 0.f, 0.f, 0.f )
 {}
 

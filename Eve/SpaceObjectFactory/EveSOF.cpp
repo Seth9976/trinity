@@ -8,6 +8,7 @@
 #include "EveSOF.h"
 #include "EveSOFDNA.h"
 #include "EveSOFUtils.h"
+#include "Tr2ExternalParameter.h"
 #include "Eve/EveTransform.h"
 #include "Eve/Turret/EveTurretSet.h"
 #include "Eve/SpaceObject/EveShip2.h"
@@ -647,20 +648,49 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 		Tr2EffectPtr planeEffect;
 		planeEffect.CreateInstance();
 		planeEffect->StartUpdate();
-		planeEffect->SetEffectPathName( planeSetData->effectResPath.c_str() );
+		std::string effectResPath;
+
+		// Select the effect based on the usage
+		switch (planeSetData->usage)
+		{
+		case EveSOFDataHullPlaneSet::USAGE_STANDARD:
+			effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
+			if( planeSetData->skinned )
+			{
+				effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx";
+			}
+			break;
+		case EveSOFDataHullPlaneSet::USAGE_HOLOGRAM:
+			effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
+			if( planeSetData->skinned )
+			{
+				effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx";
+			}
+			break;		
+		}
+
+		planeEffect->SetEffectPathName( effectResPath.c_str() );
 
 		// textures
 		planeEffect->AddResourceTexture2D( BlueSharedString("Layer1Map"), planeSetData->layer1MapResPath.c_str() );
 		planeEffect->AddResourceTexture2D( BlueSharedString("Layer2Map"), planeSetData->layer2MapResPath.c_str() );
 		planeEffect->AddResourceTexture2D( BlueSharedString("MaskMap"), planeSetData->maskMapResPath.c_str() );
-
-		// Only add this if the resPath is specified, currently only used on sovereignty claim markers
-		// - Oli (June 2016)
-		if( !planeSetData->imageMapResPath.empty() )
+		
+		// Need to set up the ImageMap texture resource if we have a hologram
+		if( planeSetData->usage == EveSOFDataHullPlaneSet::USAGE_HOLOGRAM )
 		{
-			planeEffect->AddResourceTexture2D( BlueSharedString("ImageMap"), planeSetData->imageMapResPath.c_str() );
-		}
+			planeEffect->AddResourceTexture2D( BlueSharedString("ImageMap"), "" );
+			ITriEffectParameter* imageMapParameter = planeEffect->GetParameterByName("ImageMap");
+			Tr2ExternalParameterPtr externalParameter;
+			externalParameter.CreateInstance();
 
+			externalParameter->SetName( "LogoResPath" );
+			externalParameter->SetDestinationObject( imageMapParameter );
+			externalParameter->SetDestinationAttribute( "resourcePath" );
+			externalParameter->Initialize();
+			obj->AddExternalParameter( externalParameter );
+		}
+				
 		// parameters
 		planeEffect->AddParameterVector4( BlueSharedString("PlaneData"), &planeSetData->planeData );
 

@@ -30,6 +30,7 @@
 #include "Tr2PointLight.h"
 #include "Shader/Utils/Tr2DataTextureManager.h"
 #include "Utilities/StringUtils.h"
+#include "Tr2ExternalParameter.h"
 
 #include <limits>
 
@@ -2414,6 +2415,15 @@ float EveSpaceObject2::GetCurveSetDuration( const std::string& name ) const
 bool EveSpaceObject2::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters )
 {
 	return false;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Adds an external parameter to the external parameters list.
+// --------------------------------------------------------------------------------
+void EveSpaceObject2::AddExternalParameter( Tr2ExternalParameter* externalParameter )
+{
+	m_externalParameters.Append( externalParameter->GetRawRoot() );
 }
 
 void EveSpaceObject2::SetMeshLod( Tr2MeshLod* mesh )
