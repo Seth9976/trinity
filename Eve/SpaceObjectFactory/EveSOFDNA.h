@@ -119,6 +119,7 @@ private:
 	const EveSOFDataMgr::FactionData* m_factionData;
 	const EveSOFDataMgr::RaceData* m_raceData;
 	const EveSOFDataMgr::GenericData* m_genericData;
+	const EveSOFDataMgr::PatternData* m_patternData;
 
 	// custom data blocks
 	EveSOFDataMgr::HullData m_customHullData;
@@ -127,6 +128,7 @@ private:
 	std::string m_hullName;
 	std::string m_factionName;
 	std::string m_raceName;
+	std::string m_patternName;
 	std::map<std::string, std::vector<std::string>> m_commands;
 };
 

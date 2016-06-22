@@ -47,7 +47,8 @@ static_assert( sizeof( s_dnaClasses ) / sizeof( s_dnaClasses[0] ) == EveSOFDataH
 EveSOFDNA::EveSOFDNA( IRoot* lockobj ) :
 	m_hullData( nullptr ),
 	m_factionData( nullptr ),
-	m_raceData( nullptr )
+	m_raceData( nullptr ),
+	m_patternData( nullptr )
 {
 }
 
@@ -213,6 +214,7 @@ void EveSOFDNA::Setup( const char* dnaString, EveSOFDataMgrPtr dataMgr )
 	m_hullName = dnaParts[0];
 	m_factionName = dnaParts[1];
 	m_raceName = dnaParts[2];
+	m_patternName = "";
 
 	// pointers
 	m_hullData = m_dataMgr->GetHullData( m_hullName.c_str() );
@@ -235,6 +237,8 @@ void EveSOFDNA::Setup( const char* dnaString, EveSOFDataMgrPtr dataMgr )
 		CCP_LOGERR( "Couldn't find the requested race: %s", dnaString );
 		return;
 	}
+	// pattern data (is optional! so don't report error in case of nullptr)
+	m_patternData = m_dataMgr->GetPatternData( m_patternName.c_str() );
 	// generics
 	m_genericData = m_dataMgr->GetGenericData();
 
@@ -734,7 +738,7 @@ const std::vector<EveSOFDataMgr::HullAreas>* EveSOFDNA::GetHullMeshAreas( TriBat
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Search and area collection to find the data of a specific parameter
+//   Search an area collection to find the data of a specific parameter
 // --------------------------------------------------------------------------------
 const Vector4* EveSOFDNA::SearchForParameterData( const std::map<BlueSharedString, EveSOFDataMgr::FactionAreaData>& areas, const BlueSharedString& areaDesignation, const BlueSharedString& parameterName ) const
 {
@@ -810,6 +814,16 @@ const Vector4* EveSOFDNA::GetMeshAreaParameter( const BlueSharedString& areaDesi
 	if( res )
 	{
 		return res;
+	}
+
+	// do we have it in the pattern data?
+	if( m_patternData )
+	{
+		res = SearchForParameterData( m_patternData->areaParameters, areaDesignation, parameterName );
+		if( res )
+		{
+			return res;
+		}
 	}
 
 	// do we have it in the hull data

@@ -318,7 +318,7 @@ public:
 	{
 		// boosters
 		RaceBoosterData boosters;
-		// hull area parameter overloads
+		// hull area parameter
 		std::map<BlueSharedString, FactionAreaData> hullAreaParameters;
 		// impact damage data
 		RaceDamageData damage;
@@ -329,6 +329,15 @@ public:
 	{
 		// shader params
 		std::map<BlueSharedString, Vector4> parameters;
+	};
+
+	// pattern data structs
+	struct PatternData
+	{
+		// shared data
+		std::string patternTextureResPath;
+		// hull area parameter
+		std::map<BlueSharedString, FactionAreaData> areaParameters;
 	};
 
 	// generic data structs
@@ -407,6 +416,7 @@ public:
 	bool UpdateRace( const char* raceName, EveSOFDataRace* raceData );
 	bool UpdateGeneric( EveSOFDataGeneric* genericData );
 	bool UpdateMaterial( const char* materialName, EveSOFDataMaterial* materialData );
+	bool UpdatePattern( const char* patternName, EveSOFDataPattern* patternData );
 
 	// access to generic
 	const GenericData* GetGenericData() const;
@@ -422,6 +432,9 @@ public:
 	// access to material data
 	bool HasMaterialData( const char* materialName ) const;
 	const MaterialData* GetMaterialData( const char* materialName ) const;
+	// access to pattern data
+	bool HasPatternData( const char* patternName ) const;
+	const PatternData* GetPatternData( const char* patternName ) const;
 
 private:
 	// load indiviual parts of data
@@ -430,6 +443,7 @@ private:
 	bool LoadRaceData( EveSOFDataPtr srcData );
 	bool LoadGenericData( EveSOFDataPtr srcData );
 	bool LoadMaterialData( EveSOFDataPtr srcData );
+	bool LoadPatternData( EveSOFDataPtr srcData );
 	HullAreas LoadHullAreaData( const EveSOFDataHullAreaPtr hullArea ) const;
 
 	// helper functions to pass data from trinity object to stl containers
@@ -438,6 +452,7 @@ private:
 	void GenerateRaceData( RaceData& rd, EveSOFDataRacePtr srcData ) const;
 	void GenerateGenericData( GenericData& gd, EveSOFDataGenericPtr srcData ) const;
 	void GenerateMaterialData( MaterialData& rd, EveSOFDataMaterialPtr srcData ) const;
+	void GeneratePatternData( PatternData& rd, EveSOFDataPatternPtr srcData ) const;
 
 	// keep all hull data in a map
 	std::map<std::string, HullData> m_hullData;
@@ -447,6 +462,8 @@ private:
 	std::map<std::string, RaceData> m_raceData;
 	// keep all material data in a map
 	std::map<std::string, MaterialData> m_materialData;
+	// keep all pattern data in a map
+	std::map<std::string, PatternData> m_patternData;
 
 	// keep the generic data
 	GenericData m_genericData;

@@ -665,6 +665,20 @@ const Be::ClassInfo* EveSOFDataMaterial::ExposeToBlue()
 
 
 
+BLUE_DEFINE( EveSOFDataPattern );
+const Be::ClassInfo* EveSOFDataPattern::ExposeToBlue()
+{
+	EXPOSURE_BEGIN( EveSOFDataPattern, "" )
+		MAP_INTERFACE( EveSOFDataPattern )
+
+		MAP_ATTRIBUTE( "name", m_name, "The pattern name. This functions as an ID.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "patternTextureResPath", m_patternTextureResPath, "Main texture used for this pattern.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "areas", m_areas, "", Be::READWRITE | Be::PERSIST )
+		EXPOSURE_END()
+}
+
+
+
 BLUE_DEFINE( EveSOFDataGenericString );
 const Be::ClassInfo* EveSOFDataGenericString::ExposeToBlue()
 {
@@ -794,5 +808,6 @@ const Be::ClassInfo* EveSOFData::ExposeToBlue()
 		MAP_ATTRIBUTE( "faction", m_faction, "All the factions data we have in EVE", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "race", m_race, "All the racial data we have in EVE", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "material", m_material, "All the material data we have in EVE", Be::READWRITE | Be::PERSIST )
-    EXPOSURE_END()
+		MAP_ATTRIBUTE( "pattern", m_pattern, "All the pattern data we have in EVE", Be::READWRITE | Be::PERSIST )
+	EXPOSURE_END()
 }

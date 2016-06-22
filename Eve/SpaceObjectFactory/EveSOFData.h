@@ -743,7 +743,7 @@ BLUE_DECLARE_VECTOR( EveSOFDataRace );
 
 
 // --------------------------------------------------------------------------------
-// All data storage classes for material lib data
+// All data storage classes for per material data
 // --------------------------------------------------------------------------------
 
 BLUE_CLASS( EveSOFDataMaterial ) :
@@ -762,6 +762,38 @@ public:
 };
 TYPEDEF_BLUECLASS( EveSOFDataMaterial );
 BLUE_DECLARE_VECTOR( EveSOFDataMaterial );
+
+
+
+
+
+
+
+
+
+// --------------------------------------------------------------------------------
+// All data storage classes for per pattern data
+// --------------------------------------------------------------------------------
+
+BLUE_CLASS( EveSOFDataPattern ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataPattern( IRoot* lockobj = NULL );
+	~EveSOFDataPattern() {}
+
+	// pattern name
+	std::string m_name;
+
+	// pattern texture res path
+	std::string m_patternTextureResPath;
+
+	// area parameters
+	PEveSOFDataFactionHullAreaVector m_areas;
+};
+TYPEDEF_BLUECLASS( EveSOFDataPattern );
+BLUE_DECLARE_VECTOR( EveSOFDataPattern );
 
 
 
@@ -911,6 +943,8 @@ public:
 	PEveSOFDataRaceVector m_race;
 	// material data
 	PEveSOFDataMaterialVector m_material;
+	// pattern data
+	PEveSOFDataPatternVector m_pattern;
 };
 TYPEDEF_BLUECLASS( EveSOFData );
 

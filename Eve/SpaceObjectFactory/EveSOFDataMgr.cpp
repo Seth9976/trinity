@@ -108,12 +108,36 @@ bool EveSOFDataMgr::HasMaterialData( const char* materialName ) const
 
 // --------------------------------------------------------------------------------
 // Description:
+//   check if pattern data is there. Mainly for debug reason!
+// --------------------------------------------------------------------------------
+bool EveSOFDataMgr::HasPatternData( const char* patternName ) const
+{
+	std::map<std::string, PatternData>::const_iterator finder = m_patternData.find( patternName );
+	return finder != m_patternData.end();
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Access to materialdata, only const pointer!!
 // --------------------------------------------------------------------------------
 const EveSOFDataMgr::MaterialData* EveSOFDataMgr::GetMaterialData( const char* materialName ) const
 {
 	std::map<std::string, MaterialData>::const_iterator finder = m_materialData.find( materialName );
 	if( finder == m_materialData.end() )
+	{
+		return nullptr;
+	}
+	return &finder->second;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Access to patterndata, only const pointer!!
+// --------------------------------------------------------------------------------
+const EveSOFDataMgr::PatternData* EveSOFDataMgr::GetPatternData( const char* patternName ) const
+{
+	std::map<std::string, PatternData>::const_iterator finder = m_patternData.find( patternName );
+	if( finder == m_patternData.end() )
 	{
 		return nullptr;
 	}
@@ -217,6 +241,29 @@ bool EveSOFDataMgr::UpdateMaterial( const char* materialName, EveSOFDataMaterial
 
 	// set it to the main map
 	m_materialData[ materialName ] = md;
+
+	return true;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Update an individual pattern, identified by it's name
+// --------------------------------------------------------------------------------
+bool EveSOFDataMgr::UpdatePattern( const char* patternName, EveSOFDataPattern* patternData )
+{
+	// must exist
+	if( !HasPatternData( patternName ) )
+	{
+		CCP_LOGWARN( "Trying to update a pattern which does not exist: %s", patternName );
+		return false;
+	}
+
+	// fill the non-trinity struct with the provided data
+	PatternData pd;
+	GeneratePatternData( pd, patternData );
+
+	// set it to the main map
+	m_patternData[patternName] = pd;
 
 	return true;
 }
@@ -991,6 +1038,61 @@ bool EveSOFDataMgr::LoadMaterialData( EveSOFDataPtr srcData )
 
 		// put it into the main map
 		m_materialData[(*it)->m_name] = md;
+	}
+
+	return true;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Fill a non-trinity pattern data struct with all the data from the trinity
+//   data struct
+// --------------------------------------------------------------------------------
+void EveSOFDataMgr::GeneratePatternData( PatternData& pd, EveSOFDataPatternPtr srcData ) const
+{
+	// pattern texture
+	pd.patternTextureResPath = srcData->m_patternTextureResPath;
+
+	// area parameters
+	pd.areaParameters.clear();
+	for( auto hait = srcData->m_areas.begin(); hait != srcData->m_areas.end(); ++hait )
+	{
+		EveSOFDataFactionHullAreaPtr hullAreaData = ( *hait );
+
+		FactionAreaData ad;
+		for( auto hapit = hullAreaData->m_parameters.begin(); hapit != hullAreaData->m_parameters.end(); ++hapit )
+		{
+			EveSOFDataParameterPtr parameterData = ( *hapit );
+			ad.parameters[parameterData->m_name] = parameterData->m_value;
+		}
+		pd.areaParameters[hullAreaData->m_name] = ad;
+	}
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Init pattern-specific data
+// --------------------------------------------------------------------------------
+bool EveSOFDataMgr::LoadPatternData( EveSOFDataPtr srcData )
+{
+	// store that data from that object internally
+	for( EveSOFDataPatternVector::const_iterator it = srcData->m_pattern.begin(); it != srcData->m_pattern.end(); ++it )
+	{
+		EveSOFDataPatternPtr patternData = ( *it );
+
+		// if this pattern is already there, we have a problem!
+		if( m_patternData.find( patternData->m_name ) != m_patternData.end() )
+		{
+			CCP_LOGERR( "Found a duplicate pattern name: %s", patternData->m_name.c_str() );
+			return false;
+		}
+
+		// fill the non-trinity struct with the provided data
+		PatternData pd;
+		GeneratePatternData( pd, patternData );
+
+		// put it into the main map
+		m_patternData[( *it )->m_name] = pd;
 	}
 
 	return true;
