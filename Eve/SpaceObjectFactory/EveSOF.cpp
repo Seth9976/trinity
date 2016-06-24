@@ -345,6 +345,7 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 	CCP_STATS_ZONE( __FUNCTION__ );
 
 	const std::vector<EveSOFDataMgr::HullAreas>* hullAreas = dna->GetHullMeshAreas( areaType );
+	const EveSOFDataMgr::PatternData* patternData = dna->GetPatternData( "" );
 	for( auto area = hullAreas->begin(); area != hullAreas->end(); ++area )
 	{
 		// find data on this shader from generics, we need it!
@@ -412,6 +413,12 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 				{
 					newShader->AddResourceTexture2D( it->first, highResPath.c_str() );
 				}
+			}
+
+			// pattern textures from pattern data
+			for( auto ptit = patternData->patternTextures.begin(); ptit != patternData->patternTextures.end(); ++ptit )
+			{
+				newShader->AddResourceTexture2D( ptit->first, ptit->second.resFilePath.c_str() );
 			}
 
 			// default shader textures from the generic data

@@ -1058,8 +1058,15 @@ bool EveSOFDataMgr::LoadMaterialData( EveSOFDataPtr srcData )
 // --------------------------------------------------------------------------------
 void EveSOFDataMgr::GeneratePatternData( PatternData& pd, EveSOFDataPatternPtr srcData ) const
 {
-	// pattern texture
-	pd.patternTextureResPath = srcData->m_patternTextureResPath;
+	// pattern textures
+	for( auto ptit = srcData->m_patternTextures.begin(); ptit != srcData->m_patternTextures.end(); ++ptit )
+	{
+		EveSOFDataTexturePtr tex = ( *ptit );
+
+		TextureData td;
+		td.resFilePath = tex->m_resFilePath;
+		pd.patternTextures[tex->m_name] = td;
+	}
 
 	// area parameters
 	pd.areaParameters.clear();

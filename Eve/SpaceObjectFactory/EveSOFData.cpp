@@ -195,7 +195,8 @@ EveSOFDataMaterial::EveSOFDataMaterial( IRoot* lockobj ) :
 
 
 EveSOFDataPattern::EveSOFDataPattern( IRoot* lockobj ) :
-	PARENTLOCK( m_areas )
+	PARENTLOCK( m_areas ),
+	PARENTLOCK( m_patternTextures )
 {}
 
 

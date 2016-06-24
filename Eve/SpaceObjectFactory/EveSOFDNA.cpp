@@ -932,6 +932,15 @@ const EveSOFDataMgr::HullBoosterData* EveSOFDNA::GetHullBoosterData() const
 
 // --------------------------------------------------------------------------------
 // Description:
+//   Return pattern data, but needs to exist for provided hull!
+// --------------------------------------------------------------------------------
+const EveSOFDataMgr::PatternData* EveSOFDNA::GetPatternData( const char* hullName ) const
+{
+	return m_patternData;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Sometimes it is good to know how high an ID of a mesharea can go!
 // --------------------------------------------------------------------------------
 unsigned int EveSOFDNA::GetHighestMeshAreaIndex( TriBatchType areaType ) const

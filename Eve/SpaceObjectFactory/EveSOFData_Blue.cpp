@@ -672,7 +672,7 @@ const Be::ClassInfo* EveSOFDataPattern::ExposeToBlue()
 		MAP_INTERFACE( EveSOFDataPattern )
 
 		MAP_ATTRIBUTE( "name", m_name, "The pattern name. This functions as an ID.", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "patternTextureResPath", m_patternTextureResPath, "Main texture used for this pattern.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "patternTextures", m_patternTextures, "Main textures used for this pattern.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "areas", m_areas, "", Be::READWRITE | Be::PERSIST )
 		EXPOSURE_END()
 }

@@ -335,7 +335,7 @@ public:
 	struct PatternData
 	{
 		// shared data
-		std::string patternTextureResPath;
+		std::map<BlueSharedString, TextureData> patternTextures;
 		// hull area parameter
 		std::map<BlueSharedString, FactionAreaData> areaParameters;
 	};

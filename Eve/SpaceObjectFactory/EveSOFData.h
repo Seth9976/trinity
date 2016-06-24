@@ -786,8 +786,8 @@ public:
 	// pattern name
 	std::string m_name;
 
-	// pattern texture res path
-	std::string m_patternTextureResPath;
+	// pattern textures res path
+	PEveSOFDataTextureVector m_patternTextures;
 
 	// area parameters
 	PEveSOFDataFactionHullAreaVector m_areas;
