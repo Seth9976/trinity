@@ -23,8 +23,8 @@
 extern bool g_eveSpaceObjectImpactEffectEnabled;
 
 // consts
-static const float IMPACT_HOLE_TO_ARMOR_DAMAGE_RATIO = 15.f;
-static const float IMPACT_HOLE_TO_HULL_DAMAGE_RATIO = 0.f;
+static const float IMPACT_HOLE_TO_ARMOR_DAMAGE_RATIO = 13.f;
+static const float IMPACT_HOLE_TO_HULL_DAMAGE_RATIO = 5.f;
 static const float IMPACT_ARMOR_SIZE_FACTOR = 0.0129f;
 static const float IMPACT_ARMOR_SIZE_MAX = 10.f;
 static const float IMPACT_SHIELD_SIZE_MAX = 2000.f;
@@ -59,6 +59,7 @@ EveImpactOverlay::EveImpactOverlay( IRoot* lockobj ) :
 	m_armorRepairing.CreateInstance();
 	m_shieldBoosting.CreateInstance();
 	m_shieldHardening.CreateInstance();
+	m_hullRepairing.CreateInstance();
 }
 
 EveImpactOverlay::~EveImpactOverlay()
@@ -206,6 +207,7 @@ void EveImpactOverlay::UpdateAsyncronous( EveUpdateContext& updateContext, EveSp
 	m_armorRepairing->Update( updateContext );
 	m_shieldBoosting->Update( updateContext );
 	m_shieldHardening->Update( updateContext );
+	m_hullRepairing->Update( updateContext );
 
 	// resize the texture data array based on both shield and armor impact
 	m_impactTexelData.resize( std::max( m_shieldImpactData.size(), m_armorImpactData.size() ) );
@@ -221,8 +223,8 @@ void EveImpactOverlay::UpdateAsyncronous( EveUpdateContext& updateContext, EveSp
 		m_shieldBoosting->GetKickInValue() );
 	m_impactTexelHeader.v[2] = Vector4( float( m_armorImpactData.size() ),
 		m_armorImpactParentSize,
-		0.f,
-		0.f );
+		m_hullRepairing->GetFaderValue(),
+		m_hullRepairing->GetKickInValue() );
 	m_impactTexelHeader.v[3] = Vector4( m_armorRepairing->GetFaderValue(),
 		m_armorHardening->GetFaderValue(),
 		m_armorRepairing->GetKickInValue(),
@@ -396,6 +398,22 @@ bool EveImpactOverlay::HasArmorActivity() const
 
 // --------------------------------------------------------------------------------
 // Description:
+//   Small helper function that checks if there is hull activity
+// --------------------------------------------------------------------------------
+bool EveImpactOverlay::HasHullActivity() const
+{
+	// settings
+	if( !g_eveSpaceObjectImpactEffectEnabled )
+	{
+		return false;
+	}
+
+	// hull?
+	return !m_hullRepairing->IsZero();
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Small helper function that checks if there is general activity
 // --------------------------------------------------------------------------------
 bool EveImpactOverlay::HasGeneralActivity() const
@@ -406,8 +424,8 @@ bool EveImpactOverlay::HasGeneralActivity() const
 		return false;
 	}
 
-	// armor or shield?
-	return HasArmorActivity() || HasShieldActivity();
+	// hull, armor or shield?
+	return HasHullActivity() || HasArmorActivity() || HasShieldActivity();
 }
 
 // --------------------------------------------------------------------------------
@@ -476,6 +494,10 @@ void EveImpactOverlay::ToggleEffect( const std::string& name, bool on, float dur
 	else if( name == "armorrepair" )
 	{
 		m_armorRepairing->StartFade( on, duration / 4.f );
+	}
+	else if( name == "hullrepair" )
+	{
+		m_hullRepairing->StartFade( on, duration / 4.f );
 	}
 }
 

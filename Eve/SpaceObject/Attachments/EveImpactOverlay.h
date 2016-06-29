@@ -116,6 +116,7 @@ public:
 	bool HasGeneralActivity() const;
 	bool HasShieldActivity() const;
 	bool HasArmorActivity() const;
+	bool HasHullActivity() const;
 
 private:
 	// helper functions to create the different types of impacts
@@ -171,6 +172,7 @@ private:
 	Tr2ScalarFaderPtr m_shieldBoosting;
 	Tr2ScalarFaderPtr m_armorRepairing;
 	Tr2ScalarFaderPtr m_armorHardening;
+	Tr2ScalarFaderPtr m_hullRepairing;
 };
 
 TYPEDEF_BLUECLASS( EveImpactOverlay );

@@ -40,6 +40,8 @@ const Be::ClassInfo* EveImpactOverlay::ExposeToBlue()
 		MAP_ATTRIBUTE( "armorRepairing", m_armorRepairing, "", Be::READWRITE )
 		MAP_ATTRIBUTE( "armorHardening", m_armorHardening, "", Be::READWRITE )
 
+		MAP_ATTRIBUTE( "hullRepairing", m_hullRepairing, "", Be::READWRITE )
+
 		MAP_ATTRIBUTE( "hullDamageFlickerCurve", m_hullDamageFlickerCurve, "This is the flickering for hull damage", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "hullDamageFactor", m_hullDamageFactor, "How much hull damage to show?", Be::READWRITE )
 		MAP_ATTRIBUTE( "hullImpactEmitter", m_hullImpactEmitter, "The hull impact emitter", Be::READWRITE | Be::PERSIST )
