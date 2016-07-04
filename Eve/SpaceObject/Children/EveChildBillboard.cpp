@@ -131,7 +131,13 @@ void EveChildBillboard::UpdateAsyncronous( EveUpdateContext& updateContext, IEve
 	UpdateTransform( parentTransform );
 	
 	// Do the billboard magic
-	Matrix invView = Tr2Renderer::GetInverseViewTransform();
+
+	Matrix invView;
+	const Vector3& pos = m_worldTransform.GetTranslation();
+	const Vector3& camPos = Tr2Renderer::GetViewPosition();
+	Vector3 up( 0.0f, 1.0f, 0.0f );
+	D3DXMatrixLookAtRH( &invView, &camPos, &pos, &up );
+	D3DXMatrixTranspose( &invView, &invView );
 
 	float parentScaleX = D3DXVec3Length( &parentTransform.GetX() );
 	float parentScaleY = D3DXVec3Length( &parentTransform.GetY() );
