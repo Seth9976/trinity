@@ -1564,6 +1564,15 @@ const LocatorStructureList* EveSpaceObject2::GetLocatorsForSet( const char* setN
 	return nullptr;
 }
 
+// --------------------------------------------------------------------------------
+// Description:
+//   Set a new custom mask/projection patter from the outside
+// --------------------------------------------------------------------------------
+void EveSpaceObject2::SetCustomMask( EveCustomMaskPtr newCustomMask )
+{
+	m_customMask = newCustomMask;
+}
+
 
 void EveSpaceObject2::GetImpactPosition( Vector3& out, int damageLocatorIndex, const Vector3& direction )
 {

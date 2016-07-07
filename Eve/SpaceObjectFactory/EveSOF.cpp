@@ -130,6 +130,7 @@ IRootPtr EveSOF::BuildFromDNA( const char* dnaString )
 
 	// get us the base geometry
 	SetupMesh( newObj, dna );
+	SetupCustomMask( newObj, dna );
 
 	// decals
 	SetupDecals( newObj, dna );
@@ -417,10 +418,13 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 				}
 			}
 
-			// pattern textures from pattern data
-			for( auto ptit = patternData->patternTextures.begin(); ptit != patternData->patternTextures.end(); ++ptit )
+			// pattern textures from optional(!) pattern data
+			if( patternData )
 			{
-				newShader->AddResourceTexture2D( ptit->first, ptit->second.resFilePath.c_str() );
+				for( auto ptit = patternData->patternTextures.begin(); ptit != patternData->patternTextures.end(); ++ptit )
+				{
+					newShader->AddResourceTexture2D( ptit->first, ptit->second.resFilePath.c_str() );
+				}
 			}
 
 			// default shader textures from the generic data
@@ -1114,14 +1118,17 @@ void EveSOF::SetupInstancedMeshes( EveSpaceObject2Ptr newObj, const EveSOFDNAPtr
 void EveSOF::SetupCustomMask( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
 {
 	const EveSOFDataMgr::PatternProjectionData* patternProjectionData = dna->GetPatternProjectionData( dna->GetHullName() );
+
+	// if we don't have this specific hull in the patter data, we don't need to set it to the spaceobject!
 	if( patternProjectionData )
 	{
 		EveCustomMaskPtr customMask;
 		customMask.CreateInstance();
 		customMask->Setup( patternProjectionData->position, patternProjectionData->scaling, patternProjectionData->rotation );
+
+		obj->SetCustomMask( customMask );
 	}
 }
-
 
 // --------------------------------------------------------------------------------
 // Description:

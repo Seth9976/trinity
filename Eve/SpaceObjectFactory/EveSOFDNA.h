@@ -36,6 +36,7 @@ public:
 		CMD_RESPATHINSERT,
 		CMD_VARIANT,
 		CMD_CLASS,
+		CMD_PATTERN,
 		CMD_MAX
 	}; 
 
@@ -96,6 +97,7 @@ public:
 	const EveSOFDataMgr::FactionSpriteSetColorData* GetFactionSpriteSetData( int groupIndex ) const;
 
 	// get pattern data
+	std::string GetPatternName() const;
 	const EveSOFDataMgr::PatternProjectionData* GetPatternProjectionData( const char* hullName ) const;
 	const EveSOFDataMgr::PatternData* GetPatternData() const;
 
@@ -134,7 +136,6 @@ private:
 	std::string m_hullName;
 	std::string m_factionName;
 	std::string m_raceName;
-	std::string m_patternName;
 	std::map<std::string, std::vector<std::string>> m_commands;
 };
 

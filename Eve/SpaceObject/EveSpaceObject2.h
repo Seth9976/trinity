@@ -313,6 +313,7 @@ public:
 	Vector3 GetDamageLocator( uint32_t index ) const;
 	Vector3 GetDamageLocatorDirection( uint32_t index ) const;
 	const LocatorStructureList* GetLocatorsForSet( const char* setName ) const;
+	void SetCustomMask( EveCustomMaskPtr newCustomMask );
 
 	// access to shadows
 	void SetShadowEffect( Tr2EffectPtr newShadowEffect );

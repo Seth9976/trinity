@@ -20,6 +20,7 @@ bool FileExists( const std::string& path )
 static char s_dnaSeperatorCmd = ':';
 static char s_dnaSeperatorArg = '?';
 static char s_dnaSeperatorList = ';';
+static std::string s_dnaPatternDefaultName( "default" );
 
 // dna commands
 static std::string s_dnaCommands[] = {
@@ -28,6 +29,7 @@ static std::string s_dnaCommands[] = {
 	"respathinsert",		// CMD_RESPATHINSERT
 	"variant",				// CMD_VARIANT
 	"class",				// CMD_CLASS
+	"pattern",				// CMD_PATTERN
 };
 
 static std::string s_dnaClasses[] = {
@@ -158,6 +160,17 @@ bool EveSOFDNA::ValidateContent()
 				return false;
 			}
 			break;
+		case CMD_PATTERN:
+			// has one argument: the pattern name
+			if( cit->second.size() != 1 )
+			{
+				return false;
+			}
+			if( !m_dataMgr->HasPatternData( cit->second[0].c_str() ) )
+			{
+				return false;
+			}
+			break;
 		}
 	}
 
@@ -184,7 +197,7 @@ void EveSOFDNA::Setup( const char* dnaString, EveSOFDataMgrPtr dataMgr )
 	StringSplit( dnaParts, dnaString, s_dnaSeperatorCmd );
 
 	// need three at least
-	if(dnaParts.size() < 3)
+	if( dnaParts.size() < 3 )
 	{
 		CCP_LOGERR( "Invalid SOF DNA, not enough subparts: %s", dnaString );
 		return;
@@ -210,11 +223,10 @@ void EveSOFDNA::Setup( const char* dnaString, EveSOFDataMgrPtr dataMgr )
 		m_commands[cmdAndArgs[0]] = commandList;
 	}
 
-	// names
+	// the 3 main dna names
 	m_hullName = dnaParts[0];
 	m_factionName = dnaParts[1];
 	m_raceName = dnaParts[2];
-	m_patternName = "default";
 
 	// pointers
 	m_hullData = m_dataMgr->GetHullData( m_hullName.c_str() );
@@ -238,10 +250,10 @@ void EveSOFDNA::Setup( const char* dnaString, EveSOFDataMgrPtr dataMgr )
 		return;
 	}
 	// pattern data (is NOT optional, the default one must exist!)
-	m_patternData = m_dataMgr->GetPatternData( m_patternName.c_str() );
+	m_patternData = GetPatternData();
 	if( m_patternData == nullptr )
 	{
-		CCP_LOGERR( "Couldn't find the requested pattern: %s", m_patternName.c_str() );
+		CCP_LOGERR( "Couldn't find the requested pattern, not even the default one: %s", s_dnaPatternDefaultName.c_str() );
 		return;
 	}
 	// generics
@@ -957,9 +969,10 @@ const EveSOFDataMgr::PatternProjectionData* EveSOFDNA::GetPatternProjectionData(
 {
 	// find hull in the pattern data
 	BlueSharedString s( hullName );
-	if( m_patternName == "default" )
+	// if we don't have a dna command for a pattern, the hull is also default
+	if( !HasDnaCommand( CMD_PATTERN ) )
 	{
-		s = BlueSharedString( "default" );
+		s = BlueSharedString( s_dnaPatternDefaultName );
 	}
 	auto finder = m_patternData->projectionData.find( s );
 	if( finder == m_patternData->projectionData.end() )
@@ -971,11 +984,27 @@ const EveSOFDataMgr::PatternProjectionData* EveSOFDNA::GetPatternProjectionData(
 
 // --------------------------------------------------------------------------------
 // Description:
+//   Return the pattern name, with fallback ("default") and dna commands etc.
+// --------------------------------------------------------------------------------
+std::string EveSOFDNA::GetPatternName() const
+{
+	// do we have a pattern DNA commmand?
+	std::vector<std::string> commandArgs;
+	if( !GetDnaCommandArgs( CMD_PATTERN, commandArgs ) )
+	{
+		return s_dnaPatternDefaultName;
+	}
+	return commandArgs[0];
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Return pattern data
 // --------------------------------------------------------------------------------
 const EveSOFDataMgr::PatternData* EveSOFDNA::GetPatternData() const
 {
-	return m_patternData;
+	std::string patternName = GetPatternName();
+	return m_dataMgr->GetPatternData( patternName.c_str() );
 }
 
 // --------------------------------------------------------------------------------
