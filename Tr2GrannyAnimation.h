@@ -61,6 +61,8 @@ public:
 	Vector4 CalculateSkinnedBoundingSphere( granny_file_info* fi=nullptr );
 	bool CalculateSkinnedBoundingBoxFromTransform( const Matrix& transform, Vector3& bbMin, Vector3& bbMax, granny_file_info* fi=nullptr );
 
+	void RenderBones( const Matrix& modelTransform );
+
 	std::pair<TriGeometryRes*, std::map<std::pair<TriGeometryRes*, uint32_t>, uint32_t>> CreateStaticGeometry( std::vector<TriGeometryRes*> grannies );
 
 	int GetMeshBoneCount() const;

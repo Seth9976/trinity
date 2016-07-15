@@ -364,6 +364,29 @@ bool Tr2GrannyAnimation::GetDynamicBounds( Vector4& boundingSphere, Vector3 &aab
 	return true;
 }
 
+void Tr2GrannyAnimation::RenderBones( const Matrix& modelTransform )
+{
+	Vector3 initialPlacement( 0, 0, 0 );
+	const granny_file_info* fi = GetFileInfo();
+	Matrix initialTranslation;
+	if( fi )
+	{
+		initialPlacement = Vector3( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
+	}
+	D3DXMatrixTranslation( &initialTranslation, initialPlacement.x, initialPlacement.y, initialPlacement.z );
+	
+	for( int boneIdx = 0; boneIdx < m_meshBoneCount; boneIdx++ )
+	{
+		const int* bi = GrannyGetMeshBindingFromBoneIndices( m_meshBinding );
+		Matrix mat = *(const Matrix*)GrannyGetWorldPose4x4( m_worldPose, bi[boneIdx] ) * modelTransform * initialTranslation;
+		Vector4 pos(0, 0, 0, 1);
+		D3DXVec4Transform( &pos, &pos, &mat );
+		pos.w = 2;
+		Tr2Renderer::DrawSphere( pos, 1, 0xffffffff );
+		Tr2Renderer::Printf( TRI_DBG_FONT_SMALL, Vector3( pos.x, pos.y, pos.z ), 0xffffffff, "  %s : %d / %d", m_skeleton->Bones[bi[boneIdx]].Name, bi[boneIdx], boneIdx );
+	}
+}
+
 void Tr2GrannyAnimation::RenderDynamicBounds( const Matrix& modelTransform )
 {
 	Vector3 transformed[8];

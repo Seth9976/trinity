@@ -375,6 +375,7 @@ protected:
 	bool m_debugRenderDebugInfoForChildren;
 	bool m_debugShowDynamicBounds;
 	bool m_debugShowDamageLocators;
+	bool m_debugShowBones;
 	bool m_allowLodSelection;
 
 	Matrix m_worldTransform;

@@ -164,6 +164,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_debugRenderDebugInfoForChildren( true ),
 	m_debugShowDynamicBounds( true ),
 	m_debugShowDamageLocators( false ),
+	m_debugShowBones( false ),
 	m_isVisible( false ),
 	m_isMeshVisible( false ),
 	m_localAabbMin( 0.f, 0.f, 0.f ),
@@ -428,7 +429,6 @@ void EveSpaceObject2::RenderDebugInfo( Tr2RenderContext& renderContext )
 		Matrix customMaskTransform;
 		m_customMask->GetDebugDrawMatrix( &customMaskTransform, GetBoundingSphereRadius() );
 		Tr2Renderer::DrawOrientedBox( customMaskTransform, 0xff00ffff );
-		return;
 	}
 
 	if( m_debugShowBoundingBox )
@@ -471,6 +471,10 @@ void EveSpaceObject2::RenderDebugInfo( Tr2RenderContext& renderContext )
 	if( m_animationUpdater && m_debugShowDynamicBounds && m_isAnimated )
 	{
 		m_animationUpdater->RenderDynamicBounds( m_worldTransform );
+	}
+	if( m_animationUpdater && m_debugShowBones )
+	{
+		m_animationUpdater->RenderBones( m_worldTransform );
 	}
 	Tr2Renderer::Printf( TRI_DBG_FONT_SMALL, m_worldTransform.GetTranslation(), 0xffffffff, m_name.c_str() );
 

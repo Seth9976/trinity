@@ -88,6 +88,14 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 			"If set, damage locator positions are rendered (if scene is showing debug info).", 
 			Be::READWRITE
 		)
+		
+		MAP_ATTRIBUTE
+		( 
+			"debugShowBones", 
+			m_debugShowBones, 
+			"If set, bone names and indices are shown(if scene is showing debug info).", 
+			Be::READWRITE
+		)
 
 		MAP_ATTRIBUTE
 		(
