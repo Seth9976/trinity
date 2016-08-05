@@ -229,11 +229,11 @@ void EveSwarm::RebuildCachedData( BlueAsyncRes* p )
 // --------------------------------------------------------------------------------
 void EveSwarm::UpdateSyncronous( EveUpdateContext& updateContext )
 {
-	EveShip2::UpdateSyncronous( updateContext );
 	if( m_swarmingEnabled )
 	{
 		UpdateSwarm( updateContext.GetTime() );
 	}
+	EveShip2::UpdateSyncronous( updateContext );
 }
 
 // --------------------------------------------------------------------------------
