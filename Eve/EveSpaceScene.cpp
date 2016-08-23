@@ -1966,7 +1966,7 @@ void EveSpaceScene::PopulatePerFramePSData( PerFramePSData &data )
 	D3DXVec3Normalize( &data.Sun.DirWorld, &data.Sun.DirWorld );
 	data.Sun.DirWorld = -data.Sun.DirWorld;
 	data.AmbientColor = Vector3( m_ambientColor.r, m_ambientColor.g, m_ambientColor.b );
-	data.NebulaIntensity = m_nebulaBrightnessOverride >= 0.0f ? m_nebulaBrightnessOverride : m_nebulaIntensity;
+	data.NebulaIntensity = m_nebulaBrightnessOverride > 0.0f ? m_nebulaBrightnessOverride : m_nebulaIntensity;
 	data.FogColor = Vector4( m_fogColor.r, m_fogColor.g, m_fogColor.b, 0.f );
 
 	// ps data of fog
