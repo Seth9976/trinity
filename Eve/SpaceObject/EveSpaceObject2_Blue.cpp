@@ -429,6 +429,14 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 			Be::READ
 		)
 
+		MAP_ATTRIBUTE
+		(
+			"lastDamageLocatorHit",
+			m_lastDamageLocatorHit,
+			"The last damagelocator hit.",
+			Be::READ
+		)
+
 		MAP_METHOD_AND_WRAP( "GetDamageLocatorCount", GetDamageLocatorCount, "Get number of damage locators on this ship" )
 		MAP_METHOD_AND_WRAP( "GetDamageLocator", GetDamageLocator, "Get the position of indexed damage locator, (0,0,0) is returned for indices out of range." )
 		MAP_METHOD_AND_WRAP( "GetTransformedDamageLocator", GetTransformedDamageLocator, "Get the position of indexed damage locator, (0,0,0) is returned for indices out of range." )

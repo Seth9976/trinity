@@ -176,7 +176,8 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_previousPosition( UNINITIALIZED_POSITION, UNINITIALIZED_POSITION, UNINITIALIZED_POSITION ),
 	m_spaceObjectShipData( 1.f, 1.f, EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT, 1.f ),
 	m_dirtLevel( EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT ),
-	m_isAnimated( false )
+	m_isAnimated( false ),
+	m_lastDamageLocatorHit( -1 )
 {
 	m_worldTransform = XMMatrixIdentity();
 	m_invWorldTransform = XMMatrixIdentity();
@@ -2129,6 +2130,7 @@ void EveSpaceObject2::ClearImpactDamage()
 // -----------------------------------------------------------------------------
 int EveSpaceObject2::CreateImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime, float size )
 {
+	m_lastDamageLocatorHit = damageLocatorIndex;
 	if( m_impactOverlay )
 	{
 		if( m_lodLevel > TR2_LOD_LOW )
