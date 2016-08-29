@@ -92,7 +92,7 @@ public:
 	// Registers an object and its attachments with the quad renderer
 	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
 	// Adds quads from space object and its attachments to the quad renderer. ATTENTION: this function is called in-parallel
-	virtual void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	virtual void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 
 private:
 	Tr2EffectPtr m_connectorEffect;

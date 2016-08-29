@@ -11,6 +11,7 @@
 
 #include "Tr2Renderer.h"
 #include "Utilities/BoundingSphere.h"
+#include "TriFrustum.h"
 
 namespace
 {
@@ -73,11 +74,16 @@ void EveChildQuad::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 	}
 }
 
-void EveChildQuad::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer ) const
+void EveChildQuad::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const
 {
 	if( m_display && m_effect )
 	{
-		quadRenderer.AddQuads( m_effectKey, &m_quad, 1 );
+		Vector4 sphere = Vector4( 0.f, 0.f, 0.f, std::sqrt( 2.f ) * std::max( m_scale.x, m_scale.y ) );
+		BoundingSphereTransform( m_worldTransform, sphere );
+		if( frustum.IsSphereVisible( &sphere ) )
+		{
+			quadRenderer.AddQuads( m_effectKey, &m_quad, 1 );
+		}
 	}
 }
 
@@ -87,7 +93,7 @@ void EveChildQuad::GetRenderables( const TriFrustum& frustum, std::vector<ITr2Re
 
 bool EveChildQuad::GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query ) const
 {
-	sphere = Vector4( 0.f, 0.f, 0.f, std::sqrt( 3.f * std::max( m_scale.x, m_scale.y ) ) );
+	sphere = Vector4( 0.f, 0.f, 0.f, std::sqrt( 2.f ) * std::max( m_scale.x, m_scale.y ) );
 	BoundingSphereTransform( m_worldTransform, sphere );
 	return true;
 }

@@ -75,7 +75,7 @@ void EveChildContainer::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer 
 	}
 }
 
-void EveChildContainer::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer ) const
+void EveChildContainer::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const
 {
 	if (!m_display )
 	{
@@ -83,7 +83,7 @@ void EveChildContainer::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer ) 
 	}
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		(*it)->AddQuadsToQuadRenderer( quadRenderer );
+		(*it)->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
 }
 

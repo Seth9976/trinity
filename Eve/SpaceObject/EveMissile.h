@@ -44,7 +44,7 @@ public:
 	virtual void RenderDebugInfo( Tr2RenderContext& renderContext );
 	virtual bool GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query=EVE_BOUNDS_NORMAL ) const;
 	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
-	virtual void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	virtual void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Renderable - overriding EveSpaceObject2 implementations

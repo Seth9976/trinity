@@ -97,11 +97,11 @@ void EveMissile::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 // Description:
 //   Implements IEveSpaceObject2. Adds warhead sprites to quad renderer.
 // --------------------------------------------------------------------------------
-void EveMissile::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+void EveMissile::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
 	for( auto it = m_warheads.begin(); it != m_warheads.end(); ++it )
 	{
-		( *it )->AddQuadsToQuadRenderer( quadRenderer );
+		( *it )->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
 }
 

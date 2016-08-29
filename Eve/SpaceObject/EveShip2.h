@@ -29,7 +29,7 @@ public:
 	virtual void GetRenderables( const TriFrustum& frustum, std::vector<ITr2Renderable*>& renderables, const Matrix& parentTransform );
 	virtual void RenderDebugInfo( Tr2RenderContext& renderContext );
 	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
-	virtual void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	virtual void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 	virtual void GetLights( Tr2LightManager& lightManager ) const;
 
 	/////////////////////////////////////////////////////////////////////////////////////

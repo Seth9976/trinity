@@ -214,7 +214,7 @@ void EveEffectRoot2::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 	}
 }
 
-void EveEffectRoot2::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+void EveEffectRoot2::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
 	if (!m_display )
 	{
@@ -222,7 +222,7 @@ void EveEffectRoot2::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
 	}
 	for( auto it = m_effectChildren.begin(); it != m_effectChildren.end(); ++it )
 	{
-		( *it )->AddQuadsToQuadRenderer( quadRenderer );
+		( *it )->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
 }
 

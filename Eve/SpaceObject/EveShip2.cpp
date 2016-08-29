@@ -110,13 +110,13 @@ void EveShip2::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 	}
 }
 
-void EveShip2::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+void EveShip2::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
 	if( !m_isInFrustum || !m_display )
 	{
 		return;
 	}
-	EveSpaceObject2::AddQuadsToQuadRenderer( quadRenderer );
+	EveSpaceObject2::AddQuadsToQuadRenderer( frustum, quadRenderer );
 	if( DisplayBoosters() )
 	{
 		m_boosters->AddToQuadRenderer( quadRenderer, m_worldTransform );

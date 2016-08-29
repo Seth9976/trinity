@@ -327,7 +327,7 @@ void EveTacticalOverlay::GetRenderables( const TriFrustum& frustum, std::vector<
 	m_requestedSegmentsLast = requestedSegments;
 }
 
-void EveTacticalOverlay::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+void EveTacticalOverlay::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
 	if( !m_connectorEffectHash || !m_anchorEffectHash || !m_velocityEffectHash )
 	{

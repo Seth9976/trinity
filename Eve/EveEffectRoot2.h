@@ -48,7 +48,7 @@ public:
 	bool GetLocalBoundingBox( Vector3 &min, Vector3 &max );
 	void GetLocalToWorldTransform( Matrix &transform ) const;
 	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
-	void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2SecondaryLightSource

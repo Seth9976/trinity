@@ -502,7 +502,7 @@ void EveSwarm::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 // Arguments:
 //   quadRenderer - quad renderer
 // --------------------------------------------------------------------------------
-void EveSwarm::AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer )
+void EveSwarm::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
 	if( !m_isInFrustum || !m_display )
 	{

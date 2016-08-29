@@ -481,6 +481,7 @@ private:
 		const std::vector<IEveSpaceObject2*>& objectsNotReceivingShadow );
 
 	void UpdateQuadRenderer( 
+		const TriFrustum& frustum,
 		const std::vector<ShadowReceiver>& objectsReceivingShadow, 
 		const std::vector<IEveSpaceObject2*>& objectsNotReceivingShadow, 
 		Tr2RenderContext& renderContext );

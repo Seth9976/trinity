@@ -1304,7 +1304,7 @@ void EveSpaceScene::GatherBatches( Tr2RenderContext& renderContext )
 		obj->GetRenderables( frustum, shadowRenderables, Tr2Renderer::GetIdentityTransform() );
 	}
 
-	UpdateQuadRenderer( objectsReceivingShadow, objectsNotReceivingShadow, renderContext );
+	UpdateQuadRenderer( frustum, objectsReceivingShadow, objectsNotReceivingShadow, renderContext );
 	Tr2QuadRenderer::Instance()->GetBatches( m_primaryBatches[TRIBATCHTYPE_ADDITIVE] );
 
 	GetAllBatchesFromRenderables( renderables, transparentObjects, m_primaryBatches );
@@ -1366,6 +1366,7 @@ void EveSpaceScene::UpdateShLighting(
 //   renderContext - current render context
 // --------------------------------------------------------------------------------------
 void EveSpaceScene::UpdateQuadRenderer( 
+	const TriFrustum& frustum,
 	const std::vector<ShadowReceiver>& objectsReceivingShadow, 
 	const std::vector<IEveSpaceObject2*>& objectsNotReceivingShadow, 
 	Tr2RenderContext& renderContext )
@@ -1378,7 +1379,7 @@ void EveSpaceScene::UpdateQuadRenderer(
 	{
 		for( auto i = range.begin(); i != range.end(); ++i )
 		{
-			objectsReceivingShadow[i].object->AddQuadsToQuadRenderer( quadRenderer );
+			objectsReceivingShadow[i].object->AddQuadsToQuadRenderer( frustum, quadRenderer );
 		}
 	} );
 
@@ -1386,7 +1387,7 @@ void EveSpaceScene::UpdateQuadRenderer(
 	{
 		for( auto i = range.begin(); i != range.end(); ++i )
 		{
-			objectsNotReceivingShadow[i]->AddQuadsToQuadRenderer( quadRenderer );
+			objectsNotReceivingShadow[i]->AddQuadsToQuadRenderer( frustum, quadRenderer );
 		}
 	} );
 	quadRenderer.BeginRendering( renderContext );

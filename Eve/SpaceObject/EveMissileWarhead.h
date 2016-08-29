@@ -45,7 +45,7 @@ public:
 	virtual void GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData );
 
 	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
-	void AddQuadsToQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 
 
 	// access to relative data
