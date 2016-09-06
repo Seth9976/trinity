@@ -61,14 +61,20 @@ void EveChildMesh::GetRenderables( const TriFrustum& frustum, std::vector<ITr2Re
 
 bool EveChildMesh::GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query ) const
 {
-	// TODO: leaving as is because for now S.Manekeller wants a child mesh to play around with
-	// Fix asap <Logi 27. aug 2015>
-	Vector3 transl = m_worldTransform.GetTranslation();
-	sphere.x = transl.x;
-	sphere.y = transl.y;
-	sphere.z = transl.z;
-	sphere.w = 100000;
-	return true;
+	if( m_mesh )
+	{
+		if( m_mesh->GetBoundingSphere( sphere ) )
+		{
+			if( sphere.w <= 0 )
+			{
+				// TODO: leaving as is because for now S.Manekeller wants a child mesh to play around with
+				// Fix asap <Logi 27. aug 2015>
+				sphere.w = 100000;
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 bool EveChildMesh::HasTransparentBatches()
