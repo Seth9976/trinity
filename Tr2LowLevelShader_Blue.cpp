@@ -70,7 +70,6 @@ const Be::ClassInfo* Tr2LowLevelShader::ExposeToBlue()
 {
 	EXPOSURE_BEGIN( Tr2LowLevelShader, "" )
 		MAP_INTERFACE(Tr2LowLevelShader)
-		MAP_INTERFACE(IInitialize)
 		
 	MAP_ATTRIBUTE
 	(

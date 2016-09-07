@@ -172,6 +172,13 @@ const Be::ClassInfo* Tr2Effect::ExposeToBlue()
 			"na",
 			Be::READ
 		)
+		MAP_ATTRIBUTE
+		(    
+			"options",
+			m_options,
+			":jessica-widget: effectoptions",
+			Be::READ | Be::PERSIST
+		)
 		////////////////////////////////////////////////////////////////////////////
 		//
 		MAP_ATTRIBUTE

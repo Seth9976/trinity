@@ -124,6 +124,16 @@ static Tr2SamplerOverride s_defaultValue = {
 	4 
 };
 
+
+static BlueStructureDefinition Tr2ShaderOptionStructureDef[] =
+{ 
+	{ "name", Be::SHAREDSTRING_1, offsetof( Tr2ShaderOption, name ) }, 
+	{ "value", Be::SHAREDSTRING_1, offsetof( Tr2ShaderOption, value ) }, 
+	{0} 
+};
+
+
+
 // ---------------------------------------------------------------
 Tr2Effect::Tr2Effect(IRoot* lockobj) :
 	#if TRINITYDEV
@@ -135,6 +145,7 @@ Tr2Effect::Tr2Effect(IRoot* lockobj) :
 	PARENTLOCK(m_resources),
 	PARENTLOCK( m_constParameters ),
 	PARENTLOCK( m_samplerOverrides ),
+	PARENTLOCK( m_options ),
 	m_display( true ),
 	m_parameterHash( INVALID_PARAMETER_HASH )
 {
@@ -143,6 +154,7 @@ Tr2Effect::Tr2Effect(IRoot* lockobj) :
 	m_constParameters.SetStructureDefinition( Tr2EffectParameterStructureDef );
 	m_samplerOverrides.SetStructureDefinition( Tr2SamplerOverrideStructureDef );
 	m_samplerOverrides.SetDefaultValue( &s_defaultValue );
+	m_options.SetStructureDefinition( Tr2ShaderOptionStructureDef );
 
 	m_sortValue = s_effectId++;
 
@@ -438,7 +450,7 @@ void Tr2Effect::RebuildSamplerOverrides()
 		return;
 	}
 
-	auto& desc = m_effectResource->GetEffectDescription();
+	auto& desc = m_shader->GetEffectDescription();
 	const unsigned passCount = unsigned( desc.passes.size() );
 	for( unsigned passIx = 0; passIx != passCount; ++passIx )
 	{
@@ -479,11 +491,16 @@ void Tr2Effect::RebuildCachedDataInternal()
 		return;
 	}
 	m_parameterHash = INVALID_PARAMETER_HASH;
+	m_shader = nullptr;
 
 	if( m_effectResource )
 	{		
-		RebuildCachedDataForEffect( *m_effectResource, *this, m_parametersForPasses );
-		RebuildSamplerOverrides();
+		m_shader = m_effectResource->GetShader( m_options.empty() ? nullptr : &m_options[0], m_options.size() );
+		if( m_shader )
+		{
+			RebuildCachedDataForEffect( *m_shader, *this, m_parametersForPasses );
+			RebuildSamplerOverrides();
+		}
 	}
 
 	// It's ok to pass in NULL values to these functions so that the parameters
@@ -491,12 +508,12 @@ void Tr2Effect::RebuildCachedDataInternal()
 
 	for( size_t i = 0; i != m_parameters.size(); ++i )
 	{
-		m_parameters[i]->RebuildEffectHandles( m_effectResource );
+		m_parameters[i]->RebuildEffectHandles( m_shader );
 	}
 
 	for( size_t i = 0; i != m_resources.size(); ++i)
 	{
-		m_resources[i]->RebuildEffectHandles( m_effectResource );
+		m_resources[i]->RebuildEffectHandles( m_shader );
 	}
 
 }
@@ -523,6 +540,8 @@ void Tr2Effect::ReleaseCachedData( BlueAsyncRes* p )
 	CCP_ASSERT( p == m_effectResource );
 	if( p == m_effectResource )
 	{
+		m_shader = nullptr;
+
 		const int numResources = (unsigned int)m_resources.size();
 		const int numParameters = (unsigned int)m_parameters.size();
 
@@ -617,7 +636,7 @@ bool Tr2Effect::PopulateParameters()
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	if (!m_effectResource)
+	if (!m_shader)
 	{
 		CCP_LOGERR( "No effect resource loaded." );
 		return false;
@@ -649,16 +668,16 @@ bool Tr2Effect::PopulateParameters()
 		return false;
 	};
 
-	for( unsigned passIx = 0; passIx < m_effectResource->GetPassCount(); ++passIx )
+	for( unsigned passIx = 0; passIx < m_shader->GetPassCount(); ++passIx )
 	{
-		const Tr2Pass& pass = m_effectResource->GetPass( passIx );
+		const Tr2Pass& pass = m_shader->GetEffectDescription().passes[passIx];
 		for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 		{
 			const auto& input = pass.stageInputs[i];
 
 			for( auto constant = input.constants.cbegin(); constant != input.constants.cend(); ++constant )
 			{
-				if( !GetBool( m_effectResource, constant->name.c_str(), "SasUiVisible" ) )
+				if( !GetBool( m_shader, constant->name.c_str(), "SasUiVisible" ) )
 				{
 					continue;
 				}
@@ -673,7 +692,7 @@ bool Tr2Effect::PopulateParameters()
 
 			for( auto sampler = input.resources.begin(); sampler != input.resources.end(); ++sampler )
 			{
-				if( !GetBool( m_effectResource, sampler->second.name, "SasUiVisible" ) )
+				if( !GetBool( m_shader, sampler->second.name, "SasUiVisible" ) )
 				{
 					continue;
 				}
@@ -688,7 +707,7 @@ bool Tr2Effect::PopulateParameters()
 
 			for( auto uav = input.uavs.begin(); uav != input.uavs.end(); ++uav )
 			{
-				if( !GetBool( m_effectResource, uav->second.name, "SasUiVisible" ) )
+				if( !GetBool( m_shader, uav->second.name, "SasUiVisible" ) )
 				{
 					continue;
 				}
@@ -718,7 +737,7 @@ bool Tr2Effect::PruneParameters()
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	if (!m_effectResource)
+	if (!m_shader)
 	{
 		CCP_LOGERR( "No effect resource loaded." );
 		return false;
@@ -729,14 +748,14 @@ bool Tr2Effect::PruneParameters()
 	while (y < m_parameters.GetSize())
 	{
 		std::string pName = m_parameters[y]->GetParameterName();
-		bool removeParameter = !GetBool( m_effectResource, pName.c_str(), "SasUiVisible" );
-		const Tr2EffectConstant *constant = m_effectResource->GetConstant( pName.c_str() );
+		bool removeParameter = !GetBool( m_shader, pName.c_str(), "SasUiVisible" );
+		const Tr2EffectConstant *constant = m_shader->GetConstant( pName.c_str() );
 		if( constant == nullptr && !removeParameter )
 		{
 			removeParameter = true;
-			for( unsigned passIx = 0; passIx < m_effectResource->GetPassCount() && removeParameter; ++passIx )
+			for( unsigned passIx = 0; passIx < m_shader->GetPassCount() && removeParameter; ++passIx )
 			{
-				const Tr2Pass& pass = m_effectResource->GetPass( passIx );
+				const Tr2Pass& pass = m_shader->GetEffectDescription().passes[passIx];
 				for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 				{
 					for( auto sampler = pass.stageInputs[i].resources.begin(); sampler != pass.stageInputs[i].resources.end(); ++sampler )
@@ -765,8 +784,8 @@ bool Tr2Effect::PruneParameters()
 	while( it < m_constParameters.size() )
 	{
 		const char* pName = m_constParameters[it].name.c_str();
-		bool removeParameter = !GetBool( m_effectResource, pName, "SasUiVisible" );
-		const Tr2EffectConstant *constant = m_effectResource->GetConstant( pName );
+		bool removeParameter = !GetBool( m_shader, pName, "SasUiVisible" );
+		const Tr2EffectConstant *constant = m_shader->GetConstant( pName );
 		if( constant == nullptr && !removeParameter )
 		{
 			removeParameter = true;
@@ -786,14 +805,14 @@ bool Tr2Effect::PruneParameters()
 	while (y < m_resources.GetSize())
 	{
 		std::string pName = m_resources[y]->GetParameterName();
-		bool removeParameter = !GetBool( m_effectResource, pName.c_str(), "SasUiVisible" );
-		const Tr2EffectConstant *constant = m_effectResource->GetConstant( pName.c_str() );
+		bool removeParameter = !GetBool( m_shader, pName.c_str(), "SasUiVisible" );
+		const Tr2EffectConstant *constant = m_shader->GetConstant( pName.c_str() );
 		if( constant == nullptr && !removeParameter )
 		{
 			removeParameter = true;
-			for( unsigned passIx = 0; passIx < m_effectResource->GetPassCount() && removeParameter; ++passIx )
+			for( unsigned passIx = 0; passIx < m_shader->GetPassCount() && removeParameter; ++passIx )
 			{
-				const Tr2Pass& pass = m_effectResource->GetPass( passIx );
+				const Tr2Pass& pass = m_shader->GetEffectDescription().passes[passIx];
 				for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 				{
 					for( auto sampler = pass.stageInputs[i].resources.begin(); sampler != pass.stageInputs[i].resources.end(); ++sampler )
@@ -833,9 +852,9 @@ bool Tr2Effect::IsParameterUsedByTechnique( const std::string& parameterName )
 
 unsigned int Tr2Effect::GetSortValue() const
 {
-	if( m_effectResource )
+	if( m_shader )
 	{
-		return m_effectResource->GetSortValue();
+		return m_shader->GetSortValue();
 	}
 	else
 	{
@@ -1039,13 +1058,7 @@ void Tr2Effect::ApplyShaderInputs(	unsigned passIndex,
 
 ITr2ShaderState* Tr2Effect::GetShaderStateInterface() const
 {
-	Tr2EffectRes* res = GetEffectRes();
-	if( res && res->IsGood() )
-	{
-		return res;
-	}
-
-	return NULL;
+	return m_shader;
 }
 
 uint32_t Tr2Effect::ApplyMaterialDataForPass( unsigned int passIndex, Tr2RenderContext& renderContext )

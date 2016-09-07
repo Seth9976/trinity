@@ -472,7 +472,7 @@ bool Tr2ShaderMaterial::PopulateParameters()
 
 	for( unsigned passIx = 0; passIx < m_lowLevelShader->GetPassCount(); ++passIx )
 	{
-		const Tr2Pass& pass = m_lowLevelShader->GetPass( passIx );
+		const Tr2Pass& pass = m_lowLevelShader->GetEffectDescription().passes[passIx];
 		for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 		{
 			const auto& input = pass.stageInputs[i];
@@ -541,7 +541,7 @@ bool Tr2ShaderMaterial::PruneParameters()
 			removeParameter = true;
 			for( unsigned passIx = 0; passIx < m_lowLevelShader->GetPassCount() && removeParameter; ++passIx )
 			{
-				const Tr2Pass& pass = m_lowLevelShader->GetPass( passIx );
+				const Tr2Pass& pass = m_lowLevelShader->GetEffectDescription().passes[passIx];
 				for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT && removeParameter; ++i )
 				{
 					for( auto sampler = pass.stageInputs[i].resources.begin(); sampler != pass.stageInputs[i].resources.end(); ++sampler )

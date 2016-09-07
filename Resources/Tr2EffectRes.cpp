@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Tr2EffectRes.h"
 #include "Tr2Renderer.h"
+#include "Shader/Tr2Shader.h"
 
 static unsigned int s_effectResId = 0;
 
@@ -25,102 +26,131 @@ BLUE_REGISTER_RESOURCE_EXTENSION( L"SM_HI", CreateTr2EffectRes );
 BLUE_REGISTER_RESOURCE_EXTENSION( L"SM_DEPTH", CreateTr2EffectRes );
 
 Tr2EffectRes::Tr2EffectRes( IRoot* lockobj ) :
+	m_version( 0 ),
 	m_stringTable( nullptr ),
-	m_data( nullptr ),
-	m_shaderTypeMask( 0xffFFffFFu )
+	m_stringTableSize( 0 ),
+	m_offsetCount( 0 ),
+	m_offsets( nullptr ),
+	m_permutations( "Tr2EffectRes::m_permutations" ),
+	m_shaders( "Tr2EffectRes::m_shaders" )
 {	
-	m_sortValue = s_effectResId++;
 }
 
 Tr2EffectRes::~Tr2EffectRes()
 {
-	delete[] m_stringTable;
 }
 
-const Tr2EffectConstant* Tr2EffectRes::GetConstant( const char* name ) const
+ITr2ShaderStatePtr Tr2EffectRes::GetShader( const Tr2ShaderOption* options, size_t count )
 {
-	for( auto pass = m_effect.passes.begin(); pass != m_effect.passes.end(); ++pass )
+	if( !IsGood() )
 	{
-		for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+		return nullptr;
+	}
+
+	uint32_t multiplier = 1;
+	uint32_t index = 0;
+
+	for( size_t i = 0; i < m_permutations.size(); ++i )
+	{
+		auto value = m_permutations[i].defaultOption;
+		for( size_t k = 0; k < count; ++k )
 		{
-			for( auto constant = pass->stageInputs[i].constants.begin(); constant != pass->stageInputs[i].constants.end(); ++constant )
+			if( options[k].name == m_permutations[i].name )
 			{
-				if( strcmp( constant->name.c_str(), name ) == 0 )
+				size_t val = -1;
+				for( size_t j = 0; j < m_permutations[i].options.size(); ++j )
 				{
-					return &*constant;
+					if( m_permutations[i].options[j] == options[k].value )
+					{
+						val = j;
+						break;
+					}
+				}
+				if( val == -1 )
+				{
+					CCP_LOGWARN( "Invalid situation value %s for permutation %s in effect %S", options[k].value.c_str(), m_permutations[i].name, GetPath() );
+				}
+				else
+				{
+					value = val;
 				}
 			}
 		}
+		index += uint32_t( value * multiplier );
+		multiplier *= uint32_t( m_permutations[i].options.size() );
 	}
-	return nullptr;
-}
 
-const Tr2EffectResource* Tr2EffectRes::GetResource( const char* name ) const
-{
-	for( auto pass = m_effect.passes.begin(); pass != m_effect.passes.end(); ++pass )
+	auto found = m_shaders.find( index );
+	if( found != m_shaders.end() && static_cast<Tr2Shader*>( found->second ) != nullptr)
 	{
-		for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
-		{
-			for( auto constant = pass->stageInputs[i].resources.begin(); constant != pass->stageInputs[i].resources.end(); ++constant )
-			{
-				if( strcmp( constant->second.name, name ) == 0 )
-				{
-					return &constant->second;
-				}
-			}
-			for( auto constant = pass->stageInputs[i].uavs.begin(); constant != pass->stageInputs[i].uavs.end(); ++constant )
-			{
-				if( strcmp( constant->second.name, name ) == 0 )
-				{
-					return &constant->second;
-				}
-			}
-		}
+		ITr2ShaderState* ss = found->second;
+		return ss;
 	}
-	return nullptr;
+
+	CCP_ASSERT( index < m_offsetCount );
+
+	Tr2ShaderPtr shader;
+	shader.CreateInstance();
+
+	auto offset = m_offsets[index];
+	auto buffer = reinterpret_cast<const uint8_t*>( m_data.get() ) + offset.offset;
+	if( !shader->GetEffect().Read( buffer, offset.size, m_version, m_stringTable, m_stringTableSize, CW2A( GetPath() ) ) )
+	{
+		return false;
+	}
+	shader->ProcessEffect();
+
+	m_shaders[index] = shader.p;
+	ITr2ShaderStatePtr ss = shader;
+	return ss;
 }
 
 BlueAsyncRes::LoadingResult Tr2EffectRes::DoLoad()
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	if( !m_dataStream->LockData( (void**)&m_data, 0 ) )
+	m_version = 0;
+	m_data.clear();
+	m_stringTable = nullptr;
+	m_stringTableSize = 0;
+	m_offsets = nullptr;
+	m_offsetCount = 0;
+	m_permutations.clear();
+	m_shaders.clear();
+
+	uint8_t* data = nullptr;
+	if( !m_dataStream->LockData( reinterpret_cast<void**>( &data ), 0 ) )
 	{
 		return LR_FAILED;
 	}
 
-	m_dataSize = (unsigned int)m_dataStream->GetSize();
-
-	return LR_SUCCESS;
-}
-
-bool Tr2EffectRes::DoPrepare()
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-
-	if( !Tr2Renderer::IsResourceCreationAllowed() )
+	if( data == nullptr )
 	{
-		return false;
+		return LR_FAILED;
 	}
 
-	delete[] m_stringTable;
-	m_stringTable = nullptr;
-	m_effect.passes.clear();
-	m_effect.annotations.clear();
+	auto dataSize = m_dataStream->GetSize();
 
-	if( m_data == nullptr )
+
+	m_data.resize( "Tr2EffectRes::m_data", size_t( dataSize ) );
+
+	if( m_data.empty() )
 	{
-		return false;
+		m_dataStream->UnlockData();
+		return LR_FAILED;
 	}
 
-	const uint8_t* buffer = reinterpret_cast<const uint8_t*>( m_data );
-	const uint8_t* bufferEnd = buffer + m_dataSize;
+	memcpy( m_data.get(), data, size_t( dataSize ) );
+	m_dataStream->UnlockData();
+
+	const uint8_t* buffer = reinterpret_cast<const uint8_t*>( m_data.get() );
+	const uint8_t* bufferEnd = buffer + dataSize;
 
 #define SKIP( storeType )																	\
 	if( buffer + sizeof( storeType ) > bufferEnd )											\
 	{																						\
 		CCP_LOGERR( "Unexpected end of file while reading effect \"%S\"", GetPath() );		\
-		return false;																		\
+		return LR_FAILED;																	\
 	}																						\
 	buffer += sizeof( storeType );
 
@@ -128,99 +158,118 @@ bool Tr2EffectRes::DoPrepare()
 	if( buffer + sizeof( storeType ) > bufferEnd )											\
 	{																						\
 		CCP_LOGERR( "Unexpected end of file while reading effect \"%S\"", GetPath() );		\
-		return false;																		\
+		return LR_FAILED;																	\
 	}																						\
 	value = valueType( *reinterpret_cast<const storeType*>( buffer ) );						\
 	buffer += sizeof( storeType );
 
-	uint32_t version;
-	READ( uint32_t, uint32_t, version );
-
-	if( version < 2 || version > 4 )
-	{
-		CCP_LOGERR( "Invalid version of effect file \"%S\" (version %i)", GetPath(), version );
-		return false;
+#define READ_STRING( value )																\
+	{																						\
+		uint32_t offset;																	\
+		READ( uint32_t, uint32_t, offset );													\
+		if( offset >= m_stringTableSize )													\
+		{																					\
+			CCP_LOGERR( "Invalid string offset in effect \"%S\"", GetPath() );				\
+			return LR_FAILED;																\
+		}																					\
+		value = m_stringTable + offset;														\
 	}
 
-	uint32_t headerSize;
-	READ( uint32_t, uint32_t, headerSize );
+	READ( uint32_t, uint32_t, m_version );
 
-	if( headerSize == 0 )
+	if( m_version < 2 || m_version > 5 )
 	{
-		CCP_LOGERR( "File \"%s\" contains no compiled effects", GetPath() );
-		return false;
+		CCP_LOGERR( "Invalid version of effect file \"%S\" (version %i)", GetPath(), m_version );
+		return LR_FAILED;
 	}
 
-	if( 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t ) > m_dataSize )
+	if( m_version < 5 )
 	{
-		CCP_LOGERR( "Invalid file header size in effect \"%S\". Corrupt file?", GetPath() );
-		return false;
-	}
+		uint32_t headerSize;
+		READ( uint32_t, uint32_t, headerSize );
 
-	// Get the first permutation from the file
-	SKIP( uint32_t );
-
-	uint32_t offset;
-	READ( uint32_t, uint32_t, offset );
-	if( offset > m_dataSize )
-	{
-		CCP_LOGERR( "Invalid offset in effect \"%S\". Corrupt file?", GetPath() );
-		return false;
-	}
-
-	uint32_t tableSize = *reinterpret_cast<const uint32_t*>( reinterpret_cast<const char*>( m_data ) + 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) );
-	if( 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t ) + tableSize > m_dataSize )
-	{
-		CCP_LOGERR( "Invalid string table size in effect \"%S\". Corrupt file?", GetPath() );
-		return false;
-	}
-	m_stringTable = new char[tableSize];
-	memcpy( m_stringTable, reinterpret_cast<const char*>( m_data ) + 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t ), tableSize );
-
-	buffer = reinterpret_cast<const uint8_t*>( m_data ) + offset;
-
-	if( !m_effect.Read( buffer, m_dataSize - offset, version, m_stringTable, tableSize, CW2A( GetPath() ) ) )
-	{
-		return false;
-	}
-
-	m_sortValue = 0;
-	if( !m_effect.passes.empty() )
-	{
-		// Construct sort value so that the following parameters affect it, in the order given:
-		// 1) Number of passes
-		// 2) Pixel shader in the first pass
-		// 3) Vertex shader in the first pass
-		// 4) Render states set in the first pass
-
-		unsigned int ps = m_effect.passes[0].stageInputs[PIXEL_SHADER ].m_shader & 0x3ff;
-		unsigned int vs = m_effect.passes[0].stageInputs[VERTEX_SHADER].m_shader & 0x3ff;
-		unsigned int states = m_effect.passes[0].renderStates & 0x3ff;
-		unsigned int numPasses = m_effect.passes.size() & 0x3;
-
-		m_sortValue = (numPasses << 30) | (ps << 20) | (vs << 10) | states;
-	}
-
-	m_shaderTypeMask = 0;
-	for( auto pass = m_effect.passes.cbegin(); pass != m_effect.passes.cend(); ++pass )
-	{
-		for( unsigned i = SHADER_TYPE_FIRST; i != SHADER_TYPE_COUNT; ++i )
+		if( headerSize == 0 )
 		{
-			if( pass->stageInputs[i].m_shader != Tr2EffectStageInput::INVALID )
-			{
-				m_shaderTypeMask |= 1u << i;
-			}
+			CCP_LOGERR( "File \"%s\" contains no compiled effects", GetPath() );
+			return LR_FAILED;
 		}
+
+		if( 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t ) > size_t( dataSize ) )
+		{
+			CCP_LOGERR( "Invalid file header size in effect \"%S\". Corrupt file?", GetPath() );
+			return LR_FAILED;
+		}
+
+		// Get the first permutation from the file
+		m_offsetCount = 1;
+		m_offsets = reinterpret_cast<const FileRecord*>( buffer );
+
+		m_stringTableSize = *reinterpret_cast<const uint32_t*>( reinterpret_cast<const char*>( m_data.get() ) + 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) );
+		if( 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t ) + m_stringTableSize > size_t( dataSize ) )
+		{
+			CCP_LOGERR( "Invalid string table size in effect \"%S\". Corrupt file?", GetPath() );
+			return LR_FAILED;
+		}
+		m_stringTable = reinterpret_cast<const char*>( m_data.get() ) + 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t );
+	}
+	else
+	{
+		READ( uint32_t, uint32_t, m_stringTableSize );
+		if( m_stringTableSize > size_t( dataSize ) )
+		{
+			CCP_LOGERR( "Invalid string table size in effect \"%S\". Corrupt file?", GetPath() );
+			return LR_FAILED;
+		}
+		m_stringTable = reinterpret_cast<const char*>( buffer );
+		buffer += m_stringTableSize;
+
+		uint32_t permutationCount;
+		READ( uint8_t, uint32_t, permutationCount );
+		for( uint32_t i = 0; i < permutationCount; ++i )
+		{
+			Tr2ShaderPermutation permutation;
+			std::string name;
+			READ_STRING( name );
+			permutation.name = BlueSharedString( name );
+			READ( uint8_t, size_t, permutation.defaultOption );
+			READ_STRING( permutation.description );
+
+			uint32_t count;
+			READ( uint8_t, uint32_t, count );
+			for( uint32_t j = 0; j < count;++ j )
+			{
+				std::string name;
+				READ_STRING( name );
+				permutation.options.push_back( BlueSharedString( name ) );
+			}
+			m_permutations.push_back( permutation );
+		}
+
+		uint32_t headerSize;
+		READ( uint32_t, uint32_t, headerSize );
+
+		if( headerSize == 0 )
+		{
+			CCP_LOGERR( "File \"%s\" contains no compiled effects", GetPath() );
+			return LR_FAILED;
+		}
+
+		if( 2 * sizeof( uint32_t ) + headerSize * 3 * sizeof( uint32_t ) + sizeof( uint32_t ) > size_t( dataSize ) )
+		{
+			CCP_LOGERR( "Invalid file header size in effect \"%S\". Corrupt file?", GetPath() );
+			return LR_FAILED;
+		}
+
+		m_offsetCount = headerSize;
+		m_offsets = reinterpret_cast<const FileRecord*>( buffer );
 	}
 
-
-	return true;
+	return LR_SUCCESS;
 }
 
-void Tr2EffectRes::OnCloseStream()
+bool Tr2EffectRes::DoPrepare()
 {
-	m_data = NULL;
-	m_dataSize = 0;
+	return true;
 }
 
 void Tr2EffectRes::ReleaseResources( TriStorage s )
@@ -230,6 +279,8 @@ void Tr2EffectRes::ReleaseResources( TriStorage s )
 		SetGood( false );
 		SetPrepared( false );
 		CancelPendingLoad();
+
+		m_shaders.clear();
 
 		NotifyReleaseCachedData();
 	}
@@ -267,140 +318,6 @@ void Tr2EffectRes::GetDescription( std::string& desc )
 }
 #endif
 
-void Tr2EffectRes::ApplyRenderStates(	uint32_t passIx, 
-										Tr2RenderContext &renderContext ) const
-{
-	const Tr2Pass& pass = m_effect.passes[passIx];
-
-	renderContext.m_esm.ApplyRenderStates( pass.renderStates );
-}
-
-void Tr2EffectRes::ApplySamplerStates(	uint32_t passIx, 
-										Tr2RenderContextEnum::ShaderType type,
-										Tr2RenderContext &renderContext ) const
-{
-	const Tr2Pass& pass = m_effect.passes[passIx];
-
-	for(	auto it = pass.stageInputs[type].samplers.cbegin(); 
-			it != pass.stageInputs[type].samplers.cend(); 
-			++it )
-	{
-		renderContext.m_esm.ApplySamplerSetup( 
-			type, 
-			it->first, 
-			it->second.handle );
-	}
-}
-
-void Tr2EffectRes::ApplyAllStateForPass(uint32_t passIndex, 
-										Tr2RenderContext &renderContext ) const
-{
-	const Tr2Pass& pass = m_effect.passes[passIndex];
-
-	for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
-	{
-		if( SHADER_TYPE_EXISTS( i ) )
-		{
-			renderContext.m_esm.ApplyShader( ShaderType( i ), pass.stageInputs[i].m_shader );
-			for(	auto it = pass.stageInputs[i].samplers.cbegin(); 
-					it != pass.stageInputs[i].samplers.end(); 
-					++it )
-			{
-				renderContext.m_esm.ApplySamplerSetup( 
-					Tr2RenderContextEnum::ShaderType( i ), 
-					it->first, 
-					it->second.handle );
-			}
-		}
-	}
-
-	renderContext.m_esm.ApplyRenderStates( pass.renderStates );
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Returns map of effect annotations for a given parameter or nullptr if the parameter
-//   is not found or it doesn't contain any annotations.  
-// Arguments:
-//   parameterName - Name of the effect parameter
-// Return Value:
-//   Map of effect annotations or nullptr
-// --------------------------------------------------------------------------------------
-const Tr2EffectParameterAnnotationMap* Tr2EffectRes::GetParameterAnnotations( const char* parameterName ) const
-{
-	auto it = std::find_if( m_effect.annotations.begin(), m_effect.annotations.end(), [&]( Tr2EffectAnnotationMap::const_reference key ) { return strcmp( key.first, parameterName ) == 0; } );
-	return it == m_effect.annotations.end() ? nullptr : &it->second;
-}
-
-const Tr2EffectResourceMap* Tr2EffectRes::GetResources( uint32_t pass, Tr2RenderContextEnum::ShaderType type ) const
-{
-	if( pass > m_effect.passes.size() || type < SHADER_TYPE_FIRST || type >= SHADER_TYPE_COUNT )
-	{
-		return nullptr;
-	}
-	return &m_effect.passes[pass].stageInputs[type].resources;
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Returns effect pass data.  
-// Arguments:
-//   passIx - Pass index
-// Return Value:
-//   Pass data
-// --------------------------------------------------------------------------------------
-const Tr2Pass& Tr2EffectRes::GetPass( unsigned int passIx ) const
-{
-	return m_effect.passes[passIx];
-}
-
-unsigned int Tr2EffectRes::GetPassCount() const
-{
-	if( !IsGood() || !IsPrepared() )
-	{
-		return 0;
-	}
-	return (unsigned int)m_effect.passes.size();
-}
-
-void Tr2EffectRes::ApplyShader( uint32_t passIx, 
-								Tr2RenderContextEnum::ShaderType type,
-								Tr2RenderContext &renderContext ) const
-{
-	const Tr2Pass& pass = m_effect.passes[passIx];
-	renderContext.m_esm.ApplyShader( type, pass.stageInputs[type].m_shader );
-}
-
-unsigned Tr2EffectRes::GetShaderTypeMask()
-{
-	return m_shaderTypeMask;
-}
-
-const Tr2EffectDescription& Tr2EffectRes::GetEffectDescription() const
-{
-	return m_effect;
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Returns input definition for requested shader.  
-// Arguments:
-//   passIx - Pass index
-//   type - Shader (input stage) type
-// Return Value:
-//   Pointer to shader input definition
-// --------------------------------------------------------------------------------------
-const Tr2ShaderInputDefinition* Tr2EffectRes::GetShaderInputDefinition( 
-								uint32_t passIx, 
-								Tr2RenderContextEnum::ShaderType type )
-{
-	if( passIx >= m_effect.passes.size() || type >= SHADER_TYPE_COUNT )
-	{
-		return nullptr;
-	}
-	return &m_effect.passes[passIx].stageInputs[type].inputDefinition;
-}
-
 bool Tr2EffectRes::IsMemoryUsageKnown()
 {
 	return !IsLoading();
@@ -410,5 +327,5 @@ size_t Tr2EffectRes::GetMemoryUsage()
 {
 	// memory usage here is kind of nebulous - pixel/vertex shaders are
 	// registered with the effect state manager, won't ever be freed.
-	return 1024;
+	return m_data.size();
 }

@@ -4,70 +4,42 @@
 BLUE_DEFINE( Tr2EffectRes );
 
 #if BLUE_WITH_PYTHON
-PyObject* PyGetShaderInputDefinition( PyObject* self, PyObject* args )
+PyObject* Tr2EffectRes::GetPermutationDescription()
 {
-	Tr2EffectRes* pThis = BluePythonCast<Tr2EffectRes*>( self );
-	if( !pThis || !pThis->IsGood() )
+	if( !IsGood() )
 	{
-		PyErr_SetString(PyExc_RuntimeError, "Tr2EffectRes.GetShaderInputDefinition: invalid effect resource");
-		return NULL;
-	}
-	int pass, shaderType;
-	if( !PyArg_ParseTuple( args, "ii", &pass, &shaderType ) )
-	{
-		PyErr_SetString(PyExc_RuntimeError, "Tr2EffectRes.GetShaderInputDefinition: expects to integer parameters");
-		return NULL;
-	}
-	const Tr2ShaderInputDefinition* definition = pThis->GetShaderInputDefinition( pass, Tr2RenderContextEnum::ShaderType( shaderType ) );
-	if( !definition )
-	{
-		PyErr_SetString(PyExc_RuntimeError, "Tr2EffectRes.GetShaderInputDefinition: failed to get shader input definition");
-		return NULL;
-	}
-
-	PyObject *result =  PyTuple_New( definition->elements.size() );
-	for( unsigned i = 0; i < definition->elements.size(); ++i )
-	{
-		const Tr2ShaderInputDefinitionElement& element = definition->elements[i];
-		PyTuple_SET_ITEM(result, i, Py_BuildValue("(iiii)", element.usage, element.usageIndex, element.registerIndex, element.usedMask ) ); 
-	}
-	return result;
-}
-
-PyObject* PyGetShaderResourceInputs( PyObject* self, PyObject* args )
-{
-	Tr2EffectRes* pThis = BluePythonCast<Tr2EffectRes*>( self );
-	if( !pThis || !pThis->IsGood() )
-	{
-		PyErr_SetString(PyExc_RuntimeError, "Tr2EffectRes.GetShaderInputDefinition: invalid effect resource");
-		return NULL;
-	}
-	uint32_t pass, shaderType;
-	if( !PyArg_ParseTuple( args, "ii", &pass, &shaderType ) )
-	{
+		PyErr_SetString( PyExc_ValueError, "effect is not prepared" );
 		return nullptr;
 	}
-
-	auto resources = pThis->GetResources( pass, Tr2RenderContextEnum::ShaderType( shaderType ) );
-	if( !resources )
+	PyObject* result = PyTuple_New( Py_ssize_t( m_permutations.size() ) );
+	for( size_t i = 0; i < m_permutations.size(); ++i )
 	{
-		PyErr_SetString( PyExc_IndexError, "pass out of range" );
-		return nullptr;
-	}
+		PyObject* desc = PyDict_New();
+		PyObject* element;
+		element = PyString_FromString( m_permutations[i].name.c_str() );
+		PyDict_SetItemString( desc, "name", element );
+		Py_DECREF( element );
+		element = PyTuple_New( Py_ssize_t( m_permutations[i].options.size() ) );
+		for( size_t j = 0; j < m_permutations[i].options.size(); ++j )
+		{
+			PyTuple_SetItem( element, Py_ssize_t( j ), PyString_FromString(m_permutations[i].options[j].c_str()));
+		}
+		PyDict_SetItemString( desc, "options", element );
+		Py_DECREF( element );
+		element = PyInt_FromSize_t( m_permutations[i].defaultOption );
+		PyDict_SetItemString( desc, "default", element );
+		Py_DECREF( element );
+		element = PyString_FromString( m_permutations[i].description.c_str() );
+		PyDict_SetItemString( desc, "description", element );
+		Py_DECREF( element );
 
-	PyObject *result =  PyTuple_New( resources->size() );
-	int index = 0;
-	for( auto it = std::begin( *resources ); it != std::end( *resources ); ++it )
-	{
-		PyTuple_SET_ITEM( 
-			result, 
-			index++, 
-			Py_BuildValue("(sibb)", it->second.name, it->second.type, it->second.isSRGB, it->second.isAutoregister ) ); 
+		PyTuple_SetItem( result, Py_ssize_t( i ), desc );
 	}
 	return result;
 }
 
 #endif
+
 
 const Be::ClassInfo* Tr2EffectRes::ExposeToBlue()
 {
@@ -78,27 +50,14 @@ const Be::ClassInfo* Tr2EffectRes::ExposeToBlue()
 		MAP_INTERFACE( ICacheable )
 		MAP_ICACHEABLE_METHODS()
 
-		MAP_PROPERTY_READONLY( "passCount", GetPassCount, "Number of passes used in the effect.")
-		MAP_PROPERTY_READONLY( "sortValue", GetSortValue, "Sort value used when rendering sorted by effect.")
-
-		MAP_METHOD( 
-			"GetShaderInputDefinition", 
-			PyGetShaderInputDefinition, 
-			"Returns shader input definition (inputs from graphics pipeline).\n"
-			"Result is an n-tuple of tuples (usage, usageIndex, inputRegisterIndex, usageMask).\n" 
-			"\nArguments:"
-			"\npass : Pass index"
-			"\nshader : Shader type" 
-			);
-
-		MAP_METHOD( 
-			"GetShaderResourceInputs", 
-			PyGetShaderResourceInputs, 
-			"Returns shader resource inputs as a sequence of (name, type, sRGB, autoregister) tuples.\n"
-			"\nArguments:"
-			"\npass : Pass index"
-			"\nshader : Shader type" 
-			);
+#if BLUE_WITH_PYTHON
+		MAP_METHOD_AND_WRAP(
+			"GetPermutationDescription",
+			GetPermutationDescription,
+			"Returns a description of effect permutations as a tuple of dictionaries.\n"
+			"Each dictionary contains a tuple \"options\" of permutation options, \"default\" value index and \"description\"."
+			)
+#endif
 
 	EXPOSURE_CHAINTO( BlueAsyncRes )
 }

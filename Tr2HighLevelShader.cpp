@@ -209,8 +209,6 @@ Tr2LowLevelShader* Tr2HighLevelShader::GetOrCreateLowLevelShader(
 	Tr2LowLevelShaderPtr lowLevelShader;
 	lowLevelShader.CreateInstance();
 
-	lowLevelShader->Initialize();
-
 	GetEffect( permuteIndex, currentDefines, codeSource, lowLevelShader->GetEffect() );
 
 	if( lowLevelShader->GetEffect().passes.empty() )
@@ -296,51 +294,118 @@ void Tr2HighLevelShader::LoadFXFile()
 			CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
 			return;
 		}
-		if( version < 2 || version > 4 )
+		if( version < 2 || version > 5 )
 		{
 			CCP_LOGERR( "Invalid version of effect file \"%s\" (version %i)", m_shaderFilePath.c_str(), version );
 			return;
 		}
 		m_shaderFileVersion = version;
 		
-		// Read file header and store it in the m_compiledPermutations map
-		uint32_t count = 0;
-		if( m_compiledFile->Read( &count, sizeof( count ) ) != sizeof( count ) )
+		if( version < 5 )
 		{
-			CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
-			return;
-		}
-		uint32_t* header = new uint32_t[count * 3];
-		if( m_compiledFile->Read( header, count * 3 * sizeof( uint32_t ) ) != count * 3 * sizeof( uint32_t ) )
-		{
-			CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
-			return;
-		}
-		for( unsigned i = 0; i < count; ++i )
-		{
-			FileRecord record;
-			record.offset = header[i * 3 + 1];
-			record.size = header[i * 3 + 2];
-			m_compiledPermutations[header[i * 3]] = record;
-		}
-		delete[] header;
+			// Read file header and store it in the m_compiledPermutations map
+			uint32_t count = 0;
+			if( m_compiledFile->Read( &count, sizeof( count ) ) != sizeof( count ) )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			uint32_t* header = new uint32_t[count * 3];
+			if( m_compiledFile->Read( header, count * 3 * sizeof( uint32_t ) ) != count * 3 * sizeof( uint32_t ) )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			for( unsigned i = 0; i < count; ++i )
+			{
+				FileRecord record;
+				record.offset = header[i * 3 + 1];
+				record.size = header[i * 3 + 2];
+				m_compiledPermutations[header[i * 3]] = record;
+			}
+			delete[] header;
 
-		uint32_t strignTableSize;
-		if( m_compiledFile->Read( &strignTableSize, sizeof( strignTableSize ) ) != sizeof( strignTableSize ) )
-		{
-			CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
-			return;
+			uint32_t strignTableSize;
+			if( m_compiledFile->Read( &strignTableSize, sizeof( strignTableSize ) ) != sizeof( strignTableSize ) )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			delete[] m_stringTable;
+			m_stringTable = nullptr;
+			m_stringTableSize = 0;
+			m_stringTable = new char[strignTableSize];
+			if( m_compiledFile->Read( m_stringTable, strignTableSize ) != strignTableSize )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			m_stringTableSize = strignTableSize;
 		}
-		delete[] m_stringTable;
-		m_stringTable = nullptr;
-		m_stringTableSize = 0;
-		m_stringTable = new char[strignTableSize];
-		if( m_compiledFile->Read( m_stringTable, strignTableSize ) != strignTableSize )
+		else
 		{
-			CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
-			return;
+#define READ( field )																						\
+	if( m_compiledFile->Read( &field, sizeof( field ) ) != sizeof( field ) )									\
+	{																										\
+		CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );	\
+		return;																								\
+	}
+
+
+			uint32_t strignTableSize;
+			READ( strignTableSize );
+			delete[] m_stringTable;
+			m_stringTable = nullptr;
+			m_stringTableSize = 0;
+			m_stringTable = new char[strignTableSize];
+			if( m_compiledFile->Read( m_stringTable, strignTableSize ) != strignTableSize )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			m_stringTableSize = strignTableSize;
+
+
+			uint32_t permutationCount;
+			READ( permutationCount );
+			for( uint32_t i = 0; i < permutationCount; ++i )
+			{
+				uint32_t unused32;
+				READ( unused32 );
+				uint8_t unused8;
+				READ( unused8 );
+				READ( unused32 );
+
+				uint8_t count;
+				READ( count );
+				for( uint32_t j = 0; j < count;++ j )
+				{
+					READ( unused32 );
+				}
+			}
+
+			// Read file header and store it in the m_compiledPermutations map
+			uint32_t count = 0;
+			if( m_compiledFile->Read( &count, sizeof( count ) ) != sizeof( count ) )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			uint32_t* header = new uint32_t[count * 3];
+			if( m_compiledFile->Read( header, count * 3 * sizeof( uint32_t ) ) != count * 3 * sizeof( uint32_t ) )
+			{
+				CCP_LOGERR( "Unexpected end of file while reading effect file \"%s\"", m_shaderFilePath.c_str() );
+				return;
+			}
+			for( unsigned i = 0; i < count; ++i )
+			{
+				FileRecord record;
+				record.offset = header[i * 3 + 1];
+				record.size = header[i * 3 + 2];
+				m_compiledPermutations[header[i * 3]] = record;
+			}
+			delete[] header;
 		}
-		m_stringTableSize = strignTableSize;
 	}
 }
 

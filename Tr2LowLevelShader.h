@@ -2,8 +2,7 @@
 #ifndef Tr2LowLevelShader_h
 #define Tr2LowLevelShader_h
 
-// Trinity headers
-#include "ITr2ShaderState.h"
+#include "Shader/Tr2Shader.h"
 
 // --------------------------------------------------------------------------------------
 // Description:
@@ -30,8 +29,7 @@ enum Tr2ShaderCodeSource
 //   Tr2ShaderMaterial, Tr2LowLevelShaderPass
 // --------------------------------------------------------------------------------------
 BLUE_CLASS( Tr2LowLevelShader ) :
-	public IInitialize,
-	public ITr2ShaderState
+	public Tr2Shader
 {
 public:
 	Tr2LowLevelShader( IRoot* lockobj = NULL );
@@ -39,58 +37,13 @@ public:
 
 	EXPOSE_TO_BLUE();
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// IInitialize
-	virtual bool Initialize();
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// ITr2ShaderState
-	virtual uint32_t GetPassCount() const;
-
-	virtual void ApplyAllStateForPass(	uint32_t passIndex,
-										Tr2RenderContext &renderContext ) const;
-	// Return a bitfield that indicates which shader types are used by this effect/material.
-	virtual uint32_t GetShaderTypeMask();
-
-	const Tr2EffectDescription& GetEffectDescription() const;
-
-	// individual accessors if needed.
-	virtual void ApplyRenderStates( 
-					uint32_t passIndex,
-					Tr2RenderContext &renderContext ) const;
-
-	virtual void ApplySamplerStates( 
-					uint32_t passIndex, 
-					Tr2RenderContextEnum::ShaderType type,
-					Tr2RenderContext &renderContext ) const;
-
-	virtual void ApplyShader( 
-					uint32_t passIndex, 
-					Tr2RenderContextEnum::ShaderType type,
-					Tr2RenderContext &renderContext ) const;
-
-	virtual const Tr2EffectConstant* GetConstant( const char* name ) const;
-	virtual const Tr2EffectResource* GetResource( const char* name ) const;
-	virtual const Tr2EffectParameterAnnotationMap* GetParameterAnnotations( const char* parameterName ) const;
-
-	/// 
-	unsigned int GetSortValue() const;
-	
 	unsigned int GetPermuteIndex() const { return m_permuteIndex; }
 	Tr2EffectDefine* GetCompilerDefines() const { return m_compilerDefines; }
 		
 	void SetPermuteIndex( unsigned int permuteIndex );
 	void SetCodeSource( Tr2ShaderCodeSource codeSource );
 	void SetCompilerDefines( Tr2EffectDefine* d );
-	Tr2EffectDescription& GetEffect();
 	void SetEffectPath( const std::string& effectPath );
-
-	const Tr2Pass& GetPass( unsigned int passIx ) const;
-
-	// Break apart the effect and extract state and parameters
-	void ProcessEffect( void );
-
-	friend class Tr2EffectStateManager;
 
 private:
 	// Permute index, derived from situation flag bits
@@ -101,11 +54,6 @@ private:
 	Tr2ShaderCodeSource m_codeSource;
 
 	bool m_inErrorState;
-
-	unsigned int m_sortValue;
-	unsigned m_shaderTypeMask;
-
-	Tr2EffectDescription m_effect;
 
 	std::string m_effectPath;
 

@@ -38,6 +38,7 @@ public:
 	virtual const Tr2EffectConstant* GetConstant( const char* name ) const = 0;
 	virtual const Tr2EffectResource* GetResource( const char* name ) const = 0;
 	virtual const Tr2EffectParameterAnnotationMap* GetParameterAnnotations( const char* parameterName ) const = 0;
+	virtual unsigned int GetSortValue() const = 0;
 };
 
 

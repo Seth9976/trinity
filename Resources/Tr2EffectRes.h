@@ -12,6 +12,7 @@ class TriVariable;
 struct ITriEffectResourceParameter;
 
 BLUE_DECLARE( Tr2EffectRes );
+BLUE_DECLARE( Tr2Shader );
 
 // Tr2EffectParam describes one parameter for an effect. It provides a mapping from
 // the source data.
@@ -101,13 +102,26 @@ public:
 	ITriReroutableVector m_reroutedParameters;
 };
 
+struct Tr2ShaderPermutation
+{
+	BlueSharedString name;
+	std::vector<BlueSharedString> options;
+	size_t defaultOption;
+	std::string description;
+};
+
+struct Tr2ShaderOption
+{
+	BlueSharedString name;
+	BlueSharedString value;
+};
+
 typedef std::vector<std::unique_ptr<Tr2EffectPassParameters>> Tr2EffectPassParametersVector;
 
 BLUE_CLASS( Tr2EffectRes ): 
 	public BlueAsyncRes,
 	public ICacheable,
-	public Tr2DeviceResource,
-	public ITr2ShaderState
+	public Tr2DeviceResource
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -115,41 +129,13 @@ public:
 	Tr2EffectRes( IRoot* lockobj = NULL );
 	~Tr2EffectRes();
 
+	ITr2ShaderStatePtr GetShader( const Tr2ShaderOption* options, size_t count );
+
+
 	//////////////////////////////////////////////////////////////////////////
 	// ICacheable
 	bool IsMemoryUsageKnown();
 	size_t GetMemoryUsage();
-
-	unsigned int GetSortValue() const { return m_sortValue; }
-
-	/////////////////
-	// ITr2ShaderState
-	uint32_t GetPassCount() const;
-	uint32_t GetShaderTypeMask();
-	void ApplyAllStateForPass(	uint32_t passIx,
-								Tr2RenderContext &renderContext ) const;
-	void ApplyShader(			uint32_t passIx, 
-								Tr2RenderContextEnum::ShaderType type,
-								Tr2RenderContext &renderContext ) const;
-	void ApplyRenderStates(		uint32_t passIx, 
-								Tr2RenderContext &renderContext ) const;
-	void ApplySamplerStates(	uint32_t passIx, 
-								Tr2RenderContextEnum::ShaderType type,
-								Tr2RenderContext &renderContext ) const;
-
-	const Tr2EffectConstant* GetConstant( const char* name ) const;
-	const Tr2EffectResource* GetResource( const char* name ) const;
-	const Tr2EffectParameterAnnotationMap* GetParameterAnnotations( const char* parameterName ) const;
-	const Tr2EffectResourceMap* GetResources( uint32_t pass, Tr2RenderContextEnum::ShaderType type ) const;
-	///////////////
-
-	const Tr2Pass& GetPass( unsigned int passIx ) const;
-
-	const Tr2EffectDescription& GetEffectDescription() const;
-
-	const Tr2ShaderInputDefinition* GetShaderInputDefinition( 
-								uint32_t passIx, 
-								Tr2RenderContextEnum::ShaderType type );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITriDeviceResource
@@ -164,18 +150,33 @@ private:
 	// The async management itself is done in BlueAsyncRes.
 	virtual LoadingResult DoLoad();
 	virtual bool DoPrepare();
-	virtual void OnCloseStream();
+
+#if BLUE_WITH_PYTHON
+	PyObject* GetPermutationDescription();
+#endif
 
 protected:
-	uint8_t* m_data;
-	uint32_t m_dataSize;
+	// Per-permutation compiled file information
+	struct FileRecord
+	{
+		uint32_t index;
+		// Compiled code offset into the file 
+		uint32_t offset;
+		// Compiled code size
+		uint32_t size;
+	};
 
-	unsigned int m_shaderTypeMask;
+	CcpMallocBuffer m_data;
+	uint32_t m_version;
 
-	char* m_stringTable;
-	Tr2EffectDescription m_effect;
+	const char* m_stringTable;
+	size_t m_stringTableSize;
 
-	unsigned int m_sortValue;
+	const FileRecord* m_offsets;
+	uint32_t m_offsetCount;
+
+	TrackableStdVector<Tr2ShaderPermutation> m_permutations;
+	TrackableStdUnorderedMap<uint32_t, BlueWeakRef<Tr2Shader> > m_shaders;
 
 	friend class Tr2EffectStateManager;
 };

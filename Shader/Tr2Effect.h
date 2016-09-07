@@ -34,6 +34,9 @@ struct Tr2SamplerOverride
 BLUE_DECLARE_STRUCTURE_LIST( Tr2SamplerOverride );
 
 
+BLUE_DECLARE_STRUCTURE_LIST( Tr2ShaderOption );
+
+
 BLUE_CLASS( Tr2Effect ) :
 	public IInitialize,
 	public INotify,
@@ -162,6 +165,10 @@ public: // TODO: make this private - need to change EveBoosterSet2...
 	PTr2SamplerOverrideStructureList m_samplerOverrides;
 
 private:
+	ITr2ShaderStatePtr m_shader;
+	PTr2ShaderOptionStructureList m_options;
+
+
 #if TRINITYDEV
 	bool m_insideBegin;
 	bool m_insideBeginPass;

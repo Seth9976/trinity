@@ -130,24 +130,51 @@ bool Tr2EffectDescription::Read( const void* data,
 			pass.stageInputs[type].inputDefinition.ComputeHash();
 
 			uint32_t shaderSize;
-			READ( uint32_t, uint32_t, shaderSize );
-			if( buffer + shaderSize > bufferEnd )
-			{
-				CCP_LOGERR( "Shader binary is too large in effect \"%s\". Corrupt file?", effectName );
-				return false;
-			}
-			const void* shaderCode = buffer;
-			buffer += shaderSize;
-
+			const void* shaderCode;
 			uint32_t shadowShaderSize;
-			READ( uint32_t, uint32_t, shadowShaderSize );
-			if( buffer + shadowShaderSize > bufferEnd )
+			const void* shadowShaderCode;
+
+			if( version < 5 )
 			{
-				CCP_LOGERR( "Shader binary is too large in effect \"%s\". Corrupt file?", effectName );
-				return false;
+				READ( uint32_t, uint32_t, shaderSize );
+				if( buffer + shaderSize > bufferEnd )
+				{
+					CCP_LOGERR( "Shader binary is too large in effect \"%s\". Corrupt file?", effectName );
+					return false;
+				}
+				shaderCode = buffer;
+				buffer += shaderSize;
+
+				READ( uint32_t, uint32_t, shadowShaderSize );
+				if( buffer + shadowShaderSize > bufferEnd )
+				{
+					CCP_LOGERR( "Shader binary is too large in effect \"%s\". Corrupt file?", effectName );
+					return false;
+				}
+				shadowShaderCode = buffer;
+				buffer += shadowShaderSize;
 			}
-			const void* shadowShaderCode = buffer;
-			buffer += shadowShaderSize;
+			else
+			{
+				uint32_t offset;
+				READ( uint32_t, uint32_t, shaderSize );
+				READ( uint32_t, uint32_t, offset );
+				if( shaderSize > 0 && offset + shaderSize > stringTableSize )
+				{
+					CCP_LOGERR( "Shader binary is too large in effect \"%s\". Corrupt file?", effectName );
+					return false;
+				}
+				shaderCode = stringTable + offset;
+
+				READ( uint32_t, uint32_t, shadowShaderSize );
+				READ( uint32_t, uint32_t, offset );
+				if( shadowShaderSize > 0 && offset + shadowShaderSize > stringTableSize )
+				{
+					CCP_LOGERR( "Shader binary is too large in effect \"%s\". Corrupt file?", effectName );
+					return false;
+				}
+				shadowShaderCode = stringTable + offset;
+			}
 
 			pass.stageInputs[type].m_shader = Tr2EffectStateManager::RegisterShader( 
 				type, 
@@ -204,22 +231,49 @@ bool Tr2EffectDescription::Read( const void* data,
 
 			unsigned constantValueSize;
 			READ( uint32_t, unsigned, constantValueSize );
-			if( buffer + constantValueSize > bufferEnd )
+
+			if( version < 5 )
 			{
-				CCP_LOGERR( "Constant blob is too large in effect \"%s\". Corrupt file?", effectName );
-				return false;
+				if( buffer + constantValueSize > bufferEnd )
+				{
+					CCP_LOGERR( "Constant blob is too large in effect \"%s\". Corrupt file?", effectName );
+					return false;
+				}
+
+				pass.stageInputs[type].m_constantValueSize = constantValueSize;
+
+				if( constantValueSize > SHADER_CONSTANTS_MAX )
+				{
+					CCP_LOGERR( "Effect \"%s\" has more than %i bytes in constant buffer", effectName, SHADER_CONSTANTS_MAX );
+					pass.stageInputs[type].m_constantValueSize = SHADER_CONSTANTS_MAX;
+				}
+
+				memcpy( pass.stageInputs[type].constantValues, buffer, pass.stageInputs[type].m_constantValueSize );
+				buffer += constantValueSize;
 			}
-
-			pass.stageInputs[type].m_constantValueSize = constantValueSize;
-
-			if( constantValueSize > SHADER_CONSTANTS_MAX )
+			else
 			{
-				CCP_LOGERR( "Effect \"%s\" has more than %i bytes in constant buffer", effectName, SHADER_CONSTANTS_MAX );
-				pass.stageInputs[type].m_constantValueSize = SHADER_CONSTANTS_MAX;
-			}
+				uint32_t constantValueOffset;
+				READ( uint32_t, uint32_t, constantValueOffset );
+				if( constantValueSize && constantValueOffset + constantValueSize > stringTableSize )
+				{
+					CCP_LOGERR( "Constant blob is too large in effect \"%s\". Corrupt file?", effectName );
+					return false;
+				}
 
-			memcpy( pass.stageInputs[type].constantValues, buffer, pass.stageInputs[type].m_constantValueSize );
-			buffer += constantValueSize;
+				pass.stageInputs[type].m_constantValueSize = constantValueSize;
+
+				if( constantValueSize > SHADER_CONSTANTS_MAX )
+				{
+					CCP_LOGERR( "Effect \"%s\" has more than %i bytes in constant buffer", effectName, SHADER_CONSTANTS_MAX );
+					pass.stageInputs[type].m_constantValueSize = SHADER_CONSTANTS_MAX;
+				}
+
+				if( constantValueSize )
+				{
+					memcpy( pass.stageInputs[type].constantValues, stringTable + constantValueOffset, pass.stageInputs[type].m_constantValueSize );
+				}
+			}
 
 			uint8_t textureCount;
 			READ( uint8_t, uint8_t, textureCount );
