@@ -356,7 +356,7 @@ bool Tr2Effect::AddSamplerOverride( const BlueSharedString& name, Tr2RenderConte
 	// set up the const stuff
 	Tr2SamplerOverride o;
 	o.name = name;
-	o.mipFilter = Tr2RenderContextEnum::TF_NONE;
+	o.mipFilter = Tr2RenderContextEnum::TF_LINEAR;
 	o.maxAnisotropy = 4;
 	o.maxMipLevel = 0;
 	o.lodBias = 0.f;
