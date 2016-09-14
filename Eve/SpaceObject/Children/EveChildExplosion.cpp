@@ -17,6 +17,7 @@ EveChildExplosion::EveChildExplosion( IRoot* lockobj )
 	m_localExplosionIntervalFactor( 1.f ),
 	m_globalExplosionDelay( 0.f ),
 	m_wreckSwitchTime( 0.f ),
+	m_wreckSwitchOffsetFromGlobalStart( 0.f ),
 	m_localDuration( 0.f ),
 	m_globalDuration( 0.f ),
 	m_localExplosionTransforms( "EveExplosion::m_localExplosionOrigins" ),
@@ -24,6 +25,7 @@ EveChildExplosion::EveChildExplosion( IRoot* lockobj )
 	m_playTime( 0.f ),
 	m_nextLocalExplosionTime( 0.f ),
 	m_globalExplosionTime( 0.f ),
+	m_countdownToGlobalExplosionStart( 0.f ),
 	m_nextLocalExplosion( 0 ),
 	m_isPlaying( false )
 {
@@ -53,6 +55,7 @@ void EveChildExplosion::Play()
 	CalculateExplosionTimes( uint32_t( m_localExplosionTransforms.size() ) );
 	m_isPlaying = true;
 	m_playTime = 0;
+	m_countdownToGlobalExplosionStart = m_globalExplosionTime;
 }
 
 // --------------------------------------------------------------------------------------
@@ -85,6 +88,8 @@ void EveChildExplosion::CalculateExplosionTimes( uint32_t localExplosionCount )
 	}
 	
 	m_globalExplosionTime += m_globalExplosionDelay;
+	m_totalDuration = m_globalExplosionTime + m_globalDuration;
+	m_wreckSwitchTime = m_globalExplosionTime + m_wreckSwitchOffsetFromGlobalStart;
 }
 
 // --------------------------------------------------------------------------------------
@@ -101,8 +106,6 @@ void EveChildExplosion::SetLocalExplosionTransforms( const std::vector<Matrix>& 
 		m_localExplosionTransforms.begin(), 
 		transforms.begin(), 
 		transforms.end() );
-
-	CalculateExplosionTimes( uint32_t( m_localExplosionTransforms.size() ) );
 }
 
 // --------------------------------------------------------------------------------------
@@ -130,7 +133,7 @@ void EveChildExplosion::UpdateSyncronous(
 				m_nextLocalExplosion = m_localExplosionTransforms.size();
 				for( size_t i = 0; i < m_objects.size(); )
 				{
-					if( m_objects[i] != m_globalExplosionInstance && m_objects[i] != m_localExplosionShared )
+					if( m_objects[i] != m_globalExplosionContainer && m_objects[i] != m_localExplosionShared )
 					{
 						m_objects.Remove( i );
 					}
@@ -152,7 +155,7 @@ void EveChildExplosion::UpdateSyncronous(
 					m_nextLocalExplosionTime = m_localExplosionTimes[++m_nextLocalExplosion];
 				}
 				else if( -m_nextLocalExplosionTime > m_localDuration && 
-					( !m_globalExplosion || -m_globalExplosionTime > m_globalDuration ) )
+					( !m_globalExplosion || -m_countdownToGlobalExplosionStart > m_totalDuration ) )
 				{
 					Stop();
 				}
@@ -160,29 +163,28 @@ void EveChildExplosion::UpdateSyncronous(
 		}
 		if( m_globalExplosion)
 		{
-			m_globalExplosionTime -= dt;
-			if( m_globalExplosionTime < 0 )
+			m_countdownToGlobalExplosionStart -= dt;
+			if( m_countdownToGlobalExplosionStart < 0 )
 			{
 				if( !m_globalExplosionInstance )
 				{
 					m_globalExplosionInstance.Unlock();
 					if( BeClasses->CopyTo( m_globalExplosion, (IRoot**)&m_globalExplosionInstance.p ) )
 					{	
-						EveChildContainerPtr container;
-						container.CreateInstance();
-						
 						Quaternion rotation = Quaternion( 0.0, 0.0 ,0.0, 1.0 );
 						Vector3 translation = Vector3( 0.0, 0.0, 0.0 );
 						
 						Vector3 scaling = m_globalExplosionScaling;
-						container->Setup(&scaling, &rotation, &translation, TR2_LOD_LOW );
 
-						container->m_objects.Append( m_globalExplosionInstance );
+						m_globalExplosionContainer.CreateInstance();
+						m_globalExplosionContainer->Setup(&scaling, &rotation, &translation, TR2_LOD_LOW );
+
+						m_globalExplosionContainer->m_objects.Append( m_globalExplosionInstance );
 						
-						m_objects.Append( container );
+						m_objects.Append( m_globalExplosionContainer );
 					}
 				}
-				else if( !m_localExplosion && m_localExplosions.empty() && -m_globalExplosionTime > m_globalDuration )
+				else if( !m_localExplosion && m_localExplosions.empty() && -m_countdownToGlobalExplosionStart > m_totalDuration )
 				{
 					Stop();
 				}

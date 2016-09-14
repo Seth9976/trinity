@@ -59,12 +59,15 @@ private:
 	float m_globalExplosionStartTime;
 	// Delay from explosion start to the "global" explosion in seconds
 	float m_globalExplosionDelay;
+	float m_countdownToGlobalExplosionStart;
 	// Time from the start of the explosion to the point when original model needs to be switched to the wreck
 	float m_wreckSwitchTime;
+	float m_wreckSwitchOffsetFromGlobalStart;
 	// Total duration of a single local explosion
 	float m_localDuration;
 	// Duration of the global explosion
 	float m_globalDuration;
+	float m_totalDuration;
 
 	
 
@@ -76,6 +79,7 @@ private:
 	// Child containing global explosion effect
 	IEveSpaceObjectChildPtr m_globalExplosion;
 	IEveSpaceObjectChildPtr m_globalExplosionInstance;
+	EveChildContainerPtr m_globalExplosionContainer;
 
 	// Transforms for local explosions
 	TrackableStdVector<Matrix> m_localExplosionTransforms;

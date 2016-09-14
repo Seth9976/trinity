@@ -63,7 +63,12 @@ const Be::ClassInfo* EveChildExplosion::ExposeToBlue()
 			"wreckSwitchTime", 
 			m_wreckSwitchTime, 
 			"Time from the start of the explosion to the point when original model needs to be switched to the wreck", 
-			Be::READWRITE | Be::PERSIST )
+			Be::READ )
+		MAP_ATTRIBUTE( 
+			"wreckSwitchOffsetFromGlobalStart", 
+			m_wreckSwitchOffsetFromGlobalStart, 
+			"Time from the start of the global explosion that the model will be switched", 
+			Be::READWRITE )
 		MAP_ATTRIBUTE( 
 			"localDuration", 
 			m_localDuration, 
@@ -74,7 +79,13 @@ const Be::ClassInfo* EveChildExplosion::ExposeToBlue()
 			m_globalDuration, 
 			"Duration of the global explosion", 
 			Be::READWRITE | Be::PERSIST )
-
+		
+		MAP_ATTRIBUTE( 
+			"totalDuration", 
+			m_totalDuration, 
+			"Duration of the complete explosion", 
+			Be::READ )
+			
 		MAP_ATTRIBUTE( 
 			"globalExplosionTime", 
 			m_globalExplosionTime, 
