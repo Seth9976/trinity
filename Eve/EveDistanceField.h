@@ -12,6 +12,7 @@ BLUE_DECLARE_INTERFACE( ITriVectorFunction );
 BLUE_DECLARE_VECTOR( ITriVectorFunction );
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE( TriView );
+BLUE_DECLARE( Tr2ScalarCurve );
 
 // --------------------------------------------------------------------------------------
 // Description:
@@ -31,14 +32,18 @@ public:
 	void OnListModified( long event, ssize_t key, ssize_t key2, IRoot* value, const IList* theList );
 
 	void Update( const EveUpdateContext& updateContext );
+	void SetupStaticDistanceField( Vector3 dimensions, Vector3 position, float distanceThreshold, float timeAdjustmentSecondsOut, float timeAdjustemntSecondsIn );
+	void SetupDynamicDistanceField( float distanceThreshold, float timeAdjustmentSecondsOut, float timeAdjustemntSecondsIn );
 private:
+	void CreateCurveSet();
+
 	PITriVectorFunctionVector m_objects;
 
 	TriCurveSetPtr m_curveSet;
 
 	TriViewPtr m_cameraView;
 
-        // distance value used by curve set
+    // distance value used by curve set
 	float m_distance;
 	// Adjust how long it takes to settle on a new value when zooming out
 	float m_timeAdjustmentSecondsOut;
@@ -55,6 +60,9 @@ private:
 
 	// indicate if bounds must be re-evaluated
 	bool m_dirty;
+
+	// indicate that the distance field is dynamic and therefore should be rebuilt when balls are added
+	bool m_isDynamic;
 
 	// middle of the field modified by distance threshold and so on
 	Vector3 m_middle;

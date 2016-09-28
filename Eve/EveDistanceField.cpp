@@ -5,6 +5,7 @@
 #include "TriView.h"
 #include "EveUpdateContext.h"
 #include "Curves/TriCurveSet.h"
+#include "Curves/Tr2ScalarCurve.h"
 
 
 static const float MAX_DISTANCE = 1e6;
@@ -17,7 +18,8 @@ EveDistanceField::EveDistanceField( IRoot* lockobj ) :
 	m_distanceThreshold( 3.f ),
 	m_dirty( false ),
 	m_maxXZRatio( 1.5f ),
-	m_minYRatio( 0.2f )
+	m_minYRatio( 0.2f ),
+	m_isDynamic( false )
 {
 	m_objects.SetNotify( this );
 }
@@ -86,30 +88,38 @@ void EveDistanceField::Update( const EveUpdateContext& updateContext )
 	Be::Time t = updateContext.GetTime();
 	
 	float distanceNow = MAX_DISTANCE;
-
-	auto count = m_objects.size();
-	if( count )
+	
+	if( m_isDynamic )
 	{
-		distanceNow = MAX_DISTANCE * MAX_DISTANCE;
-		if( m_dirty )
+		auto count = m_objects.size();
+		if( count )
 		{
-			CalculateFieldCoverage( t );
-			m_dirty = false;
-		}
-		else
-		{
-			Vector3 originShift = updateContext.GetOriginShift();
-			m_middle += originShift;
-		}
+			distanceNow = MAX_DISTANCE * MAX_DISTANCE;
+			if( m_dirty )
+			{
+				CalculateFieldCoverage( t );
+				m_dirty = false;
+			}
+			else
+			{
+				Vector3 originShift = updateContext.GetOriginShift();
+				m_middle += originShift;
+			}
 
-		// Calculate bounds and center
-		for( auto oit = m_objects.begin(); oit != m_objects.end(); ++oit )
-		{
-			(*oit)->GetValueAt( &posObj, t );
-			D3DXVec3Subtract( &posObj, &posObj, &posRef );
-			distanceNow = min( distanceNow, D3DXVec3LengthSq( &posObj ) );
+			// Calculate bounds and center
+			for( auto oit = m_objects.begin(); oit != m_objects.end(); ++oit )
+			{
+				(*oit)->GetValueAt( &posObj, t );
+				D3DXVec3Subtract( &posObj, &posObj, &posRef );
+				distanceNow = min( distanceNow, D3DXVec3LengthSq( &posObj ) );
+			}
+			distanceNow = sqrt( distanceNow );
 		}
-		distanceNow = sqrt( distanceNow );
+	}
+	else
+	{	
+		D3DXVec3Subtract( &posObj, &m_middle, &posRef );
+		distanceNow = min( distanceNow, D3DXVec3Length( &posObj ) );	
 	}
 
 	float frac = ( ( distanceNow > m_distance ) ? m_timeAdjustmentSecondsOut : m_timeAdjustmentSecondsIn );
@@ -130,6 +140,42 @@ void EveDistanceField::Update( const EveUpdateContext& updateContext )
 		}
 		m_curveSet->Update( m_distance );
 	}
+}
+
+void EveDistanceField::CreateCurveSet()
+{
+	m_curveSet.CreateInstance();
+	Tr2ScalarCurvePtr distanceCurve;
+	distanceCurve.CreateInstance();
+	distanceCurve->m_name = "DistanceCurve";
+	distanceCurve->m_length = 50000.0f;
+	distanceCurve->m_timeOffset = 25000.0f;
+	distanceCurve->m_startValue = 1.0f;
+
+	m_curveSet->AddCurve( (ITriFunctionPtr)distanceCurve );
+}
+
+void EveDistanceField::SetupStaticDistanceField( Vector3 dimensions, Vector3 position, float distanceThreshold, float timeAdjustmentSecondsOut, float timeAdjustmentSecondsIn )
+{
+	m_isDynamic = false;
+	m_dimensions = dimensions;
+	m_distanceThreshold = distanceThreshold;
+	m_timeAdjustmentSecondsIn = timeAdjustmentSecondsIn;
+	m_timeAdjustmentSecondsOut = timeAdjustmentSecondsOut;
+	m_middle = position;
+
+	CreateCurveSet();
+}
+
+void EveDistanceField::SetupDynamicDistanceField( float distanceThreshold, float timeAdjustmentSecondsOut, float timeAdjustmentSecondsIn )
+{
+	m_isDynamic = true;
+	m_dirty = true;
+	m_distanceThreshold = distanceThreshold;
+	m_timeAdjustmentSecondsIn = timeAdjustmentSecondsIn;
+	m_timeAdjustmentSecondsOut = timeAdjustmentSecondsOut;
+
+	CreateCurveSet();
 }
 
 void EveDistanceField::SetNeutralValues()
