@@ -45,9 +45,7 @@ void Tr2ImpostorManager::ImpostorAtlas::Resize( uint32_t width, uint32_t height,
 	m_free.clear();
 
 	uint32_t xCount = width / itemWidth;
-	uint32_t xScale = 256 / xCount;
 	uint32_t yCount = height / itemHeight;
-	uint32_t yScale = 256 / yCount;
 	m_free.reserve( xCount * yCount );
 	for( uint32_t j = 0; j < yCount; ++j )
 	{
@@ -109,7 +107,7 @@ Tr2ImpostorManager::Tr2ImpostorManager()
 	m_effect.CreateInstance();
 	m_effect->SetEffectPathName( "res:/graphics/effect/managed/space/system/impostor.fx" );
 
-	m_effectKey = m_effect->GetHashValue() + (((uint64_t)(Tr2Effect*)m_effect) << 32);
+	m_effectKey = m_effect->GetHashValue() + ( uint64_t( (Tr2Effect*)m_effect ) << 32 );
 
 	static Tr2VertexDefinition def;
 	if( def.m_items.empty() )
@@ -183,12 +181,12 @@ void Tr2ImpostorManager::Create(
 		Be::OptionalWithDefaultValue<uint32_t, 1024> width, 
 		Be::OptionalWithDefaultValue<uint32_t, 1024> height, 
 		Be::OptionalWithDefaultValue<uint32_t, 16> itemWidth, 
-		Be::OptionalWithDefaultValue<uint32_t, 16> itemHeigh )
+		Be::OptionalWithDefaultValue<uint32_t, 16> itemHeight )
 {
 	m_width = width;
 	m_height = height;
-	m_itemWidth = m_itemWidth;
-	m_itemHeight = m_itemHeight;
+	m_itemWidth = itemWidth;
+	m_itemHeight = itemHeight;
 
 	Initialize();
 }
