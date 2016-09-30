@@ -30,18 +30,13 @@ public:
 };
 
 template <class Key, class KeyList, class KeyValue>
-class Tr2Curve:
-	public ITriFunction,
+class Tr2CurveBase:
 	public IInitialize,
 	public ITriCurveLength
 {
 public:
 
-	Tr2Curve( IRoot* lockobj = NULL );
-
-	//////////////////////////////////////////////////////////////////////////
-	// ITriFunction
-	void UpdateValue( double time );
+	Tr2CurveBase( IRoot* lockobj = NULL );
 
 	//////////////////////////////////////////////////////////////////////////
 	// IInitialize
@@ -77,6 +72,7 @@ public:
 	float m_endOfSegment;	
 
 	// Value access
+	KeyValue		GetValue( double time ) { return GetValueAt( time ); }
 	KeyValue		GetValueAt( double time );
 	const KeyValue& GetKeyValue( unsigned int idx );
 	void SetKeyValue( unsigned int idx, const KeyValue& value );
@@ -103,18 +99,37 @@ private:
 	virtual void AddKey_( float time, const KeyValue& value ) = 0;
 };
 
+template <class Key, class KeyList, class KeyValue>
+class Tr2Curve : 
+	public Tr2CurveBase<Key, KeyList, KeyValue>,
+	public ITriFunction
+{
+public:
+	Tr2Curve( IRoot* lockobj = NULL )
+		:Tr2CurveBase<Key, KeyList, KeyValue>( lockobj )
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// ITriFunction
+	void UpdateValue( double time )
+	{
+		m_currentValue = GetValueAt( time );
+	}
+};
+
 /////////////////////////////////////////////////////////////////////////////
 // IInitialize
 template <class Key, class KeyList, class KeyValue>
-bool Tr2Curve<Key, KeyList, KeyValue>::Initialize(  )
+bool Tr2CurveBase<Key, KeyList, KeyValue>::Initialize(  )
 {
 	Sort();
 	return true;
 }
 
 template <class Key, class KeyList, class KeyValue>
-Tr2Curve<Key, KeyList, KeyValue>::Tr2Curve( IRoot* lockobj ):
-	PARENTLOCK2( m_keys, ITriFunction )
+Tr2CurveBase<Key, KeyList, KeyValue>::Tr2CurveBase( IRoot* lockobj ):
+	PARENTLOCK2( m_keys, IInitialize )
 {
 	m_lastKey = NULL;
 	m_nextKey = NULL;
@@ -132,19 +147,19 @@ Tr2Curve<Key, KeyList, KeyValue>::Tr2Curve( IRoot* lockobj ):
 }
 
 template <class Key, class KeyList, class KeyValue>
-std::string Tr2Curve<Key, KeyList, KeyValue>::GetName(  ) const
+std::string Tr2CurveBase<Key, KeyList, KeyValue>::GetName(  ) const
 {
 	return m_name;
 }
 
 template <class Key, class KeyList, class KeyValue>
-void Tr2Curve<Key, KeyList, KeyValue>::SetName( std::string name )
+void Tr2CurveBase<Key, KeyList, KeyValue>::SetName( std::string name )
 {
 	m_name = name;
 }
 
 template <class Key, class KeyList, class KeyValue>
-void Tr2Curve<Key, KeyList, KeyValue>::RemoveKey( unsigned int idx )
+void Tr2CurveBase<Key, KeyList, KeyValue>::RemoveKey( unsigned int idx )
 {
 	size_t numKeys = m_keys.size();
 	if ( numKeys && idx < numKeys)
@@ -158,7 +173,7 @@ void Tr2Curve<Key, KeyList, KeyValue>::RemoveKey( unsigned int idx )
 }
 
 template <class Key, class KeyList, class KeyValue>
-int Tr2Curve<Key, KeyList, KeyValue>::AddKey( float time, const KeyValue& value )
+int Tr2CurveBase<Key, KeyList, KeyValue>::AddKey( float time, const KeyValue& value )
 {
 	// This function should return the index of the key where it was added to m_keys
 	// If the time is already in a key and thus the key's value is updated for that time
@@ -248,7 +263,7 @@ int Tr2Curve<Key, KeyList, KeyValue>::AddKey( float time, const KeyValue& value 
 }
 
 template <class Key, class KeyList, class KeyValue>
-const KeyValue& Tr2Curve<Key, KeyList, KeyValue>::GetKeyValue( unsigned int idx )
+const KeyValue& Tr2CurveBase<Key, KeyList, KeyValue>::GetKeyValue( unsigned int idx )
 {
 	if ( idx < m_keys.size() )
 	{
@@ -258,7 +273,7 @@ const KeyValue& Tr2Curve<Key, KeyList, KeyValue>::GetKeyValue( unsigned int idx 
 }
 
 template <class Key, class KeyList, class KeyValue>
-void Tr2Curve<Key, KeyList, KeyValue>::SetKeyValue( unsigned int idx, const KeyValue& value )
+void Tr2CurveBase<Key, KeyList, KeyValue>::SetKeyValue( unsigned int idx, const KeyValue& value )
 {
 	if ( idx < m_keys.size() )
 	{
@@ -267,7 +282,7 @@ void Tr2Curve<Key, KeyList, KeyValue>::SetKeyValue( unsigned int idx, const KeyV
 }
 
 template <class Key, class KeyList, class KeyValue>
-float Tr2Curve<Key, KeyList, KeyValue>::GetKeyTime( unsigned int idx )
+float Tr2CurveBase<Key, KeyList, KeyValue>::GetKeyTime( unsigned int idx )
 {
 	if ( idx < m_keys.size() )
 	{
@@ -277,7 +292,7 @@ float Tr2Curve<Key, KeyList, KeyValue>::GetKeyTime( unsigned int idx )
 }
 
 template <class Key, class KeyList, class KeyValue>
-void Tr2Curve<Key, KeyList, KeyValue>::SetKeyTime( unsigned int idx, float time )
+void Tr2CurveBase<Key, KeyList, KeyValue>::SetKeyTime( unsigned int idx, float time )
 {
 	if ( idx < m_keys.size() )
 	{
@@ -287,7 +302,7 @@ void Tr2Curve<Key, KeyList, KeyValue>::SetKeyTime( unsigned int idx, float time 
 
 
 template <class Key, class KeyList, class KeyValue>
-unsigned int Tr2Curve<Key, KeyList, KeyValue>::GetKeyInterpolation( unsigned int idx )
+unsigned int Tr2CurveBase<Key, KeyList, KeyValue>::GetKeyInterpolation( unsigned int idx )
 {
 	if ( idx < m_keys.size() )
 	{
@@ -297,7 +312,7 @@ unsigned int Tr2Curve<Key, KeyList, KeyValue>::GetKeyInterpolation( unsigned int
 }
 
 template <class Key, class KeyList, class KeyValue>
-void Tr2Curve<Key, KeyList, KeyValue>::SetKeyInterpolation( unsigned int idx, unsigned int interp )
+void Tr2CurveBase<Key, KeyList, KeyValue>::SetKeyInterpolation( unsigned int idx, unsigned int interp )
 {
 	if ( idx < m_keys.size() )
 	{
@@ -306,13 +321,7 @@ void Tr2Curve<Key, KeyList, KeyValue>::SetKeyInterpolation( unsigned int idx, un
 }
 
 template <class Key, class KeyList, class KeyValue>
-void Tr2Curve<Key, KeyList, KeyValue>::UpdateValue( double time )
-{
-	m_currentValue = GetValueAt( time );
-}
-
-template <class Key, class KeyList, class KeyValue>
-KeyValue Tr2Curve<Key, KeyList, KeyValue>::GetValueAt( double time )
+KeyValue Tr2CurveBase<Key, KeyList, KeyValue>::GetValueAt( double time )
 {
 	KeyValue result;
 

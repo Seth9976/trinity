@@ -37,13 +37,23 @@ BLUE_DECLARE_VECTOR( Tr2ScalarKey );
 //   Tr2Curve, Tr2ScalarKey
 // --------------------------------------------------------------------------------------
 BLUE_CLASS( Tr2ScalarCurve ) :
-	public Tr2Curve<Tr2ScalarKey, PTr2ScalarKeyVector, float>
+	public Tr2CurveBase<Tr2ScalarKey, PTr2ScalarKeyVector, float>,
+	public ITriScalarFunction
 {
 public:
 	// Constructor
 	Tr2ScalarCurve( IRoot* lockobj = NULL );
 
 	EXPOSE_TO_BLUE();
+
+	//////////////////////////////////////////////////////////////////////////
+	// ITriScalarFunction
+	virtual void UpdateValue( double time );
+	virtual float Update( Be::Time time );
+	virtual float Update( double time );
+	virtual float GetValueAt( Be::Time time );
+	virtual float GetValueAt( double time );
+	virtual void ScaleTime( float s );
 
 	// Gets left tangent for a given key index
 	float GetKeyLeftTangent( unsigned int idx ) const;

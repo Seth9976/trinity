@@ -70,6 +70,7 @@ const Be::ClassInfo* Tr2ScalarCurve::ExposeToBlue()
     EXPOSURE_BEGIN( Tr2ScalarCurve, "" )
         MAP_INTERFACE( Tr2ScalarCurve )
 		MAP_INTERFACE( ITriFunction )
+		MAP_INTERFACE( ITriScalarFunction )
         MAP_INTERFACE( IInitialize )
 		MAP_INTERFACE( ITriCurveLength )
 
@@ -91,7 +92,7 @@ const Be::ClassInfo* Tr2ScalarCurve::ExposeToBlue()
 		MAP_METHOD_AND_WRAP( "AddKey", AddKey, "AddKey( time, value )" );
 		MAP_METHOD_AND_WRAP( "RemoveKey", RemoveKey, "RemoveKey( index )" );
 		MAP_METHOD_AND_WRAP( "GetKeyCount", GetKeyCount, "GetKeyCount( )" );
-		MAP_METHOD_AND_WRAP( "GetValueAt", GetValueAt, "GetValueAt( time )" );
+		MAP_METHOD_AND_WRAP( "GetValueAt", GetValue, "GetValueAt( time )" );
 		MAP_METHOD_AND_WRAP( "GetKeyValue", GetKeyValue, "GetKeyValue( index )" );
 		MAP_METHOD_AND_WRAP( "GetKeyTime", GetKeyTime, "GetKeyTime( index )" );
 		MAP_METHOD_AND_WRAP( "GetKeyLeftTangent", GetKeyLeftTangent, "GetKeyLeftTangent( index )" );

@@ -39,13 +39,43 @@ Tr2ScalarKey::Tr2ScalarKey( IRoot* lockobj )
 //   Default constructor.
 // --------------------------------------------------------------------------------------
 Tr2ScalarCurve::Tr2ScalarCurve( IRoot* lockobj ) : 
-	Tr2Curve<Tr2ScalarKey, PTr2ScalarKeyVector, float>( lockobj )
+	Tr2CurveBase<Tr2ScalarKey, PTr2ScalarKeyVector, float>( lockobj )
 {
 	m_startValue = 0.0f;
 	m_endValue = 0.0f;
 	m_startTangent = 0.0f;
 	m_endTangent = 0.0f;
 	m_currentValue = 0.0f;
+}
+
+void Tr2ScalarCurve::UpdateValue( double time )
+{
+	m_currentValue = GetValue( time );
+}
+
+float Tr2ScalarCurve::Update( Be::Time time )
+{
+	return m_currentValue = GetValue( TimeAsDouble( time ) );
+}
+
+float Tr2ScalarCurve::Update( double time )
+{
+	return m_currentValue = GetValue( time );
+}
+
+float Tr2ScalarCurve::GetValueAt( Be::Time time )
+{
+	return GetValue( TimeAsDouble( time ) );
+}
+
+float Tr2ScalarCurve::GetValueAt( double time )
+{
+	return GetValue( time );
+}
+
+void Tr2ScalarCurve::ScaleTime( float s )
+{
+	m_timeScale = s;
 }
 
 // --------------------------------------------------------------------------------------
