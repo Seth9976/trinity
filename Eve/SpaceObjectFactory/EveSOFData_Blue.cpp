@@ -496,6 +496,8 @@ const Be::ClassInfo* EveSOFDataHull::ExposeToBlue()
 		MAP_ATTRIBUTE( "depthAreas", m_depthAreas, "The depth areas on this mesh", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "distortionAreas", m_distortionAreas, "The distortion areas on this mesh", Be::READWRITE | Be::PERSIST )
 
+		MAP_ATTRIBUTE( "defaultPattern", m_defaultPattern, "The default pattern projection data for this hull", Be::READWRITE | Be::PERSIST )
+
 		MAP_ATTRIBUTE( "spriteSets", m_spriteSets, "The spritesets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "spotlightSets", m_spotlightSets, "The spotlightsets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "planeSets", m_planeSets, "The planesets", Be::READWRITE | Be::PERSIST )
@@ -661,6 +663,8 @@ const Be::ClassInfo* EveSOFDataRace::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "name", m_name, "The race name, eg caldari. This functions as an ID.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "booster", m_booster, "All the booster data for this race.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "defaultPattern", m_defaultPattern, "The default pattern data for this race\n:jessica-group: DefaultPattern", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "defaultPatternLayer1MaterialName", m_defaultPatternLayer1MaterialName, "The default pattern material name for this race and layer 1\n:jessica-group: DefaultPattern", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "hullAreas", m_hullAreas, "Per race shader data", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "damage", m_damage, "Pre race damage system data", Be::READWRITE | Be::PERSIST )
 		EXPOSURE_END()

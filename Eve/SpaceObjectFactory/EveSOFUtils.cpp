@@ -74,11 +74,22 @@ std::string EveSOFUtilsParameterName::ChangeMaterialIdx( const EveSOFDataMgr::Ge
 // --------------------------------------------------------------------------------
 void EveSOFUtils::GeneratePatternProjectionData( EveSOFDataMgr::PatternProjectionData* ppd, const EveSOFDataPatternTransform* patternTransform )
 {
-	ppd->enabled = true;
-	ppd->position = patternTransform->m_position;
-	ppd->scaling = patternTransform->m_scaling;
-	ppd->rotation = patternTransform->m_rotation;
-	ppd->isMirrored = patternTransform->m_isMirrored;
+	if( patternTransform )
+	{
+		ppd->enabled = true;
+		ppd->position = patternTransform->m_position;
+		ppd->scaling = patternTransform->m_scaling;
+		ppd->rotation = patternTransform->m_rotation;
+		ppd->isMirrored = patternTransform->m_isMirrored;
+	}
+	else
+	{
+		ppd->enabled = false;
+		ppd->position = Vector3( 0.f, 0.f, 0.f );
+		ppd->scaling = Vector3( 1.f, 1.f, 1.f );
+		ppd->rotation = Quaternion( 0.f, 0.f, 0.f, 1.f );
+		ppd->isMirrored = false;
+	}
 }
 
 // --------------------------------------------------------------------------------
@@ -87,17 +98,30 @@ void EveSOFUtils::GeneratePatternProjectionData( EveSOFDataMgr::PatternProjectio
 // --------------------------------------------------------------------------------
 void EveSOFUtils::GeneratePatternLayerData( EveSOFDataMgr::PatternLayerData* pld, const EveSOFDataPatternLayer* patternLayer )
 {
-	// texture name
-	pld->textureName = patternLayer->m_textureName;
-	// texture res file
-	pld->textureResFilePath = patternLayer->m_textureResFilePath;
-	// projection types, translate to AL enums right here
-	pld->projectionAddressModeU = GetTextureAddressMode( patternLayer->m_projectionTypeU );
-	pld->projectionAddressModeV = GetTextureAddressMode( patternLayer->m_projectionTypeV );
-	// material source id can be directly transltaed from enum
-	pld->materialSourceID = ( uint8_t )patternLayer->m_materialSource;
-	// material targets are bools, but need to be stored as floats (for shader)
-	pld->materialTargets = Vector4( patternLayer->m_isTargetMtl1 ? 1.f : 0.f, patternLayer->m_isTargetMtl2 ? 1.f : 0.f, patternLayer->m_isTargetMtl3 ? 1.f : 0.f, patternLayer->m_isTargetMtl4 ? 1.f : 0.f );
+	if( patternLayer )
+	{
+		// texture name
+		pld->textureName = patternLayer->m_textureName;
+		// texture res file
+		pld->textureResFilePath = patternLayer->m_textureResFilePath;
+		// projection types, translate to AL enums right here
+		pld->projectionAddressModeU = GetTextureAddressMode( patternLayer->m_projectionTypeU );
+		pld->projectionAddressModeV = GetTextureAddressMode( patternLayer->m_projectionTypeV );
+		// material source id can be directly transltaed from enum
+		pld->materialSourceID = (uint8_t)patternLayer->m_materialSource;
+		// material targets are bools, but need to be stored as floats (for shader)
+		pld->materialTargets = Vector4( patternLayer->m_isTargetMtl1 ? 1.f : 0.f, patternLayer->m_isTargetMtl2 ? 1.f : 0.f, patternLayer->m_isTargetMtl3 ? 1.f : 0.f, patternLayer->m_isTargetMtl4 ? 1.f : 0.f );
+	}
+	else
+	{
+		// defaults
+		pld->textureName = BlueSharedString( "" );
+		pld->textureResFilePath = "";
+		pld->projectionAddressModeU = Tr2RenderContextEnum::TA_WRAP;
+		pld->projectionAddressModeV = Tr2RenderContextEnum::TA_WRAP;
+		pld->materialSourceID = 0;
+		pld->materialTargets = Vector4( 0.f, 0.f, 0.f, 0.f );
+	}
 }
 
 // --------------------------------------------------------------------------------

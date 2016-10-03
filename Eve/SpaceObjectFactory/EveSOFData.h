@@ -81,10 +81,115 @@ TYPEDEF_BLUECLASS( EveSOFDataTransform );
 BLUE_DECLARE_VECTOR( EveSOFDataTransform );
 
 
+
+
+// --------------------------------------------------------------------------------
+// All data storage classes for per pattern data
+// --------------------------------------------------------------------------------
+BLUE_CLASS( EveSOFDataPatternTransform ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataPatternTransform( IRoot* lockobj = NULL );
+	~EveSOFDataPatternTransform() {}
+
+	// per-hull positional data
+	Vector3 m_position;
+	Vector3 m_scaling;
+	Quaternion m_rotation;
+
+	// mirrored at yz plane?
+	bool m_isMirrored;
+};
+TYPEDEF_BLUECLASS( EveSOFDataPatternTransform );
+
+
+BLUE_CLASS( EveSOFDataPatternPerHull ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataPatternPerHull( IRoot* lockobj = NULL );
+	~EveSOFDataPatternPerHull() {}
+
+	// exact hull name
+	BlueSharedString m_name;
+
+	// per-hull positional data
+	EveSOFDataPatternTransformPtr m_transformLayer1;
+	EveSOFDataPatternTransformPtr m_transformLayer2;
+};
+TYPEDEF_BLUECLASS( EveSOFDataPatternPerHull );
+BLUE_DECLARE_VECTOR( EveSOFDataPatternPerHull );
+
+
+BLUE_CLASS( EveSOFDataPatternLayer ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataPatternLayer( IRoot* lockobj = NULL );
+	~EveSOFDataPatternLayer() {}
+
+	// texture projection type
+	enum ProjectionType
+	{
+		PROJECTION_REPEAT = 0,
+		PROJECTION_CLAMP,
+		PROJECTION_BORDER,
+	};
+
+	// material sources
+	enum MaterialSource
+	{
+		SOURCE_MATERIAL1 = 0,
+		SOURCE_MATERIAL2,
+		SOURCE_MATERIAL3,
+		SOURCE_MATERIAL4,
+		SOURCE_PATTERN1,
+		SOURCE_PATTERN2,
+	};
+
+	// name of the texture
+	BlueSharedString m_textureName;
+	// res path
+	std::string m_textureResFilePath;
+	// how is the texture projected?
+	ProjectionType m_projectionTypeU, m_projectionTypeV;
+	// what is the pattern's material source?
+	MaterialSource m_materialSource;
+	// what is the pattern's material target?
+	bool m_isTargetMtl1, m_isTargetMtl2, m_isTargetMtl3, m_isTargetMtl4;
+};
+TYPEDEF_BLUECLASS( EveSOFDataPatternLayer );
+
+
+BLUE_CLASS( EveSOFDataPattern ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataPattern( IRoot* lockobj = NULL );
+	~EveSOFDataPattern() {}
+
+	// pattern name
+	std::string m_name;
+	// pattern layer data
+	EveSOFDataPatternLayerPtr m_layer1;
+	EveSOFDataPatternLayerPtr m_layer2;
+	// pattern placement per hull
+	PEveSOFDataPatternPerHullVector m_projections;
+};
+TYPEDEF_BLUECLASS( EveSOFDataPattern );
+BLUE_DECLARE_VECTOR( EveSOFDataPattern );
+
+
+
+
 // --------------------------------------------------------------------------------
 // All data storage classes for per-hull data
 // --------------------------------------------------------------------------------
-
 BLUE_CLASS( EveSOFDataHullSpotlightSetItem ) :
 	public IRoot
 {
@@ -473,6 +578,9 @@ public:
 	PEveSOFDataHullAreaVector m_depthAreas;
 	PEveSOFDataHullAreaVector m_distortionAreas;
 
+	// patterns
+	EveSOFDataPatternPerHullPtr m_defaultPattern;
+
 	// effects on ship
 	PEveSOFDataHullSpriteSetVector m_spriteSets;
 	PEveSOFDataHullSpotlightSetVector m_spotlightSets;
@@ -747,6 +855,10 @@ public:
 	// data
 	EveSOFDataBoosterPtr m_booster;
 
+	// default pattern
+	EveSOFDataPatternLayerPtr m_defaultPattern;
+	std::string m_defaultPatternLayer1MaterialName;
+
 	// hull area data
 	PEveSOFDataFactionHullAreaVector m_hullAreas;
 
@@ -786,118 +898,6 @@ BLUE_DECLARE_VECTOR( EveSOFDataMaterial );
 
 
 
-
-
-
-
-// --------------------------------------------------------------------------------
-// All data storage classes for per pattern data
-// --------------------------------------------------------------------------------
-BLUE_CLASS( EveSOFDataPatternTransform ) :
-	public IRoot
-{
-public:
-	EXPOSE_TO_BLUE();
-	EveSOFDataPatternTransform( IRoot* lockobj = NULL );
-	~EveSOFDataPatternTransform() {}
-
-	// per-hull positional data
-	Vector3 m_position;
-	Vector3 m_scaling;
-	Quaternion m_rotation;
-
-	// mirrored at yz plane?
-	bool m_isMirrored;
-};
-TYPEDEF_BLUECLASS( EveSOFDataPatternTransform );
-
-
-
-
-
-BLUE_CLASS( EveSOFDataPatternPerHull ) :
-	public IRoot
-{
-public:
-	EXPOSE_TO_BLUE();
-	EveSOFDataPatternPerHull( IRoot* lockobj = NULL );
-	~EveSOFDataPatternPerHull() {}
-
-	// exact hull name
-	BlueSharedString m_name;
-
-	// per-hull positional data
-	EveSOFDataPatternTransformPtr m_transformLayer1;
-	EveSOFDataPatternTransformPtr m_transformLayer2;
-};
-TYPEDEF_BLUECLASS( EveSOFDataPatternPerHull );
-BLUE_DECLARE_VECTOR( EveSOFDataPatternPerHull );
-
-
-
-
-
-BLUE_CLASS( EveSOFDataPatternLayer ) :
-	public IRoot
-{
-public:
-	EXPOSE_TO_BLUE();
-	EveSOFDataPatternLayer( IRoot* lockobj = NULL );
-	~EveSOFDataPatternLayer() {}
-
-	// texture projection type
-	enum ProjectionType
-	{
-		PROJECTION_REPEAT = 0,
-		PROJECTION_CLAMP,
-		PROJECTION_BORDER,
-	};
-
-	// material sources
-	enum MaterialSource
-	{
-		SOURCE_MATERIAL1 = 0,
-		SOURCE_MATERIAL2,
-		SOURCE_MATERIAL3,
-		SOURCE_MATERIAL4,
-		SOURCE_PATTERN1,
-		SOURCE_PATTERN2,
-	};
-
-	// name of the texture
-	BlueSharedString m_textureName;
-	// res path
-	std::string m_textureResFilePath;
-	// how is the texture projected?
-	ProjectionType m_projectionTypeU, m_projectionTypeV;
-	// what is the pattern's material source?
-	MaterialSource m_materialSource;
-	// what is the pattern's material target?
-	bool m_isTargetMtl1, m_isTargetMtl2, m_isTargetMtl3, m_isTargetMtl4;
-};
-TYPEDEF_BLUECLASS( EveSOFDataPatternLayer );
-
-
-
-
-BLUE_CLASS( EveSOFDataPattern ) :
-	public IRoot
-{
-public:
-	EXPOSE_TO_BLUE();
-	EveSOFDataPattern( IRoot* lockobj = NULL );
-	~EveSOFDataPattern() {}
-
-	// pattern name
-	std::string m_name;
-	// pattern layer data
-	EveSOFDataPatternLayerPtr m_layer1;
-	EveSOFDataPatternLayerPtr m_layer2;
-	// pattern placement per hull
-	PEveSOFDataPatternPerHullVector m_projections;
-};
-TYPEDEF_BLUECLASS( EveSOFDataPattern );
-BLUE_DECLARE_VECTOR( EveSOFDataPattern );
 
 
 
