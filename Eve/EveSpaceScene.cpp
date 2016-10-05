@@ -1435,12 +1435,12 @@ void EveSpaceScene::UpdateImpostors()
 		Vector4 sphere( 0.f, 0.f, 0.f, 1.f );
 		spaceObject->GetImpostorBoundingSphere( sphere );
 
-		Vector3 position( XMVector3TransformCoord( sphere, transform ) );
+		Vector3 position( sphere.x, sphere.y, sphere.z );
 
 		Vector3 viewDir = eye - position;
 		D3DXVec3Normalize( &viewDir, &viewDir );
 
-		const float distance = sphere.w * 50;
+		const float distance = sphere.w * 10;
 		Matrix view( XMMatrixLookAtRH( position + viewDir * distance, position, up ) );
 		Matrix proj( XMMatrixPerspectiveRH( sphere.w * 2, sphere.w * 2, distance - sphere.w, distance + sphere.w ) );
 

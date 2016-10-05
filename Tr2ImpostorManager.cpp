@@ -309,8 +309,7 @@ void Tr2ImpostorManager::EndUpdate()
 			it->first->GetImpostorBoundingSphere( sphere );
 
 			ImposterVertex vertex;
-			vertex.position = XMVector3Transform( sphere, transform );
-			vertex.position.w = sphere.w;
+			vertex.position = sphere;
 			vertex.texCoord = it->second.texcoord;
 			Tr2QuadRenderer::Instance()->AddQuads( m_effectKey, &vertex, 1 );
 		}

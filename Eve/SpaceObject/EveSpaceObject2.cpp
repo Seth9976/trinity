@@ -1056,7 +1056,7 @@ void EveSpaceObject2::GetRenderables( const TriFrustum& frustum, std::vector<ITr
 		else
 		{
 			m_lodLevel = TR2_LOD_LOW;
-			m_impostorMode = impostors != nullptr;
+			m_impostorMode = m_allowLodSelection && impostors != nullptr;
 		}
 
 		if( g_lodLevelUltraEnabled && m_estimatedPixelDiameterWithChildren > g_eveSpaceSceneHighDetailThreshold )
