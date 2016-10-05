@@ -1437,8 +1437,9 @@ void EveSpaceScene::UpdateImpostors()
 		Vector4 sphere( 0.f, 0.f, 0.f, 1.f );
 		spaceObject->GetImpostorBoundingSphere( sphere );
 
-		Matrix view( XMMatrixLookAtRH( transform.GetTranslation() + viewDir * sphere.w * 10, transform.GetTranslation(), up ) );
-		Matrix proj( XMMatrixPerspectiveRH( sphere.w * 2, sphere.w * 2, sphere.w * 9, sphere.w * 11 ) );
+		const float distance = sphere.w * 50;
+		Matrix view( XMMatrixLookAtRH( transform.GetTranslation() + viewDir * distance, transform.GetTranslation(), up ) );
+		Matrix proj( XMMatrixPerspectiveRH( sphere.w * 2, sphere.w * 2, distance - sphere.w, distance + sphere.w ) );
 
 		Tr2Renderer::SetViewTransform( view );
 		Tr2Renderer::SetProjectionTransform( proj );
