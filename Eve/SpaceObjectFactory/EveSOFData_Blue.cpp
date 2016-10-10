@@ -973,7 +973,6 @@ const Be::ClassInfo* EveSOFDataGeneric::ExposeToBlue()
 		MAP_ATTRIBUTE( "swarm", m_swarm, "Global swarm behavior preset data", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "hullAreas", m_hullAreas, "Global hull area shader data", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "variants", m_variants, "All the hull  variants", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "variants2", m_variants2, "All the hull  variants", Be::READWRITE | Be::PERSIST )
 		EXPOSURE_END()
 }
 

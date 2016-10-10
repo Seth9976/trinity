@@ -114,8 +114,7 @@ EveSOFDataGeneric::EveSOFDataGeneric( IRoot* lockobj ) :
 	PARENTLOCK( m_areaShaders ),
 	PARENTLOCK( m_decalShaders ),
 	PARENTLOCK( m_hullAreas ),
-	PARENTLOCK( m_variants ),
-	PARENTLOCK( m_variants2 )
+	PARENTLOCK( m_variants )
 	{}
 
 

@@ -1077,8 +1077,7 @@ public:
 	PEveSOFDataFactionHullAreaVector m_hullAreas;
 
 	// effect data
-	PEveSOFDataHullAreaVector m_variants;
-	PEveSOFDataGenericVariantVector m_variants2;
+	PEveSOFDataGenericVariantVector m_variants;
 };
 TYPEDEF_BLUECLASS( EveSOFDataGeneric );
 
