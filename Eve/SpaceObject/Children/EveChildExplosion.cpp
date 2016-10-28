@@ -116,13 +116,19 @@ void EveChildExplosion::SetLocalExplosionTransforms( const std::vector<Matrix>& 
 
 // --------------------------------------------------------------------------------------
 // Description:
-//   Assigns transforms to be used for local explosions
+//   Assigns a offset to use as an offset for the global explosion
+//   This offset will be scaled by the inverse of the parent scale, so it is positioned 
+//	 correctly
 // Arguments:
-//   transforms - Transforms for local explosions
+//   offset - The offset to use
 // --------------------------------------------------------------------------------------
 void EveChildExplosion::SetGlobalExplosionOffset( const Vector3& offset )
 {
 	m_globalExplosionOffset = offset;
+	m_globalExplosionOffset.x /= this->m_scaling.x;
+	m_globalExplosionOffset.y /= this->m_scaling.y;
+	m_globalExplosionOffset.z /= this->m_scaling.z;
+
 }
 
 // --------------------------------------------------------------------------------------
@@ -141,7 +147,6 @@ void EveChildExplosion::UpdateSyncronous(
 {
 	if( m_isPlaying )
 	{
-		bool shouldStop = false;
 		auto dt = updateContext.GetDeltaT();
 		m_playTime += dt;
 		if( m_localExplosion || !m_localExplosions.empty() )

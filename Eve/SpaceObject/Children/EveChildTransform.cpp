@@ -66,12 +66,9 @@ void EveChildTransform::UpdateTransform( const Matrix& parentTransform )
 			Vector3 scale, translation;
 			Quaternion rotation;
 			Matrix parentTransformWithoutRotation;
-
-			Quaternion identityRotation = Quaternion( 0, 0, 0, 1 );
-			Vector3 zero = Vector3( 0, 0, 0 );
-
+			
 			D3DXMatrixDecompose( &scale, &rotation, &translation, &parentTransform );
-			D3DXMatrixTransformation( &parentTransformWithoutRotation, &zero, &identityRotation, &scale, &zero, &identityRotation, &translation );
+			D3DXMatrixTransformation( &parentTransformWithoutRotation, nullptr, nullptr, &scale, nullptr, nullptr, &translation );
 						
 			D3DXMatrixMultiply( &m_worldTransform, &m_localTransform, &parentTransformWithoutRotation );
 		}

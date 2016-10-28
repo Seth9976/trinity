@@ -1049,14 +1049,9 @@ void EveSpaceObject2::GetRenderables( const TriFrustum& frustum, std::vector<ITr
 		{
 			m_lodLevel = TR2_LOD_MEDIUM;
 		}
-		else if( m_estimatedPixelDiameter > g_eveSpaceSceneLowDetailThreshold * 0.5f )
-		{
-			m_lodLevel = TR2_LOD_LOW;
-		}
 		else
 		{
 			m_lodLevel = TR2_LOD_LOW;
-			m_impostorMode = m_allowLodSelection && impostors != nullptr;
 		}
 
 		if( g_lodLevelUltraEnabled && m_estimatedPixelDiameterWithChildren > g_eveSpaceSceneHighDetailThreshold )
@@ -1071,9 +1066,14 @@ void EveSpaceObject2::GetRenderables( const TriFrustum& frustum, std::vector<ITr
 		{
 			m_lodLevelWithChildren = TR2_LOD_MEDIUM;
 		}
+		else if( m_estimatedPixelDiameterWithChildren > g_eveSpaceSceneLowDetailThreshold * 0.5f )
+		{
+			m_lodLevelWithChildren = TR2_LOD_LOW;
+		}
 		else
 		{
 			m_lodLevelWithChildren = TR2_LOD_LOW;
+			m_impostorMode = m_allowLodSelection && impostors != nullptr;
 		}
 
 		if( m_allowLodSelection && m_isMeshVisible )
