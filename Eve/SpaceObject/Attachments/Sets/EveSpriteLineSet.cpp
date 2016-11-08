@@ -7,6 +7,7 @@
 
 #include "EveSpriteLineSet.h"
 
+#include "Include/TriMath.h"
 #include "Tr2QuadRenderer.h"
 #include "Tr2Renderer.h"
 #include "Utilities/MatrixUtils.h"
@@ -107,43 +108,90 @@ bool EveSpriteLineSet::OnPrepareResources()
 		Matrix m;
 		D3DXMatrixRotationQuaternion( &m, &spriteLine->m_rotation );
 
-		// how many sprites on this line?
-		size_t numOfSprites = size_t( spriteLine->m_scaling.x );
-
-		// increase buffer
-		totalBufferSize += numOfSprites;
-		m_buffer.resize( totalBufferSize );
-		m_spriteData.resize( totalBufferSize );
-
-		// start populating the sprites from this line
-		Vector3 pos( spriteLine->m_position );
-		Vector3 dir( 1.f, 0.f, 0.f );
-		D3DXVec3TransformNormal( &dir, &dir, &m );
-		EveSpriteSet::PoolVertex* vtx = &m_buffer[totalBufferidx];
-		EveSpriteSet::SpriteData* spr = &m_spriteData[totalBufferidx];
-		for( size_t i = 0; i < numOfSprites; ++i )
+		// interpret as circle or line?
+		if( spriteLine->m_isCircle )
 		{
-			// fill static pool data
-			vtx->position = pos;
-			vtx->warpColor = vtx->color = ( ( spriteLine->m_color & 0xff0000 ) >> 16 ) | ( spriteLine->m_color & 0xff00ff00 ) | ( ( spriteLine->m_color & 0xff ) << 16 );
-			vtx->blinkPhase = spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i;
-			vtx->blinkRate = spriteLine->m_blinkRate;
-			vtx->minScale = spriteLine->m_minScale;
-			vtx->maxScale = spriteLine->m_maxScale;
-			vtx->falloff = spriteLine->m_falloff;
-			vtx->activation = 1.f;
+			// how many sprites on this line?
+			size_t numOfSprites = size_t( spriteLine->m_spacing );
 
-			// fill animated pool data
-			spr->position = pos;
-			spr->boneIndex = spriteLine->m_boneIndex;
+			// increase buffer
+			totalBufferSize += numOfSprites;
+			m_buffer.resize( totalBufferSize );
+			m_spriteData.resize( totalBufferSize );
 
-			// next
-			pos += spriteLine->m_spacing * dir;
-			++vtx;
-			++spr;
+			// start populating the sprites from this circle
+			float alpha = 0.f;
+			EveSpriteSet::PoolVertex* vtx = &m_buffer[totalBufferidx];
+			EveSpriteSet::SpriteData* spr = &m_spriteData[totalBufferidx];
+			for( size_t i = 0; i < numOfSprites; ++i )
+			{
+				// position on an ellipsoid in x,z-plane
+				Vector3 pos( spriteLine->m_scaling.x * sinf( alpha ), 0.f, spriteLine->m_scaling.y * cosf( alpha ) );
+				D3DXVec3TransformCoord( &vtx->position, &pos, &m );
+				pos += spriteLine->m_position;
+				// fill static pool data
+				vtx->position = pos;
+				vtx->warpColor = vtx->color = ( ( spriteLine->m_color & 0xff0000 ) >> 16 ) | ( spriteLine->m_color & 0xff00ff00 ) | ( ( spriteLine->m_color & 0xff ) << 16 );
+				vtx->blinkPhase = spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i;
+				vtx->blinkRate = spriteLine->m_blinkRate;
+				vtx->minScale = spriteLine->m_minScale;
+				vtx->maxScale = spriteLine->m_maxScale;
+				vtx->falloff = spriteLine->m_falloff;
+				vtx->activation = 1.f;
+
+				// fill animated pool data
+				spr->position = pos;
+				spr->boneIndex = spriteLine->m_boneIndex;
+
+				// next
+				alpha += TRI_2PI / spriteLine->m_spacing;
+				++vtx;
+				++spr;
+			}
+
+			totalBufferidx = totalBufferSize;
+		}
+		else
+		{
+			// how many sprites on this line?
+			size_t numOfSprites = size_t( spriteLine->m_scaling.x );
+
+			// increase buffer
+			totalBufferSize += numOfSprites;
+			m_buffer.resize( totalBufferSize );
+			m_spriteData.resize( totalBufferSize );
+
+			// start populating the sprites from this line
+			Vector3 pos( spriteLine->m_position );
+			Vector3 dir( 1.f, 0.f, 0.f );
+			D3DXVec3TransformNormal( &dir, &dir, &m );
+			EveSpriteSet::PoolVertex* vtx = &m_buffer[totalBufferidx];
+			EveSpriteSet::SpriteData* spr = &m_spriteData[totalBufferidx];
+			for( size_t i = 0; i < numOfSprites; ++i )
+			{
+				// fill static pool data
+				vtx->position = pos;
+				vtx->warpColor = vtx->color = ( ( spriteLine->m_color & 0xff0000 ) >> 16 ) | ( spriteLine->m_color & 0xff00ff00 ) | ( ( spriteLine->m_color & 0xff ) << 16 );
+				vtx->blinkPhase = spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i;
+				vtx->blinkRate = spriteLine->m_blinkRate;
+				vtx->minScale = spriteLine->m_minScale;
+				vtx->maxScale = spriteLine->m_maxScale;
+				vtx->falloff = spriteLine->m_falloff;
+				vtx->activation = 1.f;
+
+				// fill animated pool data
+				spr->position = pos;
+				spr->boneIndex = spriteLine->m_boneIndex;
+
+				// next
+				pos += spriteLine->m_spacing * dir;
+				++vtx;
+				++spr;
+			}
+
+			totalBufferidx = totalBufferSize;
 		}
 
-		totalBufferidx = totalBufferSize;
 	}
 
 	return true;

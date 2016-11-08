@@ -14,6 +14,7 @@ const Be::ClassInfo* EveSpriteLineSetItem::ExposeToBlue()
         MAP_INTERFACE( EveSpriteLineSetItem )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "isCircle", m_isCircle, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "position", m_position, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "rotation", m_rotation, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "scaling", m_scaling, "", Be::READWRITE | Be::PERSIST )

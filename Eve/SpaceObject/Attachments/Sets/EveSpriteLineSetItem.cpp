@@ -12,6 +12,7 @@
 //   Initialize data members
 // --------------------------------------------------------------------------------
 EveSpriteLineSetItem::EveSpriteLineSetItem( IRoot* lockobj ) :
+	m_isCircle( false ),
 	m_position( 0.f, 0.f, 0.f ),
 	m_rotation( 0.f, 0.f, 0.f, 1.f ),
 	m_scaling( 1.f, 1.f, 1.f ),

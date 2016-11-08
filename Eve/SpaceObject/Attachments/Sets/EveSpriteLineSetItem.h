@@ -27,6 +27,7 @@ public:
 
 	// data
 	BlueSharedString m_name;
+	bool m_isCircle;
 	Vector3 m_position;
 	Quaternion m_rotation;
 	Vector3 m_scaling;
