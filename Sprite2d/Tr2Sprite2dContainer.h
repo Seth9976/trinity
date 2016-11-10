@@ -71,6 +71,9 @@ protected:
 	float m_pickRadius;
 
 	bool m_cacheContents;
+	bool m_cacheContentsHint;
+	uint8_t m_dirtyFrameCount;
+	uint8_t m_cleanFrameCount;
 	struct Tr2Sprite2dDisplayList* m_cachedDisplayList;
 };
 

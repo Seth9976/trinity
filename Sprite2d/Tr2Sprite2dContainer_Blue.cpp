@@ -89,10 +89,20 @@ const Be::ClassInfo* Tr2Sprite2dContainer::ExposeToBlue()
 		MAP_ATTRIBUTE
 		(
 			"cacheContents",
-			m_cacheContents,
+			m_cacheContentsHint,
 			"Should contents of this container be cached? This can drastically improve\n"
-			"render performance of containers with static contents",
+			"render performance of containers with static contents. This flag is only\n"
+			"a hint, the container uses caching when it doesn't change too often.",
 			Be::READWRITE | Be::NOTIFY
+		)
+
+		MAP_ATTRIBUTE
+		(
+			"isCachingContents",
+			m_cacheContents,
+			"Is the contents of this container currently cached. Use cacheContents to\n"
+			"turn caching on/off.",
+			Be::READ
 		)
 
 	EXPOSURE_CHAINTO( Tr2Sprite2dContainerBase )

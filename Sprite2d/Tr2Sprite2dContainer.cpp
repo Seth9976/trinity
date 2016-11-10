@@ -86,7 +86,10 @@ Tr2Sprite2dContainer::Tr2Sprite2dContainer( IRoot* lockobj ) :
 	m_absoluteCoordinates( false ),
 	m_clip( false ),
 	m_pickRadius( 0.0f ),
-	m_cacheContents( false ),
+	m_cacheContents( true ),
+	m_cacheContentsHint( false ),
+	m_dirtyFrameCount( 0 ),
+	m_cleanFrameCount( 0 ),
 	m_cachedDisplayList( nullptr )
 {
 	m_children.SetNotify( this );
@@ -111,6 +114,50 @@ void Tr2Sprite2dContainer::GatherSprites( Tr2Sprite2dScene* renderer )
 	if( m_displayWidth <= 0.0f || m_displayHeight <= 0.0f )
 	{
 		return;
+	}
+
+	if( m_cacheContentsHint )
+	{
+		if( m_isDirty )
+		{
+			m_cleanFrameCount = 0;
+			if( m_dirtyFrameCount > 10 )
+			{
+				m_cacheContents = false;
+				if( m_cachedDisplayList )
+				{
+					CCP_DELETE m_cachedDisplayList;
+					m_cachedDisplayList = nullptr;
+				}
+			}
+			else
+			{
+				m_dirtyFrameCount++;
+			}
+		}
+		else
+		{
+			m_dirtyFrameCount = 0;
+			if( m_cleanFrameCount > 3 )
+			{
+				m_cacheContents = true;
+			}
+			else
+			{
+				m_cleanFrameCount++;
+			}
+		}
+	}
+	else
+	{
+		m_dirtyFrameCount = 0;
+		m_cleanFrameCount = 0;
+		m_cacheContents = false;
+		if( m_cachedDisplayList )
+		{
+			CCP_DELETE m_cachedDisplayList;
+			m_cachedDisplayList = nullptr;
+		}
 	}
 
 	if( m_cacheContents && !renderer->IsCapturing() )
@@ -151,6 +198,7 @@ void Tr2Sprite2dContainer::GatherSprites( Tr2Sprite2dScene* renderer )
 	else
 	{
 		GatherSpritesHelper(renderer);
+		m_isDirty = false;
 	}
 }
 
