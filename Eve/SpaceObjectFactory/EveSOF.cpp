@@ -714,7 +714,8 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 		}
 		else if( planeSetData->usage == EveSOFDataHullPlaneSet::USAGE_VIDEO )
 		{
-			planeEffect->AddResourceTexture2D( BlueSharedString( "ImageMap" ), m_dataMgr.GetGenericData()->whiteTextureResPath.c_str() );
+			// setting the dynamic video resource, it's hard-coded because at the moment (30-11-2016) it's not doing anything...
+			planeEffect->AddResourceTexture2D( BlueSharedString( "ImageMap" ), "dynamic:/hangarvideos" );
 		}
 				
 		// parameters
