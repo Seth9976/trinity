@@ -2,6 +2,8 @@
 #ifndef Tr2RenderTarget_h_
 #define Tr2RenderTarget_h_
 
+#include "ITr2TextureProvider.h"
+
 BLUE_DECLARE( Tr2RenderTarget );
 
 // -------------------------------------------------------------
@@ -10,7 +12,7 @@ BLUE_DECLARE( Tr2RenderTarget );
 //   a renderTarget.
 //   This class replaces TriSurface and TriTextureRes.
 // -------------------------------------------------------------
-BLUE_CLASS( Tr2RenderTarget ) : public IRoot
+BLUE_CLASS( Tr2RenderTarget ) : public ITr2TextureProvider
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -37,6 +39,8 @@ public:
 					Tr2RenderContextEnum::PixelFormat format, 
 					unsigned msaaType, unsigned msaaQuality,
 					unsigned flags );
+
+	virtual Tr2TextureAL* GetTexture();
 
 	void Attach( Tr2RenderTargetAL* renderTarget, IRoot* owner );
 	bool IsAttached() const;

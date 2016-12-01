@@ -11,6 +11,7 @@ const Be::ClassInfo* Tr2RenderTarget::ExposeToBlue()
 
 		MAP_INTERFACE( IRoot )
 		MAP_INTERFACE( Tr2RenderTarget )
+		MAP_INTERFACE( ITr2TextureProvider )
 
 		MAP_METHOD_AND_WRAP
 		(

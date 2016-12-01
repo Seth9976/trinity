@@ -95,6 +95,16 @@ long Tr2RenderTarget::CreateEx(	unsigned width, unsigned height, unsigned mipLev
 									renderContext ).GetResult();
 }
 
+Tr2TextureAL* Tr2RenderTarget::GetTexture()
+{
+	auto& rt = GetRenderTarget();
+	if( rt.IsValid() && rt.GetTexture().IsValid() )
+	{
+		return  &rt.GetTexture();
+	}
+	return nullptr;
+}
+
 // --------------------------------------------------------------------------------------
 // Description:
 //   Attaches this object to existing AL render target. Attached Tr2RenderTarget doesn't

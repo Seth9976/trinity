@@ -9,7 +9,7 @@ const Be::ClassInfo* Tr2TextureAtlas::ExposeToBlue()
 {
     EXPOSURE_BEGIN( Tr2TextureAtlas, "" )
         MAP_INTERFACE( Tr2TextureAtlas )
-		MAP_INTERFACE( ID3DTexture )
+		MAP_INTERFACE( ITr2TextureProvider )
 
 		MAP_ATTRIBUTE_WITH_CHOOSER
 		(

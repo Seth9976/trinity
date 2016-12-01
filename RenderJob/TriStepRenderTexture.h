@@ -4,7 +4,7 @@
 
 
 #include "TriRenderStep.h"
-#include "ID3DTexture.h"
+#include "ITr2TextureProvider.h"
 
 BLUE_DECLARE( Tr2AtlasTexture );
 BLUE_DECLARE( Tr2RenderTarget );
@@ -22,7 +22,7 @@ public:
 	//RenderStep
 	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
 
-	void SetTexture( ID3DTexture* tex );
+	void SetTexture( ITr2TextureProvider* tex );
 	void SetTexture( Tr2AtlasTexture* tex );
 	void SetTexture( Tr2RenderTarget* tex );
 	void SetTexture( Tr2DepthStencil* tex );
@@ -31,7 +31,7 @@ public:
 private:
 	void BlankOut();
 	TriStepResult ClearIfFail( bool result, Tr2RenderContext& renderContext );
-	ID3DTexturePtr m_texture;
+	ITr2TextureProviderPtr m_texture;
 	Tr2AtlasTexturePtr m_atlasTexture;
 	Tr2RenderTargetPtr	m_renderTarget;
 	Tr2DepthStencilPtr	m_depthStencil;

@@ -28,7 +28,7 @@ void TriStepRenderTexture::BlankOut()
 	m_textureRes   = nullptr;
 }
 
-void TriStepRenderTexture::SetTexture( ID3DTexture* tex )
+void TriStepRenderTexture::SetTexture( ITr2TextureProvider* tex )
 {
 	BlankOut();
 	m_texture = tex;	

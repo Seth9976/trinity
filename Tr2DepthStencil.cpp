@@ -41,6 +41,15 @@ long Tr2DepthStencil::CreateEx( unsigned width, unsigned height, DepthStencilFor
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 	return m_depthStencil.CreateEx( width, height, dsFormat, msaaType, msaaQuality, flags, renderContext ).GetResult();
 }
+
+Tr2TextureAL* Tr2DepthStencil::GetTexture()
+{
+	if( m_depthStencil.IsValid() && m_depthStencil.GetTexture().IsValid() )
+	{
+		return  &m_depthStencil.GetTexture();
+	}
+	return nullptr;
+}
 	
 bool Tr2DepthStencil::IsValid() const
 {

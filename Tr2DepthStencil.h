@@ -2,6 +2,8 @@
 #ifndef Tr2DepthStencil_h_
 #define Tr2DepthStencil_h_
 
+#include "ITr2TextureProvider.h"
+
 BLUE_DECLARE( Tr2DepthStencil );
 
 // -------------------------------------------------------------
@@ -11,7 +13,7 @@ BLUE_DECLARE( Tr2DepthStencil );
 //   This class replaces TriSurface for those use-cases where the
 //   surface was just a depth stencil surface.
 // -------------------------------------------------------------
-BLUE_CLASS( Tr2DepthStencil ) : public IRoot
+BLUE_CLASS( Tr2DepthStencil ) : public ITr2TextureProvider
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -25,6 +27,8 @@ public:
 		Be::OptionalWithDefaultValue<Tr2RenderContextEnum::DepthStencilFormat, Tr2RenderContextEnum::DSFMT_UNKNOWN> format,
 		Be::OptionalWithDefaultValue<unsigned, 1> msaaType,
 		Be::OptionalWithDefaultValue<unsigned, 0> msaaQuality );
+
+	virtual Tr2TextureAL* GetTexture();
 
 	long Create( unsigned width, unsigned height, Tr2RenderContextEnum::DepthStencilFormat format, unsigned msaaType, unsigned msaaQuality );
 	long CreateEx( unsigned width, unsigned height, Tr2RenderContextEnum::DepthStencilFormat format, unsigned msaaType, unsigned msaaQuality, unsigned flags );

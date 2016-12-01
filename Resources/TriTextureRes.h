@@ -26,7 +26,7 @@
 
 #include "include/ITriTextureRes.h"
 #include "Tr2DeviceResource.h"
-#include "ID3DTexture.h"
+#include "ITr2TextureProvider.h"
 #include "Tr2AsyncSave.h"
 
 class Tr2RenderTarget;
@@ -41,7 +41,7 @@ BLUE_DECLARE( Tr2HostBitmap );
 /////////////////////////////////////////////////////////////////////////////////////
 BLUE_CLASS( TriTextureRes ) :
 	public BlueAsyncRes,
-	public ID3DTexture,
+	public ITr2TextureProvider,
 	public ICacheable,
 	public ITriTextureRes,
 	public Tr2DeviceResource,

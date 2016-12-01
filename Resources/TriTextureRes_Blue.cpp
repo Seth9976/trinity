@@ -4,6 +4,8 @@
 #include "Tr2DepthStencil.h"
 #include "Tr2HostBitmap.h"
 
+BLUE_DEFINE_INTERFACE( ITr2TextureProvider );
+
 BLUE_DEFINE( TriTextureRes );
 
 using namespace Tr2RenderContextEnum;
@@ -167,7 +169,7 @@ const Be::ClassInfo* TriTextureRes::ExposeToBlue()
     EXPOSURE_BEGIN( TriTextureRes, "" )
 		MAP_INTERFACE(ITriTextureRes)
 		MAP_INTERFACE(TriTextureRes)
-		MAP_INTERFACE( ID3DTexture )
+		MAP_INTERFACE( ITr2TextureProvider )
 		MAP_INTERFACE( IBlueResource )
 		MAP_INTERFACE( ICacheable )
 		MAP_ICACHEABLE_METHODS()

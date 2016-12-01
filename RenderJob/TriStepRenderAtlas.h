@@ -4,7 +4,6 @@
 
 
 #include "TriRenderStep.h"
-#include "ID3DTexture.h"
 
 class Tr2TextureAtlas;
 class Tr2AtlasTexture;

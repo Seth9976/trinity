@@ -5,7 +5,7 @@
 
 
 #include "Tr2DeviceResource.h"
-#include "ID3DTexture.h"
+#include "ITr2TextureProvider.h"
 #include "include/Rect.h"
 
 BLUE_DECLARE( Tr2AtlasTexture );
@@ -30,7 +30,7 @@ struct Tr2TextureAtlasArea
 };
 
 BLUE_CLASS( Tr2TextureAtlas ):
-     public ID3DTexture,
+     public ITr2TextureProvider,
 	 public Tr2DeviceResource
 {
 public:
@@ -62,7 +62,7 @@ public:
 #endif
 
 	//////////////////////////////////////////////////////////////////////////
-	// ID3DTexture
+	// ITr2TextureProvider
 	Tr2TextureAL* GetTexture();
 	Tr2RenderTargetAL* GetRenderTarget();
 

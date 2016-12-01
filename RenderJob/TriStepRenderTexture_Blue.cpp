@@ -34,7 +34,7 @@ static PyObject* py__init__( PyObject* self, PyObject* args )
 			Py_RETURN_NONE;
 		}
 
-		ID3DTexture* texture = BluePythonCast<ID3DTexture*>( pyTexture );
+		ITr2TextureProvider* texture = BluePythonCast<ITr2TextureProvider*>( pyTexture );
 		if( texture )
 		{
 			pThis->SetTexture( texture );
