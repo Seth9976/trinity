@@ -479,11 +479,11 @@ static bool IsRightHanded()
 {
 	if( s_isRightHanded )
 	{
-		Py_RETURN_TRUE;
+		return true;
 	}
 	else
 	{
-		Py_RETURN_FALSE;
+		return false;
 	}
 }
 
