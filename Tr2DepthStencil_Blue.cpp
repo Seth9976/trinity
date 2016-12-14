@@ -74,7 +74,6 @@ const Be::ClassInfo* Tr2DepthStencil::ExposeToBlue()
 			":param format: buffer format (trinity.DEPTH_STENCIL_FORMAT)\n"
 			":param msaaType: sample count\n"
 			":param msaaQuality: MSAA quality"
-			":param flags: trinity.EX_FLAG"
 			);
 
 		MAP_METHOD_AND_WRAP( 

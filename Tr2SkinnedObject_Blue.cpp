@@ -189,7 +189,7 @@ const Be::ClassInfo* Tr2SkinnedObject::ExposeToBlue()
 			"GetBoneIndex"    , 
 			GetBoneIndex    , 
 			"returns the joint index in the anim rig of this bone\n" 
-			":paran name: bone name"
+			":param name: bone name"
 		)
 		MAP_METHOD_AND_WRAP( "GetSkeletonTag"  , GetSkeletonTag  , "returns a counter that goes up every time the skeleton rig got invalidated" )
 		MAP_METHOD_AND_WRAP( 

@@ -187,14 +187,12 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 		(
 			"AddText",
 			AddText,
-			"n = AddText(text, params)"
+			"n = AddText(text)"
 			"\nAdds text to the measurer object, advancing the cursor horizontally."
 			"\nNew line characters are not handled here, they are expected to be"
 			"\nhandled outside the measurer."
-			"\n\nArguments:"
-			"\n  text   - unicode string to be added"
-			"\n  params - as returned by font.GetParams"
-			"\n\nReturns:"
+			"\n:param text: unicode string to be added"
+			"\n\n:returns:"
 			"\n  the number of characters added. May be less the length of the given"
 			"\n  text if a limit is set on the measurer."
 		)
@@ -207,9 +205,8 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 			"\nCommits text previously added with AddText, shifting it by the"
 			"\ngiven x,y coordinates."
 			"\nText can also be canceled with CancelLastText."
-			"\n\nArguments:"
-			"\n  shiftX - amount in pixels that text to commit is shifted by horizontally"
-			"\n  shiftY - amount in pixels that text to commit is shifted by vertically"
+			"\n:param shiftX: amount in pixels that text to commit is shifted by horizontally"
+			"\n:param shiftY: amount in pixels that text to commit is shifted by vertically"
 		)
 
 		MAP_METHOD_AND_WRAP
@@ -251,8 +248,7 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 			DrawToAtlasTexture,
 			"DrawToAtlasTexture(atlasTexture)"
 			"\nDraws all committed text to the atlas texture."
-			"\n\nArguments:"
-			"\n  atlasTexture - a Tr2AtlasTexture object"
+			"\n:param atlasTexture: a Tr2AtlasTexture object"
 		)
 
 		MAP_METHOD_AND_WRAP
@@ -261,8 +257,7 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 			DrawToTexture,
 			"DrawToTexture(texture)"
 			"\nDraws all committed text to the texture."
-			"\n\nArguments:"
-			"\n  texture - a TriTextureRes object"
+			"\n:param texture: a TriTextureRes object"
 		)
 
 		MAP_METHOD_AND_WRAP
@@ -271,8 +266,7 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 			DrawToHostBitmap,
 			"DrawToHostBitmap(hostBitmap)"
 			"\nDraws all committed text to the hostBitmap."
-			"\n\nArguments:"
-			"\n  hostBitmap - a Tr2HostBitmap object"
+			"\n:param hostBitmap: a Tr2HostBitmap object"
 		)
 
 		MAP_METHOD_AND_WRAP
@@ -282,9 +276,8 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 			"ix = GetIndexAtPos(x)"
 			"\nReturns the character index of the given x position. This only works"
 			"\nfor single line text."
-			"\n\nArguments:"
-			"\n  x - position being queried"
-			"\n\nReturns:"
+			"\n:param x: position being queried"
+			"\n\n:returns:"
 			"\n  index into the string that corresponds to the x position."
 		)
 
@@ -294,10 +287,8 @@ const Be::ClassInfo* Tr2FontMeasurer::ExposeToBlue()
 			GetWidthAtIndex,
 			"x = GetWidthAtIndex(ix)"
 			"\nReturns the width of the string at the given index."
-			"\n\nArguments:"
-			"\n  ix = index into the string"
-			"\n\nReturns:"
-			"\n  the width of the string at the given index."
+			"\n:param ix: index into the string"
+			"\n\n:returns: the width of the string at the given index."
 		)
 	EXPOSURE_END()
 }

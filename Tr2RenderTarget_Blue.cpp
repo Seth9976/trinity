@@ -46,7 +46,6 @@ const Be::ClassInfo* Tr2RenderTarget::ExposeToBlue()
 			"Creates a new MSAA render target\n"
 			":param width: render target width\n"
 			":param height: render target height\n"
-			":param mipCount: number of mip levels (0 = full pyramid)\n"
 			":param format: pixel format (trinity.PIXEL_FORMAT)"
 			":param msaaType: number of samples\n"
 			":param msaaQuality: MSAA quality"
