@@ -42,6 +42,7 @@ public:
 	IRootPtr Build( const char* hullName, const char* factionName, const char* raceName );
 	// build a spaceship from a dns string and return a EveShip2 object
 	IRootPtr BuildFromDNA( const char* dnaString );
+
 	// validate a dna string (slow!)
 	bool ValidateDNA( const char* dnaString );
 
@@ -49,7 +50,7 @@ public:
 	void SetupTurretMaterialFromDNA( EveTurretSet* turretSet, const char* dnaString );
 	void SetupTurretMaterialFromFaction( EveTurretSet* turretSet, const char* factionName );
 
-
+	EveSOFDataMgr& DataManager() { return m_dataMgr; }
 private:
 	// creation
 	EveSpaceObject2Ptr CreateSpaceObject( const EveSOFDNAPtr dna ) const;

@@ -20,7 +20,6 @@ public:
 
 	void py__init__( ITr2Scene* scene );
 
-private:
 	ITr2ScenePtr m_scene;
 };
 

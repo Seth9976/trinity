@@ -31,7 +31,7 @@ BLUE_DECLARE( Tr2MouseCursor );
 BLUE_DECLARE( TriRect );
 BLUE_DECLARE( Tr2PresentParameters );
 
-class App : 
+BLUE_CLASS( App ) : 
 	public INotify,
 	public IBlueEvents
 {

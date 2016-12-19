@@ -49,7 +49,7 @@ extern const Be::VarChooser TriDeviceTypeChooser[];
 extern bool g_usingEXDevice;
 #endif
 
-class TriDevice :
+BLUE_CLASS( TriDevice ):
 	public ITriDevice,
 	public INotify,
 	public IBlueEvents,

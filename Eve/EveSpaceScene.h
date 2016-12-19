@@ -65,7 +65,7 @@ BLUE_DECLARE( Tr2ImpostorManager );
 
 enum TAASampling { TAA_NONE=0, TAA_RANDOM=1, TAA_2X=2, TAA_3X=3, TAA_4X=4 };
 
-class EveSpaceScene :
+BLUE_CLASS( EveSpaceScene ) :
 	public ITr2Scene,
 	public ITr2MultiPassScene,
 	public IInitialize,
@@ -142,6 +142,8 @@ public:
 
 	Tr2ShLightingManagerPtr GetShLightingManager() const;
 	void SetShLightingManager( Tr2ShLightingManager* manager );
+
+	IEveSpaceObject2Vector& Objects() { return m_objects; }
 
 protected:
 	// Data shared between the different rendering method chunks

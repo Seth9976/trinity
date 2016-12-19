@@ -34,6 +34,8 @@ public:
 	bool		SetThreadAffinity( uint32_t threadAffinity );
 	uint32_t	GetThreadAffinity() const;
 
+	TriRenderStepVector& Steps() { return m_renderSteps; }
+
 	// ITriDeviceResource is needed, for cases when people decorate the renderjob class
 	// as a manager for the surfaces and resource that are needed for it
 	virtual void ReleaseResources( TriStorage s );

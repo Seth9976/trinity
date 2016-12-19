@@ -21,7 +21,6 @@ public:
 	static PyObject* py__init__( PyObject* self, PyObject* args );
 #endif
 
-private:
 	Color m_color;
 	float m_depth;
 	unsigned int m_stencil;
