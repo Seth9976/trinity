@@ -7,6 +7,23 @@
 #include "StdAfx.h"
 #include "Tr2DebugRenderer.h"
 
+namespace
+{
+
+std::vector<std::string> GetDebugRenderOptions( IRoot* object )
+{
+	std::vector<std::string> result;
+	if( auto renderable = dynamic_cast<ITr2DebugRenderable*>( object ) )
+	{
+		Tr2DebugRendererOptions options;
+		renderable->GetDebugOptions( options );
+		result.insert( result.end(), options.begin(), options.end() );
+	}
+	return result;
+}
+
+}
+
 BLUE_DEFINE( Tr2DebugRenderer );
 
 
@@ -22,6 +39,12 @@ const Be::ClassInfo* Tr2DebugRenderer::ExposeToBlue()
 			":param objects: selected objects\n" 
 		)
 		MAP_METHOD_AND_WRAP( 
+			"GetOptions", 
+			GetOptions, 
+			"Returns a list of currently enabled options for an object\n"
+			":param obj: object\n" 
+		)
+		MAP_METHOD_AND_WRAP( 
 			"SetOptions", 
 			SetOptions, 
 			"Assign a set of visualization options for a single object\n"
@@ -29,10 +52,23 @@ const Be::ClassInfo* Tr2DebugRenderer::ExposeToBlue()
 			":param options: set of visualization options\n" 
 		)
 		MAP_METHOD_AND_WRAP( 
+			"GetDefaultOptions", 
+			GetDefaultOptions, 
+			"Returns a list of fallback visualization options\n"
+		)
+		MAP_METHOD_AND_WRAP( 
 			"SetDefaultOptions", 
 			SetDefaultOptions, 
-			"Assign a set of fallback visualization options\n"
+			"Assign a list of fallback visualization options\n"
 			":param options: set of visualization options\n" 
 		)
 	EXPOSURE_END()
 }
+
+MAP_FUNCTION_AND_WRAP( 
+	"GetDebugRenderOptions",
+	GetDebugRenderOptions,
+	"Returns possible debug rendering options for an object\n"
+	":param obj: any blue-exposed object\n"
+	":returns: list of option names that can be set with Tr2DebugRenderer" 
+	);

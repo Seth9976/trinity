@@ -29,7 +29,9 @@ struct Tr2DebugColor
 	// color for things behind other geometry
 	uint32_t m_zFailColor;
 
+	Tr2DebugColor( uint32_t color );
 	Tr2DebugColor( const Color& color );
+	Tr2DebugColor( uint32_t color, uint32_t zFailColor );
 	Tr2DebugColor( const Color& color, const Color& zFailColor );
 };
 
@@ -37,6 +39,20 @@ struct Tr2DebugObjectReference
 {
 	IRootPtr m_object;
 	uint32_t m_area;
+
+	template <typename T>
+	Tr2DebugObjectReference( T* object )
+		:m_object( object->GetRawRoot() ),
+		m_area( 0 )
+	{
+	}
+
+	template <typename T>
+	Tr2DebugObjectReference( T* object, uint32_t area )
+		:m_object( object->GetRawRoot() ),
+		m_area( area )
+	{
+	}
 
 	Tr2DebugObjectReference( IRoot* object );
 	Tr2DebugObjectReference( IRoot* object, uint32_t area );
@@ -59,6 +75,12 @@ public:
 	Tr2DebugRenderer( IRoot* lockobj = nullptr );
 
 	EXPOSE_TO_BLUE();
+
+	template <typename T>
+	bool HasOption( T* owner, const char* option ) const
+	{
+		return this->HasOption( owner->GetRawRoot(), option );
+	}
 
     bool HasOption( IRoot* owner, const char* option ) const;
     bool IsSelected( IRoot* owner ) const;
@@ -84,6 +106,7 @@ public:
     void DrawBox( Tr2DebugObjectReference owner, const Vector3& min, const Vector3& max, Effect effect, Tr2DebugColor color );
     void DrawBox( Tr2DebugObjectReference owner, const Matrix& transform, const Vector3& min, const Vector3& max, Effect effect, Tr2DebugColor color );
 
+    void DrawSphere( Tr2DebugObjectReference owner, const Vector4& sphere, uint32_t segments, Effect effect, Tr2DebugColor color );
     void DrawSphere( Tr2DebugObjectReference owner, const Vector3& center, float radius, uint32_t segments, Effect effect, Tr2DebugColor color );
     void DrawSphere( Tr2DebugObjectReference owner, const Matrix& transform, uint32_t segments, Effect effect, Tr2DebugColor color );
     void DrawSphere( Tr2DebugObjectReference owner, const Matrix& transform, float radius, uint32_t segments, Effect effect, Tr2DebugColor color );
@@ -91,6 +114,7 @@ public:
 
     void DrawCylinder( Tr2DebugObjectReference owner, const Matrix& transform, float radius, float height, uint32_t segments, Effect effect, Tr2DebugColor color );
 	void DrawCylinder( Tr2DebugObjectReference owner, const Vector3& cap0, const Vector3& cap1, float radius, uint32_t segments, Effect effect, Tr2DebugColor color );
+	void DrawCylinder( Tr2DebugObjectReference owner, const Matrix& transform, const Vector3& cap0, const Vector3& cap1, float radius, uint32_t segments, Effect effect, Tr2DebugColor color );
 
 	void DrawCone( Tr2DebugObjectReference owner, const Matrix& transform, float radius, float height, uint32_t segments, Effect effect, Tr2DebugColor color );
 	void DrawCone( Tr2DebugObjectReference owner, const Vector3& base, const Vector3& focal, float radius, uint32_t segments, Effect effect, Tr2DebugColor color );
@@ -107,16 +131,20 @@ public:
 
 	void DrawExtrusionShape( Tr2DebugObjectReference owner, const Matrix& transform, const Vector2* vertices, const Vector2* normals, uint32_t vertexCount, uint32_t segments, Effect effect, Tr2DebugColor color );
     
-    void Printf( TriDebugFont font, const Vector3& pos, const Color& color, const char* msg, ... );
+	void DrawText( TriDebugFont font, const Vector3& pos, const Color& color, const char* msg, ... );
     
+	// needs to be called every frame before any Draw method
     void BeginRender();
+	// needs to be called every frame after all Draw methods
     void EndRender( Tr2RenderContext& renderContext );
     
     Tr2DebugObjectReference Pick( float& depth, Tr2RenderContext& renderContext );
     
     void SetSelectedObjects( const std::vector<IRoot*>& objects );
     void SetOptions( IRoot* owner, std::vector<Tr2DebugRendererOption>& options );
+	std::vector<Tr2DebugRendererOption> GetOptions( IRoot* owner ) const;
     void SetDefaultOptions( const std::vector<Tr2DebugRendererOption>& options );
+	std::vector<Tr2DebugRendererOption> GetDefaultOptions() const;
 private:
 	struct Vertex
 	{

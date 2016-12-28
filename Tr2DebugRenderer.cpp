@@ -59,12 +59,25 @@ TriDebugTextRenderer& GetDebugTextRenderer()
 	return renderer;
 }
 
+}
 
+
+
+Tr2DebugColor::Tr2DebugColor( uint32_t color )
+	:m_color( color ),
+	m_zFailColor( 0u )
+{
 }
 
 Tr2DebugColor::Tr2DebugColor( const Color& color )
 	:m_color( color ),
 	m_zFailColor( 0u )
+{
+}
+
+Tr2DebugColor::Tr2DebugColor( uint32_t color, uint32_t zFailColor )
+	:m_color( color ),
+	m_zFailColor( zFailColor )
 {
 }
 
@@ -115,8 +128,7 @@ Tr2DebugRenderer::Vertex::Vertex( const Vector3& position, Tr2DebugColor color, 
 	m_zFailColor( color.m_zFailColor ),
 	m_line( 1.f )
 {
-	uint32_t index = uint32_t( objectIndex + 1 );
-	m_object = *reinterpret_cast<float*>( &index );
+	m_object = float( objectIndex + 1 );
 }
 
 Tr2DebugRenderer::Vertex::Vertex( const Vector3& position, const Vector3& normal, Tr2DebugColor color, size_t objectIndex )
@@ -126,8 +138,7 @@ Tr2DebugRenderer::Vertex::Vertex( const Vector3& position, const Vector3& normal
 	m_zFailColor( color.m_zFailColor ),
 	m_line( 0 )
 {
-	uint32_t index = uint32_t( objectIndex + 1 );
-	m_object = *reinterpret_cast<float*>( &index );
+	m_object = float( objectIndex + 1 );
 }
 
 
@@ -269,6 +280,11 @@ void Tr2DebugRenderer::DrawBox( Tr2DebugObjectReference owner, const Matrix& tra
 	}
 }
 
+void Tr2DebugRenderer::DrawSphere( Tr2DebugObjectReference owner, const Vector4& sphere, uint32_t segments, Effect effect, Tr2DebugColor color )
+{
+	DrawSphere( owner, Tr2Renderer::GetIdentityTransform(), Vector3( sphere.x, sphere.y, sphere.z ), sphere.w, segments, effect, color );
+}
+
 void Tr2DebugRenderer::DrawSphere( Tr2DebugObjectReference owner, const Vector3& center, float radius, uint32_t segments, Effect effect, Tr2DebugColor color )
 {
 	DrawSphere( owner, Tr2Renderer::GetIdentityTransform(), center, radius, segments, effect, color );
@@ -379,9 +395,14 @@ void Tr2DebugRenderer::DrawCylinder( Tr2DebugObjectReference owner, const Matrix
 
 void Tr2DebugRenderer::DrawCylinder( Tr2DebugObjectReference owner, const Vector3& cap0, const Vector3& cap1, float radius, uint32_t segments, Effect effect, Tr2DebugColor color )
 {
-	Matrix transform = LineTransform( cap0, cap1 );
+	DrawCylinder( owner, Tr2Renderer::GetIdentityTransform(), cap0, cap1, radius, segments, effect, color );
+}
 
-	DrawCylinder( owner, transform, radius, XMVectorGetX( XMVector3Length( cap1 - cap0 ) ), segments, effect, color );
+void Tr2DebugRenderer::DrawCylinder( Tr2DebugObjectReference owner, const Matrix& transform, const Vector3& cap0, const Vector3& cap1, float radius, uint32_t segments, Effect effect, Tr2DebugColor color )
+{
+	Matrix t = LineTransform( cap0, cap1 ) * transform;
+
+	DrawCylinder( owner, t, radius, XMVectorGetX( XMVector3Length( cap1 - cap0 ) ), segments, effect, color );
 }
 
 void Tr2DebugRenderer::DrawCone( Tr2DebugObjectReference owner, const Matrix& transform, float radius, float height, uint32_t segments, Effect effect, Tr2DebugColor color )
@@ -658,7 +679,7 @@ void Tr2DebugRenderer::DrawExtrusionShape( Tr2DebugObjectReference owner, const 
 	}
 }
 
-void Tr2DebugRenderer::Printf( TriDebugFont font, const Vector3& pos, const Color& color, const char* msg, ... )
+void Tr2DebugRenderer::DrawText( TriDebugFont font, const Vector3& pos, const Color& color, const char* msg, ... )
 {
 	va_list args;
     va_start( args, msg );
@@ -722,7 +743,7 @@ Tr2DebugObjectReference Tr2DebugRenderer::Pick( float& depth, Tr2RenderContext& 
 		}
 	}
 
-	if( !m_objectLineOffsets.empty() )
+	if( !m_objectTriangleOffsets.empty() )
 	{
 		renderContext.SetTopology( Tr2RenderContextEnum::TOP_TRIANGLES );
 
@@ -749,7 +770,7 @@ Tr2DebugObjectReference Tr2DebugRenderer::Pick( float& depth, Tr2RenderContext& 
 	if( m_pickBuffer.PrepareGetResults( data, pitch, renderContext ) )
 	{
 		float* pixels = static_cast<float*>( data );
-		uint32_t index = static_cast<uint32_t*>( data )[0];
+		uint32_t index = uint32_t( pixels[0] + 0.5f );
 		bool isLine = pixels[1] != 0;
 		depth = pixels[2];
 
@@ -844,13 +865,32 @@ void Tr2DebugRenderer::SetOptions( IRoot* owner, std::vector<Tr2DebugRendererOpt
 		}
 		return;
 	}
+
 	auto& dest = m_options[owner];
 	dest.clear();
 	dest.insert( options.begin(), options.end() );
+}
+
+std::vector<Tr2DebugRendererOption> Tr2DebugRenderer::GetOptions( IRoot* owner ) const
+{
+	std::vector<Tr2DebugRendererOption> result;
+	auto found = m_options.find( owner );
+	if( found != m_options.end() )
+	{
+		result.insert( result.end(), found->second.begin(), found->second.end() );
+	}
+	return result;
 }
 
 void Tr2DebugRenderer::SetDefaultOptions( const std::vector<Tr2DebugRendererOption>& options )
 {
 	m_defaultOptions.clear();
 	m_defaultOptions.insert( options.begin(), options.end() );
+}
+
+std::vector<Tr2DebugRendererOption> Tr2DebugRenderer::GetDefaultOptions() const
+{
+	std::vector<Tr2DebugRendererOption> result;
+	result.insert( result.end(), m_defaultOptions.begin(), m_defaultOptions.end() );
+	return result;
 }
