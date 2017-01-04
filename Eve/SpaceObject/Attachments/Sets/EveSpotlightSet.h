@@ -86,6 +86,7 @@ private:
 	bool m_useQuadRenderer;
 	bool m_skinned;
 	std::string m_name;
+	float m_intensity;
 
 	PEveSpotlightSetItemVector m_spotlightItems;
 

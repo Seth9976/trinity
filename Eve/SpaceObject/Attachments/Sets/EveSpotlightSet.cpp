@@ -107,6 +107,7 @@ EveSpotlightSet::EveSpotlightSet( IRoot* lockobj ) :
 	m_display( true ),
 	m_useQuadRenderer( false ),
 	m_skinned( false ),
+	m_intensity( 1.0f ),
 	PARENTLOCK( m_spotlightItems ),
 	m_vertexDeclHandle( Tr2EffectStateManager::UNINITIALIZED_DECLARATION ),
 	m_coneEffectHash( 0 ),
@@ -479,6 +480,9 @@ void EveSpotlightSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Ma
 	{
 		return;
 	}
+
+	activation *= m_intensity;
+
 	Matrix m = Tr2Renderer::GetIdentityTransform();
 	if( !m_skinned )
 	{

@@ -30,6 +30,20 @@ const Be::ClassInfo* EveSpotlightSet::ExposeToBlue()
 		)
 		MAP_ATTRIBUTE
 		(
+			"skinned", 
+			m_skinned, 
+			"Is the set skinned (requires that the owner object to be skinned)",
+			Be::READWRITE | Be::PERSIST
+		)
+		MAP_ATTRIBUTE
+		(
+			"intensity", 
+			m_intensity, 
+			"Overall intensity",
+			Be::READWRITE | Be::PERSIST
+		)
+		MAP_ATTRIBUTE
+		(
 			"coneEffect",  
 			m_coneEffect, 
 			"Effect to use to render the spotlight cones",
