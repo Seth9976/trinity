@@ -57,24 +57,6 @@ namespace
 const int CONE_QUAD_COUNT = 4;
 const int SPRITE_QUAD_COUNT = 2;
 
-// --------------------------------------------------------------------------------
-// Description:
-//   A struct representing the vertex data used by the spotlight set.
-// --------------------------------------------------------------------------------
-struct SpotVertex
-{
-	Color m_color;
-	Vector4 m_transform1;
-	Vector4 m_transform2;
-	Vector4 m_transform3;
-	Vector3 m_scale;
-	uint8_t m_index;
-	uint8_t m_boneIndex;
-	uint8_t m_boosterGainInfluence;
-
-	uint8_t m_padding;
-};
-
 }
 
 // --------------------------------------------------------------------------------
