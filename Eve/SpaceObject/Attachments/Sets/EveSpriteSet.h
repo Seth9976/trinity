@@ -3,8 +3,6 @@
 #define EveSpriteSet_H
 
 
-#include "Tr2DeviceResource.h"
-#include "ITr2GeometryProvider.h"
 #include "EveSpriteSetItem.h"
 #include "ITr2Renderable.h"
 
@@ -19,9 +17,7 @@ class Tr2PerObjectData;
 class Tr2QuadRenderer;
 
 BLUE_CLASS( EveSpriteSet ):
-	public IInitialize,
-	public ITr2GeometryProvider,
-	public Tr2DeviceResource
+	public IInitialize
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -63,9 +59,6 @@ public:
 	// Rebuild resources
 	void Rebuild();
 
-	void GetBatches( ITriRenderBatchAccumulator* accumulator, const Tr2PerObjectData* perObjectData );
-
-	void UseQuadRenderer( bool useQuadRenderer, bool skinned );
 	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
 
 	void AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& world, float activation, const granny_matrix_3x4* bones, size_t boneCount );
@@ -78,27 +71,19 @@ public:
 	Tr2EffectPtr GetEffect();
 	void SetEffect( Tr2EffectPtr effect );
 
+	void SetSkinned( bool skinned );
+
 	void RenderDebugInfo( const Matrix& worldTransform, Tr2DebugRenderer& renderer );
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
 	bool Initialize();
-	
-	//////////////////////////////////////////////////////////////////////////////////////
-	// ITr2GeometryProvider
-	void SubmitGeometry( Tr2RenderContext& renderContext );
 
 	void GetPickingBatches( ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData );
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// ITriDeviceResource
-	void ReleaseResources( TriStorage s );
-private:
-	bool OnPrepareResources();
 private:
 	// Persisted members
 	bool m_display;
-	bool m_useQuadRenderer;
 	bool m_skinned;
 	std::string m_name;
 	unsigned m_effectHash;
@@ -106,11 +91,6 @@ private:
 
 	PEveSpriteSetItemVector m_sprites;
 	Tr2EffectPtr m_effect;
-
-	// Member variables for runtime state
-	unsigned int m_vertexDeclHandle;
-	unsigned int m_vertexCount;
-	Tr2VertexBufferAL m_vertexBuffer;
 
 	// buffers for globals quadrenderer
 	TrackableStdVector<PoolVertex> m_buffer;

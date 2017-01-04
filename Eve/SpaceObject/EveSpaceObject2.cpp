@@ -655,16 +655,6 @@ void EveSpaceObject2::GetBatches( ITriRenderBatchAccumulator* batches, TriBatchT
 	// Implement special behavior for specific batch types on a spaceobject
 	if( batchType == TRIBATCHTYPE_ADDITIVE )
 	{
-		for( auto it = m_spriteSets.begin(); it != m_spriteSets.end(); ++it )
-		{
-			(*it)->GetBatches( batches, perObjectData );
-		}
-
-		for( auto it = m_spotlightSets.begin(); it != m_spotlightSets.end(); ++it )
-		{
-			(*it)->GetBatches( batches, perObjectData );
-		}
-
 		for( auto it = m_planeSets.begin(); it != m_planeSets.end(); ++it )
 		{
 			(*it)->GetBatches( batches, batchType, perObjectData );

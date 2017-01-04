@@ -76,19 +76,6 @@ EveMissileWarhead::~EveMissileWarhead()
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Implements IInitialize. Sets up sprite set to use quad renderer.
-// --------------------------------------------------------------------------------
-bool EveMissileWarhead::Initialize()
-{
-	if( m_spriteSet )
-	{
-		m_spriteSet->UseQuadRenderer( true, false );
-	}
-	return EveTransform::Initialize();
-}
-
-// --------------------------------------------------------------------------------
-// Description:
 //   Implements IEveSpaceObject2. Registers sprite set with quad renderer.
 // --------------------------------------------------------------------------------
 void EveMissileWarhead::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
@@ -646,19 +633,6 @@ uint32_t EveMissileWarhead::GetPerObjectDataSize( Tr2RenderContextEnum::ShaderTy
 			64 +				// m_vsWorldMatrixLast
 			16 +				// m_vsSpaceObjectData
 			16; 				// m_spaceObjectClipData
-	}
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Implements IRenderable. Adds batches to the batch accumulator.
-// --------------------------------------------------------------------------------
-void EveMissileWarhead::GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData )
-{
-	EveTransform::GetBatches( batches, batchType, perObjectData );
-	if( batchType == TRIBATCHTYPE_ADDITIVE && m_spriteSet )
-	{
-		m_spriteSet->GetBatches( batches, perObjectData );
 	}
 }
 

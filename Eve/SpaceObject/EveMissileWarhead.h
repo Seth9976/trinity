@@ -29,10 +29,6 @@ public:
 
 	EveMissileWarhead( IRoot* lockobj = NULL );
 	~EveMissileWarhead();
-	
-	//////////////////////////////////////////////////////////////////////////////////////
-	// IInitialize
-	bool Initialize();
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IEveSpaceObject2
@@ -42,7 +38,6 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Renderable - overriding EveTransform implementations
 	virtual Tr2PerObjectData* GetPerObjectData( ITriRenderBatchAccumulator* accumulator );
-	virtual void GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData );
 
 	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
 	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );

@@ -28,27 +28,9 @@ const Tr2VertexDefinition& EveSpriteSet::PoolVertex::GetDefinition()
 	return s_spriteVertexDecl;
 }
 
-struct SpriteVertex
-{
-	Vector3 m_position;
-	uint32_t m_color;
-	float m_blinkPhase;
-	float m_blinkRate;
-	float m_minScale;
-	float m_maxScale;
-	float m_falloff;
-	uint8_t m_index;
-	uint8_t m_boneIndex;
-	// cppcheck-suppress unusedStructMember 
-	uint8_t m_padding[2];
-};
-
 EveSpriteSet::EveSpriteSet( IRoot* lockobj ) :
 	PARENTLOCK( m_sprites ),
-	m_vertexCount( 0 ),
 	m_display( true ),
-	m_vertexDeclHandle( Tr2EffectStateManager::UNINITIALIZED_DECLARATION ),
-	m_useQuadRenderer( false ),
 	m_skinned( false ),
 	m_effectHash( 0 ),
 	m_intensity( 1.f ),
@@ -63,150 +45,11 @@ EveSpriteSet::~EveSpriteSet()
 
 bool EveSpriteSet::Initialize()
 {
-	UseQuadRenderer( true, false );
-	PrepareResources();
-	return true;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Switches sprite set to use shared quad renderer.
-// Arguments:
-//   useQuadRenderer - if the quad renderer should be used
-//   skinned - if the spotlight set should use skinning (only matters for quad rendering)
-// --------------------------------------------------------------------------------
-void EveSpriteSet::UseQuadRenderer( bool useQuadRenderer, bool skinned )
-{
-	if( useQuadRenderer && !m_effect )
-	{
-		CCP_ASSERT_M( false, "effect must be initialized before using quad renderer" );
-		useQuadRenderer = false;
-	}
-	if( m_useQuadRenderer == useQuadRenderer )
-	{
-		return;
-	}
-	m_useQuadRenderer = useQuadRenderer;
-	m_skinned = skinned;
-	if( m_useQuadRenderer )
+	if( m_effect )
 	{
 		m_effectHash = m_effect->GetHashValue();
-		ReleaseResources( TRISTORAGE_ALL );
-		PrepareResources();
 	}
-	PrepareResources();
-}
-
-void EveSpriteSet::ReleaseResources( TriStorage s )
-{
-	m_vertexDeclHandle = Tr2EffectStateManager::UNINITIALIZED_DECLARATION;
-	m_vertexBuffer.Destroy();
-}
-
-bool EveSpriteSet::OnPrepareResources()
-{
-	if( m_useQuadRenderer )
-	{
-		int n = (unsigned int)m_sprites.GetSize();
-		m_buffer.resize( n );
-		for( int i = 0; i < n; ++i )
-		{
-			auto sprite = m_sprites[i];
-			auto& vertex = m_buffer[i];
-			vertex.position = sprite->m_position;
-			uint32_t color = sprite->m_color;
-			vertex.color = 
-				( ( color & 0xff0000 ) >> 16 ) |
-				( color & 0xff00ff00 ) |
-				( ( color & 0xff ) << 16 );
-			color = sprite->m_warpColor;
-			vertex.warpColor = 
-				( ( color & 0xff0000 ) >> 16 ) |
-				( color & 0xff00ff00 ) |
-				( ( color & 0xff ) << 16 );
-			vertex.blinkPhase = sprite->m_blinkPhase;
-			vertex.blinkRate = sprite->m_blinkRate;
-			vertex.minScale = sprite->m_minScale;
-			vertex.maxScale = sprite->m_maxScale;
-			vertex.falloff = sprite->m_falloff;
-		}
-
-		m_spriteData.resize( n );
-		for( int i = 0; i < n; ++i )
-		{
-			m_spriteData[i].position = m_sprites[i]->m_position;
-			m_spriteData[i].boneIndex = m_sprites[i]->m_boneIndex;
-		}
-		return true;
-	}
-
-	if( m_vertexBuffer.IsValid() )
-	{
-		return true;
-	}
-
-	if( m_sprites.empty() )
-	{
-		return true;
-	}
-
-	// register vertex declaration
-	static Tr2VertexDefinition s_spriteVertexDecl;
-	if( s_spriteVertexDecl.empty() )
-	{
-		Tr2VertexDefinition& vd = s_spriteVertexDecl;
-		vd.Add( vd.FLOAT32_3, vd.POSITION );
-		vd.Add( vd.UBYTE_4_NORM , vd.COLOR );
-		vd.Add( vd.FLOAT32_1, vd.TEXCOORD, 0 );
-		vd.Add( vd.FLOAT32_1, vd.TEXCOORD, 1 );
-		vd.Add( vd.FLOAT32_1, vd.TEXCOORD, 2 );
-		vd.Add( vd.FLOAT32_1, vd.TEXCOORD, 3 );
-		vd.Add( vd.FLOAT32_1, vd.TEXCOORD, 4 );
-		vd.Add( vd.UBYTE_4  , vd.TEXCOORD, 5 );
-	}
-
-	m_vertexDeclHandle = Tr2EffectStateManager::GetVertexDeclarationHandle( s_spriteVertexDecl );
-	if( m_vertexDeclHandle == Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
-	{
-		return false;
-	}
-
-	m_vertexCount = (unsigned int)m_sprites.GetSize() * 6;
-
-	std::vector<SpriteVertex> pVerts( m_vertexCount );
-
-	int n = (unsigned int)m_sprites.GetSize();
-	for( int i = 0; i < n; ++i )
-	{
-		for( int j = 0; j < 6; ++j )
-		{
-			SpriteVertex& vertex = pVerts[i*6 + j];
-			vertex.m_position = m_sprites[i]->m_position;
-			uint32_t color = m_sprites[i]->m_color;
-			vertex.m_color = 
-				( ( color & 0xff0000 ) >> 16 ) |
-				( color & 0xff00ff00 ) |
-				( ( color & 0xff ) << 16 );
-			vertex.m_blinkPhase = m_sprites[i]->m_blinkPhase;
-			vertex.m_blinkRate = m_sprites[i]->m_blinkRate;
-			vertex.m_minScale = m_sprites[i]->m_minScale;
-			vertex.m_maxScale = m_sprites[i]->m_maxScale;
-			vertex.m_falloff = m_sprites[i]->m_falloff;
-			vertex.m_boneIndex = m_sprites[i]->m_boneIndex;
-		}
-
-		pVerts[i*6 + 0].m_index = 0;
-		pVerts[i*6 + 1].m_index = 2;
-		pVerts[i*6 + 2].m_index = 1;
-
-		pVerts[i*6 + 3].m_index = 0;
-		pVerts[i*6 + 4].m_index = 3;
-		pVerts[i*6 + 5].m_index = 2;
-	}
-
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-	CR_RETURN_VAL( m_vertexBuffer.Create( m_vertexCount * sizeof( SpriteVertex ), USAGE_IMMUTABLE, &pVerts[0], renderContext ), false );
-
+	Rebuild();
 	return true;
 }
 
@@ -221,7 +64,7 @@ bool EveSpriteSet::OnPrepareResources()
 // --------------------------------------------------------------------------------
 void EveSpriteSet::AddBoosterGlowToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& world, float boosterGain, float warpIntensity )
 {
-	if( !m_useQuadRenderer || !m_display || m_spriteData.empty() )
+	if( !m_display || m_spriteData.empty() )
 	{
 		return;
 	}
@@ -256,10 +99,7 @@ void EveSpriteSet::AddBoosterGlowToQuadRenderer( Tr2QuadRenderer& quadRenderer, 
 
 void EveSpriteSet::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 {
-	if( m_useQuadRenderer )
-	{
-		quadRenderer.RegisterEffect( m_effectHash, TRIBATCHTYPE_ADDITIVE, sizeof( PoolVertex ), 1, PoolVertex::GetDefinition(), m_effect );
-	}
+	quadRenderer.RegisterEffect( m_effectHash, TRIBATCHTYPE_ADDITIVE, sizeof( PoolVertex ), 1, PoolVertex::GetDefinition(), m_effect );
 }
 
 // --------------------------------------------------------------------------------
@@ -275,7 +115,7 @@ void EveSpriteSet::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 // --------------------------------------------------------------------------------
 void EveSpriteSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& world, float activation, const granny_matrix_3x4* bones, size_t boneCount )
 {
-	if( !m_useQuadRenderer || !m_display || m_spriteData.empty() )
+	if( !m_display || m_spriteData.empty() )
 	{
 		return;
 	}
@@ -322,8 +162,6 @@ void EveSpriteSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matri
 
 void EveSpriteSet::Clear()
 {
-	m_vertexDeclHandle = Tr2EffectStateManager::UNINITIALIZED_DECLARATION;
-	m_vertexBuffer.Destroy();
 	m_sprites.Remove(-1);
 }
 
@@ -363,43 +201,6 @@ void EveSpriteSet::Add( EveSpriteSetItemPtr newItem )
 	m_sprites.Append( newItem );
 }
 
-void EveSpriteSet::SubmitGeometry( Tr2RenderContext& renderContext )
-{
-	renderContext.m_esm.ApplyVertexDeclaration( m_vertexDeclHandle );
-	renderContext.m_esm.ApplyStreamSource( 0, m_vertexBuffer, 0, sizeof( SpriteVertex ) );
-	
-	renderContext.SetTopology( TOP_TRIANGLES );
-	renderContext.DrawPrimitive( 0, m_vertexCount / 3 );
-}
-
-void EveSpriteSet::GetBatches( ITriRenderBatchAccumulator* accumulator, const Tr2PerObjectData* perObjectData )
-{
-	if( !m_vertexBuffer.IsValid() || !m_effect || m_useQuadRenderer )
-	{
-		return;
-	}
-
-	if( m_vertexDeclHandle == Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
-	{
-		return;
-	}
-
-	if( !m_display )
-	{
-		return;
-	}
-
-	TriForwardingBatch* batch = accumulator->Allocate<TriForwardingBatch>();
-	if( batch )
-	{
-		batch->SetPerObjectData( perObjectData );
-		batch->SetShaderMaterial( m_effect );
-		batch->SetGeometryProvider( this );
-
-		accumulator->Commit( batch );
-	}
-}
-
 EveSpriteSetItemVector* EveSpriteSet::GetSprites()
 {
 	return &m_sprites;
@@ -418,6 +219,19 @@ Tr2EffectPtr EveSpriteSet::GetEffect()
 void EveSpriteSet::SetEffect( Tr2EffectPtr effect )
 {
 	m_effect = effect;
+	if( m_effect )
+	{
+		m_effectHash = m_effect->GetHashValue();
+	}
+	else
+	{
+		m_effectHash = 0;
+	}
+}
+
+void EveSpriteSet::SetSkinned( bool skinned )
+{
+	m_skinned = skinned;
 }
 
 void EveSpriteSet::SetName( const char* name )
@@ -431,8 +245,36 @@ void EveSpriteSet::SetName( const char* name )
 // --------------------------------------------------------------------------------
 void EveSpriteSet::Rebuild()
 {
-	ReleaseResources( 0 );
-	PrepareResources();
+	int n = (unsigned int)m_sprites.GetSize();
+	m_buffer.resize( n );
+	for( int i = 0; i < n; ++i )
+	{
+		auto sprite = m_sprites[i];
+		auto& vertex = m_buffer[i];
+		vertex.position = sprite->m_position;
+		uint32_t color = sprite->m_color;
+		vertex.color = 
+			( ( color & 0xff0000 ) >> 16 ) |
+			( color & 0xff00ff00 ) |
+			( ( color & 0xff ) << 16 );
+		color = sprite->m_warpColor;
+		vertex.warpColor = 
+			( ( color & 0xff0000 ) >> 16 ) |
+			( color & 0xff00ff00 ) |
+			( ( color & 0xff ) << 16 );
+		vertex.blinkPhase = sprite->m_blinkPhase;
+		vertex.blinkRate = sprite->m_blinkRate;
+		vertex.minScale = sprite->m_minScale;
+		vertex.maxScale = sprite->m_maxScale;
+		vertex.falloff = sprite->m_falloff;
+	}
+
+	m_spriteData.resize( n );
+	for( int i = 0; i < n; ++i )
+	{
+		m_spriteData[i].position = m_sprites[i]->m_position;
+		m_spriteData[i].boneIndex = m_sprites[i]->m_boneIndex;
+	}
 }
 
 

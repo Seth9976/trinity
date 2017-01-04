@@ -29,9 +29,7 @@ BLUE_DECLARE( Tr2DebugRenderer );
 //   EveSpriteSet, EveSpaceObject2
 // --------------------------------------------------------------------------------
 BLUE_CLASS( EveSpotlightSet ):
-	public IInitialize,
-	public ITr2GeometryProvider,
-	public Tr2DeviceResource
+	public IInitialize
 {
 public:
     EXPOSE_TO_BLUE();
@@ -42,24 +40,12 @@ public:
     EveSpotlightSet( IRoot* lockobj = NULL );
 	~EveSpotlightSet();
 
-	void UseQuadRenderer( bool useQuadRenderer, bool skinned );
 	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
 	void AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& world, float activation, float boosterGain, const granny_matrix_3x4* bones, size_t boneCount );
-
-	void GetBatches( ITriRenderBatchAccumulator* accumulator, const Tr2PerObjectData* perObjectData );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
 	bool Initialize();
-
-	//////////////////////////////////////////////////////////////////////////////////////
-	// ITr2GeometryProvider
-	void SubmitGeometry( Tr2RenderContext& renderContext );
-	void SubmitSpriteGeometry( Tr2RenderContext& renderContext );
-
-	//////////////////////////////////////////////////////////////////////////////////////////
-	// ITriDeviceResource
-	void ReleaseResources( TriStorage s );
 
 	void Rebuild();
 
@@ -68,6 +54,8 @@ public:
 	void SetConeEffect( Tr2EffectPtr effect );
 	Tr2EffectPtr GetGlowEffect() const;
 	void SetGlowEffect( Tr2EffectPtr effect );
+
+	void SetSkinned( bool skinned );
 
 	// access name
 	const char* GetName() const;
@@ -81,9 +69,7 @@ public:
 
 	void RenderDebugInfo( const Matrix& worldTransform, Tr2DebugRenderer& renderer );
 private:
-	bool OnPrepareResources();
 	bool m_display;	
-	bool m_useQuadRenderer;
 	bool m_skinned;
 	std::string m_name;
 	float m_intensity;
@@ -92,13 +78,6 @@ private:
 
 	Tr2EffectPtr m_coneEffect;
 	Tr2EffectPtr m_glowEffect;
-
-	unsigned int m_vertexDeclHandle;
-	unsigned int m_coneVertexCount;
-	Tr2VertexBufferAL m_coneVertexBuffer;
-
-	unsigned int m_spriteVertexCount;
-	Tr2VertexBufferAL m_spriteVertexBuffer;
 
 	struct GlowPoolVertex
 	{

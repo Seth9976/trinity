@@ -203,11 +203,6 @@ void EveBoosterSet2Renderable::GetBatches( ITriRenderBatchAccumulator* batches, 
 			batch->SetGeometryProvider( this );
 			batches->Commit( batch );
 		}
-
-		if( m_boosterSet->m_glows )
-		{
-			m_boosterSet->m_glows->GetBatches( batches, perObjectData );
-		}
 	}
 
 	if( m_trailsLOD > g_eveSpaceSceneLowDetailThreshold )
@@ -735,10 +730,6 @@ EveBoosterSet2::~EveBoosterSet2()
 // --------------------------------------------------------------------------------
 bool EveBoosterSet2::Initialize()
 {
-	if( m_glows )
-	{
-		m_glows->UseQuadRenderer( true, false );
-	}
 	PrepareResources();
 	return true;
 }
@@ -1020,11 +1011,6 @@ bool EveBoosterSet2::OnPrepareResources()
 		, false );
 	// now build the "instance" buffer, which depends on the actual number of booster, this set currently holds
 	RebuildInstanceData( renderContext );
-
-	if( m_glows )
-	{
-		m_glows->PrepareResources();
-	}
 
 	if( m_trails )
 	{

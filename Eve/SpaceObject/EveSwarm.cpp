@@ -480,12 +480,10 @@ void EveSwarm::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 {
 	for( auto it = m_spriteSets.begin(); it != m_spriteSets.end(); ++it )
 	{
-		(*it)->UseQuadRenderer( true, false );
 		(*it)->RegisterWithQuadRenderer( quadRenderer );
 	}
 	for( auto it = m_spotlightSets.begin(); it != m_spotlightSets.end(); ++it )
 	{
-		(*it)->UseQuadRenderer( true, false );
 		(*it)->RegisterWithQuadRenderer( quadRenderer );
 	}
 	if( m_boosters )
