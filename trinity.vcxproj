@@ -3080,7 +3080,6 @@
     <ClInclude Include="Include\ITriMatrix.h"/>
     <ClInclude Include="Include\ITriObserverLocal.h"/>
     <ClInclude Include="Include\ITriQuaternion.h"/>
-    <ClInclude Include="Include\ITriRect.h"/>
     <ClInclude Include="Include\ITriRotationCurve.h"/>
     <ClInclude Include="Include\ITriScalarCurve.h"/>
     <ClInclude Include="Include\ITriTargetable.h"/>

@@ -921,9 +921,6 @@
     <ClInclude Include="Include\ITriQuaternion.h">
       <Filter>Source Files\Include</Filter>
     </ClInclude>
-    <ClInclude Include="Include\ITriRect.h">
-      <Filter>Source Files\Include</Filter>
-    </ClInclude>
     <ClInclude Include="Include\ITriRotationCurve.h">
       <Filter>Source Files\Include</Filter>
     </ClInclude>
