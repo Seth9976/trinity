@@ -173,6 +173,22 @@ void EveStretch::UpdateVisibility( const TriFrustum& frustum, const Matrix& pare
 		m_lodLevel = EveLODHelper::MergeLOD( m_lodLevel, m_sourceObject->GetLODLevel() );
 	}
 	
+	if( m_destObject && m_displayDestObject )
+	{
+		Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
+		Quaternion tmpResult;
+		D3DXQuaternionMultiply(&rotation,				
+			TriQuaternionRotationArc(&tmpResult, &Y_AXIS, &directionVec), &rotation);
+
+		Vector3 scaling = Vector3( m_destObjectScale, m_destObjectScale, m_destObjectScale );
+		Matrix m;
+		D3DXMatrixTransformation( &m, NULL, NULL, &scaling, NULL, &rotation, &m_destinationPosition );
+
+		m_destObject->UpdateVisibility( frustum, m );
+		// The object's LOD is a combination of it's move, stretch, dest and source object's LODs
+		m_lodLevel = EveLODHelper::MergeLOD( m_lodLevel, m_destObject->GetLODLevel() );
+	}
+	
 	if( m_stretchObject )
 	{
 		if( m_useTransformsForStretch )
@@ -241,23 +257,6 @@ void EveStretch::UpdateVisibility( const TriFrustum& frustum, const Matrix& pare
 		// The object's LOD is a combination of it's move, stretch, dest and source object's LODs
 		m_lodLevel = EveLODHelper::MergeLOD( m_lodLevel, m_moveObject->GetLODLevel() );
 	}
-	
-	if( m_destObject && m_displayDestObject )
-	{
-		Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
-		Quaternion tmpResult;
-		D3DXQuaternionMultiply(&rotation,				
-			TriQuaternionRotationArc(&tmpResult, &Y_AXIS, &directionVec), &rotation);
-
-		Vector3 scaling = Vector3( m_destObjectScale, m_destObjectScale, m_destObjectScale );
-		Matrix m;
-		D3DXMatrixTransformation( &m, NULL, NULL, &scaling, NULL, &rotation, &m_destinationPosition );
-
-		m_destObject->UpdateVisibility( frustum, m );
-		// The object's LOD is a combination of it's move, stretch, dest and source object's LODs
-		m_lodLevel = EveLODHelper::MergeLOD( m_lodLevel, m_destObject->GetLODLevel() );
-	}
-	
 }
 
 void EveStretch::GetRenderables( std::vector<ITr2Renderable*>& renderables)
