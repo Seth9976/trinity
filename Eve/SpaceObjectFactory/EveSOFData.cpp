@@ -267,7 +267,7 @@ EveSOFDataHullArea::EveSOFDataHullArea( IRoot* lockobj ) :
 	m_index( 0 ),
 	m_count( 1 ),
 	m_blockedMaterials( 0 ),
-	m_areaType( EveSOFDataArea::TYPE_HULL )
+	m_areaType( EveSOFDataArea::TYPE_PRIMARY )
 {}
 
 

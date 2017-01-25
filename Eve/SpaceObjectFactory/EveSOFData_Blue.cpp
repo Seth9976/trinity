@@ -24,7 +24,7 @@ const Be::ClassInfo* EveSOFDataAreaMaterial::ExposeToBlue()
 
 Be::VarChooser EveSOFDataAreaTypeChooser[] =
 {
-	{ "Hull", BeCast( EveSOFDataArea::TYPE_HULL ), "Area Type Hull" },
+	{ "Primary", BeCast( EveSOFDataArea::TYPE_PRIMARY ), "Primary Area Type" },
 	{ "Glass", BeCast( EveSOFDataArea::TYPE_GLASS ), "Area Type Glass" },
 	{ "Sails", BeCast( EveSOFDataArea::TYPE_SAILS ), "Area Type Sails" },
 	{ "Reactor", BeCast( EveSOFDataArea::TYPE_REACTOR ), "Area Type Reactor" },
@@ -41,12 +41,13 @@ const Be::ClassInfo* EveSOFDataArea::ExposeToBlue()
 	EXPOSURE_BEGIN( EveSOFDataArea, "" )
 		MAP_INTERFACE( EveSOFDataArea )
 
-		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_HULL].mKey, m_materials[TYPE_HULL], "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_PRIMARY].mKey, m_materials[TYPE_PRIMARY], "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_GLASS].mKey, m_materials[TYPE_GLASS], "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_REACTOR].mKey, m_materials[TYPE_REACTOR], "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_SAILS].mKey, m_materials[TYPE_SAILS], "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_REACTOR].mKey, m_materials[TYPE_REACTOR], "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_DARKHULL].mKey, m_materials[TYPE_DARKHULL], "", Be::READWRITE | Be::PERSIST )
-	EXPOSURE_END()
+		MAP_ATTRIBUTE( EveSOFDataAreaTypeChooser[TYPE_WRECK].mKey, m_materials[TYPE_WRECK], "", Be::READWRITE | Be::PERSIST )
+		EXPOSURE_END()
 }
 
 

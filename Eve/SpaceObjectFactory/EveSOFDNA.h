@@ -106,7 +106,7 @@ public:
 
 	// get mixed data
 	const char* GetDnaString() const;
-	const Vector4* GetMeshAreaParameter( const BlueSharedString& areaDesignation, const BlueSharedString& parameterName, const std::map<BlueSharedString, Vector4>* hullParameters = nullptr, unsigned int blockededMaterials = 0 ) const;
+	const Vector4* GetMeshAreaParameter( EveSOFDataArea::AreaType areaType, const BlueSharedString& parameterName, const std::map<BlueSharedString, Vector4>* hullParameters = nullptr, unsigned int blockededMaterials = 0 ) const;
 	const char* GetImpactShieldShader() const;
 	unsigned int GetHighestMeshAreaIndex( TriBatchType areaType ) const;
 
@@ -118,7 +118,7 @@ private:
 	bool GetDnaCommandArgs( DnaCommand cmd, std::vector<std::string>& args ) const;
 	bool HasDnaCommand( DnaCommand cmd ) const;
 	// search and area collection to find the data of a specific parameter
-	const Vector4* SearchForParameterData( const std::map<BlueSharedString, EveSOFDataMgr::FactionAreaData>& areas, const BlueSharedString& areaDesignation, const BlueSharedString& parameterName ) const;
+	const Vector4* SearchForParameterData( const std::map<BlueSharedString, EveSOFDataMgr::FactionAreaData>& areas, EveSOFDataArea::AreaType areaType, const BlueSharedString& parameterName ) const;
 	const Vector4* SearchForParameterData( const EveSOFDataMgr::MaterialData* materialData, const EveSOFUtilsParameterName* parameterName ) const;
 
 	// the dna as a string

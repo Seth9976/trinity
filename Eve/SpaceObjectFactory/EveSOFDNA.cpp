@@ -838,8 +838,35 @@ const Vector4* EveSOFDNA::SearchForParameterData( const EveSOFDataMgr::MaterialD
 // Description:
 //   Search an area collection to find the data of a specific parameter
 // --------------------------------------------------------------------------------
-const Vector4* EveSOFDNA::SearchForParameterData( const std::map<BlueSharedString, EveSOFDataMgr::FactionAreaData>& areas, const BlueSharedString& areaDesignation, const BlueSharedString& parameterName ) const
+const Vector4* EveSOFDNA::SearchForParameterData( const std::map<BlueSharedString, EveSOFDataMgr::FactionAreaData>& areas, EveSOFDataArea::AreaType areaType, const BlueSharedString& parameterName ) const
 {
+	// temporary binding areaType enum to string, removed soon!
+	BlueSharedString areaDesignation( "empty" );
+	switch(areaType)
+	{
+	case EveSOFDataArea::TYPE_PRIMARY:
+		areaDesignation = BlueSharedString( "hull" );
+		break;
+	case EveSOFDataArea::TYPE_GLASS:
+		areaDesignation = BlueSharedString( "glass" );
+		break;
+	case EveSOFDataArea::TYPE_SAILS:
+		areaDesignation = BlueSharedString( "sails" );
+		break;
+	case EveSOFDataArea::TYPE_REACTOR:
+		areaDesignation = BlueSharedString( "reactor" );
+		break;
+	case EveSOFDataArea::TYPE_DARKHULL:
+		areaDesignation = BlueSharedString( "darkhull" );
+		break;
+	case EveSOFDataArea::TYPE_WRECK:
+		areaDesignation = BlueSharedString( "generic_wreck" );
+		break;
+	case EveSOFDataArea::TYPE_NO_OVERWRITE:
+		return nullptr;
+	}
+
+
 	// try to find the specified hull
 	auto parameterListIt = areas.find( areaDesignation );
 	if( parameterListIt == areas.end() )
@@ -863,7 +890,7 @@ const Vector4* EveSOFDNA::SearchForParameterData( const std::map<BlueSharedStrin
 // Description:
 //   Return a shader parameter for a faction override
 // --------------------------------------------------------------------------------
-const Vector4* EveSOFDNA::GetMeshAreaParameter( const BlueSharedString& areaDesignation, const BlueSharedString& parameterName, const std::map<BlueSharedString, Vector4>* hullParameters, unsigned int blockededMaterials ) const
+const Vector4* EveSOFDNA::GetMeshAreaParameter( EveSOFDataArea::AreaType areaType, const BlueSharedString& parameterName, const std::map<BlueSharedString, Vector4>* hullParameters, unsigned int blockededMaterials ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -920,21 +947,21 @@ const Vector4* EveSOFDNA::GetMeshAreaParameter( const BlueSharedString& areaDesi
 	}
 
 	// do we have it in the generic data?
-	const Vector4* res = SearchForParameterData( m_genericData->hullAreaParameters, areaDesignation, parameterName );
+	const Vector4* res = SearchForParameterData( m_genericData->hullAreaParameters, areaType, parameterName );
 	if( res )
 	{
 		return res;
 	}
 
 	// do we have it in the race data?
-	res = SearchForParameterData( m_raceData->hullAreaParameters, areaDesignation, parameterName );
+	res = SearchForParameterData( m_raceData->hullAreaParameters, areaType, parameterName );
 	if( res )
 	{
 		return res;
 	}
 
 	// do we have it in the faction data?
-	res = SearchForParameterData( m_factionData->areaParameters, areaDesignation, parameterName );
+	res = SearchForParameterData( m_factionData->areaParameters, areaType, parameterName );
 	if( res )
 	{
 		return res;
@@ -978,7 +1005,7 @@ const Vector4* EveSOFDNA::GetFactionTurretParameters( const BlueSharedString& pa
 	std::string turretParamName = paramName.ChangeMaterialIdx( m_genericData, turretMaterialIdx );
 
 	// now use this parameter name to get the actual value
-	return GetMeshAreaParameter( BlueSharedString( "hull" ), BlueSharedString( turretParamName ) );
+	return GetMeshAreaParameter( EveSOFDataArea::TYPE_PRIMARY, BlueSharedString( turretParamName ) );
 }
 
 // --------------------------------------------------------------------------------

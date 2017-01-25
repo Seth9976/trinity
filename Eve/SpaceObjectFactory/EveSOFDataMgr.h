@@ -159,7 +159,7 @@ public:
 	{
 		unsigned int index;
 		unsigned int count;
-		BlueSharedString designation;
+		EveSOFDataArea::AreaType areaType;
 		BlueSharedString shader;
 		unsigned int blockedMaterials;
 		std::map<BlueSharedString, TextureData> textures;

@@ -357,7 +357,7 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 			// parameters
 			for( auto shaderParamIt = shaderData->parameters.begin(); shaderParamIt != shaderData->parameters.end(); ++shaderParamIt )
 			{
-				const Vector4* paramValue = dna->GetMeshAreaParameter( area->designation, *shaderParamIt, &area->parameters, area->blockedMaterials );
+				const Vector4* paramValue = dna->GetMeshAreaParameter( area->areaType, *shaderParamIt, &area->parameters, area->blockedMaterials );
 				if( paramValue )
 				{
 					newShader->AddParameterVector4( *shaderParamIt, paramValue );
@@ -438,7 +438,6 @@ void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodRe
 			// new mesharea
 			Tr2MeshAreaPtr newMeshArea;
 			newMeshArea.CreateInstance();
-			newMeshArea->SetName( area->designation.c_str() );
 			newMeshArea->SetMaterial( newShader );
 			newMeshArea->SetIndex( area->index );
 			newMeshArea->SetCount( area->count );
@@ -1063,7 +1062,7 @@ void EveSOF::SetupInstancedMeshes( EveSpaceObject2Ptr newObj, const EveSOFDNAPtr
 			// parameters
 			for( auto shaderParamIt = shaderData->parameters.begin(); shaderParamIt != shaderData->parameters.end(); ++shaderParamIt )
 			{
-				const Vector4* paramValue = dna->GetMeshAreaParameter( BlueSharedString( "hull" ), *shaderParamIt );
+				const Vector4* paramValue = dna->GetMeshAreaParameter( EveSOFDataArea::TYPE_PRIMARY, *shaderParamIt );
 				if( paramValue )
 				{
 					newShader->AddParameterVector4( *shaderParamIt, paramValue );

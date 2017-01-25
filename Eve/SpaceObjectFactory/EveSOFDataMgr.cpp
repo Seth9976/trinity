@@ -396,8 +396,8 @@ EveSOFDataMgr::HullAreas EveSOFDataMgr::LoadHullAreaData( const EveSOFDataHullAr
 	ha.index = areaData->m_index;
 	ha.count = areaData->m_count;
 	ha.blockedMaterials = areaData->m_blockedMaterials;
-	ha.designation = areaData->m_name;
 	ha.shader = areaData->m_shader;
+	ha.areaType = areaData->m_areaType;
 	for( auto matit = areaData->m_textures.begin(); matit != areaData->m_textures.end(); ++matit )
 	{
 		EveSOFDataTexturePtr textureData = (*matit);

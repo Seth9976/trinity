@@ -107,7 +107,7 @@ public:
 	// area type
 	enum AreaType
 	{
-		TYPE_HULL = 0,
+		TYPE_PRIMARY = 0,
 		TYPE_GLASS,
 		TYPE_SAILS,
 		TYPE_REACTOR,
