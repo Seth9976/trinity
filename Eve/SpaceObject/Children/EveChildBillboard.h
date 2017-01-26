@@ -17,6 +17,8 @@ BLUE_DECLARE( TriFrustum );
 BLUE_DECLARE( Tr2MeshBase );
 BLUE_DECLARE( EveUpdateContext );
 BLUE_DECLARE( EveSpaceObject2 );
+BLUE_DECLARE( Tr2PointLight );
+BLUE_DECLARE_VECTOR( Tr2PointLight );
 
 BLUE_CLASS( EveChildBillboard ) :
 	public IEveSpaceObjectChild,
@@ -41,7 +43,7 @@ public:
 	void ChangeLOD( Tr2Lod lod ) {};
 	void PlayCurveSet( const std::string& name ) {};
 	void StopCurveSet( const std::string& name ) {};
-	void GetLights( Tr2LightManager& lightManager ) const {};
+	void GetLights( Tr2LightManager& lightManager ) const;
 	float GetCurveSetDuration( const std::string& name ) const { return 0; }
 	void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
 	
@@ -60,6 +62,7 @@ public:
 private:
 	BlueSharedString m_name;
 	Tr2MeshBasePtr m_mesh;
+	PTr2PointLightVector m_lights;
 	Vector4 m_boundingSphere;
 	float m_minScreenSize;
 

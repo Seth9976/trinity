@@ -18,7 +18,8 @@ const Be::ClassInfo* EveChildBillboard::ExposeToBlue()
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST	)
 		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "mesh", m_mesh, "", Be::READWRITE | Be::PERSIST )
-		
+		MAP_ATTRIBUTE( "lights", m_lights, "", Be::READ | Be::PERSIST )
+
 		MAP_ATTRIBUTE( "translation", m_translation, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "scaling", m_scaling,"", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "localTransform", m_localTransform, "", Be::READWRITE | Be::PERSIST )

@@ -9,6 +9,7 @@
 #include "Tr2MeshArea.h"
 #include "Tr2MeshBase.h"
 #include "TriFrustum.h"
+#include "Tr2PointLight.h"
 
 #include "Eve/SpaceObject/EveSpaceObject2.h"
 #include "Eve/EveTransform.h"
@@ -20,6 +21,7 @@ extern float g_eveSpaceSceneLODFactor;
 
 EveChildBillboard::EveChildBillboard( IRoot* lockobj ):
 	EveChildTransform(),
+	PARENTLOCK( m_lights ),
 	m_boundingSphere( 0.0, 0.0, 0.0, -1.0),
 	m_minScreenSize( 0.f ),
 	m_display( true )
@@ -191,4 +193,15 @@ Tr2PerObjectData* EveChildBillboard::GetPerObjectData( ITriRenderBatchAccumulato
 	D3DXMatrixInverse( &data->m_worldInverseTranspose, NULL, &m_worldTransform );
 
 	return data;
+}
+
+void EveChildBillboard::GetLights( Tr2LightManager& lightManager ) const
+{
+	XMMATRIX worldTransform = m_worldTransform;
+	float scaling = XMVectorGetX( XMVectorAdd( XMVector3LengthEst( m_worldTransform.GetX() ),
+		XMVectorAdd( XMVector3LengthEst( m_worldTransform.GetY() ), XMVector3LengthEst( m_worldTransform.GetZ() ) ) ) ) / 3.f;
+	for( auto it = std::begin( m_lights ); it != std::end( m_lights ); ++it )
+	{
+		( *it )->AddLight( lightManager, worldTransform, scaling );
+	}
 }
