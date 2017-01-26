@@ -162,7 +162,7 @@ bool TriFrustum::IsSphereVisible( const Vector3& center, float radius, bool cull
 	// For some reason the old code ignored the back plane. I don't know why!!
 	for( int i = 0; i < (PLANE_COUNT - 1) + cullBackPlane; i++ )
 	{
-		if( D3DXPlaneDotCoord( &m_planes[i], &center )  < radius )
+		if( D3DXPlaneDotCoord( &m_planes[i], &center )  < -radius )
 		{
 #ifdef TRINITYDEV
 			m_frustumRejectionCounter++;
