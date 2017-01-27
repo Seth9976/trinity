@@ -437,6 +437,7 @@ void EveSpaceObject2::GetDebugOptions( Tr2DebugRendererOptions& options )
 	options.insert( "Plane Sets" );
 	options.insert( "Lights" );
 	options.insert( "Locators" );
+	options.insert( "Shield" );
 	for( auto it = m_locatorSets.begin(); it != m_locatorSets.end(); ++it )
 	{
 		std::string name = "Locators ";
@@ -477,6 +478,15 @@ void EveSpaceObject2::RenderDebugInfo( Tr2DebugRenderer& renderer )
 	if( renderer.HasOption( GetRawRoot(), "Bounding Sphere" ) )
 	{
 		renderer.DrawSphere( this, m_boundingSphereWorldCenter, m_boundingSphereWorldRadius, 8, Tr2DebugRenderer::Wireframe, 0xffff00ff );
+	}
+
+	if( renderer.HasOption( GetRawRoot(), "Shield" ) )
+	{
+		Matrix transform( XMMatrixScalingFromVector( m_shapeEllipsoidRadius ) );
+		transform *= Matrix( XMMatrixTranslationFromVector( m_shapeEllipsoidCenter ) );
+		transform *= m_worldTransform;
+		renderer.DrawSphere( Tr2DebugObjectReference( this, 200 ), transform, 20, Tr2DebugRenderer::Wireframe, 0xff4444ff );
+		renderer.DrawSphere( Tr2DebugObjectReference( this, 200 ), transform, 20, Tr2DebugRenderer::Solid, Tr2DebugColor( 0x884444ff, 0x444444ff ) );
 	}
 
 	if( renderer.HasOption( GetRawRoot(), "Mesh Area Bounding Boxes" ) )
@@ -537,6 +547,7 @@ void EveSpaceObject2::RenderDebugInfo( Tr2DebugRenderer& renderer )
 			GetDamageLocatorPosition( &pos, i, true );
 			Vector3 dir;
 			GetDamageLocatorDirection( &dir, i, true );
+
 			renderer.DrawSphereArrow( Tr2DebugObjectReference( &m_persistedDamageLocators, i ), pos, dir, m_boundingSphereRadius / 50.f, 8, Tr2DebugRenderer::Lit, 0xffff0088 );
 		}
 	}
