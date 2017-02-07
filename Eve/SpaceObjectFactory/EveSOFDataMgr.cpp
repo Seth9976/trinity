@@ -1000,19 +1000,10 @@ void EveSOFDataMgr::GenerateRaceData( RaceData& rd, EveSOFDataRacePtr srcData ) 
 	rd.boosters.volumetric = srcData->m_booster->m_volumetric;
 
 	// shader data
-	rd.hullAreaParameters.clear();
-	for( auto hait = srcData->m_hullAreas.begin(); hait != srcData->m_hullAreas.end(); ++hait )
-	{
-		EveSOFDataFactionHullAreaPtr hullAreaData = (*hait);
-
-		FactionAreaData fad;
-		for( auto hapit = hullAreaData->m_parameters.begin(); hapit != hullAreaData->m_parameters.end(); ++hapit )
-		{
-			EveSOFDataParameterPtr param = (*hapit);
-			fad.parameters[ param->m_name ] = param->m_value;
-		}
-		rd.hullAreaParameters[ hullAreaData->m_name ] = fad;
-	}
+	rd.areaMaterials[EveSOFDataArea::TYPE_PRIMARY].generalParameters.clear();
+	rd.areaMaterials[EveSOFDataArea::TYPE_PRIMARY].generalParameters["GeneralHeatGlowColor"] = srcData->m_hullPrimaryHeatColor;
+	rd.areaMaterials[EveSOFDataArea::TYPE_REACTOR].generalParameters.clear();
+	rd.areaMaterials[EveSOFDataArea::TYPE_REACTOR].generalParameters["GeneralHeatGlowColor"] = srcData->m_hullReactorHeatColor;
 
 	// damage data
 	rd.damage.armorDamageParameters.clear();

@@ -309,6 +309,7 @@ public:
 
 		// hull area parameter overloads
 		std::map<BlueSharedString, FactionAreaData> areaParameters;
+//		AreaMaterialData m_areaMaterials[EveSOFDataArea::TYPE_MAX];
 		// spritesets
 		std::map<int, FactionSpriteSetColorData> spriteSetsColor;
 		// spotlight sets
@@ -371,8 +372,8 @@ public:
 	{
 		// boosters
 		RaceBoosterData boosters;
-		// hull area parameter
-		std::map<BlueSharedString, FactionAreaData> hullAreaParameters;
+		// hull area materials
+		AreaMaterialData areaMaterials[EveSOFDataArea::TYPE_MAX];
 		// impact damage data
 		RaceDamageData damage;
 	};

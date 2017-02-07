@@ -688,7 +688,8 @@ const Be::ClassInfo* EveSOFDataRace::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "name", m_name, "The race name, eg caldari. This functions as an ID.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "booster", m_booster, "All the booster data for this race.", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "hullAreas", m_hullAreas, "Per race shader data", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "hullPrimaryHeatColor", m_hullPrimaryHeatColor, "Per race heat color for primary hulls", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "hullReactorHeatColor", m_hullReactorHeatColor, "Per race heat color for reactor hulls", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "damage", m_damage, "Pre race damage system data", Be::READWRITE | Be::PERSIST )
 		EXPOSURE_END()
 }

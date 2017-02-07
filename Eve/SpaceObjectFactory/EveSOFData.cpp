@@ -224,7 +224,8 @@ EveSOFDataHull::EveSOFDataHull( IRoot* lockobj ) :
 
 
 EveSOFDataRace::EveSOFDataRace( IRoot* lockobj ) :
-	PARENTLOCK( m_hullAreas )
+	m_hullPrimaryHeatColor( 1.f, 1.f, 1.f, 1.f ),
+	m_hullReactorHeatColor( 1.f, 1.f, 1.f, 1.f )
 {}
 
 

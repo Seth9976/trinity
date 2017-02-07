@@ -911,8 +911,9 @@ public:
 	// data
 	EveSOFDataBoosterPtr m_booster;
 
-	// hull area data
-	PEveSOFDataFactionHullAreaVector m_hullAreas;
+	// specific hull area data
+	Color m_hullPrimaryHeatColor;
+	Color m_hullReactorHeatColor;
 
 	// impact effect
 	EveSOFDataRaceDamagePtr m_damage;

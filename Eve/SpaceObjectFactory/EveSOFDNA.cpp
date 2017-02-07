@@ -972,14 +972,18 @@ const Vector4* EveSOFDNA::GetMeshAreaParameter( EveSOFDataArea::AreaType areaTyp
 	}
 
 	// do we have it in the race data?
-	const Vector4* res = SearchForParameterData( m_raceData->hullAreaParameters, areaType, parameterName );
-	if( res )
+	if( areaType == EveSOFDataArea::TYPE_PRIMARY || areaType == EveSOFDataArea::TYPE_REACTOR )
 	{
-		return res;
+		EveSOFUtilsParameterName param( m_genericData->materialPrefixes, parameterName.c_str() );
+		const Vector4* res = SearchForParameterData( &m_raceData->areaMaterials[areaType], &param );
+		if( res )
+		{
+			return res;
+		}
 	}
 
 	// do we have it in the faction data?
-	res = SearchForParameterData( m_factionData->areaParameters, areaType, parameterName );
+	const Vector4* res = SearchForParameterData( m_factionData->areaParameters, areaType, parameterName );
 	if( res )
 	{
 		return res;
