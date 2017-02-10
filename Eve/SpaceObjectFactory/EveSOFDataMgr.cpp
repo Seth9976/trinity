@@ -1001,9 +1001,9 @@ void EveSOFDataMgr::GenerateRaceData( RaceData& rd, EveSOFDataRacePtr srcData ) 
 
 	// shader data
 	rd.areaMaterials[EveSOFDataArea::TYPE_PRIMARY].generalParameters.clear();
-	rd.areaMaterials[EveSOFDataArea::TYPE_PRIMARY].generalParameters["GeneralHeatGlowColor"] = srcData->m_hullPrimaryHeatColor;
+	rd.areaMaterials[EveSOFDataArea::TYPE_PRIMARY].generalParameters["GeneralHeatGlowColor"] = Vector4( srcData->m_hullPrimaryHeatColor );
 	rd.areaMaterials[EveSOFDataArea::TYPE_REACTOR].generalParameters.clear();
-	rd.areaMaterials[EveSOFDataArea::TYPE_REACTOR].generalParameters["GeneralHeatGlowColor"] = srcData->m_hullReactorHeatColor;
+	rd.areaMaterials[EveSOFDataArea::TYPE_REACTOR].generalParameters["GeneralHeatGlowColor"] = Vector4( srcData->m_hullReactorHeatColor );
 
 	// damage data
 	rd.damage.armorDamageParameters.clear();

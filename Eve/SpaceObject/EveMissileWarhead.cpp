@@ -121,7 +121,7 @@ void EveMissileWarhead::UpdateVisibility( const TriFrustum& frustum, const Matri
 	m_lodLevel = TR2_LOD_LOW;
 
 	// is this one here enabled?
-	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() || !m_display )
+	if( ( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() ) || !m_display )
 	{
 		return;
 	}

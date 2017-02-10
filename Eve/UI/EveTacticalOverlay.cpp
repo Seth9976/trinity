@@ -263,7 +263,7 @@ void EveTacticalOverlay::UpdateVisibility( const TriFrustum& frustum, const Matr
 		{
 			Vector2 planarDiff( positionPlane.x - position.x, positionPlane.z - position.z );
 			float length = D3DXVec2Length( &planarDiff );
-			float height = abs( position.y - positionPlane.y );
+			float height = std::abs( position.y - positionPlane.y );
 			// Wide arches need more segments to look good
 			segments *= 1.f + m_arcSegmentMultiplier * length / height;
 			requestedSegments += segments * m_segmentCountMultiplier;

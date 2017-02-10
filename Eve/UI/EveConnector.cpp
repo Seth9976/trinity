@@ -135,7 +135,7 @@ inline void EveConnector::AddOrbit( EveCurveLineSet* lineSet, const Vector3& cen
 
 	// Draw the orbit circle
 	D3DXVec3Normalize( &upDir, &planeNormal );
-	if( abs( D3DXVec3Dot( &upDir, &up ) ) < 0.999 )
+	if( std::abs( D3DXVec3Dot( &upDir, &up ) ) < 0.999 )
 	{
 		D3DXVec3Cross( &side, &up, &upDir );
 		D3DXVec3Normalize( &side, &side );

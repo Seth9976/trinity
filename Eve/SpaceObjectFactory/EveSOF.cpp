@@ -247,6 +247,8 @@ EveSpaceObject2Ptr EveSOF::CreateSpaceObject( const EveSOFDNAPtr dna ) const
 			spaceObject = newSwarm;
 		}
 		break;
+    default:
+        break;
 	}
 
 	return spaceObject;
@@ -865,22 +867,18 @@ void RecursiveBindParticleEmitters( EveTransformPtr transform, TriCurveSetPtr cu
 
 void RecursiveBindParticleEmitters( IEveSpaceObjectChild* child, TriCurveSetPtr curveSet, Tr2ScalarCurvePtr curve )
 {
-	EveChildContainerPtr container;
-	EveChildParticleSystemPtr psys;
-
-	if( container = BlueCastPtr( child ) )
+	if( EveChildContainerPtr container = BlueCastPtr( child ) )
 	{
 		for( auto childIt = container->m_objects.begin(); childIt != container->m_objects.end(); ++childIt )
 		{
 			RecursiveBindParticleEmitters( *childIt, curveSet, curve );
 		}
 	}
-	else if( psys = BlueCastPtr( child ) )
+	else if( EveChildParticleSystemPtr psys = BlueCastPtr( child ) )
 	{
 		for( auto emitterIt = psys->m_particleEmitters.begin(); emitterIt != psys->m_particleEmitters.end(); ++emitterIt )
 		{
-			Tr2DynamicEmitterPtr dynamicEmitter;
-			if( dynamicEmitter = BlueCastPtr( *emitterIt ) )
+			if( Tr2DynamicEmitterPtr dynamicEmitter = BlueCastPtr( *emitterIt ) )
 			{
 				TriValueBindingPtr binding;
 				binding.CreateInstance();
