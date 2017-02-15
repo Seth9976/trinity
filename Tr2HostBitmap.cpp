@@ -494,6 +494,70 @@ bool Tr2HostBitmap::Compress( unsigned compressionFormat, unsigned qualityLevel,
 #endif
 }
 
+
+bool chan_selected( const std::string& channels, char channel )
+{
+	return channels.find_first_of( channel ) != std::string::npos;
+}
+
+
+bool check_chan_value( uint32_t mask, uint32_t shift, uint32_t pixval, uint32_t testval )
+{
+	uint32_t chan_val = ( pixval & mask ) >> shift;
+	return chan_val == testval;
+}
+
+
+uint32_t Tr2HostBitmap::CountPixelsOfValue( const std::string& channels, uint32_t value ) const
+{
+	// Count the number of pixels for which all rgba channels listed in "channels" param match value.
+
+	if( !IsValid() || GetBytesPerPixel(m_format) != 4 || IsCompressed() )
+	{
+		return 0;
+	}
+
+	uint32_t numpix = 0;
+
+	for( uint32_t x = 0; x < m_width; x++ )
+	{
+		for( uint32_t y = 0; y < m_height; y++ )
+		{
+			uint32_t pixval;
+			if( GetPixel(x, y, &pixval) )
+			{
+				bool matches = true;
+				if( chan_selected( channels, 'a' ) )
+				{
+					matches &= check_chan_value( 0xFF000000, 24, pixval, value );
+				}
+				
+				if( chan_selected( channels, 'r' ) )
+				{
+					matches &= check_chan_value( 0x00FF0000, 16, pixval, value );
+				}
+				
+				if( chan_selected( channels, 'g') )
+				{
+					matches &= check_chan_value( 0x0000FF00, 8, pixval, value );
+				}
+				
+				if( chan_selected( channels, 'b' ) )
+				{
+					matches &= check_chan_value( 0x000000FF, 0, pixval, value );
+				}
+
+				if( matches )
+				{
+					numpix++;
+				}
+			}
+		}
+	}
+
+	return numpix;
+}
+
 bool Tr2HostBitmap::SetPixel( int x, int y, const void *data )
 {
 	if( !IsValid() || GetBytesPerPixel( m_format ) != 4 || IsCompressed() )
@@ -511,7 +575,7 @@ bool Tr2HostBitmap::SetPixel( int x, int y, const void *data )
 	return true;
 }
 
-bool Tr2HostBitmap::GetPixel( int x, int y, void *data )
+bool Tr2HostBitmap::GetPixel( int x, int y, void *data ) const
 {
 	if( !IsValid() || GetBytesPerPixel( m_format ) != 4 || IsCompressed() )
 	{

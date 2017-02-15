@@ -323,7 +323,6 @@ static PyObject* PySave( PyObject* self, PyObject* args )
 	return PythonSave( self, args, false );
 }
 
-
 static PyObject* PyCompareBitmaps( PyObject* self, PyObject* args )
 {
 	using namespace Tr2RenderContextEnum;
@@ -651,6 +650,15 @@ const Be::ClassInfo* Tr2HostBitmap::ExposeToBlue()
 			":param path: full path (not a res path)\n"
 			":type path: basestring\n"
 			":rtype: bool"
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"CountPixelsOfValue",
+			CountPixelsOfValue,
+			"Count number of pixels that have a specific value in selected channels.\n"
+			":param channels: String containing one or more of 'r', 'g', 'b', 'a' characters.\n"
+			":param value: Value to count for masked pixels"
 		)
 
 		MAP_METHOD_AS_METHOD
