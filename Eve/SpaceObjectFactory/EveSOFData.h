@@ -314,7 +314,7 @@ public:
 	enum Usage
 	{
 		USAGE_STANDARD = 0,
-		USAGE_HOLOGRAM,
+		USAGE_ALLIANCE_LOGO,
 		USAGE_VIDEO,
 	};
 

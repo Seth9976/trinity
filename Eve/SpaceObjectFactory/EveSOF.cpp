@@ -638,26 +638,22 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 		Tr2EffectPtr planeEffect;
 		planeEffect.CreateInstance();
 		planeEffect->StartUpdate();
-		std::string effectResPath;
 
-		// Select the effect based on the usage
+		// Select the planeset's data based on the usage
+		std::string effectResPath, imageMapResPath, externalParamName;
 		switch (planeSetData->usage)
 		{
 		case EveSOFDataHullPlaneSet::USAGE_STANDARD:
-			effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
-			if( planeSetData->skinned )
-			{
-				effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx";
-			}
+			effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
 			break;
-		case EveSOFDataHullPlaneSet::USAGE_HOLOGRAM:
 		case EveSOFDataHullPlaneSet::USAGE_VIDEO:
-			effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
-			if( planeSetData->skinned )
-			{
-				effectResPath = "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx";
-			}
-			break;		
+			effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
+			imageMapResPath = "dynamic:/hangarvideos";
+			break;
+		case EveSOFDataHullPlaneSet::USAGE_ALLIANCE_LOGO:
+			effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
+			externalParamName = "LogoResPath";
+			break;
 		}
 
 		planeEffect->SetEffectPathName( effectResPath.c_str() );
@@ -667,24 +663,22 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 		planeEffect->AddResourceTexture2D( BlueSharedString("Layer2Map"), planeSetData->layer2MapResPath.c_str() );
 		planeEffect->AddResourceTexture2D( BlueSharedString("MaskMap"), planeSetData->maskMapResPath.c_str() );
 		
-		// Need to set up the ImageMap texture resource if we have a hologram
-		if( planeSetData->usage == EveSOFDataHullPlaneSet::USAGE_HOLOGRAM )
+		// Imagemap texture?
+		if( !imageMapResPath.empty() || !externalParamName.empty() )
 		{
-			planeEffect->AddResourceTexture2D( BlueSharedString("ImageMap"), "" );
-			ITriEffectParameter* imageMapParameter = planeEffect->GetParameterByName("ImageMap");
-			Tr2ExternalParameterPtr externalParameter;
-			externalParameter.CreateInstance();
+			planeEffect->AddResourceTexture2D( BlueSharedString("ImageMap"), imageMapResPath.c_str() );
 
-			externalParameter->SetName( "LogoResPath" );
-			externalParameter->SetDestinationObject( imageMapParameter );
-			externalParameter->SetDestinationAttribute( "resourcePath" );
-			externalParameter->Initialize();
-			obj->AddExternalParameter( externalParameter );
-		}
-		else if( planeSetData->usage == EveSOFDataHullPlaneSet::USAGE_VIDEO )
-		{
-			// setting the dynamic video resource, it's hard-coded because at the moment (30-11-2016) it's not doing anything...
-			planeEffect->AddResourceTexture2D( BlueSharedString( "ImageMap" ), "dynamic:/hangarvideos" );
+			if( !externalParamName.empty() )
+			{
+				ITriEffectParameter* imageMapParameter = planeEffect->GetParameterByName( "ImageMap" );
+				Tr2ExternalParameterPtr externalParameter;
+				externalParameter.CreateInstance();
+				externalParameter->SetName( externalParamName );
+				externalParameter->SetDestinationObject( imageMapParameter );
+				externalParameter->SetDestinationAttribute( "resourcePath" );
+				externalParameter->Initialize();
+				obj->AddExternalParameter( externalParameter );
+			}
 		}
 				
 		// parameters

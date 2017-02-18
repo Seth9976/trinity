@@ -187,7 +187,7 @@ BLUE_DEFINE( EveSOFDataHullPlaneSet );
 Be::VarChooser EveSOFDataHullPlaneSetUsageChooser[] =
 {
 	{	"Standard", BeCast( EveSOFDataHullPlaneSet::USAGE_STANDARD ), "Standard planeset" },
-	{	"Hologram", BeCast( EveSOFDataHullPlaneSet::USAGE_HOLOGRAM), "Hologram planeset" },
+	{	"AllianceLogo", BeCast( EveSOFDataHullPlaneSet::USAGE_ALLIANCE_LOGO ), "Alliance logo planeset" },
 	{	"Video", BeCast( EveSOFDataHullPlaneSet::USAGE_VIDEO ), "Video planeset" },
 	{ 0 }
 };
