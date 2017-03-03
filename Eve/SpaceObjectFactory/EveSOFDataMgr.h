@@ -285,11 +285,6 @@ public:
 		Color color;
 	};
 
-	struct FactionAreaData
-	{
-		std::map<BlueSharedString, Vector4> parameters;
-	};
-
 	struct FactionDecalData
 	{
 		bool isVisible;
@@ -305,9 +300,6 @@ public:
 
 	struct FactionData
 	{
-		// temp
-		bool useNewAreaTypes;
-
 		// texture insert
 		std::string resPathInsert;
 
@@ -318,8 +310,7 @@ public:
 		PatternLayerData defaultPattern;
 		std::string defaultPatternLayer1MaterialName;
 
-		// hull area parameter overloads
-		std::map<BlueSharedString, FactionAreaData> areaParameters;
+		// hull area materials
 		AreaMaterialData areaMaterials;
 		// spritesets
 		std::map<int, FactionSpriteSetColorData> spriteSetsColor;

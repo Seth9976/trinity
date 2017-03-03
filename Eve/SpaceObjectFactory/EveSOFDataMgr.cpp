@@ -828,9 +828,6 @@ bool EveSOFDataMgr::LoadFactionData( EveSOFDataPtr srcData )
 // --------------------------------------------------------------------------------
 void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr srcData ) const
 {
-	// temp!
-	fd.useNewAreaTypes = srcData->m_useNewAreaTypes;
-
 	// insert data
 	fd.resPathInsert = srcData->m_resPathInsert;
 
@@ -938,20 +935,6 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 				fd.areaMaterials.generalParameters[std::make_pair( i, "GeneralGlowColor" )] = Vector4( areaMaterial->m_generalGlowColor );
 			}
 		}
-	}
-
-	fd.areaParameters.clear();
-	for( auto hait = srcData->m_areas.begin(); hait != srcData->m_areas.end(); ++hait )
-	{
-		EveSOFDataFactionHullAreaPtr hullAreaData = (*hait);
-
-		FactionAreaData ad;
-		for( auto hapit = hullAreaData->m_parameters.begin(); hapit != hullAreaData->m_parameters.end(); ++hapit )
-		{
-			EveSOFDataParameterPtr parameterData = (*hapit);
-			ad.parameters[parameterData->m_name] = parameterData->m_value;
-		}
-		fd.areaParameters[hullAreaData->m_name] = ad;
 	}
 
 	// pattern data
