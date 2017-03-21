@@ -5,6 +5,7 @@
 //
 #include "StdAfx.h"
 #include "Utilities/StringUtils.h"
+#include "Include/TriMath.h"
 #include "EveSOF.h"
 #include "EveSOFDNA.h"
 #include "EveSOFUtils.h"
@@ -479,6 +480,7 @@ void EveSOF::SetupSpriteSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) c
 	CCP_STATS_ZONE( __FUNCTION__ );
 
 	// cycle over all hulls in the multi-hull list
+	Vector3 hullOffset( 0.f, 0.f, 0.f );
 	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
 	{
 		// cycle over all spritesets of this hull
@@ -520,7 +522,7 @@ void EveSOF::SetupSpriteSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) c
 				spriteSetItem->m_falloff = itemData->falloff;
 				spriteSetItem->m_maxScale = itemData->maxScale;
 				spriteSetItem->m_minScale = itemData->minScale;
-				spriteSetItem->m_position = itemData->position;
+				spriteSetItem->m_position = itemData->position + hullOffset;
 
 				// put it into spriteset
 				spriteSet->Add( spriteSetItem );
@@ -529,6 +531,13 @@ void EveSOF::SetupSpriteSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) c
 			spriteSet->Rebuild();
 			// put set onto ship
 			obj->AddSpriteSet( spriteSet );
+		}
+
+		// next hull needs offset update from hull's locator
+		const Vector3* nextSubsystemOffset = dna->GetHullNextSubsystemOffset( hullIdx );
+		if( nextSubsystemOffset )
+		{
+			hullOffset += *nextSubsystemOffset;
 		}
 	}
 }
@@ -542,6 +551,7 @@ void EveSOF::SetupSpotlightSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna 
 	CCP_STATS_ZONE( __FUNCTION__ );
 
 	// cycle over all hulls in the multi-hull list
+	Vector3 hullOffset( 0.f, 0.f, 0.f );
 	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
 	{
 		// cycle over all spritesets of this hull
@@ -606,7 +616,7 @@ void EveSOF::SetupSpotlightSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna 
 				spotlightSetItem->m_boneIndex = ssiit->boneIndex;
 				spotlightSetItem->m_boosterGainInfluence = ssiit->boosterGainInfluence;
 				spotlightSetItem->m_spriteScale = ssiit->spriteScale;
-				spotlightSetItem->m_transform = ssiit->transform;
+				TriMatrixTranslate( &spotlightSetItem->m_transform, &ssiit->transform, &hullOffset );
 
 				// add it
 				spotlightSet->AddSpotlightItem( spotlightSetItem );
@@ -615,6 +625,13 @@ void EveSOF::SetupSpotlightSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna 
 			spotlightSet->Rebuild();
 			// add to ship
 			obj->AddSpotlightSet( spotlightSet );
+		}
+
+		// next hull needs offset update from hull's locator
+		const Vector3* nextSubsystemOffset = dna->GetHullNextSubsystemOffset( hullIdx );
+		if( nextSubsystemOffset )
+		{
+			hullOffset += *nextSubsystemOffset;
 		}
 	}
 }
@@ -628,6 +645,7 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 	CCP_STATS_ZONE( __FUNCTION__ );
 
 	// cycle over all hulls in the multi-hull list
+	Vector3 hullOffset( 0.f, 0.f, 0.f );
 	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
 	{
 		// cycle over all spritesets of this hull
@@ -712,7 +730,7 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 				EvePlaneSetItemPtr planeSetItem;
 				planeSetItem.CreateInstance();
 				// fill it up
-				planeSetItem->m_position = psiit->position;
+				planeSetItem->m_position = psiit->position + hullOffset;
 				planeSetItem->m_rotation = psiit->rotation;
 				planeSetItem->m_scaling = psiit->scaling;
 				planeSetItem->m_color = psiit->color;
@@ -738,6 +756,13 @@ void EveSOF::SetupPlaneSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 			// add to ship
 			obj->AddPlaneSet( planeSet );
 		}
+
+		// next hull needs offset update from hull's locator
+		const Vector3* nextSubsystemOffset = dna->GetHullNextSubsystemOffset( hullIdx );
+		if( nextSubsystemOffset )
+		{
+			hullOffset += *nextSubsystemOffset;
+		}
 	}
 }
 
@@ -750,6 +775,7 @@ void EveSOF::SetupSpriteLineSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna
 	CCP_STATS_ZONE( __FUNCTION__ );
 
 	// cycle over all hulls in the multi-hull list
+	Vector3 hullOffset( 0.f, 0.f, 0.f );
 	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
 	{
 		// cycle over all spritelinesets of this hull
@@ -791,7 +817,7 @@ void EveSOF::SetupSpriteLineSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna
 				spriteLineSetItem->m_falloff = itemData->falloff;
 				spriteLineSetItem->m_maxScale = itemData->maxScale;
 				spriteLineSetItem->m_minScale = itemData->minScale;
-				spriteLineSetItem->m_position = itemData->position;
+				spriteLineSetItem->m_position = itemData->position + hullOffset;
 				spriteLineSetItem->m_rotation = itemData->rotation;
 				spriteLineSetItem->m_scaling = itemData->scaling;
 				spriteLineSetItem->m_spacing = itemData->spacing;
@@ -804,6 +830,13 @@ void EveSOF::SetupSpriteLineSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna
 			spriteLineSet->Rebuild();
 			// put set onto ship
 			obj->AddSpriteLineSet( spriteLineSet );
+		}
+
+		// next hull needs offset update from hull's locator
+		const Vector3* nextSubsystemOffset = dna->GetHullNextSubsystemOffset( hullIdx );
+		if( nextSubsystemOffset )
+		{
+			hullOffset += *nextSubsystemOffset;
 		}
 	}
 }

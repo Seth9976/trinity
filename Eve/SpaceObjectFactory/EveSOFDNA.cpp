@@ -590,6 +590,17 @@ const std::vector<BlueSharedString> EveSOFDNA::GetHullLocatorSetNames( size_t n 
 	return locatorNames;
 }
 
+// --------------------------------------------------------------------------------
+const Vector3* EveSOFDNA::GetHullNextSubsystemOffset( size_t n ) const
+{
+	const std::vector<EveSOFDataMgr::LocatorDirectionData>* nextSubsystemlocators = GetHullLocators( "next_subsystem", n );
+	if( nextSubsystemlocators && !nextSubsystemlocators->empty() )
+	{
+		// always just take first locator
+		return &nextSubsystemlocators->at( 0 ).position;
+	}
+	return nullptr;
+}
 
 // --------------------------------------------------------------------------------
 // Description:

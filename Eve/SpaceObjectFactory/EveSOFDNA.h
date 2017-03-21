@@ -90,6 +90,7 @@ public:
 	const std::vector<EveSOFDataMgr::LocatorData>& GetHullTurretLocators( size_t n = 0 ) const;
 	const std::vector<EveSOFDataMgr::LocatorDirectionData>* GetHullLocators( const char* setName, size_t n = 0 ) const;
 	const std::vector<BlueSharedString> GetHullLocatorSetNames( size_t n = 0 ) const;
+	const Vector3* GetHullNextSubsystemOffset( size_t n ) const;
 
 	// get faction data
 	void ModifyTextureResPath( std::string& resPath, const char* resName ) const;
