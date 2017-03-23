@@ -312,12 +312,21 @@ void EveSOF::SetupMesh( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
 
 	// setup mesh areas, try sharing as many Tr2LodResources as possible
 	std::map<std::string, Tr2LodResourcePtr> lodResPerTexture;
-	FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_OPAQUE ), TRIBATCHTYPE_OPAQUE, dna );
-	FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_DECAL ), TRIBATCHTYPE_DECAL, dna );
-	FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT ), TRIBATCHTYPE_TRANSPARENT, dna );
-	FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_ADDITIVE ), TRIBATCHTYPE_ADDITIVE, dna );
-	FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_DEPTH ), TRIBATCHTYPE_DEPTH, dna );
-	FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_DISTORTION ), TRIBATCHTYPE_DISTORTION, dna );
+
+	// multi-hull! so mesh index must be tracked
+	size_t meshIndexOffset = 0;
+	// cycle over all hulls in the multi-hull list
+	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
+	{
+		size_t cntr = 0;
+		cntr += FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_OPAQUE ), TRIBATCHTYPE_OPAQUE, dna, hullIdx, meshIndexOffset );
+		cntr += FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_DECAL ), TRIBATCHTYPE_DECAL, dna, hullIdx, meshIndexOffset );
+		cntr += FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT ), TRIBATCHTYPE_TRANSPARENT, dna, hullIdx, meshIndexOffset );
+		cntr += FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_ADDITIVE ), TRIBATCHTYPE_ADDITIVE, dna, hullIdx, meshIndexOffset );
+		cntr += FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_DEPTH ), TRIBATCHTYPE_DEPTH, dna, hullIdx, meshIndexOffset );
+		cntr += FillMeshAreaVector( lodResPerTexture, mesh->GetAreas( TRIBATCHTYPE_DISTORTION ), TRIBATCHTYPE_DISTORTION, dna, hullIdx, meshIndexOffset );
+		meshIndexOffset += cntr;
+	}
 
 	// register all used lodresource objects with the new mesh
 	for( auto it = lodResPerTexture.begin(); it != lodResPerTexture.end(); ++it )
@@ -336,116 +345,120 @@ void EveSOF::SetupMesh( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
 // Description:
 //   Fill up mesh area vector given the hull and faction area data provided.
 // --------------------------------------------------------------------------------
-void EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodResCollector, Tr2MeshAreaVector* meshAreaVector, TriBatchType areaType, const EveSOFDNAPtr dna ) const
+size_t EveSOF::FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodResCollector, Tr2MeshAreaVector* meshAreaVector, TriBatchType areaType, const EveSOFDNAPtr dna, size_t hullIdx, size_t meshIndexOffset ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	const std::vector<EveSOFDataMgr::HullAreas>* hullAreas = dna->GetHullMeshAreas( areaType );
+	const std::vector<EveSOFDataMgr::HullAreas>* hullAreas = dna->GetHullMeshAreas( areaType, hullIdx );
 	for( auto area = hullAreas->begin(); area != hullAreas->end(); ++area )
 	{
 		// find data on this shader from generics, we need it!
 		const EveSOFDataMgr::GenericShaderData* shaderData = dna->GetGenericAreaShaderData( area->shader );
-		if( shaderData )
+		if( !shaderData )
 		{
+			CCP_LOGERR( "EveSOF::FillMeshAreaVector: couldn't find generic info for shader %s", area->shader.c_str() );
+			return 0;
+		}
 
-			// every area has it's own shader, nothing we can share here
-			Tr2EffectPtr newShader;
-			newShader.CreateInstance();
-			newShader->StartUpdate();
+		// every area has it's own shader, nothing we can share here
+		Tr2EffectPtr newShader;
+		newShader.CreateInstance();
+		newShader->StartUpdate();
 
-			// construct res path of the shader
-			newShader->SetEffectPathName( dna->GetCompleteShaderPath( area->shader.c_str() ).c_str() );
+		// construct res path of the shader
+		newShader->SetEffectPathName( dna->GetCompleteShaderPath( area->shader.c_str() ).c_str() );
 
-			// parameters
-			for( auto shaderParamIt = shaderData->parameters.begin(); shaderParamIt != shaderData->parameters.end(); ++shaderParamIt )
+		// parameters
+		for( auto shaderParamIt = shaderData->parameters.begin(); shaderParamIt != shaderData->parameters.end(); ++shaderParamIt )
+		{
+			const Vector4* paramValue = dna->GetMeshAreaParameter( area->areaType, *shaderParamIt, &area->parameters, area->blockedMaterials );
+			if( paramValue )
 			{
-				const Vector4* paramValue = dna->GetMeshAreaParameter( area->areaType, *shaderParamIt, &area->parameters, area->blockedMaterials );
-				if( paramValue )
-				{
-					newShader->AddParameterVector4( *shaderParamIt, paramValue );
-				}
+				newShader->AddParameterVector4( *shaderParamIt, paramValue );
 			}
+		}
 
-			// shader textures from the hull data
-			for( auto it = area->textures.begin(); it != area->textures.end(); ++it )
+		// shader textures from the hull data
+		for( auto it = area->textures.begin(); it != area->textures.end(); ++it )
+		{
+			CCP_STATS_ZONE( __FUNCTION__ " texture" );
+
+			// res path how it is from hull data
+			std::string highResPath = it->second.resFilePath;
+			// get's modified by the faction data
+			dna->ModifyTextureResPath( highResPath, it->first.c_str() );
+			// make three paths for the three LODs
+			std::string mediumResPath, lowResPath, ultraResPath;
+			if( GenerateLodResourcePaths( mediumResPath, lowResPath, ultraResPath, highResPath.c_str(), it->first.c_str() ) )
 			{
-				CCP_STATS_ZONE( __FUNCTION__ " texture" );
-
-				// res path how it is from hull data
-				std::string highResPath = it->second.resFilePath;
-				// get's modified by the faction data
-				dna->ModifyTextureResPath( highResPath, it->first.c_str() );
-				// make three paths for the three LODs
-				std::string mediumResPath, lowResPath, ultraResPath;
-				if( GenerateLodResourcePaths( mediumResPath, lowResPath, ultraResPath, highResPath.c_str(), it->first.c_str() ) )
+				// now we need a lod resource object, maybe we already have one?
+				auto finder = lodResCollector.find( highResPath );
+				if( finder != lodResCollector.end() )
 				{
-					// now we need a lod resource object, maybe we already have one?
-					auto finder = lodResCollector.find( highResPath );
-					if( finder != lodResCollector.end() )
-					{
-						// yeah, we have one: use it!
-						newShader->AddResourceTexture2DLod( it->first, finder->second );
-					}
-					else
-					{
-						// not found, so we have to make a new one
-						Tr2LodResourcePtr lodResource;
-						lodResource.CreateInstance();
-
-						CCP_STATS_ZONE( __FUNCTION__ " lodResource" );
-
-						lodResource->SetName( it->first );
-						lodResource->SetResourcePath( TR2_LOD_LOW, lowResPath.c_str() );
-						lodResource->SetResourcePath( TR2_LOD_MEDIUM, mediumResPath.c_str() );
-						lodResource->SetResourcePath( TR2_LOD_HIGH, highResPath.c_str() );
-						lodResource->SetResourcePath( TR2_LOD_ULTRA, ultraResPath.c_str() );
-						newShader->AddResourceTexture2DLod( it->first, lodResource );
-						// also add it to the mesh for updating
-						lodResCollector[ highResPath ] = lodResource;
-					}
+					// yeah, we have one: use it!
+					newShader->AddResourceTexture2DLod( it->first, finder->second );
 				}
 				else
 				{
-					newShader->AddResourceTexture2D( it->first, highResPath.c_str() );
+					// not found, so we have to make a new one
+					Tr2LodResourcePtr lodResource;
+					lodResource.CreateInstance();
+
+					CCP_STATS_ZONE( __FUNCTION__ " lodResource" );
+
+					lodResource->SetName( it->first );
+					lodResource->SetResourcePath( TR2_LOD_LOW, lowResPath.c_str() );
+					lodResource->SetResourcePath( TR2_LOD_MEDIUM, mediumResPath.c_str() );
+					lodResource->SetResourcePath( TR2_LOD_HIGH, highResPath.c_str() );
+					lodResource->SetResourcePath( TR2_LOD_ULTRA, ultraResPath.c_str() );
+					newShader->AddResourceTexture2DLod( it->first, lodResource );
+					// also add it to the mesh for updating
+					lodResCollector[ highResPath ] = lodResource;
 				}
 			}
-
-			// pattern textures
-			size_t patternLayerCount = dna->GetPatternLayerCount();
-			for( size_t i = 0; i < patternLayerCount; ++i )
+			else
 			{
-				const EveSOFDataMgr::PatternLayerData* patternLayerData = dna->GetPatternLayerData( i );
-				if( patternLayerData )
-				{
-					newShader->AddResourceTexture2D( patternLayerData->textureName, patternLayerData->textureResFilePath.c_str() );
-
-					// pattern textures almost always require a sampler change: repeat is boring....
-					newShader->AddSamplerOverride( BlueSharedString( std::string( patternLayerData->textureName.c_str() ) + "Sampler" ), patternLayerData->projectionAddressModeU, patternLayerData->projectionAddressModeV );
-				}
+				newShader->AddResourceTexture2D( it->first, highResPath.c_str() );
 			}
-
-			// default shader textures & parameters from the generic data
-			for( auto gtit = shaderData->defaultTextures.begin(); gtit != shaderData->defaultTextures.end(); ++gtit )
-			{
-				newShader->AddResourceTexture2D( gtit->first, gtit->second.resFilePath.c_str() );
-			}
-			for( auto gpit = shaderData->defaultParameters.begin(); gpit != shaderData->defaultParameters.end(); ++gpit )
-			{
-				newShader->AddParameterVector4( gpit->first, &gpit->second );
-			}
-
-			// that's it for setting up this shader, must rebuild cache on it!
-			newShader->EndUpdate();
-
-			// new mesharea
-			Tr2MeshAreaPtr newMeshArea;
-			newMeshArea.CreateInstance();
-			newMeshArea->SetMaterial( newShader );
-			newMeshArea->SetIndex( area->index );
-			newMeshArea->SetCount( area->count );
-			meshAreaVector->Append( newMeshArea );
 		}
+
+		// pattern textures
+		size_t patternLayerCount = dna->GetPatternLayerCount();
+		for( size_t i = 0; i < patternLayerCount; ++i )
+		{
+			const EveSOFDataMgr::PatternLayerData* patternLayerData = dna->GetPatternLayerData( i );
+			if( patternLayerData )
+			{
+				newShader->AddResourceTexture2D( patternLayerData->textureName, patternLayerData->textureResFilePath.c_str() );
+
+				// pattern textures almost always require a sampler change: repeat is boring....
+				newShader->AddSamplerOverride( BlueSharedString( std::string( patternLayerData->textureName.c_str() ) + "Sampler" ), patternLayerData->projectionAddressModeU, patternLayerData->projectionAddressModeV );
+			}
+		}
+
+		// default shader textures & parameters from the generic data
+		for( auto gtit = shaderData->defaultTextures.begin(); gtit != shaderData->defaultTextures.end(); ++gtit )
+		{
+			newShader->AddResourceTexture2D( gtit->first, gtit->second.resFilePath.c_str() );
+		}
+		for( auto gpit = shaderData->defaultParameters.begin(); gpit != shaderData->defaultParameters.end(); ++gpit )
+		{
+			newShader->AddParameterVector4( gpit->first, &gpit->second );
+		}
+
+		// that's it for setting up this shader, must rebuild cache on it!
+		newShader->EndUpdate();
+
+		// new mesharea
+		Tr2MeshAreaPtr newMeshArea;
+		newMeshArea.CreateInstance();
+		newMeshArea->SetMaterial( newShader );
+		newMeshArea->SetIndex( area->index + (unsigned int)meshIndexOffset );
+		newMeshArea->SetCount( area->count );
+		meshAreaVector->Append( newMeshArea );
 	}
+
+	return hullAreas->size();
 }
 
 // --------------------------------------------------------------------------------
