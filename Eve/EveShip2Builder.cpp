@@ -923,6 +923,7 @@ bool EveShip2Builder::CombineHullGeometry()
 
 	InitializeGrannyFile();
 
+	Vector3 offset( 0.f, 0.f, 0.f );
 	for( size_t grnResIdx = 0; grnResIdx != m_grannyResources.size(); ++grnResIdx )
 	{
 		TriGrannyResPtr grnRes = m_grannyResources[ grnResIdx ];
@@ -935,19 +936,6 @@ bool EveShip2Builder::CombineHullGeometry()
 			return false;
 		}
 
-		// offset is in a locator set on the hull
-		Vector3 offset( 0.f, 0.f, 0.f );
-		for( auto it = sofHull->m_locatorSets.begin(); it != sofHull->m_locatorSets.end(); ++it )
-		{
-			if( (*it)->m_name == BlueSharedString( "next_subsystem" ) )
-			{
-				if( !( *it )->m_locators.empty() )
-				{
-					offset = ( *it )->m_locators[0]->m_position;
-				}
-			}
-		}
-
 		granny_file* grannyFile = grnRes->GetGrannyFile();
 		granny_file_info* fi = GrannyGetFileInfo( grannyFile );
 		granny_mesh* grannyMesh = fi->Meshes[0];
@@ -955,7 +943,6 @@ bool EveShip2Builder::CombineHullGeometry()
 		// report!
 		CCP_LOGERR( "EveShip2Builder: processing with offset (%f,%f,%f)", offset.x, offset.y, offset.z );
 
-		// vertex type
 		if( !m_grannyVertexData.VertexType )
 		{
 			m_grannyVertexData.VertexType = grannyMesh->PrimaryVertexData->VertexType;
@@ -1060,6 +1047,20 @@ bool EveShip2Builder::CombineHullGeometry()
 		}
 
 		m_areaOffset += grannyMesh->MaterialBindingCount;
+
+		// offset is in a locator set on the hull
+		for( auto it = sofHull->m_locatorSets.begin(); it != sofHull->m_locatorSets.end(); ++it )
+		{
+			if( ( *it )->m_name == BlueSharedString( "next_subsystem" ) )
+			{
+				if( !( *it )->m_locators.empty() )
+				{
+					offset += ( *it )->m_locators[0]->m_position;
+				}
+			}
+		}
+
+
 	}
 
 	// save it
