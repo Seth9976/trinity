@@ -89,9 +89,9 @@ public:
 	const std::vector<EveSOFDataMgr::HullSpotlightSetData>& GetHullSpotlightSets( size_t n ) const;
 	const std::vector<EveSOFDataMgr::HullSpriteSetData>& GetHullSpriteSets( size_t n ) const;
 	const std::vector<EveSOFDataMgr::HullSpriteLineSetData>& GetHullSpriteLineSets( size_t n ) const;
-	const std::vector<EveSOFDataMgr::LocatorData>& GetHullTurretLocators( size_t n = 0 ) const;
+	const std::vector<EveSOFDataMgr::LocatorData>& GetHullTurretLocators( size_t n ) const;
 	const std::vector<EveSOFDataMgr::LocatorDirectionData>* GetHullLocators( const char* setName, size_t n = 0 ) const;
-	const std::vector<BlueSharedString> GetHullLocatorSetNames( size_t n = 0 ) const;
+	const std::vector<BlueSharedString> GetHullLocatorSetNames( size_t n ) const;
 	const Vector3* GetHullNextSubsystemOffset( size_t n ) const;
 
 	// get faction data

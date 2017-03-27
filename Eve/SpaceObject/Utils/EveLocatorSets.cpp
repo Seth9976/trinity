@@ -46,6 +46,15 @@ void EveLocatorSets::Set( const char* name, const Locator* locators, size_t coun
 }
 
 // --------------------------------------------------------------------------------
+void EveLocatorSets::Translate( const Vector3& offset )
+{
+	for( auto it = m_locators.begin(); it != m_locators.end(); ++it )
+	{
+		it->position += offset;
+	}
+}
+
+// --------------------------------------------------------------------------------
 // Description:
 //   Merge this locatorset with another set
 // --------------------------------------------------------------------------------

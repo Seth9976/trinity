@@ -1630,38 +1630,60 @@ void EveSOF::SetupLocators( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) con
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
-	// create and setup all turret locators
-	const std::vector<EveSOFDataMgr::LocatorData>& turretLocators = dna->GetHullTurretLocators();
-	for( auto tlit = turretLocators.begin(); tlit != turretLocators.end(); ++tlit )
+	// cycle over all hulls in the multi-hull list
+	Vector3 hullOffset( 0.f, 0.f, 0.f );
+	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
 	{
-		// create a new locator
+		// create and setup all turret locators
+		const std::vector<EveSOFDataMgr::LocatorData>& turretLocators = dna->GetHullTurretLocators( hullIdx );
+		for( auto tlit = turretLocators.begin(); tlit != turretLocators.end(); ++tlit )
+		{
+			// create a new locator
+			EveLocator2Ptr loc;
+			loc.CreateInstance();
+
+			// set it up
+			loc->SetName( tlit->name );
+
+			Matrix m;
+			TriMatrixTranslate( &m, &tlit->transform, &hullOffset );
+			loc->SetTransform( m );
+
+			// add it to the new ship
+			obj->AddLocator( loc );
+		}
+
+		const std::vector<BlueSharedString> locatorSetsNames = dna->GetHullLocatorSetNames( hullIdx );
+		for( auto locatorSetName = locatorSetsNames.begin(); locatorSetName != locatorSetsNames.end(); ++locatorSetName )
+		{
+			auto locators = dna->GetHullLocators( locatorSetName->c_str(), hullIdx );
+			if( locators )
+			{
+				EveLocatorSetsPtr locSets;
+				locSets.CreateInstance();
+				locSets->Set( locatorSetName->c_str(), ( const Locator* ) &( *locators )[0], locators->size() );
+				locSets->Translate( hullOffset );
+				obj->MergeToLocatorSet( *locSets );
+			}
+		}
+
+		// create and setup the audio locator
 		EveLocator2Ptr loc;
 		loc.CreateInstance();
-
-		// set it up
-		loc->SetName( tlit->name );
-		loc->SetTransform( tlit->transform );
+		loc->SetName( "locator_audio_booster" );
+		const Vector3* pos = dna->GetHullAudioPosition( hullIdx );
+		loc->SetTransform( Matrix( 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, pos->x, pos->y, pos->z, 1.f ) );
 
 		// add it to the new ship
 		obj->AddLocator( loc );
+
+		// next hull needs offset update from hull's locator
+		const Vector3* nextSubsystemOffset = dna->GetHullNextSubsystemOffset( hullIdx );
+		if( nextSubsystemOffset )
+		{
+			hullOffset += *nextSubsystemOffset;
+		}
 	}
-
-	const std::vector<BlueSharedString> locatorSetsNames = dna->GetHullLocatorSetNames();
-	for( auto locatorSetName = locatorSetsNames.begin(); locatorSetName != locatorSetsNames.end(); ++locatorSetName)
-	{
-		auto locators = dna->GetHullLocators( locatorSetName->c_str() );
-		obj->AddLocatorSet( locatorSetName->c_str(), ( const Locator* ) &( *locators )[0], locators->size() );
-	}
-
-	// create and setup the audio locator
-	EveLocator2Ptr loc;
-	loc.CreateInstance();
-	loc->SetName( "locator_audio_booster" );
-	const Vector3* pos = dna->GetHullAudioPosition();
-	loc->SetTransform( Matrix( 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, pos->x, pos->y, pos->z, 1.f ) );
-
-	// add it to the new ship
-	obj->AddLocator( loc );
 }
 
 // --------------------------------------------------------------------------------

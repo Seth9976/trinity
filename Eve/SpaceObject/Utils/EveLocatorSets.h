@@ -32,6 +32,7 @@ public:
 
 	// access
 	void Set( const char* name, const Locator* locators, size_t count );
+	void Translate( const Vector3& offset );
 	void Append( const Locator* locators, size_t count );
 
 	bool HasName( const char* name ) const;
