@@ -2146,6 +2146,14 @@ void EveSpaceScene::PopulatePerFrameVSData( PerFrameVSData &data )
 	// sun data
 	data.Sun = m_sunData;
 	data.Sun.DiffuseColor = m_useSunColorWithDynamicLights && g_eveSpaceSceneDynamicLighting ? m_sunColorWithDynamicLights : m_sunColor;
+	if( Tr2Renderer::GetShaderModel() == TR2SM_3_0_LO )
+	{
+		float intensity = std::max( std::max( data.Sun.DiffuseColor.r, data.Sun.DiffuseColor.g ), data.Sun.DiffuseColor.b );
+		if( intensity > 3.0f )
+		{
+			data.Sun.DiffuseColor /= intensity;
+		}
+	}
 
 	// make sure whatever direction we get in here, it is normalized! And inverted: Shaders work with direction to light...
 	D3DXVec3Normalize( &data.Sun.DirWorld, &data.Sun.DirWorld );
