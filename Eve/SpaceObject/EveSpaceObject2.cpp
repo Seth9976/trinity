@@ -600,10 +600,28 @@ void EveSpaceObject2::RenderDebugInfo( Tr2DebugRenderer& renderer )
 			for( size_t i = 0; i < locators.size(); ++i )
 			{
 				auto& locator = locators[i];
+				auto position = locator.position;
+				auto rotation = locator.direction;
+
+				if( locator.boneIndex && m_animationUpdater && m_animationUpdater->IsInitialized() )
+				{
+					size_t boneCount = size_t( m_animationUpdater->GetMeshBoneCount() );
+					if( boneCount )
+					{
+						const granny_matrix_3x4* bones = m_animationUpdater->GetMeshBoneMatrixList();
+						Matrix boneTF;
+						D3DXMatrixIdentity( &boneTF );
+						TriMatrixCopyFrom3x4( &boneTF, &bones[locator.boneIndex] );
+						position = XMVector3TransformCoord( position, boneTF );
+
+						rotation = XMQuaternionMultiply( rotation, XMQuaternionRotationMatrix( boneTF ) );
+					}
+				}
+
 				renderer.DrawSphereArrow( 
 					Tr2DebugObjectReference( &locators, uint32_t( i ) ),
-					Vector3( XMVector3TransformCoord( locator.position, m_worldTransform ) ), 
-					Vector3( XMVector3TransformNormal( Vector3( 0, 1, 0 ), Matrix( XMMatrixRotationQuaternion( locator.direction ) ) * m_worldTransform ) ), 
+					Vector3( XMVector3TransformCoord( position, m_worldTransform ) ),
+					Vector3( XMVector3TransformNormal( Vector3( 0, 1, 0 ), Matrix( XMMatrixRotationQuaternion( rotation ) ) * m_worldTransform ) ),
 					m_boundingSphereRadius / 50.f,
 					8,
 					Tr2DebugRenderer::Lit,
