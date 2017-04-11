@@ -16,7 +16,7 @@ const Be::ClassInfo* EveSpherePin::ExposeToBlue()
 		MAP_ATTRIBUTE( "name", m_name, "A name for this pin", Be::READWRITE | Be::PERSIST )
 
 		MAP_ATTRIBUTE( "pinEffect", m_pinEffect, "The effect to use to draw the 3d pin", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "pickEffect", m_pickEffect, "The effect to use to draw the 3d pin", Be::READ )
+		MAP_ATTRIBUTE( "pickEffect", m_pickEffect, "The effect to use to draw the 3d pin\n:jessica-skip-validation:", Be::READ )
 
 		MAP_ATTRIBUTE( "curveSets", m_curveSets, "Curvesets for animating things", Be::READWRITE | Be::PERSIST )
 
