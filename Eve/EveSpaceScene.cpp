@@ -170,7 +170,8 @@ EveSpaceScene::EveSpaceScene( IRoot* lockobj ) :
 	m_sunColorWithDynamicLights( 1.0f, 1.0f, 1.0f, 1.0f ),
 	m_useSunColorWithDynamicLights( false ),
 	m_nebulaBrightnessOverride( 0.f ),
-	m_nebulaBrightnessOverrideVar( "NebulaBrightnessOverride", m_nebulaBrightnessOverride )
+	m_nebulaBrightnessOverrideVar( "NebulaBrightnessOverride", m_nebulaBrightnessOverride ),
+	m_hasDepthPass( false )
 {
 	TriPoolAllocator* allocator = Tr2Renderer::GetPoolAllocator();
 	m_primaryBatches[TRIBATCHTYPE_OPAQUE] = CCP_NEW( "EveSpaceScene/m_batches" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
@@ -1130,6 +1131,8 @@ void EveSpaceScene::BeginRender( Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
+	m_hasDepthPass = false;
+
 	if( !m_display )
 	{
 		return;
@@ -1344,6 +1347,7 @@ void EveSpaceScene::GatherBatches( Tr2RenderContext& renderContext )
 
 	GetAllBatchesFromRenderables( renderables, transparentObjects, m_primaryBatches );
 	GetTransparentBatchesFromRenderables( shadowRenderables, transparentObjects, m_primaryBatches );
+	GetDepthBatchesFromRenderables( shadowRenderables, m_primaryBatches );
 	PrepareTransparentBatch( transparentObjects, m_primaryBatches );
 
 	FinalizeBatches( m_primaryBatches );
@@ -1709,11 +1713,13 @@ void EveSpaceScene::RenderDepthPass( Tr2RenderContext& renderContext )
 	// Render to depth map
 	if( Tr2Renderer::GetShaderModel() == TR2SM_3_0_DEPTH )
 	{
+		m_hasDepthPass = true;
+
 		Tr2Renderer::ClearDepthBuffer( 0.0f );
 
 		ApplyPerFrameData( renderContext );
 
-		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_OPAQUE );
+		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
 		renderContext.RenderBatchesWithOverride( m_primaryBatches[TRIBATCHTYPE_OPAQUE], f_writeDepthOpaqueOverride, Tr2RenderContext::OM_DO_NOT_SET_ORIGINAL_PS );
 		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
 		renderContext.RenderBatches( m_primaryBatches[TRIBATCHTYPE_DEPTH] );
@@ -1738,7 +1744,7 @@ void EveSpaceScene::RenderDepthPass( Tr2RenderContext& renderContext )
 			GetDepthBatchesFromRenderables( visible, m_secondaryBatches );
 
 			FinalizeBatches( m_secondaryBatches );
-			renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_OPAQUE );
+			renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
 			renderContext.RenderBatchesWithOverride( m_secondaryBatches[TRIBATCHTYPE_OPAQUE], f_writeDepthOpaqueOverride, Tr2RenderContext::OM_DO_NOTHING );
 			renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
 			renderContext.RenderBatches( m_secondaryBatches[TRIBATCHTYPE_DEPTH] );
@@ -1766,12 +1772,23 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 		return;
 	}
 
+	if( m_hasDepthPass )
+	{
+		renderContext.SetReadOnlyDepth( true );
+	}
+
 	std::vector<ITr2Renderable*> objectRenderables;
 	
 	if( auto lightManager = Tr2LightManager::GetInstance() )
 	{
 		CCP_STATS_SCOPED_TIME( updateDynamicLightLists );
-		lightManager->UpdateLists( renderContext );
+
+		uint32_t msaaType = 0;
+		if( m_depthMap )
+		{
+			msaaType = std::max( m_depthMap->m_depthStencil.GetMsaaType(), 1u );
+		}
+		lightManager->UpdateLists( msaaType, renderContext );
 	}
 	
 	// Draw the planets to the z-buffer to occlude any stations etc.
@@ -1808,8 +1825,17 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 	SetNoShadow();
 	ApplyPerFrameData( renderContext );
 
+	if( !m_hasDepthPass )
+	{
+		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
+		renderContext.RenderBatches( m_primaryBatches[TRIBATCHTYPE_DEPTH] );
+	}
+
 	renderContext.m_esm.UnsetAllTextures();
-	renderContext.SetReadOnlyDepth( true );
+	if( !m_hasDepthPass )
+	{
+		renderContext.SetReadOnlyDepth( true );
+	}
 	{
 		CCP_STATS_GPU_ZONE( "RenderMainPass/RenderTransparentBatches" );
 		RenderTransparentBatches( m_primaryBatches, renderContext );
@@ -1819,7 +1845,6 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 		RenderDistortionBatches( m_primaryBatches, renderContext );
 	}
 	renderContext.m_esm.UnsetAllTextures();
-	renderContext.SetReadOnlyDepth( false );
 
 	//GPU particles
 	if( GetGpuParticleSystem() )
@@ -1827,6 +1852,8 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 		GetGpuParticleSystem()->Update( m_updateTime, m_updateContext.GetOriginShift(), renderContext );
 		GetGpuParticleSystem()->Render( renderContext );
 	}
+
+	renderContext.SetReadOnlyDepth( false );
 
 	renderContext.m_esm.EndManagedRendering();
 

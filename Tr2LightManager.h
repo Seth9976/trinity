@@ -42,7 +42,7 @@ public:
 	void Clear();
 	void SetFrustum( const TriFrustum& frustum );
 	void AddPointLight( const Vector3& position, float radius, const Color& color );
-	ALResult UpdateLists( Tr2RenderContext& renderContext );
+	ALResult UpdateLists( uint32_t msaaType, Tr2RenderContext& renderContext );
 
 	virtual void ReleaseResources( TriStorage s );
 
@@ -64,7 +64,7 @@ private:
 
 	virtual bool OnPrepareResources();
 
-	ALResult DoUpdateLists( Tr2RenderContext& renderContext );
+	ALResult DoUpdateLists( uint32_t msaaType, Tr2RenderContext& renderContext );
 	ALResult ClearLightIndices( Tr2RenderContext& renderContext );
 	ALResult UpdateLightBuffer( Tr2RenderContext& renderContext );
 

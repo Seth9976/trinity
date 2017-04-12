@@ -43,7 +43,8 @@ struct PerFrameData
 	uint32_t tilesY;
 	uint32_t lightCount;
 	uint32_t indexBufferSize;
-	uint32_t _padding[2];
+	uint32_t msaaSamples;
+	uint32_t _padding[1];
 };
 
 bool ExtractAnnotationValue( const Tr2EffectParameterAnnotation& annotation, 
@@ -192,7 +193,7 @@ ALResult Tr2LightManager::UpdateLightBuffer( Tr2RenderContext& renderContext )
 	return m_lightBuffer->GetGpuBuffer( 0 )->Unlock( renderContext );
 }
 
-ALResult Tr2LightManager::DoUpdateLists( Tr2RenderContext& renderContext )
+ALResult Tr2LightManager::DoUpdateLists( uint32_t msaaType, Tr2RenderContext& renderContext )
 {
 	if( !m_lightBuffer->IsValid() || !m_indexBuffer->IsValid() )
 	{
@@ -212,10 +213,16 @@ ALResult Tr2LightManager::DoUpdateLists( Tr2RenderContext& renderContext )
 	perFrameData.tilesY = ( perFrameData.height + ( TILE_HEIGHT - 1 ) ) / TILE_HEIGHT;
 	perFrameData.lightCount = std::min( m_lightBuffer->GetGpuBuffer( 0 )->GetNumElements(), uint32_t( m_lightData.GetCount() ) );
 	perFrameData.indexBufferSize = INDEX_BUFFER_SIZE;
+	perFrameData.msaaSamples = msaaType;
 	if( !FillAndSetConstants( m_perFrameData, perFrameData, Tr2RenderContextEnum::COMPUTE_SHADER, Tr2Renderer::GetPerFramePSStartRegister(), renderContext ) )
 	{
 		return E_FAIL;
 	}
+	static const BlueSharedString msaaOptions[] = { 
+		BlueSharedString( "DEPTH_BUFFER_NONE" ), 
+		BlueSharedString( "DEPTH_BUFFER_NON_MSAA" ), 
+		BlueSharedString( "DEPTH_BUFFER_MSAA" ) };
+	m_effect->SetOption( BlueSharedString( "DEPTH_BUFFER_TYPE" ), msaaOptions[std::min( msaaType, 2u )]);
 
 	renderContext.m_esm.ApplyShaderBuffer( Tr2RenderContextEnum::COMPUTE_SHADER, 1, *m_lightBuffer->GetGpuBuffer( 0 ) );
 	CR_RETURN_HR( renderContext.SetUav( Tr2RenderContextEnum::COMPUTE_SHADER, 1, *m_indexBuffer->GetGpuBuffer( 0 ), 0 ) );
@@ -226,7 +233,7 @@ ALResult Tr2LightManager::DoUpdateLists( Tr2RenderContext& renderContext )
 	return S_OK;
 }
 
-ALResult Tr2LightManager::UpdateLists( Tr2RenderContext& renderContext )
+ALResult Tr2LightManager::UpdateLists( uint32_t msaaType, Tr2RenderContext& renderContext )
 {
 	m_lightBufferVariable = m_lightBuffer;
 	m_indexBufferVariable = m_indexBuffer;
@@ -236,7 +243,7 @@ ALResult Tr2LightManager::UpdateLists( Tr2RenderContext& renderContext )
 		return ClearLightIndices( renderContext );
 	}
 
-	auto hr = DoUpdateLists( renderContext );
+	auto hr = DoUpdateLists( msaaType, renderContext );
 	if( FAILED( hr ) )
 	{
 		ClearLightIndices( renderContext );

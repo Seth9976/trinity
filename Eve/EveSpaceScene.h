@@ -471,6 +471,8 @@ private:
 	Tr2EffectPtr m_pickEffect;
 	EveStarfieldPtr m_starfield;
 
+	bool m_hasDepthPass;
+
 	Tr2EffectPtr m_visualizerEffects[VM_COUNT];
 
 	void UpdateVariableStore();
