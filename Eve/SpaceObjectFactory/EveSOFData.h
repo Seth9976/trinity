@@ -1072,6 +1072,9 @@ public:
 
 	BlueSharedString m_shader;
 
+	// decal/alpha/transparency texture
+	BlueSharedString m_transparencyTextureName;
+
 	// complete list of parameters
 	PEveSOFDataGenericStringVector m_parameters;
 

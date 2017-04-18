@@ -424,6 +424,34 @@ bool Tr2Effect::AddParameterColor( const BlueSharedString& name, const Color* va
 	return true;
 }
 
+// --------------------------------------------------------------------------------
+void Tr2Effect::ClearAllParameters()
+{
+	// clear out all const and non-const parameters
+	StartUpdate();
+	m_constParameters.Clear();
+	m_parameters.Clear();
+	EndUpdate();
+}
+
+// --------------------------------------------------------------------------------
+void Tr2Effect::ClearAllResourceTexture2D( const BlueSharedString* excludeName )
+{
+	// keeper?
+	ITriEffectParameterPtr keeper;
+	if( excludeName )
+	{
+		keeper = GetResourceByName( excludeName->c_str() );
+	}
+	// clear and put back
+	m_resources.Clear();
+	if( keeper )
+	{
+		m_resources.Append( keeper );
+	}
+}
+
+// --------------------------------------------------------------------------------
 void Tr2Effect::SetOption( const BlueSharedString& name, const BlueSharedString& value )
 {
 	for( auto it = m_options.begin(); it != m_options.end(); ++it )

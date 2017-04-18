@@ -911,6 +911,7 @@ const Be::ClassInfo* EveSOFDataGenericShader::ExposeToBlue()
         MAP_INTERFACE( EveSOFDataGenericShader )
 
 		MAP_ATTRIBUTE( "shader", m_shader, "The actual shader", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "transparencyTextureName", m_transparencyTextureName, "Some shaders have transparency maps.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "parameters", m_parameters, "Complete list of all parameters for this shader", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "defaultTextures", m_defaultTextures, "Default (global) textures for this shader", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "defaultParameters", m_defaultParameters, "Default (global) parameters for this shader", Be::READWRITE | Be::PERSIST )

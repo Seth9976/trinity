@@ -68,7 +68,7 @@ public:
 	virtual Tr2EffectRes* GetEffectRes() const;
 	const char* GetName() const;
 
-	// sets & adds
+	// sets & adds & clears
 	void SetEffectPathName( const char* path );
 	bool AddResourceTexture2D( const BlueSharedString& name, const char* resPath );
 	bool AddResourceTexture2DLod( const BlueSharedString& name, Tr2LodResourcePtr lodResource );
@@ -76,6 +76,8 @@ public:
 	bool AddParameterVector4( const BlueSharedString& name, const Vector4* value );
 	bool AddParameterFloat( const BlueSharedString& name, float value );
 	bool AddParameterColor( const BlueSharedString& name, const Color* value );
+	void ClearAllParameters();
+	void ClearAllResourceTexture2D( const BlueSharedString* excludeName = nullptr );
 
 	void SetOption( const BlueSharedString& name, const BlueSharedString& value );
 	void ResetOption( const BlueSharedString& name );
