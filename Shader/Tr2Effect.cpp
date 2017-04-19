@@ -342,6 +342,13 @@ bool Tr2Effect::AddResourceTexture2DLod( const BlueSharedString& name, Tr2LodRes
 }
 
 // --------------------------------------------------------------------------------
+bool Tr2Effect::AddResource( ITriEffectParameter* param )
+{
+	m_resources.Append( param );
+	return true;
+}
+
+// --------------------------------------------------------------------------------
 // Description:
 //   Manually adding a sampler override to change texture lookups
 // --------------------------------------------------------------------------------
@@ -435,20 +442,9 @@ void Tr2Effect::ClearAllParameters()
 }
 
 // --------------------------------------------------------------------------------
-void Tr2Effect::ClearAllResourceTexture2D( const BlueSharedString* excludeName )
+void Tr2Effect::ClearAllResources()
 {
-	// keeper?
-	ITriEffectParameterPtr keeper;
-	if( excludeName )
-	{
-		keeper = GetResourceByName( excludeName->c_str() );
-	}
-	// clear and put back
 	m_resources.Clear();
-	if( keeper )
-	{
-		m_resources.Append( keeper );
-	}
 }
 
 // --------------------------------------------------------------------------------

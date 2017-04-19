@@ -77,6 +77,7 @@ private:
 	// helper functions
 	size_t FillMeshAreaVector( std::map<std::string, Tr2LodResourcePtr>& lodResCollector, Tr2MeshAreaVector* meshAreaVector, TriBatchType areaType, const EveSOFDNAPtr dna, size_t hullIdx, size_t meshIndexOffset ) const;
 	bool GenerateLodResourcePaths( std::string& mediumResPath, std::string& lowResPath, std::string& ultraResPath, const char* resPath, const char* usage ) const;
+	void GenerateDepthFromDecalArea( Tr2MeshLodPtr mesh, const EveSOFDNAPtr dna ) const;
 
 	// all the source data
 	PEveSOFDataMgr m_dataMgr;
@@ -84,6 +85,7 @@ private:
 	// shared
 	Tr2EffectPtr m_spriteSetEffect;
 	Tr2EffectPtr m_shadowEffect, m_shadowEffectSkinned;
+	BlueSharedString m_depthOnlyEffectName;
 };
 
 TYPEDEF_BLUECLASS( EveSOF );

@@ -437,6 +437,8 @@ public:
 	{
 		// complete list of parameters
 		std::vector<BlueSharedString> parameters;
+		// one transparency map (if shader has it)
+		BlueSharedString transparencyTextureName;
 		// global textures for this shader
 		std::map<BlueSharedString, TextureData> defaultTextures;
 		// global parameters for this shader

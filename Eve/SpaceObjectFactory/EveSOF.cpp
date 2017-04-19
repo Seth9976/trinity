@@ -53,6 +53,9 @@
 EveSOF::EveSOF( IRoot* lockobj ) :
 	PARENTLOCK( m_dataMgr )
 {
+	// hard-coded depth only shader name
+	m_depthOnlyEffectName = BlueSharedString( "depthonlyv5.fx" );
+
 	// pre-register some really needed vars in the global variable store
 	Tr2Variable var1( "DepthMap", (ITr2TextureProvider*)nullptr );
 	Tr2Variable var2( "DepthMapMsaa", (ITr2TextureProvider*)nullptr );
@@ -328,6 +331,9 @@ void EveSOF::SetupMesh( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
 		meshIndexOffset += cntr;
 	}
 
+	// decal areas need an accompanying depth area
+	GenerateDepthFromDecalArea( mesh, dna );
+
 	// register all used lodresource objects with the new mesh
 	for( auto it = lodResPerTexture.begin(); it != lodResPerTexture.end(); ++it )
 	{
@@ -339,6 +345,37 @@ void EveSOF::SetupMesh( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
 
 	// assign mesh to ship
 	obj->SetMeshLod( mesh );
+}
+
+// --------------------------------------------------------------------------------
+void EveSOF::GenerateDepthFromDecalArea( Tr2MeshLodPtr mesh, const EveSOFDNAPtr dna ) const
+{
+	Tr2MeshAreaVector* depthAreas = mesh->GetAreas( TRIBATCHTYPE_DEPTH );
+	Tr2MeshAreaVector* decalAreas = mesh->GetAreas( TRIBATCHTYPE_DECAL );
+	for( auto da = decalAreas->begin(); da != decalAreas->end(); ++da )
+	{
+		Tr2MeshAreaPtr ma;
+		BeClasses->CopyTo( *da, (IRoot**)&ma );
+
+		Tr2Effect* destShader = dynamic_cast<Tr2Effect*>( ma->GetMaterialInterface() );
+		Tr2Effect* srcShader = dynamic_cast<Tr2Effect*>( ( *da )->GetMaterialInterface() );
+		if( destShader && srcShader )
+		{
+			const EveSOFDataMgr::GenericShaderData* depthOnlyShaderData = dna->GetGenericAreaShaderData( m_depthOnlyEffectName );
+			if( depthOnlyShaderData )
+			{
+				destShader->SetEffectPathName( dna->GetCompleteShaderPath( m_depthOnlyEffectName.c_str() ).c_str() );
+				destShader->SetOption( BlueSharedString( "OPT_APLHA_CLIP" ), BlueSharedString( "ALPHA_CLIP_ENABLED" ) );
+				destShader->ClearAllParameters();
+				destShader->ClearAllResources();
+
+				ITriEffectParameter* p = srcShader->GetResourceByName( depthOnlyShaderData->transparencyTextureName.c_str() );
+				destShader->AddResource( p );
+			}
+		}
+
+		depthAreas->Append( ma );
+	}
 }
 
 // --------------------------------------------------------------------------------

@@ -1315,6 +1315,8 @@ void EveSOFDataMgr::GenerateGenericData( GenericData& gd, EveSOFDataGenericPtr s
 			gsd.parameters.push_back( BlueSharedString( paramData->m_str ) );
 		}
 
+		gsd.transparencyTextureName = shaderData->m_transparencyTextureName;
+
 		gd.areaShaderData[ shaderData->m_shader ] = gsd;
 	}
 
