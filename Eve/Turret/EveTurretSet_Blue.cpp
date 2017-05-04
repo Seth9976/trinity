@@ -62,6 +62,7 @@ const Be::ClassInfo* EveTurretSet::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "boundingSphere", m_boundingSphere, "Bounding sphere for visibility detection", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "bottomClipHeight", m_bottomClipHeight, "Everything gets cut-off below this height (y-coord)", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "useDynamicBounds", m_useDynamicBounds, "Use dynamic bounds for culling, lod and shadows", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 
 		MAP_ATTRIBUTE( "locatorName", m_locatorName, "locator name for all turrets of this pair (A, B, C is auto-attached!)", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "slotNumber", m_slotNumber, "the slot number of the turret", Be::READWRITE )

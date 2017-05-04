@@ -11,6 +11,7 @@
 #include "ITr2GeometryProvider.h"
 #include "include/ITriTargetable.h"
 #include "Tr2ShLightingManager.h"
+#include "Tr2GrannyAnimation.h"
 
 // needed for override
 #include "Tr2PerObjectData.h"
@@ -307,6 +308,12 @@ private:
 		granny_world_pose*		grnWorldPose;
 	};
 	std::vector<SingleTurretData> m_singleTurrets;
+	std::vector<GrannyBoneBindingBounds> m_boneBounds;
+	bool m_useDynamicBounds;
+	
+	void InitializeDynamicBounds( granny_file_info* fi, granny_skeleton* skeleton );
+	bool GetDynamicBounds( const SingleTurretData& turret, Vector4* boundingSphere, Vector3* aabbMin, Vector3* aabbMax ) const;
+	void RenderDynamicBounds();
 
 	// bounding sphere
 	Vector4 m_boundingSphere;

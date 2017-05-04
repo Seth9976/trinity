@@ -8,6 +8,7 @@
 
 #include "Shader/Tr2Effect.h"
 #include "Resources/TriGeometryRes.h"
+#include "Utilities/BoundingBox.h"
 #include "Utilities/BoundingSphere.h"
 #include "TriFrustumOrtho.h"
 #include "TriRenderBatch.h"
@@ -68,6 +69,7 @@ EveTurretSet::EveTurretSet( IRoot* lockobj ) :
 	m_displayEffects( true ),
 	m_isOnline( true ),
 	m_updatePitchPose( false ),
+	m_useDynamicBounds( false ),
 	m_visibleCount( 0 ),
 	m_estimatedPixelDiameter( -1.f ),
 	m_lodLevel( LOD_INVALID ),
@@ -184,6 +186,10 @@ bool EveTurretSet::OnModified( Be::Var* value )
 	else if( IsMatch( value, m_laserMissBehaviour ) || IsMatch( value, m_projectileMissBehaviour ) || IsMatch( value, m_impactSize ) )
 	{
 		m_target->SetBehaviour( m_laserMissBehaviour, m_projectileMissBehaviour, m_impactSize );
+	}
+	else if( IsMatch( value, m_useDynamicBounds ) )
+	{
+		InitializeDynamicBounds( nullptr, nullptr );
 	}
 	return true;
 }
@@ -353,6 +359,204 @@ void EveTurretSet::Cleanup()
 		// zero/invalidate other data
 		it->grnSkeleton = NULL;
 	}
+	m_boneBounds.clear();
+}
+
+// --------------------------------------------------------------------------------
+void EveTurretSet::InitializeDynamicBounds( granny_file_info* fi, granny_skeleton* skeleton )
+{
+	m_boneBounds.clear();
+	if( !m_useDynamicBounds )
+	{
+		return;
+	}
+
+	if( !fi )
+	{
+		if( !m_geometryResource )
+		{
+			return;
+		}
+		fi = m_geometryResource->GetGrannyInfo();
+		if( !fi )
+		{
+			return;
+		}
+	}
+
+	if( !skeleton ) 
+	{
+		if( m_singleTurrets.size() == 0 || !m_singleTurrets[0].grnModelInstance )
+		{
+			return;
+		}
+		skeleton = m_singleTurrets[0].grnSkeleton;
+	}
+	if( fi->ModelCount )
+	{
+		for( int32_t j = 0; j < fi->Models[0]->MeshBindingCount ; ++j )
+		{
+			granny_model* model = fi->Models[0];
+			granny_model_mesh_binding& meshBinding = model->MeshBindings[j];
+			granny_bone_binding* bb = meshBinding.Mesh->BoneBindings;
+			for( int boneIdx = 0; boneIdx < meshBinding.Mesh->BoneBindingCount; boneIdx++ )
+			{
+				GrannyBoneBindingBounds bounds;
+				GrannyFindBoneByName( skeleton, bb[boneIdx].BoneName, &bounds.m_boneIndex );
+
+				Vector3 minBounds( bb[boneIdx].OBBMin );
+				Vector3 maxBounds( bb[boneIdx].OBBMax );
+				bounds.m_corners[0] = minBounds;
+				bounds.m_corners[1] = maxBounds;
+				bounds.m_corners[2] = Vector3( minBounds.x, minBounds.y, maxBounds.z );
+				bounds.m_corners[3] = Vector3( minBounds.x, maxBounds.y, minBounds.z );
+				bounds.m_corners[4] = Vector3( minBounds.x, maxBounds.y, maxBounds.z );
+				bounds.m_corners[5] = Vector3( maxBounds.x, minBounds.y, minBounds.z );
+				bounds.m_corners[6] = Vector3( maxBounds.x, minBounds.y, maxBounds.z );
+				bounds.m_corners[7] = Vector3( maxBounds.x, maxBounds.y, minBounds.z );
+				m_boneBounds.push_back( bounds );
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------------
+bool EveTurretSet::GetDynamicBounds( const SingleTurretData& turret, Vector4* boundingSphere, Vector3* aabbMin, Vector3* aabbMax ) const
+{
+	Vector3 transformed[8];
+	if( m_boneBounds.empty() || !m_geometryResource )
+	{
+		return false;
+	}
+
+	if( !turret.grnModelInstance )
+	{
+		return false;
+	}
+
+	if( boundingSphere )
+	{
+		BoundingSphereInitialize( *boundingSphere );
+	}
+	if( aabbMin && aabbMax )
+	{
+		BoundingBoxInitialize( *aabbMin, *aabbMax );
+	}
+
+	for( size_t i = 0; i < m_boneBounds.size(); ++i )
+	{
+		const Matrix* mat = reinterpret_cast<const Matrix*>( GrannyGetWorldPose4x4( turret.grnWorldPose, m_boneBounds[i].m_boneIndex ) );
+
+		for( size_t point = 0; point < 8; point++ )
+		{
+			D3DXVec3TransformCoord( &transformed[point], &m_boneBounds[i].m_corners[point], mat );
+			if( aabbMin && aabbMax )
+			{
+				BoundingBoxUpdate( *aabbMin, *aabbMax, transformed[point] );
+			}
+			if( boundingSphere )
+			{
+				BoundingSphereUpdate( transformed[point], *boundingSphere );
+			}
+		}
+	}
+	
+	const granny_file_info* fi = m_geometryResource->GetGrannyInfo();
+	if( fi && fi->ModelCount )
+	{
+		if( aabbMin && aabbMax )
+		{
+			*aabbMin += Vector3( fi->Models[ 0 ]->InitialPlacement.Position );
+			*aabbMax += Vector3( fi->Models[ 0 ]->InitialPlacement.Position );
+		}
+		if( boundingSphere )
+		{
+		
+			(*boundingSphere).x += fi->Models[ 0 ]->InitialPlacement.Position[0];
+			(*boundingSphere).y += fi->Models[ 0 ]->InitialPlacement.Position[1];
+			(*boundingSphere).z += fi->Models[ 0 ]->InitialPlacement.Position[2];
+		}
+	}
+	return true;
+}
+
+
+// --------------------------------------------------------------------------------
+void EveTurretSet::RenderDynamicBounds()
+{
+	Vector3 transformed[8];
+	if( m_boneBounds.empty() || !m_geometryResource )
+	{
+		return;
+	}
+
+	const granny_file_info* fi = m_geometryResource->GetGrannyInfo();
+
+	for( auto it = m_singleTurrets.begin(); it != m_singleTurrets.end(); it++ )
+	{
+		Vector4 boundingSphere;
+		Vector3 aabbMin, aabbMax;
+		BoundingBoxInitialize( aabbMin, aabbMax );
+		bool initialized = false;
+
+		Vector3 initialPlacement( 0, 0, 0 );
+		Matrix initialTranslation;
+		
+		if( !it->grnModelInstance )
+		{
+			return;
+		}
+
+		Matrix modelTransform = it->worldMatrix;
+
+		if( fi )
+		{
+			initialPlacement = Vector3( fi->Models[ 0 ]->InitialPlacement.Position );
+		}
+		D3DXMatrixTranslation( &initialTranslation, initialPlacement.x, initialPlacement.y, initialPlacement.z );
+
+		for( unsigned i = 0; i < m_boneBounds.size(); ++i )
+		{
+		
+			Matrix mat = *reinterpret_cast<const Matrix*>( GrannyGetWorldPose4x4( it->grnWorldPose, m_boneBounds[i].m_boneIndex ) ) * modelTransform * initialTranslation;
+
+			for( unsigned point = 0; point < 8; point++ )
+			{
+				D3DXVec3TransformCoord( &transformed[point], &m_boneBounds[i].m_corners[point], &mat );
+				BoundingBoxUpdate( aabbMin, aabbMax, transformed[point] );
+				if( !initialized )
+				{
+					boundingSphere.x = transformed[point].x;
+					boundingSphere.y = transformed[point].y;
+					boundingSphere.z = transformed[point].z;
+					boundingSphere.w = 0;
+					initialized = true;
+				}
+				else
+				{
+					BoundingSphereUpdate( transformed[point], boundingSphere );
+				}
+			}
+
+			Tr2Renderer::DrawLine( transformed[0], 0xff0000ff, transformed[2], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[0], 0xff0000ff, transformed[5], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[5], 0xff0000ff, transformed[6], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[2], 0xff0000ff, transformed[6], 0xff0000ff );
+						
+			Tr2Renderer::DrawLine( transformed[1], 0xff0000ff, transformed[7], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[1], 0xff0000ff, transformed[4], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[3], 0xff0000ff, transformed[4], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[3], 0xff0000ff, transformed[7], 0xff0000ff );
+
+			Tr2Renderer::DrawLine( transformed[1], 0xff0000ff, transformed[6], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[0], 0xff0000ff, transformed[3], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[7], 0xff0000ff, transformed[5], 0xff0000ff );
+			Tr2Renderer::DrawLine( transformed[4], 0xff0000ff, transformed[2], 0xff0000ff );
+		}
+
+		Tr2Renderer::DrawSphere( boundingSphere, 8, 0xffff0000 );
+		Tr2Renderer::DrawBox( aabbMin, aabbMax, 0xffff0000 );
+	}
 }
 
 // --------------------------------------------------------------------------------
@@ -466,6 +670,11 @@ void EveTurretSet::RebuildCachedData( BlueAsyncRes* p )
 								);
 
 								m_singleTurrets.resize( m_possibleTurretDisplayAmount );
+							}
+
+							if( m_singleTurrets.size() > 0 )
+							{
+								InitializeDynamicBounds( grannyFileInfo, m_singleTurrets[0].grnSkeleton );
 							}
 						}
 					}
@@ -1137,6 +1346,7 @@ void EveTurretSet::RenderDebugInfo( Tr2DebugRenderer& renderer )
 			renderer.DrawSphere( this, center, m_boundingSphere.w, 10, Tr2DebugRenderer::Wireframe, 0xffffff00 );
 		}
 	}
+	RenderDynamicBounds();
 }
 
 // --------------------------------------------------------------------------------
@@ -1200,6 +1410,7 @@ void EveTurretSet::UpdateVisibility( const TriFrustum& frustum )
 	{
 		// transform bounding sphere into world space to check against frustum
 		Vector4 transformedBoundingSphere = m_boundingSphere;
+		GetDynamicBounds( *it, &transformedBoundingSphere, nullptr, nullptr );
 		BoundingSphereTransform( it->worldMatrix, transformedBoundingSphere );
 		it->visible = frustum.IsSphereVisible( &transformedBoundingSphere );
 		// count visible turrets of this set, mainly for debug purposes
