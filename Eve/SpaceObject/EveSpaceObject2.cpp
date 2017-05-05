@@ -454,11 +454,10 @@ void EveSpaceObject2::RenderDebugInfo( Tr2DebugRenderer& renderer )
 	{
 		Vector3 minBounds( -0.5f, -0.5f, -0.5f );
 		Vector3 maxBounds( 0.5f, 0.5f, 0.5f );
-		uint32_t color = 0xff0000ff;
 
 		if( GetLocalBoundingBox( minBounds, maxBounds ) )
 		{
-			renderer.DrawBox( this, m_worldTransform, minBounds, maxBounds, Tr2DebugRenderer::Wireframe, color );
+			renderer.DrawBox( this, m_worldTransform, minBounds, maxBounds, Tr2DebugRenderer::Wireframe, 0xff0000ff );
 		}
 	}
 
