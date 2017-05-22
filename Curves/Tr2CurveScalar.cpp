@@ -73,7 +73,8 @@ Tr2CurveScalar::Tr2CurveScalar( IRoot* lockobj )
 	m_timeScale( 1.f ),
 	m_currentValue( 0.f ),
 	m_lastSegment( 0 ),
-	m_extrapolation( Tr2CurveExtrapolation::CLAMP )
+	m_extrapolationBefore( Tr2CurveExtrapolation::CLAMP ),
+	m_extrapolationAfter( Tr2CurveExtrapolation::CLAMP )
 {
 	m_keys.SetStructureDefinition( Tr2CurveScalarKeyDef );
 	m_keys.SetDefaultValue( &s_defaultKey );
@@ -125,14 +126,15 @@ float Tr2CurveScalar::GetValue( double time ) const
 
 	auto count = m_keys.size();
 
-	if( m_extrapolation == Tr2CurveExtrapolation::LINEAR )
+	if( m_extrapolationBefore == Tr2CurveExtrapolation::LINEAR || m_extrapolationAfter == Tr2CurveExtrapolation::LINEAR )
 	{
 		float t = float( time );
-		if( t < m_keys[0].m_time )
+
+		if( m_extrapolationBefore == Tr2CurveExtrapolation::LINEAR && t < m_keys[0].m_time )
 		{
 			return m_keys[0].m_value - ( m_keys[0].m_time - t ) * m_keys[0].m_leftTangent;
 		}
-		else if( t > m_keys[count - 1].m_time )
+		else if( m_extrapolationAfter == Tr2CurveExtrapolation::LINEAR && t > m_keys[count - 1].m_time )
 		{
 			return m_keys[count - 1].m_value + ( t - m_keys[count - 1].m_time ) * m_keys[count - 1].m_rightTangent;
 		}
@@ -289,14 +291,14 @@ float Tr2CurveScalar::GetLocalTime( double time ) const
 	double length = last - first;
 	if( time < first )
 	{
-		if( m_extrapolation == Tr2CurveExtrapolation::CLAMP )
+		if( m_extrapolationBefore == Tr2CurveExtrapolation::CLAMP )
 		{
 			return float( first );
 		}
 		double intPart;
 		double fracPart = modf( -( time - first ) / length, &intPart );
 
-		if( m_extrapolation == Tr2CurveExtrapolation::CYCLE )
+		if( m_extrapolationBefore == Tr2CurveExtrapolation::CYCLE )
 		{
 			fracPart = 1.0 - fracPart;
 		}
@@ -314,7 +316,7 @@ float Tr2CurveScalar::GetLocalTime( double time ) const
 		return float( time );
 	}
 
-	if( m_extrapolation == Tr2CurveExtrapolation::CLAMP )
+	if( m_extrapolationAfter == Tr2CurveExtrapolation::CLAMP )
 	{
 		return float( last );
 	}
@@ -322,7 +324,7 @@ float Tr2CurveScalar::GetLocalTime( double time ) const
 	double intPart;
 	double fracPart = modf( ( time - first ) / length, &intPart );
 
-	if( m_extrapolation == Tr2CurveExtrapolation::MIRROR )
+	if( m_extrapolationAfter == Tr2CurveExtrapolation::MIRROR )
 	{
 		if( int64_t( intPart ) % 2 != 0 )
 		{
@@ -338,7 +340,7 @@ float Tr2CurveScalar::GetSegmentValue( float time, const Tr2CurveScalarKey& k0, 
 	switch( k0.m_interpolation )
 	{
 	case Tr2CurveInterpolation::CONSTANT:
-		return k0.m_value;
+		return time == k1.m_time ? k1.m_value : k0.m_value;
 	case Tr2CurveInterpolation::LINEAR:
 		return k0.m_value + ( k1.m_value - k0.m_value ) * ( time - k0.m_time ) / ( k1.m_time - k0.m_time );
 	case Tr2CurveInterpolation::HERMITE:

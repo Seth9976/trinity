@@ -116,10 +116,16 @@ const Be::ClassInfo* Tr2CurveScalar::ExposeToBlue()
 			"Curve value after the last update", 
 			Be::READ )
 		MAP_ATTRIBUTE_WITH_CHOOSER( 
-			"extrapolation", 
-			m_extrapolation, 
-			"Curve extrapolation type", 
+			"extrapolationBefore", 
+			m_extrapolationBefore, 
+			"Curve extrapolation type for time before the start of the curve", 
 			Be::ENUM | Be::READWRITE | Be::PERSIST, 
+			Tr2CurveExtrapolationChooser )
+		MAP_ATTRIBUTE_WITH_CHOOSER(
+			"extrapolationAfter",
+			m_extrapolationAfter,
+			"Curve extrapolation type for time after the end of the curve",
+			Be::ENUM | Be::READWRITE | Be::PERSIST,
 			Tr2CurveExtrapolationChooser )
 
 		MAP_ATTRIBUTE( 

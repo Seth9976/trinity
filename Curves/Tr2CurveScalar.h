@@ -105,7 +105,8 @@ private:
 	float m_timeScale;
 	float m_currentValue;
 	mutable size_t m_lastSegment;
-	Tr2CurveExtrapolation::Type m_extrapolation;
+	Tr2CurveExtrapolation::Type m_extrapolationBefore;
+	Tr2CurveExtrapolation::Type m_extrapolationAfter;
 };
 
 TYPEDEF_BLUECLASS( Tr2CurveScalar );
