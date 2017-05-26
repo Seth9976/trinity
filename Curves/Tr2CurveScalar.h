@@ -99,6 +99,8 @@ public:
 	float GetTimeScale() const;
 	void SetTimeScale( float timeScale );
 
+	bool IsEmpty() const;
+
 	void OnKeysChanged();
 private:
 	float GetLocalTime( double time ) const;

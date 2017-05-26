@@ -388,3 +388,9 @@ void Tr2CurveScalar::SetTimeScale( float timeScale )
 {
 	m_timeScale = timeScale;
 }
+
+// --------------------------------------------------------------------------------
+bool Tr2CurveScalar::IsEmpty() const
+{
+	return m_keys.empty();
+}
