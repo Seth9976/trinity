@@ -2819,6 +2819,7 @@
     <ClInclude Include="Curves\Tr2BoneMatrixCurve.h"/>
     <ClInclude Include="Curves\Tr2ColorCurve.h"/>
     <ClInclude Include="Curves\Tr2CurveColor.h"/>
+    <ClInclude Include="Curves\Tr2CurveConstant.h"/>
     <ClInclude Include="Curves\Tr2CurveEulerRotation.h"/>
     <ClInclude Include="Curves\Tr2CurveEulerRotationExpression.h"/>
     <ClInclude Include="Curves\Tr2CurveRandomAxisRotation.h"/>
@@ -3383,6 +3384,8 @@
     <ClCompile Include="Curves\Tr2ColorCurve_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2CurveColor.cpp"/>
     <ClCompile Include="Curves\Tr2CurveColor_Blue.cpp"/>
+    <ClCompile Include="Curves\Tr2CurveConstant.cpp"/>
+    <ClCompile Include="Curves\Tr2CurveConstant_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2CurveEulerRotation.cpp"/>
     <ClCompile Include="Curves\Tr2CurveEulerRotationExpression.cpp"/>
     <ClCompile Include="Curves\Tr2CurveEulerRotationExpression_Blue.cpp"/>
