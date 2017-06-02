@@ -30,7 +30,8 @@
 "TriRotationCurve is a keframed mathimatical function of time. Where each \r\n\
 key defines the interpolation to the next key. TriRotationCurve also \r\n\
 defines the extrapolation to happen when time is greater than \r\n\
-mStart + mLength or less than mStart"
+mStart + mLength or less than mStart\n\
+:jessica-deprecated:"
 
 #include "include/ITriRotationCurve.h"
 #include "include/ITriDuration.h"

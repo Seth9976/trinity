@@ -38,7 +38,7 @@ const Be::ClassInfo* Tr2Vector3Key::ExposeToBlue()
 
 const Be::ClassInfo* Tr2Vector3Curve::ExposeToBlue()
 {
-	EXPOSURE_BEGIN( Tr2Vector3Curve, ":jessica-icon: tree/trivectorcurve.png" )
+	EXPOSURE_BEGIN( Tr2Vector3Curve, ":jessica-icon: tree/trivectorcurve.png\n:jessica-deprecated:" )
 		MAP_INTERFACE( Tr2Vector3Curve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( IInitialize )

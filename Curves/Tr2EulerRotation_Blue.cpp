@@ -11,7 +11,7 @@ BLUE_DEFINE( Tr2EulerRotation );
 // --------------------------------------------------------------------------------------
 const Be::ClassInfo* Tr2EulerRotation::ExposeToBlue()
 {
-    EXPOSURE_BEGIN( Tr2EulerRotation, ":jessica-icon: tree/trirotationcurve.png" )
+    EXPOSURE_BEGIN( Tr2EulerRotation, ":jessica-icon: tree/trirotationcurve.png\n:jessica-deprecated:" )
         MAP_INTERFACE( Tr2EulerRotation )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( ITriCurveLength )

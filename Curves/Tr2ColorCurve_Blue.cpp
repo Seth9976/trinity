@@ -45,7 +45,7 @@ const Be::ClassInfo* Tr2ColorKey::ExposeToBlue()
 // --------------------------------------------------------------------------------------
 const Be::ClassInfo* Tr2ColorCurve::ExposeToBlue()
 {
-	EXPOSURE_BEGIN( Tr2ColorCurve, ":jessica-icon: tree/tricolor.png" )
+	EXPOSURE_BEGIN( Tr2ColorCurve, ":jessica-icon: tree/tricolor.png\n:jessica-deprecated:" )
 		MAP_INTERFACE( Tr2ColorCurve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( IInitialize )

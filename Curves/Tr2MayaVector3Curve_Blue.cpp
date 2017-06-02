@@ -7,7 +7,7 @@ BLUE_DEFINE( Tr2MayaVector3Curve );
 
 const Be::ClassInfo* Tr2MayaVector3Curve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN( Tr2MayaVector3Curve, ":jessica-icon: tree/trivectorcurve.png" )
+    EXPOSURE_BEGIN( Tr2MayaVector3Curve, ":jessica-icon: tree/trivectorcurve.png\n:jessica-deprecated:" )
         MAP_INTERFACE( Tr2MayaVector3Curve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( IInitialize )

@@ -42,7 +42,7 @@ const Be::ClassInfo* Tr2ScalarExprKey::ExposeToBlue()
 
 const Be::ClassInfo* Tr2ScalarExprKeyCurve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN( Tr2ScalarExprKeyCurve, "" )
+    EXPOSURE_BEGIN( Tr2ScalarExprKeyCurve, ":jessica-deprecated:" )
 		MAP_INTERFACE( ITriFunction )
         MAP_INTERFACE( IInitialize )
 		MAP_INTERFACE( ITriCurveLength )

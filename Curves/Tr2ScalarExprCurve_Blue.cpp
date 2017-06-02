@@ -5,7 +5,7 @@ BLUE_DEFINE( Tr2ScalarExprCurve );
 
 const Be::ClassInfo* Tr2ScalarExprCurve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN( Tr2ScalarExprCurve, "" )
+    EXPOSURE_BEGIN( Tr2ScalarExprCurve, ":jessica-deprecated:" )
         MAP_INTERFACE( Tr2ScalarExprCurve )
 		MAP_INTERFACE( ITriCurveLength )
 		MAP_INTERFACE( ITriFunction )

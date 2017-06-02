@@ -31,7 +31,8 @@
 key defines the interpolation to the next key. TriColorCurve also \r\n\
 defines the extrapolation to happen when time is greater than \r\n\
 mStart + mLength or less than mStart\n\
-:jessica - icon : tree/tricolor.png"
+:jessica - icon : tree/tricolor.png\n\
+:jessica-deprecated:"
 
 #include "include/ITriColorCurve.h"
 #include "include/ITriDuration.h"

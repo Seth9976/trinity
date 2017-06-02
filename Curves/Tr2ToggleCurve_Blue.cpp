@@ -28,7 +28,7 @@ const Be::ClassInfo* Tr2ToggleKey::ExposeToBlue()
 // --------------------------------------------------------------------------------------
 const Be::ClassInfo* Tr2ToggleCurve::ExposeToBlue()
 {
-	EXPOSURE_BEGIN( Tr2ToggleCurve, "" )
+	EXPOSURE_BEGIN( Tr2ToggleCurve, ":jessica-deprecated:" )
 		MAP_INTERFACE( Tr2ToggleCurve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( IInitialize )

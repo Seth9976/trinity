@@ -18,7 +18,7 @@ const Be::ClassInfo* TriTorque::ExposeToBlue()
 
 const Be::ClassInfo* TriRigidOrientation::ExposeToBlue()
 {
-	EXPOSURE_BEGIN(TriRigidOrientation, "no comment")
+	EXPOSURE_BEGIN(TriRigidOrientation, "no comment\n:jessica-deprecated:")
 		MAP_INTERFACE(ITriFunction)
 		MAP_INTERFACE(ITriQuaternionFunction)
 

@@ -67,7 +67,7 @@ const Be::ClassInfo* Tr2ScalarKey::ExposeToBlue()
 // --------------------------------------------------------------------------------------
 const Be::ClassInfo* Tr2ScalarCurve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN( Tr2ScalarCurve, ":jessica-icon: tree/triscalarcurve.png" )
+    EXPOSURE_BEGIN( Tr2ScalarCurve, ":jessica-icon: tree/triscalarcurve.png\n:jessica-deprecated:" )
         MAP_INTERFACE( Tr2ScalarCurve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( ITriScalarFunction )

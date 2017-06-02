@@ -15,7 +15,7 @@ BLUE_DEFINE( TriRandomConstantCurve );
 
 const Be::ClassInfo* TriScalarSequencer::ExposeToBlue()
 {
-	EXPOSURE_BEGIN(TriScalarSequencer, "no comment")
+	EXPOSURE_BEGIN(TriScalarSequencer, "no comment\n:jessica-deprecated:")
 		MAP_INTERFACE(ITriFunction)
 		MAP_INTERFACE(ITriScalarFunction)
 		MAP_INTERFACE(ITriCurveLength)
@@ -121,7 +121,7 @@ const Be::ClassInfo* TriScalarSequencer::ExposeToBlue()
 
 const Be::ClassInfo* TriVectorSequencer::ExposeToBlue()
 {
-	EXPOSURE_BEGIN(TriVectorSequencer, "no comment")
+	EXPOSURE_BEGIN(TriVectorSequencer, "no comment\n:jessica-deprecated:")
 		MAP_INTERFACE(ITriFunction)
 		MAP_INTERFACE(ITriVectorFunction)
 
@@ -180,7 +180,7 @@ const Be::ClassInfo* TriVectorSequencer::ExposeToBlue()
 
 const Be::ClassInfo* TriQuaternionSequencer::ExposeToBlue()
 {
-	EXPOSURE_BEGIN(TriQuaternionSequencer, "no comment")
+	EXPOSURE_BEGIN(TriQuaternionSequencer, "no comment\n:jessica-deprecated:")
 		MAP_INTERFACE(ITriFunction)
 		MAP_INTERFACE(ITriQuaternionFunction)
         MAP_INTERFACE(ITriCurveLength)
@@ -230,7 +230,7 @@ const Be::ClassInfo* TriQuaternionSequencer::ExposeToBlue()
 
 const Be::ClassInfo* TriColorSequencer::ExposeToBlue()
 {
-    EXPOSURE_BEGIN(TriColorSequencer, "Add or Multiply Color Curves")
+    EXPOSURE_BEGIN(TriColorSequencer, "Add or Multiply Color Curves\n:jessica-deprecated:")
         MAP_INTERFACE(ITriFunction)
         MAP_INTERFACE(ITriColorFunction)
         MAP_INTERFACE(ITriCurveLength)
@@ -290,7 +290,7 @@ const Be::ClassInfo* TriColorSequencer::ExposeToBlue()
 
 const Be::ClassInfo* TriXYZScalarSequencer::ExposeToBlue()
 {
-    EXPOSURE_BEGIN(TriXYZScalarSequencer, "Use the XYZ Scalar Sequencer to create a 3d vector function from three 1d scalar functions.")
+    EXPOSURE_BEGIN(TriXYZScalarSequencer, "Use the XYZ Scalar Sequencer to create a 3d vector function from three 1d scalar functions.\n:jessica-deprecated:")
         MAP_INTERFACE(ITriFunction)
         MAP_INTERFACE(ITriVectorFunction)
         MAP_INTERFACE(ITriCurveLength)
@@ -353,7 +353,7 @@ const Be::ClassInfo* TriXYZScalarSequencer::ExposeToBlue()
 
 const Be::ClassInfo* TriYPRSequencer::ExposeToBlue()
 {
-    EXPOSURE_BEGIN(TriYPRSequencer, "Yaw Pitch Roll Sequencer returns a Quaternion from three scalar curves representing yaw, pitch and roll. Note that this uses degrees, not radians.")
+    EXPOSURE_BEGIN(TriYPRSequencer, "Yaw Pitch Roll Sequencer returns a Quaternion from three scalar curves representing yaw, pitch and roll. Note that this uses degrees, not radians.\n:jessica-deprecated:")
         MAP_INTERFACE(ITriFunction)
         MAP_INTERFACE(ITriQuaternionFunction)
 
@@ -419,7 +419,7 @@ const Be::ClassInfo* TriYPRSequencer::ExposeToBlue()
 
 const Be::ClassInfo* TriRGBAScalarSequencer::ExposeToBlue()
 {
-    EXPOSURE_BEGIN(TriRGBAScalarSequencer, "Use the RGBA Scalar Sequencer to create a RGBA function from four 1d scalar functions.")
+    EXPOSURE_BEGIN(TriRGBAScalarSequencer, "Use the RGBA Scalar Sequencer to create a RGBA function from four 1d scalar functions.\n:jessica-deprecated:")
         MAP_INTERFACE(ITriFunction)
         MAP_INTERFACE(ITriColorFunction)
         MAP_INTERFACE(ITriCurveLength)
@@ -573,7 +573,7 @@ const Be::ClassInfo* TriPerlinCurve::ExposeToBlue()
 
 const Be::ClassInfo* TriSineCurve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN(TriSineCurve, "A scalar function that generates sine waves")
+    EXPOSURE_BEGIN(TriSineCurve, "A scalar function that generates sine waves\n:jessica-deprecated:")
         MAP_INTERFACE(ITriFunction)
         MAP_INTERFACE(ITriScalarFunction)
 
@@ -636,7 +636,7 @@ const Be::ClassInfo* TriSineCurve::ExposeToBlue()
 
 const Be::ClassInfo* TriRandomConstantCurve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN(TriRandomConstantCurve, "A scalar function that sets a random constant upon initialization")
+    EXPOSURE_BEGIN(TriRandomConstantCurve, "A scalar function that sets a random constant upon initialization\n:jessica-deprecated:")
         MAP_INTERFACE(ITriFunction)
         MAP_INTERFACE(ITriScalarFunction)
 

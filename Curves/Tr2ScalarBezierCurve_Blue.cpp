@@ -31,7 +31,7 @@ const Be::ClassInfo* Tr2ScalarBezierKey::ExposeToBlue()
 // --------------------------------------------------------------------------------------
 const Be::ClassInfo* Tr2ScalarBezierCurve::ExposeToBlue()
 {
-	EXPOSURE_BEGIN( Tr2ScalarBezierCurve, ":jessica-icon: tree/triscalarcurve.png" )
+	EXPOSURE_BEGIN( Tr2ScalarBezierCurve, ":jessica-icon: tree/triscalarcurve.png\n:jessica-deprecated:" )
 		MAP_INTERFACE( Tr2ScalarBezierCurve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( IInitialize )

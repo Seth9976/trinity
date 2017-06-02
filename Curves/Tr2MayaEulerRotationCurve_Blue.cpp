@@ -7,7 +7,7 @@ BLUE_DEFINE( Tr2MayaEulerRotationCurve );
 
 const Be::ClassInfo* Tr2MayaEulerRotationCurve::ExposeToBlue()
 {
-    EXPOSURE_BEGIN( Tr2MayaEulerRotationCurve, ":jessica-icon: tree/trirotationcurve.png" )
+    EXPOSURE_BEGIN( Tr2MayaEulerRotationCurve, ":jessica-icon: tree/trirotationcurve.png\n:jessica-deprecated:" )
         MAP_INTERFACE( Tr2MayaEulerRotationCurve )
 		MAP_INTERFACE( ITriFunction )
 		MAP_INTERFACE( IInitialize )
