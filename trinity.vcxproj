@@ -2841,11 +2841,13 @@
     <ClInclude Include="Curves\Tr2MayaVector3Curve.h"/>
     <ClInclude Include="Curves\Tr2QuaternionCurve.h"/>
     <ClInclude Include="Curves\Tr2QuaternionLerpCurve.h"/>
+    <ClInclude Include="Curves\Tr2RotationAdapter.h"/>
     <ClInclude Include="Curves\Tr2ScalarBezierCurve.h"/>
     <ClInclude Include="Curves\Tr2ScalarCurve.h"/>
     <ClInclude Include="Curves\Tr2ScalarExprCurve.h"/>
     <ClInclude Include="Curves\Tr2ScalarExprKeyCurve.h"/>
     <ClInclude Include="Curves\Tr2ToggleCurve.h"/>
+    <ClInclude Include="Curves\Tr2TranslationAdapter.h"/>
     <ClInclude Include="Curves\Tr2Vector2Curve.h"/>
     <ClInclude Include="Curves\Tr2Vector3Curve.h"/>
     <ClInclude Include="Curves\TriColorCurve.h"/>
@@ -3428,6 +3430,8 @@
     <ClCompile Include="Curves\Tr2QuaternionCurve_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2QuaternionLerpCurve.cpp"/>
     <ClCompile Include="Curves\Tr2QuaternionLerpCurve_Blue.cpp"/>
+    <ClCompile Include="Curves\Tr2RotationAdapter.cpp"/>
+    <ClCompile Include="Curves\Tr2RotationAdapter_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2ScalarBezierCurve.cpp"/>
     <ClCompile Include="Curves\Tr2ScalarBezierCurve_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2ScalarCurve.cpp"/>
@@ -3438,6 +3442,8 @@
     <ClCompile Include="Curves\Tr2ScalarExprKeyCurve_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2ToggleCurve.cpp"/>
     <ClCompile Include="Curves\Tr2ToggleCurve_Blue.cpp"/>
+    <ClCompile Include="Curves\Tr2TranslationAdapter.cpp"/>
+    <ClCompile Include="Curves\Tr2TranslationAdapter_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2Vector2Curve.cpp"/>
     <ClCompile Include="Curves\Tr2Vector2Curve_Blue.cpp"/>
     <ClCompile Include="Curves\Tr2Vector3Curve.cpp"/>

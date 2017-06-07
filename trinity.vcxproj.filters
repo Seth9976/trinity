@@ -564,6 +564,9 @@
     <ClInclude Include="Curves\Tr2QuaternionLerpCurve.h">
       <Filter>Source Files\Curves</Filter>
     </ClInclude>
+    <ClInclude Include="Curves\Tr2RotationAdapter.h">
+      <Filter>Source Files\Curves</Filter>
+    </ClInclude>
     <ClInclude Include="Curves\Tr2ScalarBezierCurve.h">
       <Filter>Source Files\Curves</Filter>
     </ClInclude>
@@ -577,6 +580,9 @@
       <Filter>Source Files\Curves</Filter>
     </ClInclude>
     <ClInclude Include="Curves\Tr2ToggleCurve.h">
+      <Filter>Source Files\Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\Tr2TranslationAdapter.h">
       <Filter>Source Files\Curves</Filter>
     </ClInclude>
     <ClInclude Include="Curves\Tr2Vector2Curve.h">
@@ -2313,6 +2319,12 @@
     <ClCompile Include="Curves\Tr2QuaternionLerpCurve_Blue.cpp">
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
+    <ClCompile Include="Curves\Tr2RotationAdapter.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2RotationAdapter_Blue.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
     <ClCompile Include="Curves\Tr2ScalarBezierCurve.cpp">
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
@@ -2341,6 +2353,12 @@
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
     <ClCompile Include="Curves\Tr2ToggleCurve_Blue.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2TranslationAdapter.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2TranslationAdapter_Blue.cpp">
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
     <ClCompile Include="Curves\Tr2Vector2Curve.cpp">
