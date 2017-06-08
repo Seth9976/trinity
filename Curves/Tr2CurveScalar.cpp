@@ -128,7 +128,7 @@ float Tr2CurveScalar::GetValue( double time ) const
 
 	if( m_extrapolationBefore == Tr2CurveExtrapolation::LINEAR || m_extrapolationAfter == Tr2CurveExtrapolation::LINEAR )
 	{
-		float t = float( time );
+		float t = float( time / (double)m_timeScale - (double)m_timeOffset );
 
 		if( m_extrapolationBefore == Tr2CurveExtrapolation::LINEAR && t < m_keys[0].m_time )
 		{
@@ -145,12 +145,12 @@ float Tr2CurveScalar::GetValue( double time ) const
 		return m_keys[0].m_value;
 	}
 
-	if( m_extrapolationBefore == Tr2CurveExtrapolation::CLAMP && float( time ) <= m_keys[0].m_time )
+	if( m_extrapolationBefore == Tr2CurveExtrapolation::CLAMP && float( time / (double)m_timeScale - (double)m_timeOffset ) <= m_keys[0].m_time )
 	{
 		return m_keys[0].m_value;
 	}
 
-	if( m_extrapolationAfter == Tr2CurveExtrapolation::CLAMP && float( time ) >= m_keys[m_keys.size() - 1].m_time )
+	if( m_extrapolationAfter == Tr2CurveExtrapolation::CLAMP && float( time / (double)m_timeScale - (double)m_timeOffset ) >= m_keys[m_keys.size() - 1].m_time )
 	{
 		return m_keys[m_keys.size() - 1].m_value;
 	}
