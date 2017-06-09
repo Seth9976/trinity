@@ -5,7 +5,7 @@ BLUE_DEFINE( Tr2CurveVector3Expression );
 
 const Be::ClassInfo* Tr2CurveVector3Expression::ExposeToBlue()
 {
-	EXPOSURE_BEGIN( Tr2CurveVector3Expression, ":jessica-icon: tree/trivectorcurve.png" )
+	EXPOSURE_BEGIN( Tr2CurveVector3Expression, ":jessica-icon: tree/CurveExpression.png" )
 		MAP_INTERFACE( Tr2CurveVector3Expression )
 		MAP_INTERFACE( ITriColorFunction )
 		MAP_INTERFACE( ITriVectorFunction )
