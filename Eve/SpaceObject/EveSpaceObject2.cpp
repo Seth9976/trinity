@@ -485,8 +485,11 @@ void EveSpaceObject2::RenderDebugInfo( Tr2DebugRenderer& renderer )
 
 	if( renderer.HasOption( GetRawRoot(), "Shield" ) )
 	{
-		Matrix transform( XMMatrixScalingFromVector( m_shapeEllipsoidRadius ) );
-		transform *= Matrix( XMMatrixTranslationFromVector( m_shapeEllipsoidCenter ) );
+		Vector3 radius;
+		Vector3 center;
+		GetShapeEllipsoid(center, radius);
+		Matrix transform( XMMatrixScalingFromVector( radius ) );
+		transform *= Matrix( XMMatrixTranslationFromVector( center ) );
 		transform *= m_worldTransform;
 		renderer.DrawSphere( Tr2DebugObjectReference( this, 200 ), transform, 20, Tr2DebugRenderer::Wireframe, 0xff4444ff );
 		renderer.DrawSphere( Tr2DebugObjectReference( this, 200 ), transform, 20, Tr2DebugRenderer::Solid, Tr2DebugColor( 0x884444ff, 0x444444ff ) );
