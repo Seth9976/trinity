@@ -46,6 +46,11 @@ public:
 private:
 	struct PerThreadData
 	{
+		PerThreadData()
+			:addedSize( 0 )
+		{
+		}
+
 		// Per-effect, per-thread accumulation buffer
 		CcpMallocBuffer buffer;
 		// Size of data in the buffer
