@@ -4,7 +4,7 @@ Imports:
 - ../ImageIO/uses_ImageIO.yaml
 - ../../../../../../sdk/squish/1.10/squish_1.10.yaml
 - ../CcpMath/uses_CcpMath.yaml
-- ../../../../../../sdk/muparser/v1.30/muparser_v1.30.yaml
+- ../../../../../../sdk/muparser/v2.2.5/muparser.yaml
 - ../../../../../../sdk/freetype/2.4.6/freetype_2.4.6.yaml
 
 # Settings from the General section, for all configurations
