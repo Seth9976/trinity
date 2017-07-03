@@ -187,6 +187,7 @@ protected:
 		Tr2EffectParamVector &pv, 
 		uint32_t resourceFlags );
 	void MapPassParameters(
+		size_t technique,
 		unsigned passIx,
 		Tr2EffectPassParameters& pp,
 		Tr2RenderContextEnum::ShaderType stage,

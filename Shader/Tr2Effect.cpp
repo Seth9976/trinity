@@ -301,11 +301,14 @@ void Tr2Effect::ReleaseResources( TriStorage s )
 	{
 		for( auto it = m_parametersForPasses.begin(); it != m_parametersForPasses.end(); ++it )
 		{
-			for( unsigned i = 0; i != SHADER_TYPE_COUNT; ++i )
+			for( auto jt = it->begin(); jt != it->end(); ++jt )
 			{
-				if( ( *it )->m_stageInput[i].m_constantBuffer )
+				for( unsigned i = 0; i != SHADER_TYPE_COUNT; ++i )
 				{
-					( *it )->m_stageInput[i].m_constantBuffer->Destroy();
+					if( ( *jt )->m_stageInput[i].m_constantBuffer )
+					{
+						( *jt )->m_stageInput[i].m_constantBuffer->Destroy();
+					}
 				}
 			}
 		}
@@ -644,31 +647,34 @@ void Tr2Effect::RebuildSamplerOverrides()
 	}
 
 	auto& desc = m_shader->GetEffectDescription();
-	const unsigned passCount = unsigned( desc.passes.size() );
-	for( unsigned passIx = 0; passIx != passCount; ++passIx )
+	for( size_t technique = 0; technique < desc.techniques.size(); ++technique )
 	{
-		Tr2EffectPassParameters& pp = *m_parametersForPasses[passIx];
-
-		for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+		const unsigned passCount = unsigned( desc.techniques[technique].passes.size() );
+		for( unsigned passIx = 0; passIx != passCount; ++passIx )
 		{
-			auto& stage = desc.passes[passIx].stageInputs[i];
-			if( !stage.m_exists )
-			{
-				continue;
-			}
+			Tr2EffectPassParameters& pp = *m_parametersForPasses[technique][passIx];
 
-			for( auto jt = m_samplerOverrides.begin(); jt != m_samplerOverrides.end(); ++jt )
+			for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 			{
-				for( auto it = stage.samplers.begin(); it != stage.samplers.end(); ++it )
+				auto& stage = desc.techniques[technique].passes[passIx].stageInputs[i];
+				if( !stage.m_exists )
 				{
-					if( it->second.name && strcmp( jt->name.c_str(), it->second.name ) == 0 )
-					{
-						Tr2SamplerOverrideData d;
-						d.handle = Tr2EffectStateManager::RegisterSamplerSetup( CreateSamplerDescription( *jt ) );
-						d.registerIndex = it->first;
+					continue;
+				}
 
-						pp.m_stageInput[i].m_samplers.push_back( d );
-						break;
+				for( auto jt = m_samplerOverrides.begin(); jt != m_samplerOverrides.end(); ++jt )
+				{
+					for( auto it = stage.samplers.begin(); it != stage.samplers.end(); ++it )
+					{
+						if( it->second.name && strcmp( jt->name.c_str(), it->second.name ) == 0 )
+						{
+							Tr2SamplerOverrideData d;
+							d.handle = Tr2EffectStateManager::RegisterSamplerSetup( CreateSamplerDescription( *jt ) );
+							d.registerIndex = it->first;
+
+							pp.m_stageInput[i].m_samplers.push_back( d );
+							break;
+						}
 					}
 				}
 			}
@@ -698,38 +704,40 @@ void Tr2Effect::RebuildCachedDataInternal()
 			m_parametersForPasses.clear();
 
 			auto& desc = m_shader->GetEffectDescription();
-			const unsigned passCount = unsigned( desc.passes.size() );
 
-			if( !passCount )
+			m_parametersForPasses.resize( desc.techniques.size() );
+
+			for( size_t technique = 0; technique < desc.techniques.size(); ++technique )
 			{
-				return;
-			}
 
-			m_parametersForPasses.resize( passCount );
+				const unsigned passCount = unsigned( desc.techniques[technique].passes.size() );
 
-			for( unsigned passIx = 0; passIx != passCount; ++passIx )
-			{
-				m_parametersForPasses[passIx].reset( CCP_NEW( "Tr2EffectPassParameters" ) Tr2EffectPassParameters() );
-				Tr2EffectPassParameters& pp = *m_parametersForPasses[passIx];
+				m_parametersForPasses[technique].resize( passCount );
 
-				for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+				for( unsigned passIx = 0; passIx != passCount; ++passIx )
 				{
-					auto& stage = desc.passes[passIx].stageInputs[i];
-					if( !stage.m_exists )
-					{
-						continue;
-					}
+					m_parametersForPasses[technique][passIx].reset( CCP_NEW( "Tr2EffectPassParameters" ) Tr2EffectPassParameters() );
+					Tr2EffectPassParameters& pp = *m_parametersForPasses[technique][passIx];
 
-					MapPassParameters( passIx, pp, Tr2RenderContextEnum::ShaderType( i ), stage.constants, desc, renderContext );
+					for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+					{
+						auto& stage = desc.techniques[technique].passes[passIx].stageInputs[i];
+						if( !stage.m_exists )
+						{
+							continue;
+						}
 
-					auto& input = pp.m_stageInput[i];
-					if( !stage.resources.empty() )
-					{
-						MapPassResources( stage.resources, input.m_textures, 0 );
-					}
-					if( !stage.uavs.empty() )
-					{
-						MapPassResources( stage.uavs, input.m_uavs, ITr2EffectValue::RESOURCE_FLAG_UAV );
+						MapPassParameters( technique, passIx, pp, Tr2RenderContextEnum::ShaderType( i ), stage.constants, desc, renderContext );
+
+						auto& input = pp.m_stageInput[i];
+						if( !stage.resources.empty() )
+						{
+							MapPassResources( stage.resources, input.m_textures, 0 );
+						}
+						if( !stage.uavs.empty() )
+						{
+							MapPassResources( stage.uavs, input.m_uavs, ITr2EffectValue::RESOURCE_FLAG_UAV );
+						}
 					}
 				}
 			}
@@ -914,56 +922,59 @@ bool Tr2Effect::PopulateParameters()
 		return false;
 	};
 
-	for( unsigned passIx = 0; passIx < m_shader->GetPassCount(); ++passIx )
+	auto& desc = m_shader->GetEffectDescription();
+	for( auto technique = desc.techniques.begin(); technique != desc.techniques.end(); ++technique )
 	{
-		const Tr2Pass& pass = m_shader->GetEffectDescription().passes[passIx];
-		for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+		for( auto pass = technique->passes.begin(); pass != technique->passes.end(); ++pass )
 		{
-			const auto& input = pass.stageInputs[i];
-
-			for( auto constant = input.constants.cbegin(); constant != input.constants.cend(); ++constant )
+			for( unsigned i = 0; i != Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 			{
-				if( !GetBool( m_shader, constant->name.c_str(), "SasUiVisible" ) )
+				const auto& input = pass->stageInputs[i];
+
+				for( auto constant = input.constants.cbegin(); constant != input.constants.cend(); ++constant )
 				{
-					continue;
+					if( !GetBool( m_shader, constant->name.c_str(), "SasUiVisible" ) )
+					{
+						continue;
+					}
+
+					if( hasParameter( constant->name.c_str() ) )
+					{
+						continue;
+					}
+
+					ConvertEffectConstant( *constant, input.constantValues, paramAdder );
 				}
 
-				if( hasParameter( constant->name.c_str() ) )
+				for( auto sampler = input.resources.begin(); sampler != input.resources.end(); ++sampler )
 				{
-					continue;
-				}
-				
-				ConvertEffectConstant( *constant, input.constantValues, paramAdder );										
-			}
+					if( !GetBool( m_shader, sampler->second.name, "SasUiVisible" ) )
+					{
+						continue;
+					}
 
-			for( auto sampler = input.resources.begin(); sampler != input.resources.end(); ++sampler )
-			{
-				if( !GetBool( m_shader, sampler->second.name, "SasUiVisible" ) )
-				{
-					continue;
-				}
+					if( hasParameter( sampler->second.name ) )
+					{
+						continue;
+					}
 
-				if( hasParameter( sampler->second.name ) )
-				{
-					continue;
-				}
-				
-				ConvertEffectResource( sampler->second, paramAdder, resourceAdder );
-			}
-
-			for( auto uav = input.uavs.begin(); uav != input.uavs.end(); ++uav )
-			{
-				if( !GetBool( m_shader, uav->second.name, "SasUiVisible" ) )
-				{
-					continue;
+					ConvertEffectResource( sampler->second, paramAdder, resourceAdder );
 				}
 
-				if( hasParameter( uav->second.name ) )
+				for( auto uav = input.uavs.begin(); uav != input.uavs.end(); ++uav )
 				{
-					continue;
+					if( !GetBool( m_shader, uav->second.name, "SasUiVisible" ) )
+					{
+						continue;
+					}
+
+					if( hasParameter( uav->second.name ) )
+					{
+						continue;
+					}
+
+					ConvertEffectResource( uav->second, paramAdder, resourceAdder );
 				}
-				
-				ConvertEffectResource( uav->second, paramAdder, resourceAdder );
 			}
 		}
 	}
@@ -999,17 +1010,20 @@ bool Tr2Effect::PruneParameters()
 		if( constant == nullptr && !removeParameter )
 		{
 			removeParameter = true;
-			for( unsigned passIx = 0; passIx < m_shader->GetPassCount() && removeParameter; ++passIx )
+			auto& desc = m_shader->GetEffectDescription();
+			for( auto technique = desc.techniques.begin(); technique != desc.techniques.end(); ++technique )
 			{
-				const Tr2Pass& pass = m_shader->GetEffectDescription().passes[passIx];
-				for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+				for( auto pass = technique->passes.begin(); pass != technique->passes.end(); ++pass )
 				{
-					for( auto sampler = pass.stageInputs[i].resources.begin(); sampler != pass.stageInputs[i].resources.end(); ++sampler )
+					for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 					{
-						if( strcmp( sampler->second.name, pName.c_str() ) == 0 )
+						for( auto sampler = pass->stageInputs[i].resources.begin(); sampler != pass->stageInputs[i].resources.end(); ++sampler )
 						{
-							removeParameter = false;
-							break;
+							if( strcmp( sampler->second.name, pName.c_str() ) == 0 )
+							{
+								removeParameter = false;
+								break;
+							}
 						}
 					}
 				}
@@ -1056,17 +1070,20 @@ bool Tr2Effect::PruneParameters()
 		if( constant == nullptr && !removeParameter )
 		{
 			removeParameter = true;
-			for( unsigned passIx = 0; passIx < m_shader->GetPassCount() && removeParameter; ++passIx )
+			auto& desc = m_shader->GetEffectDescription();
+			for( auto technique = desc.techniques.begin(); technique != desc.techniques.end(); ++technique )
 			{
-				const Tr2Pass& pass = m_shader->GetEffectDescription().passes[passIx];
-				for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
+				for( auto pass = technique->passes.begin(); pass != technique->passes.end(); ++pass )
 				{
-					for( auto sampler = pass.stageInputs[i].resources.begin(); sampler != pass.stageInputs[i].resources.end(); ++sampler )
+					for( unsigned i = 0; i < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++i )
 					{
-						if( strcmp( sampler->second.name, pName.c_str() ) == 0 )
+						for( auto sampler = pass->stageInputs[i].resources.begin(); sampler != pass->stageInputs[i].resources.end(); ++sampler )
 						{
-							removeParameter = false;
-							break;
+							if( strcmp( sampler->second.name, pName.c_str() ) == 0 )
+							{
+								removeParameter = false;
+								break;
+							}
 						}
 					}
 				}
@@ -1475,12 +1492,13 @@ bool GetBool( const Tr2Shader* shaderState, const char* paramName, const char* a
 //	 renderContext - render context
 // --------------------------------------------------------------------------------------
 void Tr2Effect::MapPassParameters( 
-			unsigned passIx,
-			Tr2EffectPassParameters& pp,
-			Tr2RenderContextEnum::ShaderType stage,
-			const Tr2EffectConstantVector& constants, 
-			const Tr2EffectDescription& desc,
-			Tr2RenderContext& renderContext )
+	size_t technique,
+	unsigned passIx,
+	Tr2EffectPassParameters& pp,
+	Tr2RenderContextEnum::ShaderType stage,
+	const Tr2EffectConstantVector& constants, 
+	const Tr2EffectDescription& desc,
+	Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -1580,8 +1598,8 @@ void Tr2Effect::MapPassParameters(
 		}
 	}
 
-	unsigned int constantDefaultValueSize = desc.passes[passIx].stageInputs[stage].m_constantValueSize;
-	const void* constantDefaultValues = desc.passes[passIx].stageInputs[stage].constantValues;
+	unsigned int constantDefaultValueSize = desc.techniques[technique].passes[passIx].stageInputs[stage].m_constantValueSize;
+	const void* constantDefaultValues = desc.techniques[technique].passes[passIx].stageInputs[stage].constantValues;
 
 	constantSize = std::max( constantSize, constantDefaultValueSize );
 	// Allocate constant buffer
