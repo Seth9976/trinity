@@ -12,7 +12,7 @@
 #include "TriRenderBatch.h"
 #include "Tr2PointLight.h"
 #include "Shader/Tr2Effect.h"
-
+#include "Particle/Tr2GpuSharedEmitter.h"
 
 namespace
 {
@@ -178,6 +178,7 @@ void EveStretch2::Update(EveUpdateContext& updateContext)
 		m_end->Update( TimeAsDouble( time - m_startTime ) );
 		m_effectData.z = float( m_end->GetScaledTime() );
 	}
+	UpdateEmitter( updateContext );
 }
 
 void EveStretch2::UpdateInactive( EveUpdateContext& updateContext )
@@ -203,6 +204,38 @@ void EveStretch2::UpdateInactive( EveUpdateContext& updateContext )
 		m_end->Update( TimeAsDouble( time - m_startTime ) );
 		m_effectData.z = float( m_end->GetScaledTime() );
 	}
+}
+
+void EveStretch2::UpdateEmitter( EveUpdateContext& updateContext )
+{
+	if( !m_sourceEmitter )
+	{
+		return;
+	}
+	auto direction = m_destination - m_source;
+	float x = std::abs( direction.x );
+	float y = std::abs( direction.y );
+	float z = std::abs( direction.z );
+	Vector3 up;
+	if( x < y && x < z )
+	{
+		up = Vector3( 1, 0, 0 );
+	}
+	else if( y < x && y < z )
+	{
+		up = Vector3( 0, 1, 0 );
+	}
+	else
+	{
+		up = Vector3( 0, 0, 1 );
+	}
+	
+	ITr2GenericEmitter::UpdateArguments args(
+		updateContext.GetTime(),
+		updateContext.GetGpuParticleSystem(),
+		Matrix( XMMatrixLookAtLH( m_source, m_destination, up ) ),
+		updateContext.GetOriginShift() );
+	m_sourceEmitter->Update( args );
 }
 
 void EveStretch2::UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform )

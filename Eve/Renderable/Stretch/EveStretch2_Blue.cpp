@@ -78,6 +78,13 @@ const Be::ClassInfo* EveStretch2::ExposeToBlue()
 			"Point light at the effect destination",
 			Be::READWRITE | Be::PERSIST
 		)
+		MAP_ATTRIBUTE
+		(
+			"sourceEmitter",
+			m_sourceEmitter,
+			"GPU particle emitter at the source",
+			Be::READWRITE | Be::PERSIST
+		)
 
 	EXPOSURE_END()
 }
