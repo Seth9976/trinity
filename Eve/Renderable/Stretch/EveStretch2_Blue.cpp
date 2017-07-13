@@ -85,6 +85,20 @@ const Be::ClassInfo* EveStretch2::ExposeToBlue()
 			"GPU particle emitter at the source",
 			Be::READWRITE | Be::PERSIST
 		)
+		MAP_ATTRIBUTE
+		(
+			"sourceObserver",
+			m_sourceObserver,
+			"Observer at the source position",
+			Be::READWRITE | Be::PERSIST
+		)
+		MAP_ATTRIBUTE
+		(
+			"destinationObserver",
+			m_destinationObserver,
+			"Observer at the destination position",
+			Be::READWRITE | Be::PERSIST
+		)
 
 	EXPOSURE_END()
 }

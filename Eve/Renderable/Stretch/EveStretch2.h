@@ -16,6 +16,7 @@ BLUE_DECLARE( Tr2Effect );
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE( Tr2PointLight );
 BLUE_DECLARE( Tr2GpuSharedEmitter );
+BLUE_DECLARE( TriObserverLocal );
 
 
 // --------------------------------------------------------------------------------------
@@ -67,7 +68,8 @@ protected:
 	virtual bool OnPrepareResources();
 	virtual void SubmitGeometry( Tr2RenderContext& renderContext );
 private:
-	void UpdateEmitter( EveUpdateContext& updateContext );
+	void GetEndPointTransforms( Matrix& source, Matrix& destination ) const;
+	Matrix GetDestinationTransform() const;
 
 	Tr2EffectPtr m_effect;
 	TriCurveSetPtr m_start;
@@ -77,6 +79,9 @@ private:
 	Tr2PointLightPtr m_sourceLight;
 	Tr2PointLightPtr m_destinationLight;
 	Tr2GpuSharedEmitterPtr m_sourceEmitter;
+
+	TriObserverLocalPtr m_sourceObserver;
+	TriObserverLocalPtr m_destinationObserver;
 
 	Be::Time m_startTime;
 

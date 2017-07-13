@@ -13,6 +13,7 @@
 #include "Tr2PointLight.h"
 #include "Shader/Tr2Effect.h"
 #include "Particle/Tr2GpuSharedEmitter.h"
+#include "TriObserverLocal.h"
 
 namespace
 {
@@ -178,7 +179,26 @@ void EveStretch2::Update(EveUpdateContext& updateContext)
 		m_end->Update( TimeAsDouble( time - m_startTime ) );
 		m_effectData.z = float( m_end->GetScaledTime() );
 	}
-	UpdateEmitter( updateContext );
+
+	Matrix src, dest;
+	GetEndPointTransforms( src, dest );
+	if( m_sourceObserver )
+	{
+		m_sourceObserver->Update( src );
+	}
+	if( m_destinationObserver )
+	{
+		m_destinationObserver->Update( dest );
+	}
+	if( m_sourceEmitter )
+	{
+		ITr2GenericEmitter::UpdateArguments args(
+			updateContext.GetTime(),
+			updateContext.GetGpuParticleSystem(),
+			src,
+			updateContext.GetOriginShift() );
+		m_sourceEmitter->Update( args );
+	}
 }
 
 void EveStretch2::UpdateInactive( EveUpdateContext& updateContext )
@@ -204,14 +224,21 @@ void EveStretch2::UpdateInactive( EveUpdateContext& updateContext )
 		m_end->Update( TimeAsDouble( time - m_startTime ) );
 		m_effectData.z = float( m_end->GetScaledTime() );
 	}
+
+	Matrix src, dest;
+	GetEndPointTransforms( src, dest );
+	if( m_sourceObserver )
+	{
+		m_sourceObserver->Update( src );
+	}
+	if( m_destinationObserver )
+	{
+		m_destinationObserver->Update( dest );
+	}
 }
 
-void EveStretch2::UpdateEmitter( EveUpdateContext& updateContext )
+void EveStretch2::GetEndPointTransforms( Matrix& source, Matrix& destination ) const
 {
-	if( !m_sourceEmitter )
-	{
-		return;
-	}
 	auto direction = m_destination - m_source;
 	float x = std::abs( direction.x );
 	float y = std::abs( direction.y );
@@ -230,18 +257,16 @@ void EveStretch2::UpdateEmitter( EveUpdateContext& updateContext )
 		up = Vector3( 0, 0, 1 );
 	}
 
-	Matrix transform = Tr2Renderer::GetIdentityTransform();
-	transform.GetZ() = XMVector3Normalize( direction );
-	transform.GetX() = XMVector3Normalize( XMVector3Cross( up, transform.GetZ() ) );
-	transform.GetY() = XMVector3Cross( transform.GetX(), transform.GetZ() );
-	transform.GetTranslation() = m_source;
-	
-	ITr2GenericEmitter::UpdateArguments args(
-		updateContext.GetTime(),
-		updateContext.GetGpuParticleSystem(),
-		transform,
-		updateContext.GetOriginShift() );
-	m_sourceEmitter->Update( args );
+	source = Tr2Renderer::GetIdentityTransform();
+	source.GetZ() = XMVector3Normalize( direction );
+	source.GetX() = XMVector3Normalize( XMVector3Cross( up, source.GetZ() ) );
+	source.GetY() = XMVector3Cross( source.GetX(), source.GetZ() );
+	source.GetTranslation() = m_source;
+
+	destination = source;
+	destination.GetZ() = -destination.GetZ();
+	destination.GetX() = -destination.GetX();
+	destination.GetTranslation() = m_destination;
 }
 
 void EveStretch2::UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform )
