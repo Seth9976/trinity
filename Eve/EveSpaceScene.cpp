@@ -176,14 +176,14 @@ EveSpaceScene::EveSpaceScene( IRoot* lockobj ) :
 	m_primaryBatches[TRIBATCHTYPE_ADDITIVE] = CCP_NEW( "EveSpaceScene/m_additiveBatches" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 	m_primaryBatches[TRIBATCHTYPE_DISTORTION] = CCP_NEW( "EveSpaceScene/m_distortionBatches" ) TriRenderBatchAccumulator<>( allocator );
 	m_primaryBatches[TRIBATCHTYPE_TRANSPARENT] = CCP_NEW( "EveSpaceScene/m_sortedBatches" ) TriRenderBatchAccumulator<>( allocator );
-	m_primaryBatches[TRIBATCHTYPE_DEPTH] = CCP_NEW( "EveSpaceScene/m_depthBatches" ) TriRenderBatchAccumulator<>( allocator );
+	m_primaryBatches[TRIBATCHTYPE_DEPTH] = CCP_NEW( "EveSpaceScene/m_depthBatches" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 
 	m_secondaryBatches[TRIBATCHTYPE_OPAQUE] = CCP_NEW( "EveSpaceScene/m_batches2" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 	m_secondaryBatches[TRIBATCHTYPE_DECAL] = CCP_NEW( "EveSpaceScene/m_decalBatches2" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 	m_secondaryBatches[TRIBATCHTYPE_ADDITIVE] = CCP_NEW( "EveSpaceScene/m_additiveBatches2" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 	m_secondaryBatches[TRIBATCHTYPE_DISTORTION] = CCP_NEW( "EveSpaceScene/m_distortionBatches2" ) TriRenderBatchAccumulator<>( allocator );
 	m_secondaryBatches[TRIBATCHTYPE_TRANSPARENT] = CCP_NEW( "EveSpaceScene/m_sortedBatches2" ) TriRenderBatchAccumulator<>( allocator );
-	m_secondaryBatches[TRIBATCHTYPE_DEPTH] = CCP_NEW( "EveSpaceScene/m_depthBatches2" ) TriRenderBatchAccumulator<>( allocator );
+	m_secondaryBatches[TRIBATCHTYPE_DEPTH] = CCP_NEW( "EveSpaceScene/m_depthBatches2" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 
 	m_shadowBatches = CCP_NEW( "EveSpaceScene/m_shadowBatches" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
 
@@ -1704,7 +1704,9 @@ void EveSpaceScene::RenderDepthPass( Tr2RenderContext& renderContext )
 	// Render to depth map
 	if( Tr2Renderer::GetShaderModel() == TR2SM_3_0_DEPTH )
 	{
+#if TRINITY_PLATFORM != TRINITY_DIRECTX9
 		m_hasDepthPass = true;
+#endif
 
 		Tr2Renderer::ClearDepthBuffer( 0.0f );
 
@@ -1782,6 +1784,12 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 		lightManager->UpdateLists( msaaType, renderContext );
 	}
 	
+	if( !m_hasDepthPass )
+	{
+		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
+		renderContext.RenderBatches( m_primaryBatches[TRIBATCHTYPE_DEPTH], BlueSharedString( "Depth" ) );
+	}
+
 	// Draw the planets to the z-buffer to occlude any stations etc.
 	// that might be drawn behind moons.
 	for( EvePlanetVector::iterator it = m_planets.begin(); it != m_planets.end(); ++it )
@@ -1797,12 +1805,6 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 							Tr2EffectStateManager::RM_OPAQUE,
 							renderContext );
 		objectRenderables.clear();
-	}
-
-	if( !m_hasDepthPass )
-	{
-		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
-		renderContext.RenderBatches( m_primaryBatches[TRIBATCHTYPE_DEPTH], BlueSharedString( "Depth" ) );
 	}
 
 	{
@@ -1821,12 +1823,6 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 
 	SetNoShadow();
 	ApplyPerFrameData( renderContext );
-
-	if( !m_hasDepthPass )
-	{
-		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
-		renderContext.RenderBatches( m_primaryBatches[TRIBATCHTYPE_DEPTH], BlueSharedString( "Depth" ) );
-	}
 
 	renderContext.m_esm.UnsetAllTextures();
 	if( !m_hasDepthPass )
