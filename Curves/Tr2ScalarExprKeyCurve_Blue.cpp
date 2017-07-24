@@ -4,7 +4,25 @@
 BLUE_DEFINE( Tr2ScalarExprKeyCurve );
 BLUE_DEFINE( Tr2ScalarExprKey );
 
-extern Be::VarChooser ScalarInterpolationChooser[];
+Be::VarChooser ScalarInterpolationChooser[] =
+{
+	{
+		"CONSTANT",
+		BeCast( CONSTANT ),
+		"Performs a constant interpolation"
+	},
+	{
+		"LINEAR",
+		BeCast( LINEAR ),
+		"Performs a linear interpolation"
+	},
+	{
+		"HERMITE",
+		BeCast( HERMITE ),
+		"Performs a Hermite spline interpolation"
+	},
+	{ 0 }
+};
 
 const Be::ClassInfo* Tr2ScalarExprKey::ExposeToBlue()
 {
