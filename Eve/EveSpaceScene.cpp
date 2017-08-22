@@ -2582,7 +2582,7 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 			if( p != NULL )
 			{
 				renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_PICKING );
-				renderContext.RenderBatchesForPicking( m_pickEffect, p, DEFAULT_TECHNIQUE, objectNum );
+				renderContext.RenderBatchesForPickingWithoutOverride( m_opaquePickingBatches, BlueSharedString( "Picking" ), objectNum );
 			}
 
 			// Render additional picking batches. These use a user specified pick shader with no override.
@@ -2591,7 +2591,7 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 			if( m_pickingBatches != NULL )
 			{
 				renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_PICKING );
-				renderContext.RenderBatchesForPickingWithoutOverride( m_pickingBatches, DEFAULT_TECHNIQUE, objectNum );
+				renderContext.RenderBatchesForPickingWithoutOverride( m_pickingBatches, BlueSharedString( "Picking" ), objectNum );
 			}
 
 			if( m_pickBuffer.EndRendering( renderContext ) )
