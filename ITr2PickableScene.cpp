@@ -370,8 +370,10 @@ bool ITr2PickableScene::RenderPicking( ITriRenderBatchAccumulator* pOpaquePickin
 
     if( p != NULL )
     {
+		pOpaquePickingBatches->Finalize();
+
         renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_PICKING );
-        renderContext.RenderBatchesForPicking( GetPickingEffect( pass ), p, DEFAULT_TECHNIQUE, objectNum );
+        renderContext.RenderBatchesForPickingWithoutOverride( pOpaquePickingBatches, BlueSharedString( "Picking" ), objectNum );
     }
 
     if( pPickingBatches && RenderPickingAreasForComponents( pass ) )
