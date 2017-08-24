@@ -180,6 +180,7 @@ public:
 		Vector3 scaling;
 		int groupIndex;
 		int boneIndex;
+		int meshIndex;
 		std::string shader;
 		std::map<BlueSharedString, TextureData> textures;
 		std::map<BlueSharedString, Vector4> parameters;

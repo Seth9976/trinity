@@ -1643,12 +1643,11 @@ void EveSOF::SetupDecals( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
 				// parent hull textures
 				for( auto ptit = shaderData->parentTextures.begin(); ptit != shaderData->parentTextures.end(); ++ptit )
 				{
-					int32_t meshIndexOfDecal = -1;
-					if( meshIndexOfDecal != -1 )
+					if( hdit->meshIndex != -1 )
 					{
 						// get the filepath from the hull
 						std::string resFilePath;
-						if( dna->GetHullTextureWithMeshIndex( resFilePath, *ptit, meshIndexOfDecal, hullIdx ) )
+						if( dna->GetHullTextureWithMeshIndex( resFilePath, *ptit, hdit->meshIndex, hullIdx ) )
 						{
 							shader->AddResourceTexture2D( *ptit, resFilePath.c_str() );
 						}
