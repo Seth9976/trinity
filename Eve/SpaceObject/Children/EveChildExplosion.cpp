@@ -186,11 +186,15 @@ void EveChildExplosion::UpdateSyncronous(
 					Matrix transform = m_localExplosionTransforms[m_nextLocalExplosion];
 					transform.GetTranslation() = XMVector3TransformCoord( transform.GetTranslation(), XMMatrixInverse( &det, m_localTransform ) );
 					SpawnLocalExplosion( transform );
-					m_nextLocalExplosionTime = m_localExplosionTimes[++m_nextLocalExplosion];
+					m_nextLocalExplosion++;
+					if( m_nextLocalExplosion < m_localExplosionTransforms.size() )
+					{
+						m_nextLocalExplosionTime = m_localExplosionTimes[m_nextLocalExplosion];
+					}
 				}
 			}
 		}
-		if( m_globalExplosion)
+		if( m_globalExplosion )
 		{
 			m_countdownToGlobalExplosionStart -= dt;
 			if( m_countdownToGlobalExplosionStart < 0 )
