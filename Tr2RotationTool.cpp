@@ -5,6 +5,7 @@
 #include "Shader/Tr2Effect.h"
 
 Tr2RotationTool::Tr2RotationTool( IRoot* lockobj )
+	:m_precision( 1 )
 {
 	m_xLine = NULL;
 	m_yLine = NULL;
@@ -135,7 +136,7 @@ void Tr2RotationTool::Move( int mouseX, int mouseY, int mouseXDelta, int mouseYD
 			angleSign *= -1.0f;
 		}
 	}
-	m_angle = (acos( dot ) * angleSign)*2.0f;
+	m_angle = acos( dot ) * angleSign * m_precision;
 	m_moved = true;
 }
 

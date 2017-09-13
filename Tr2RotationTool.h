@@ -20,7 +20,8 @@ public:
 	Vector3 Hemisphere( int mouseX, int mouseY, Tr2Viewport& viewport, Matrix& viewMatrix, Matrix& projectionMatrix ) const;
 	Vector3 GetDesiredPlaneNormal( Vector3& ray, Matrix& viewMatrix );
 
-	float	m_angle;
+	float m_angle;
+	float m_precision;
 	Quaternion m_rotation;
 
 	Tr2LineSetPtr m_xLine;
