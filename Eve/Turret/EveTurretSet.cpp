@@ -56,21 +56,6 @@ extern float g_eveSpaceSceneVisibilityThreshold;
 const float TRACKING_FADE_TIME = 1.f;
 
 
-namespace
-{
-	class EveTurretSetRendererBatch : public TriForwardingBatch
-	{
-	public:
-#if TRINITY_PLATFORM == TRINITY_DIRECTX11
-		OverrideOptions RenderWithOverride( void ) const
-		{
-			return DO_NOT_USE_OVERRIDE_SHADERS;
-		}
-#endif
-	};
-
-}
-
 // --------------------------------------------------------------------------------
 // Description:
 //   Initialize data members, set everything to inlavid/empty and call
@@ -1512,7 +1497,7 @@ void EveTurretSet::GetBatches( ITriRenderBatchAccumulator* batches,
 		return;
 	}
 
-	EveTurretSetRendererBatch* batch = batches->Allocate<EveTurretSetRendererBatch>();
+	TriForwardingBatch* batch = batches->Allocate<TriForwardingBatch>();
 	if( batch )
 	{
 		batch->SetPerObjectData( perObjectData );
