@@ -108,13 +108,6 @@ const Be::ClassInfo* Tr2RenderTarget::ExposeToBlue()
 			":param msaaQuality: MSAA quality"
 			)
 
-		MAP_METHOD_AND_WRAP
-		(
-			"CreateUAV",
-			CreateUAV,
-			"[Experimental] Create Unordered Access View"
-		)
-
 		MAP_METHOD_AND_WRAP( 
 			"sharedHandle",	
 			GetSharedHandle, 

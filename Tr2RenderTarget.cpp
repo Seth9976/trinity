@@ -200,12 +200,6 @@ long Tr2RenderTarget::Resolve( Tr2RenderTarget* destination )
 	return GetRenderTarget().Resolve( *destination, renderContext ).GetResult();
 }
 
-long Tr2RenderTarget::CreateUAV()
-{
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-	return GetRenderTarget().GetTexture().CreateUAV( renderContext ).GetResult();
-}
-
 // --------------------------------------------------------------------------------------
 // Description:
 //   Checks if the object contains a reference to given AL object. This method is exposed

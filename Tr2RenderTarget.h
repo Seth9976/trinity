@@ -56,8 +56,6 @@ public:
 	uint32_t GetMsaaQuality() const;
 	Tr2RenderContextEnum::PixelFormat GetFormat() const;
 
-	long CreateUAV();
-
 	long GenerateMipMaps();
 	long Resolve( Tr2RenderTarget* destination );
 	
