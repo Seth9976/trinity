@@ -1031,36 +1031,29 @@ void Tr2ParticleSystem::UpdateViewDependentData( const TriFrustum* frustum, cons
 	}
 	
 	m_shouldSortVisible = true;
+	m_updatePeriod = 1;
 	if( frustum )
 	{
 		Vector3 minB, maxB;
 		//If we were about to sort, first check that this system is visible and large enough to warrant sorting
 		if( GetBoundingBox( minB, maxB ) )
 		{
-			const Vector3 centre( ( maxB + minB ) * 0.5f );
+			Vector3 centre( ( maxB + minB ) * 0.5f );
 			const Vector3 extent( ( maxB - minB ) * 0.5f );
 
 			//use the contained sphere rather than circumscribing sphere, just to be a little conservative
 			const float radius = std::max( std::abs( extent.x ), std::max( std::abs( extent.y ), std::abs( extent.z ) ) );
+			
+			centre = Vector3( XMVector3TransformCoord( centre, m_worldTransform ) );
 			const Vector4 boundingSphere = Vector4( centre.x, centre.y, centre.z, radius );
 
-			if( frustum->IsSphereVisible( &boundingSphere ) )
-			{
-				const float estimatedSize = frustum->GetPixelSizeAccross( &boundingSphere );
-				//for testing, just using a constant here
-				m_shouldSortVisible = estimatedSize > 128.f;
-				m_updatePeriod = m_shouldSortVisible ? 1 : 2;
-			}
-			else
+			if( !frustum->IsSphereVisible( &boundingSphere ) )
 			{
 				m_shouldSortVisible = false;
+				// update every fourth frame
 				m_updatePeriod = 4;
 			}
 		}
-	}
-	else
-	{
-		m_updatePeriod = 1;
 	}
 }
 
