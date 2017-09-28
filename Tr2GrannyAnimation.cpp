@@ -1104,13 +1104,19 @@ void Tr2GrannyAnimation::SetLayerControlParam( const char* layerName, float cont
 {
 	const char* base_name_string = "";
 
-	if ( !strcmp(layerName, base_name_string) )
+	if ( !layerName || !strcmp(layerName, base_name_string) )
 	{
 		GetAnimationLayer( nullptr )->SetControlParam( controlParam );
 	}
 	else
 	{
-		GetAnimationLayer( layerName )->SetControlParam( controlParam );
+		auto animLayer = GetAnimationLayer( layerName );
+		if ( !animLayer )
+		{
+				CCP_LOGERR( "SetLayerControlParam: Layer name '%s' not found.", layerName );
+				return;
+		}
+		animLayer->SetControlParam( controlParam );
 	}
 }
 
