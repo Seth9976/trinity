@@ -492,6 +492,11 @@ void Tr2GrannyAnimationLayer::UpdateControlParam( float animation_time )
 		return;
 	}
 
+	if (animation_time == m_lastControlUpdateTime)
+	{
+		return;
+	}
+
 	float timeIncrement = animation_time - m_lastControlUpdateTime;
 	float controlIncrement = timeIncrement * m_skewRate;
 
