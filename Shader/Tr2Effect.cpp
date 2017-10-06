@@ -15,6 +15,7 @@
 #include "Shader/Parameter/Tr2GeometryBufferParameter.h"
 #include "Shader/Parameter/TriVariableParameter.h"
 #include "Shader/Parameter/Tr2RuntimeTextureParameter.h"
+#include "Shader/Parameter/Tr2Matrix4Parameter.h"
 
 BLUE_DEFINE_INTERFACE( ITr2EffectValue );
 
@@ -1697,5 +1698,42 @@ void Tr2Effect::SetParameter( const BlueSharedString& name, ITr2TextureProvider*
 		param.CreateInstance();
 		param->Create( name, texture );
 		AddResource( param );
+	}
+}
+
+// --------------------------------------------------------------------------------------
+void Tr2Effect::SetParameter( const BlueSharedString& name, float value )
+{
+	auto existing = GetParameterByName( name.c_str() );
+	Tr2FloatParameterPtr param = BlueCastPtr( existing );
+
+	if( param )
+	{
+		param->SetValue( value );
+	}
+	else
+	{
+		param.CreateInstance();
+		param->m_name = name;
+		param->SetValue( value );
+		m_parameters.Append( param->GetRawRoot() );
+	}
+}
+
+// --------------------------------------------------------------------------------------
+void Tr2Effect::SetParameter( const BlueSharedString& name, const Matrix& matrix )
+{
+	auto existing = GetParameterByName( name.c_str() );
+	Tr2Matrix4ParameterPtr param = BlueCastPtr( existing );
+	if( param )
+	{
+		param->SetValue( matrix );
+	}
+	else
+	{
+		param.CreateInstance();
+		param->m_name = name;
+		param->SetValue( matrix );
+		m_parameters.Append( param->GetRawRoot() );
 	}
 }

@@ -90,6 +90,8 @@ public:
 
 	void SetParameter( const BlueSharedString& name, ITr2GpuBuffer* buffer, uint32_t initialCount = -1 );
 	void SetParameter( const BlueSharedString& name, ITr2TextureProvider* texture );
+	void SetParameter( const BlueSharedString& name, float value );
+	void SetParameter( const BlueSharedString& name, const Matrix& matrix );
 
 	void SetOption( const BlueSharedString& name, const BlueSharedString& value );
 	void ResetOption( const BlueSharedString& name );

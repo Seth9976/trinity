@@ -15,7 +15,7 @@ BLUE_CLASS_ALLOW_DELAYED_DELETE( Tr2Matrix4Parameter );
 // SeeAlso:
 //   Tr2Effect
 // -----------------------------------------------------------------------------------
-class Tr2Matrix4Parameter:
+BLUE_CLASS( Tr2Matrix4Parameter ):
 	public ITriEffectParameter,
 	public ITriReroutable
 {
@@ -56,6 +56,9 @@ public:
 	void UnregisterBinding( TriValueBinding* vb );
 	bool IsRerouted() const;
 
+	Matrix	GetValue();
+	void	SetValue( const Matrix & );
+
 private:
 	// If this parameter is bound to a curve we have to inform the binding of the
 	// destination value the effect sets when the parameters are mapped to shader
@@ -64,8 +67,6 @@ private:
 	BindingVector_t m_bindings;
 	float* m_reroutedValue;
 
-	Matrix	GetValue();
-	void	SetValue( const Matrix & );
 };
 
 TYPEDEF_BLUECLASS( Tr2Matrix4Parameter );
