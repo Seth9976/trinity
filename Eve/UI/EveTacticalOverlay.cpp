@@ -22,7 +22,8 @@ EveTacticalOverlayTrackObject::EveTacticalOverlayTrackObject( IRoot* lockobj ) :
 	m_position( 0, 0, 0 ),
 	m_velocity( 0, 0, 0 ),
 	m_radius( 0 ),
-	m_aggressive( false )
+	m_aggressive( false ),
+	m_showVelocity( true )
 {
 }
 
@@ -228,7 +229,6 @@ void EveTacticalOverlay::UpdateVisibility( const TriFrustum& frustum, const Matr
 	m_anchorBuffer.clear();
 	m_velocityBuffer.clear();
 	
-	VelocityConnectorVertex vtx;
 	Vector3 up( 0, 1, 0 );
 	float distanceThreshold = ( m_ranges.x + m_ranges.y ) * m_ranges.z;
 	float requestedSegments = 0.f;
@@ -298,6 +298,10 @@ void EveTacticalOverlay::UpdateVisibility( const TriFrustum& frustum, const Matr
 			{
 				continue;
 			}
+			if( i == 0.f && !((*it)->ShowVelocity()))
+			{
+				continue;
+			}
 			VelocityConnectorVertex vtx;
 			vtx.instanceData = Vector4( position, i );
 			float blink = i == 1 ? 0.9f : 0.f;
@@ -305,13 +309,14 @@ void EveTacticalOverlay::UpdateVisibility( const TriFrustum& frustum, const Matr
 			m_velocityBuffer.push_back( vtx );
 		}
 	}
-
+	
+	VelocityConnectorVertex vtx;
 	// Add velocity for your ship
 	vtx.instanceData = Vector4( m_rootPosition, 0.f );
 	vtx.instanceData2 = Vector4( m_rootVelocity, floor( m_ranges.w ) );
 	m_velocityBuffer.push_back( vtx );
 	// And blinking velocities for selected target
-	if( m_interestObject )
+	if( m_interestObject && m_interestObject->ShowVelocity() )
 	{
 		// Your velocity at the target
 		vtx.instanceData = Vector4( m_interestObject->GetPosition(), 0.f );

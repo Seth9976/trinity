@@ -1320,9 +1320,11 @@ bool EveTurretSet::GetLocalBoundingBox( Vector3& aabbMin, Vector3& aabbMax )
 	{
 		if( it->valid )
 		{
-			GetDynamicBounds( *it, nullptr, &minBounds, &maxBounds);
-			BoundingBoxUpdate( aabbMin, aabbMax, minBounds, maxBounds );
-			valid = true;
+			if( GetDynamicBounds( *it, nullptr, &minBounds, &maxBounds ) )
+			{
+				BoundingBoxUpdate( aabbMin, aabbMax, minBounds, maxBounds );
+				valid = true;
+			}
 		}
 	}
 

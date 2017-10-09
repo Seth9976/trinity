@@ -23,10 +23,11 @@ public:
 	~EveTacticalOverlayTrackObject() {}
 
 	void UpdatePosition( EveUpdateContext& updateContext );
-	inline Vector3 GetVelocity() { return m_velocity; }
-	inline Vector3 GetPosition() { return m_position; }
-	inline float GetRadius() { return m_radius; }
-	inline bool IsAggressive() { return m_aggressive; }
+	inline Vector3 GetVelocity() const { return m_velocity; }
+	inline Vector3 GetPosition() const { return m_position; }
+	inline float GetRadius() const { return m_radius; }
+	inline bool IsAggressive() const { return m_aggressive; }
+	inline bool ShowVelocity() const { return m_showVelocity; }
 
 private:
 	ITriVectorFunctionPtr m_positionCurve;
@@ -34,6 +35,7 @@ private:
 	Vector3 m_velocity;
 	float m_radius;
 	bool m_aggressive;
+	bool m_showVelocity;
 };
 TYPEDEF_BLUECLASS( EveTacticalOverlayTrackObject );
 BLUE_DECLARE_VECTOR( EveTacticalOverlayTrackObject );

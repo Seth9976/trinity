@@ -16,6 +16,7 @@ const Be::ClassInfo* EveTacticalOverlayTrackObject::ExposeToBlue()
 		MAP_ATTRIBUTE( "position", m_position, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "radius", m_radius, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "isAggressive", m_aggressive, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "showVelocity", m_showVelocity, "", Be::READWRITE | Be::PERSIST )
     EXPOSURE_END()
 }
 
