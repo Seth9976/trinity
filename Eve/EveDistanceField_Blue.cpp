@@ -8,6 +8,7 @@ const Be::ClassInfo* EveDistanceField::ExposeToBlue()
 	EXPOSURE_BEGIN( EveDistanceField, "" )
         MAP_INTERFACE( EveDistanceField )
 		MAP_INTERFACE( IListNotify )
+		MAP_INTERFACE( INotify )
 
 		MAP_ATTRIBUTE( "cameraView", m_cameraView, "na", Be::READWRITE )
 		MAP_ATTRIBUTE( "objects", m_objects, "na", Be::READWRITE | Be::NOTIFY  )
