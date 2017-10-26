@@ -318,9 +318,9 @@ void EveDistanceField::RenderDebugInfo( Tr2DebugRenderer& renderer )
 	for( auto it = m_debugPositions.begin(); it != m_debugPositions.end(); ++it )
 	{
 		const Vector3 pos = *it;
-		renderer.DrawLine( this, m_middle, pos, 0x3f00ff00 );
-		renderer.DrawSphere( this, pos, m_minDistance, 3, Tr2DebugRenderer::Wireframe, 0x3fffffff );
-		renderer.DrawSphere( this, pos, m_maxDistance, 3, Tr2DebugRenderer::Wireframe, 0x1fffffff );
+		renderer.DrawLine( this, m_middle, pos, 0x7f00ff00 );
+		renderer.DrawSphere( this, pos, m_minDistance, 8, Tr2DebugRenderer::Wireframe, 0x3f3f3f3f );
+		renderer.DrawSphere( this, pos, m_maxDistance, 8, Tr2DebugRenderer::Wireframe, 0x1f1f1f1f );
 	}
 }
 
