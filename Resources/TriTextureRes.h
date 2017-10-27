@@ -71,10 +71,6 @@ public:
 	long UpdateSubresource( unsigned left, unsigned top, unsigned right, unsigned bottom, const void* source, unsigned sourcePitch );
 	const Tr2TextureAL* GetTexture() const;
 	
-	// Make a TriTextureRes that wraps around an existing texture, renderTarget (that's readable) or depthBuffer (that's readable).
-	// RT and DS must stay alive and the textureRes will show a live view on their contents.
-	//bool SetTexture( TID3DTextureResource* );
-	bool SetTexture( Tr2TextureAL& texture );
 	bool SetTextureFromRT( Tr2RenderTarget* renderTarget );
 	bool SetTextureFromDS( Tr2DepthStencil* depthStencil );
 	
@@ -134,7 +130,8 @@ public:
 	}
 
 private:
-	Tr2TextureAL		m_texture;
+	Tr2TextureAL *m_texture;
+	Tr2TextureAL m_ownTexture;
 	Tr2RenderTargetPtr	m_wrappedRenderTarget;
 	Tr2DepthStencilPtr	m_wrappedDepthStencil;
 
@@ -156,6 +153,7 @@ private:
 	bool m_isTextureResizable			: 1;	// do we listen to the global mipskip setting?
 	
 private:
+	bool SetTexture( Tr2TextureAL& texture );
 	bool Generate( const char *	);
 	bool HasALObject( int type, size_t object );
 
