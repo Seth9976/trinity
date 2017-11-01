@@ -312,5 +312,3 @@ static const char* GetGrannyProductVersion()
 }
 
 MAP_FUNCTION_AND_WRAP( "GetGrannyProductVersion", GetGrannyProductVersion, "Returns the 'GrannyProductVersion' string as defined by Granny" );
-
-TRI_REGISTER_SETTING( "gpuTelemetryEnabled", g_gpuTelemetryEnabled );

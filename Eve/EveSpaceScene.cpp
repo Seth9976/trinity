@@ -1029,7 +1029,6 @@ void EveSpaceScene::RenderObjectsReceivingShadows(	std::vector<ShadowReceiver>& 
 
 		FinalizeBatches( m_secondaryBatches );
 		{
-			CCP_STATS_GPU_ZONE( "RenderObjectsReceivingShadoes/RenderOpaqueBatches" );
 			if( m_velocityMap )
 			{
 				Tr2PushPopRT rt( *m_velocityMap, renderContext, 1 );
@@ -1638,14 +1637,8 @@ bool EveSpaceScene::RenderBackgroundPass( Tr2RenderContext& renderContext )
 			GetAllBatchesFromRenderables( visible, transparentObjects, m_secondaryBatches );
 			PrepareTransparentBatch( transparentObjects, m_secondaryBatches );
 			FinalizeBatches( m_secondaryBatches );
-			{
-				CCP_STATS_GPU_ZONE( "RenderBackgroundPass/RenderOpaqueBatches" );
-				RenderOpaqueBatches( m_secondaryBatches, renderContext );
-			}
-			{
-				CCP_STATS_GPU_ZONE( "RenderBackgroundPass/RenderTransparentBatches" );
-				RenderTransparentBatches( m_secondaryBatches, renderContext );
-			}
+			RenderOpaqueBatches( m_secondaryBatches, renderContext );
+			RenderTransparentBatches( m_secondaryBatches, renderContext );
 			ClearBatches( m_secondaryBatches );
 		}
 		visible.clear();
@@ -1680,8 +1673,6 @@ bool EveSpaceScene::RenderBackgroundPass( Tr2RenderContext& renderContext )
 		RenderTransparentBatches( m_secondaryBatches, renderContext );
 		if( m_secondaryBatches[TRIBATCHTYPE_DISTORTION]->GetBatchCount() > 0 )
 		{
-			CCP_STATS_GPU_ZONE( "RenderBackgroundPass/RenderDistortionBatches" );
-
 			RenderDistortionBatches( m_secondaryBatches, renderContext );
 			doBackgroundDistortion = true;
 		}
@@ -1816,7 +1807,6 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 	}
 
 	{
-		CCP_STATS_GPU_ZONE( "RenderMainPass/RenderOpaqueBatches" );
 		if( m_velocityMap )
 		{
 			Tr2PushPopRT rt( *m_velocityMap, renderContext, 1 );
@@ -1837,14 +1827,8 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 	{
 		renderContext.SetReadOnlyDepth( true );
 	}
-	{
-		CCP_STATS_GPU_ZONE( "RenderMainPass/RenderTransparentBatches" );
-		RenderTransparentBatches( m_primaryBatches, renderContext );
-	}
-	{
-		CCP_STATS_GPU_ZONE( "RenderMainPass/RenderDistortionBatches" );
-		RenderDistortionBatches( m_primaryBatches, renderContext );
-	}
+	RenderTransparentBatches( m_primaryBatches, renderContext );
+	RenderDistortionBatches( m_primaryBatches, renderContext );
 	renderContext.m_esm.UnsetAllTextures();
 
 	//GPU particles
@@ -2734,18 +2718,14 @@ void EveSpaceScene::RenderPlanets( Tr2RenderContext& renderContext )
 	GetAllBatchesFromRenderables( planetRenderables, renderablesWithTransparencies, m_secondaryBatches );
 	PrepareTransparentBatch( renderablesWithTransparencies, m_secondaryBatches );
 	FinalizeBatches( m_secondaryBatches );
-	{
-		CCP_STATS_GPU_ZONE( "RenderPlanets/RenderOpaqueBatches" );
-		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
-		renderContext.RenderBatches( m_secondaryBatches[TRIBATCHTYPE_DEPTH], BlueSharedString( "Depth" ) );
-		RenderOpaqueBatches( m_secondaryBatches, renderContext );
-	}
+
+	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_DEPTH_ONLY );
+	renderContext.RenderBatches( m_secondaryBatches[TRIBATCHTYPE_DEPTH], BlueSharedString( "Depth" ) );
+	RenderOpaqueBatches( m_secondaryBatches, renderContext );
+
 	renderContext.m_esm.UnsetAllTextures();
 	renderContext.SetReadOnlyDepth( true );
-	{
-		CCP_STATS_GPU_ZONE( "RenderPlanets/RenderTransparentBatches" );
-		RenderTransparentBatches( m_secondaryBatches, renderContext );
-	}
+	RenderTransparentBatches( m_secondaryBatches, renderContext );
 	renderContext.m_esm.UnsetAllTextures();
 	renderContext.SetReadOnlyDepth( false );
 	ClearBatches( m_secondaryBatches );
