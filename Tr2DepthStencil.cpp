@@ -28,18 +28,11 @@ void Tr2DepthStencil::py__init__(
 	}		
 }
 
-long Tr2DepthStencil::Create( unsigned width, unsigned height, DepthStencilFormat dsFormat, unsigned msaaType, unsigned msaaQuality )
+long Tr2DepthStencil::Create( unsigned width, unsigned height, DepthStencilFormat dsFormat, unsigned msaaType, unsigned msaaQuality, Tr2RenderContextEnum::ExFlag flags )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	return m_depthStencil.Create( width, height, dsFormat, msaaType, msaaQuality, renderContext ).GetResult();
-}
-
-long Tr2DepthStencil::CreateEx( unsigned width, unsigned height, DepthStencilFormat dsFormat, unsigned msaaType, unsigned msaaQuality, unsigned flags )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-	return m_depthStencil.CreateEx( width, height, dsFormat, msaaType, msaaQuality, flags, renderContext ).GetResult();
+	return m_depthStencil.Create( width, height, dsFormat, Tr2MsaaDesc( msaaType, msaaQuality ), flags, renderContext ).GetResult();
 }
 
 Tr2TextureAL* Tr2DepthStencil::GetTexture()
@@ -61,12 +54,6 @@ void Tr2DepthStencil::Destroy()
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	m_depthStencil.Destroy();
-}
-	
-bool Tr2DepthStencil::IsReadable() const
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-	return m_depthStencil.IsValid() && m_depthStencil.IsReadable();
 }
 
 // --------------------------------------------------------------------------------------
@@ -95,7 +82,38 @@ bool Tr2DepthStencil::HasALObject( int type, size_t object )
 // Return Value:
 //   Shared handle of contained AL depth stencil
 // --------------------------------------------------------------------------------------
-uint32_t Tr2DepthStencil::GetSharedHandle() const
+uintptr_t Tr2DepthStencil::GetSharedHandle() const
 {
 	return m_depthStencil.GetSharedHandle();
 }
+
+// --------------------------------------------------------------------------------------
+uint32_t Tr2DepthStencil::GetWidth() const
+{
+	return m_depthStencil.GetWidth();
+}
+
+// --------------------------------------------------------------------------------------
+uint32_t Tr2DepthStencil::GetHeight() const
+{
+	return m_depthStencil.GetHeight();
+}
+
+// --------------------------------------------------------------------------------------
+uint32_t Tr2DepthStencil::GetMsaaSamples() const
+{
+	return m_depthStencil.GetMsaaDesc().samples;
+}
+
+// --------------------------------------------------------------------------------------
+uint32_t Tr2DepthStencil::GetMsaaQuality() const
+{
+	return m_depthStencil.GetMsaaDesc().quality;
+}
+
+// --------------------------------------------------------------------------------------
+Tr2RenderContextEnum::DepthStencilFormat Tr2DepthStencil::GetFormat() const
+{
+	return m_depthStencil.GetFormat();
+}
+

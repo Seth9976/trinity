@@ -918,7 +918,7 @@ void EveSpaceScene::RenderDistortionBatches( BatchMap& batches, Tr2RenderContext
 	
 	if( m_depthMap && m_depthMap->IsValid() )
     {
-		if( m_depthMap->m_depthStencil.GetMsaaType() > 1 )
+		if( m_depthMap->m_depthStencil.GetMsaaDesc().samples > 1 )
 		{
 			Tr2Renderer::SetDepthStencilBuffer( nullDS, renderContext );
 		}
@@ -1778,7 +1778,7 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 		uint32_t msaaType = 0;
 		if( m_depthMap )
 		{
-			msaaType = std::max( m_depthMap->m_depthStencil.GetMsaaType(), 1u );
+			msaaType = std::max( m_depthMap->m_depthStencil.GetMsaaDesc().samples, 1u );
 		}
 		lightManager->UpdateLists( msaaType, renderContext );
 	}

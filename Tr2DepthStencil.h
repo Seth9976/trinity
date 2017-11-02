@@ -21,6 +21,8 @@ public:
     Tr2DepthStencil( IRoot* = 0 );
 	~Tr2DepthStencil();
 
+	virtual Tr2TextureAL* GetTexture();
+
 	void py__init__(
 		Be::OptionalWithDefaultValue<unsigned, 0> width,
 		Be::OptionalWithDefaultValue<unsigned, 0> height,
@@ -28,15 +30,24 @@ public:
 		Be::OptionalWithDefaultValue<unsigned, 1> msaaType,
 		Be::OptionalWithDefaultValue<unsigned, 0> msaaQuality );
 
-	virtual Tr2TextureAL* GetTexture();
+	long Create( 
+		unsigned width, 
+		unsigned height, 
+		Tr2RenderContextEnum::DepthStencilFormat format, 
+		unsigned msaaType, 
+		unsigned msaaQuality, 
+		Tr2RenderContextEnum::ExFlag flags = Tr2RenderContextEnum::EX_NONE );
 
-	long Create( unsigned width, unsigned height, Tr2RenderContextEnum::DepthStencilFormat format, unsigned msaaType, unsigned msaaQuality );
-	long CreateEx( unsigned width, unsigned height, Tr2RenderContextEnum::DepthStencilFormat format, unsigned msaaType, unsigned msaaQuality, unsigned flags );
 	bool IsValid() const;
 	void Destroy();
-	bool IsReadable() const;
 
-	uint32_t GetSharedHandle() const;
+	uintptr_t GetSharedHandle() const;
+
+	uint32_t GetWidth() const;
+	uint32_t GetHeight() const;
+	uint32_t GetMsaaSamples() const;
+	uint32_t GetMsaaQuality() const;
+	Tr2RenderContextEnum::DepthStencilFormat GetFormat() const;
 
 	Tr2DepthStencilAL	m_depthStencil;
 

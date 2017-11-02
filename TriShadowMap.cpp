@@ -232,14 +232,7 @@ bool TriShadowMap::OnPrepareResources()
 	}
 	if( !m_shadowMapDS.IsValid() )
 	{
-		CR_RETURN_VAL( 
-				m_shadowMapDS.Create(	m_size, 
-										m_size, 
-										DSFMT_AUTO, 
-										0, 
-										0, 
-										renderContext )
-				, false );
+		CR_RETURN_VAL( m_shadowMapDS.Create( m_size, m_size, DSFMT_AUTO, Tr2MsaaDesc(), EX_NONE, renderContext ), false );
 	}
 
 	if( m_shadowSizeHandle )

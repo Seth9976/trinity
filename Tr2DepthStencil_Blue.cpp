@@ -20,30 +20,23 @@ const Be::ClassInfo* Tr2DepthStencil::ExposeToBlue()
 			"No arguments"
 		)
 
-		MAP_METHOD_AND_WRAP
-		(
-			"IsReadable",
-			IsReadable,
-			"No arguments\n"
-			"Returns true if the depthStencil is readable, so setting it in the\n"
-			"variable store will make it act like a source texture."
-		)
-
-		MAP_METHOD_AND_WRAP
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(
 			"Create",
 			Create,
+			1,
 			":param width: buffer width\n"
 			":param height: buffer height\n"
 			":param format: buffer format (trinity.DEPTH_STENCIL_FORMAT)\n"
 			":param msaaType: sample count\n"
 			":param msaaQuality: MSAA quality"
+			":param flags: trinity.EX_FLAG"
 		)
 
 		MAP_METHOD_AND_WRAP
 		(
 			"CreateEx",
-			CreateEx,
+			Create,
 			":param width: buffer width\n"
 			":param height: buffer height\n"
 			":param format: buffer format (trinity.DEPTH_STENCIL_FORMAT)\n"
@@ -54,15 +47,13 @@ const Be::ClassInfo* Tr2DepthStencil::ExposeToBlue()
 
 		MAP_ATTRIBUTE( "name",					m_name,							"", Be::READWRITE | Be::PERSIST );
 
-		MAP_ATTRIBUTE( "width" ,				m_depthStencil.m_width,			"", Be::READ );
-		MAP_ATTRIBUTE( "height",				m_depthStencil.m_height,		"", Be::READ );		
-		MAP_ATTRIBUTE( "multiSampleType",		m_depthStencil.m_msaaType,		"", Be::READ );
-		MAP_ATTRIBUTE( "multiSampleQuality",	m_depthStencil.m_msaaQuality,	"", Be::READ );
+		MAP_PROPERTY_READONLY( "width", GetWidth, "" );
+		MAP_PROPERTY_READONLY( "height", GetHeight, "" );
+		MAP_PROPERTY_READONLY( "multiSampleType", GetMsaaSamples, "" );
+		MAP_PROPERTY_READONLY( "multiSampleQuality", GetMsaaQuality, "" );
+		MAP_PROPERTY_READONLY( "format", GetFormat, "" );
 
-		MAP_ATTRIBUTE_WITH_CHOOSER( "format", m_depthStencil.m_format,	"", Be::READ | Be::ENUM, Tr2RenderContextEnum_DepthStencilFormat_Chooser );
-
-		MAP_PROPERTY_READONLY( "isValid",		IsValid,	"IsValid()" );
-		MAP_PROPERTY_READONLY( "isReadable",	IsReadable, "IsReadable()" );
+		MAP_PROPERTY_READONLY( "isValid", IsValid, "is the graphics object successfully creaed" );
 
 		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS( 
 			"__init__", 
