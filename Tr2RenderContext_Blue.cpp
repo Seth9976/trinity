@@ -138,7 +138,6 @@ const Be::VarChooser Tr2RenderContextEnum_ExFlag_Chooser[] =
 {
 	{	"CREATE_SHARED",			BeCast( EX_CREATE_SHARED ),				"" },	
 	{	"BIND_UNORDERED_ACCESS",	BeCast( EX_BIND_UNORDERED_ACCESS ),		"" },	
-	{	"WRITABLE_UAV",				BeCast( EX_WRITABLE_UAV ),				"" },	
 	{	"DRAW_INDIRECT",			BeCast( EX_DRAW_INDIRECT ),				"" },	
 	{0}
 };

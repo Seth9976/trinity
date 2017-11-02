@@ -209,13 +209,15 @@ bool TriShadowMap::OnPrepareResources()
 
 	if( m_filterVsm && !m_filterBlurRT.IsValid() )
 	{
-		CR_RETURN_VAL( 
-			m_filterBlurRT.Create(	m_size, 
-									m_size, 
-									1, 
-									pixelFormat, 
-									renderContext )
-			, false );
+		CR_RETURN_VAL( m_filterBlurRT.Create(	
+			m_size, 
+			m_size, 
+			1, 
+			pixelFormat,
+			Tr2MsaaDesc(), 
+			0, 
+			EX_NONE,
+			renderContext ), false );
 	}
 
 	if( !m_noShadowTexture->GetTexture()->IsValid() )

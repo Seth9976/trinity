@@ -42,7 +42,7 @@ bool Tr2PickBuffer::OnPrepareResources()
 
 	// create the pixel buffer as a rendertarget
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	CR( m_pickTarget.CreateEx( bufferWidth, bufferHeight, 1, m_format, 1, 0, 0, EX_PICKING_BUFFER_WORKAROUND, renderContext ) );
+	CR( m_pickTarget.Create( bufferWidth, bufferHeight, 1, m_format, Tr2MsaaDesc(), 0, EX_NONE, renderContext ) );
 	CR( m_depthBuffer.Create( bufferWidth, bufferHeight, Tr2RenderContextEnum::DSFMT_D24S8, Tr2MsaaDesc(), EX_NONE, renderContext ) );
 
 	return true;

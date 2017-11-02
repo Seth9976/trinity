@@ -26,19 +26,21 @@ public:
 		unsigned mipCount, 
 		Tr2RenderContextEnum::PixelFormat format,
 		unsigned msaaType, 
-		unsigned msaaQuality );
+		unsigned msaaQuality,
+		Tr2RenderContextEnum::ExFlag flags );
 
-	long Create(	unsigned width, unsigned height, unsigned mipLevelCount,
-					Tr2RenderContextEnum::PixelFormat format );
+	long Create( 
+		unsigned width, 
+		unsigned height, 
+		unsigned mipLevelCount,
+		Tr2RenderContextEnum::PixelFormat format,
+		unsigned msaaType = 1, 
+		unsigned msaaQuality = 0,
+		Tr2RenderContextEnum::ExFlag flags = Tr2RenderContextEnum::EX_NONE );
 
 	long CreateMsaa(	unsigned width, unsigned height,
 						Tr2RenderContextEnum::PixelFormat format, 
 						unsigned msaaType, unsigned msaaQuality );
-
-	long CreateEx(	unsigned width, unsigned height, unsigned mipLevelCount, 
-					Tr2RenderContextEnum::PixelFormat format, 
-					unsigned msaaType, unsigned msaaQuality,
-					unsigned flags );
 
 	virtual Tr2TextureAL* GetTexture();
 

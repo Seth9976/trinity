@@ -22,24 +22,24 @@ void Tr2RenderTarget::py__init__(
 	unsigned mipCount, 
 	Tr2RenderContextEnum::PixelFormat format,
 	unsigned msaaType, 
-	unsigned msaaQuality )
+	unsigned msaaQuality,
+	Tr2RenderContextEnum::ExFlag flags )
 {
 	if( width && height && format )
 	{
 		CCP_ASSERT( msaaType <= 1 || mipCount <= 1 );	// can't have msaa and mips at the same time.
-		if( msaaType <= 1 )
-		{
-			Create( width, height, mipCount, format );
-		}
-		else
-		{
-			CreateMsaa( width, height, format, msaaType, msaaQuality );
-		}
+		Create( width, height, mipCount, format, msaaType, msaaQuality, flags );
 	}		
 }
 
-long Tr2RenderTarget::Create(	unsigned width, unsigned height, unsigned mipLevelCount,
-								Tr2RenderContextEnum::PixelFormat format )
+long Tr2RenderTarget::Create(	
+	unsigned width, 
+	unsigned height, 
+	unsigned mipLevelCount, 
+	Tr2RenderContextEnum::PixelFormat format,
+	unsigned msaaType,
+	unsigned msaaQuality,
+	Tr2RenderContextEnum::ExFlag flags )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	USE_MAIN_THREAD_RENDER_CONTEXT();
@@ -47,11 +47,15 @@ long Tr2RenderTarget::Create(	unsigned width, unsigned height, unsigned mipLevel
 	{
 		return E_INVALIDARG;
 	}
-	return m_renderTarget.Create(	width, 
-									height, 
-									mipLevelCount, 
-									format, 
-									renderContext ).GetResult();
+	return m_renderTarget.Create(
+		width,
+		height,
+		mipLevelCount,
+		format,
+		Tr2MsaaDesc( msaaType, msaaQuality ),
+		( flags & Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS ) ? Tr2RenderContextEnum::USAGE_UNORDERED_ACCESS : 0,
+		ExFlag( flags ),
+		renderContext ).GetResult();
 }
 
 long Tr2RenderTarget::CreateMsaa(	unsigned width, unsigned height, 
@@ -64,35 +68,15 @@ long Tr2RenderTarget::CreateMsaa(	unsigned width, unsigned height,
 	{
 		return E_INVALIDARG;
 	}
-	return m_renderTarget.Create(	width, 
-									height, 
-									1, 
-									format, 
-									msaaType, 
-									msaaQuality, 
-									renderContext ).GetResult();
-}
-
-long Tr2RenderTarget::CreateEx(	unsigned width, unsigned height, unsigned mipLevelCount, 
-								Tr2RenderContextEnum::PixelFormat format, 
-								unsigned msaaType, unsigned msaaQuality,
-								unsigned flags )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-	if( IsAttached() )
-	{
-		return E_INVALIDARG;
-	}
-	return m_renderTarget.CreateEx( width, 
-									height, 
-									mipLevelCount, 
-									format, 
-									msaaType, 
-									msaaQuality, 
-									( flags & Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS ) ? Tr2RenderContextEnum::USAGE_UNORDERED_ACCESS : 0,
-									flags,
-									renderContext ).GetResult();
+	return m_renderTarget.Create(	
+		width, 
+		height, 
+		1, 
+		format, 
+		Tr2MsaaDesc( msaaType, msaaQuality ),
+		0,
+		EX_NONE,
+		renderContext ).GetResult();
 }
 
 Tr2TextureAL* Tr2RenderTarget::GetTexture()
@@ -179,7 +163,7 @@ void Tr2RenderTarget::Destroy()
 
 bool Tr2RenderTarget::IsReadable() const
 {
-	return GetRenderTarget().IsReadable();
+	return GetRenderTarget().GetTexture().IsValid() && GetRenderTarget().GetMsaaDesc().samples < 2;
 }
 
 long Tr2RenderTarget::GenerateMipMaps()
@@ -272,7 +256,7 @@ uint32_t Tr2RenderTarget::GetMipCount() const
 // --------------------------------------------------------------------------------------
 uint32_t Tr2RenderTarget::GetMsaaType() const
 {
-	return GetRenderTarget().GetMsaaType();
+	return GetRenderTarget().GetMsaaDesc().samples;
 }
 
 // --------------------------------------------------------------------------------------
@@ -283,7 +267,7 @@ uint32_t Tr2RenderTarget::GetMsaaType() const
 // --------------------------------------------------------------------------------------
 uint32_t Tr2RenderTarget::GetMsaaQuality() const
 {
-	return GetRenderTarget().GetMsaaQuality();
+	return GetRenderTarget().GetMsaaDesc().quality;
 }
 
 // --------------------------------------------------------------------------------------

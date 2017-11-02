@@ -13,49 +13,59 @@ const Be::ClassInfo* Tr2RenderTarget::ExposeToBlue()
 		MAP_INTERFACE( Tr2RenderTarget )
 		MAP_INTERFACE( ITr2TextureProvider )
 
-		MAP_METHOD_AND_WRAP
-		(
-			"IsValid",
-			IsValid,
-			"No arguments"
-		)
-
-		MAP_METHOD_AND_WRAP
-		(
-			"IsReadable",
-			IsReadable,
-			"No arguments\n"
-			"Returns true if the renderTarget can be textured from."
-		)
-
-		MAP_METHOD_AND_WRAP
-		(
-			"Create",
-			Create,
-			"Creates a new render target\n"
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS(
+			"__init__",
+			py__init__,
+			7,
+			"Provide no arguments, and call Create/CreateMsaa later, or provide\n"
+			"width, height, mipCount, trinity.PIXEL_FORMAT, msaaType=0, msaaQuality=0, flags=0.\n"
 			":param width: render target width\n"
 			":param height: render target height\n"
 			":param mipCount: number of mip levels (0 = full pyramid)\n"
 			":param format: pixel format (trinity.PIXEL_FORMAT)"
+			":param msaaType: number of samples\n"
+			":param msaaQuality: MSAA quality\n"
+			":param flags: trinity.EX_FLAG"
 		)
 
-		MAP_METHOD_AND_WRAP
+
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
+		(
+			"Create",
+			Create,
+			3,
+			"Creates a new render target\n"
+			":jessica-deprecated:\n"
+			":param width: render target width\n"
+			":param height: render target height\n"
+			":param mipCount: number of mip levels (0 = full pyramid)\n"
+			":param format: pixel format (trinity.PIXEL_FORMAT)\n"
+			":param msaaType: number of samples\n"
+			":param msaaQuality: MSAA quality\n"
+			":param flags: trinity.EX_FLAG"
+		)
+
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(
 			"CreateMsaa",
 			CreateMsaa,
+			1,
 			"Creates a new MSAA render target\n"
+			":jessica-deprecated:\n"
 			":param width: render target width\n"
 			":param height: render target height\n"
 			":param format: pixel format (trinity.PIXEL_FORMAT)"
 			":param msaaType: number of samples\n"
-			":param msaaQuality: MSAA quality"
+			":param msaaQuality: MSAA quality\n"
+			":param flags: trinity.EX_FLAG"
 		)
 
 		MAP_METHOD_AND_WRAP
 		(
 			"CreateEx",
-			CreateEx,
+			Create,
 			"Creates a new render target\n"
+			":jessica-deprecated:\n"
 			":param width: render target width\n"
 			":param height: render target height\n"
 			":param mipCount: number of mip levels (0 = full pyramid)\n"
@@ -65,6 +75,12 @@ const Be::ClassInfo* Tr2RenderTarget::ExposeToBlue()
 			":param flags: trinity.EX_FLAG"
 		)
 
+		MAP_METHOD_AND_WRAP
+		(
+			"IsValid",
+			IsValid,
+			"No arguments"
+		)
 		MAP_METHOD_AND_WRAP
 		(
 			"GenerateMipMaps",
@@ -91,22 +107,8 @@ const Be::ClassInfo* Tr2RenderTarget::ExposeToBlue()
 
 		MAP_PROPERTY_READONLY( "format", GetFormat,	"" );
 
-		MAP_PROPERTY_READONLY( "isValid",		IsValid,	"IsValid()" );
-		MAP_PROPERTY_READONLY( "isReadable",	IsReadable, "IsReadable()" );
-
-		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS( 
-			"__init__", 
-			py__init__, 
-			6,
-			"Provide no arguments, and call Create/CreateMsaa later, or provide\n" 
-			"width, height, mipCount, trinity.PIXEL_FORMAT, msaaType=0, msaaQuality=0.\n"
-			":param width: render target width\n"
-			":param height: render target height\n"
-			":param mipCount: number of mip levels (0 = full pyramid)\n"
-			":param format: pixel format (trinity.PIXEL_FORMAT)"
-			":param msaaType: number of samples\n"
-			":param msaaQuality: MSAA quality"
-			)
+		MAP_PROPERTY_READONLY( "isValid", IsValid, "is the graphics object successfully creaed" );
+		MAP_PROPERTY_READONLY( "isReadable", IsReadable, "can the RT be used as a texture" );
 
 		MAP_METHOD_AND_WRAP( 
 			"sharedHandle",	
