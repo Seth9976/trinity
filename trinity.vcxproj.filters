@@ -14,6 +14,7 @@
     <Filter Include="Source Files\Eve\SpaceObject\Attachments"/>
     <Filter Include="Source Files\Eve\SpaceObject\Attachments\Sets"/>
     <Filter Include="Source Files\Eve\SpaceObject\Children"/>
+    <Filter Include="Source Files\Eve\SpaceObject\Children\TransformModifiers"/>
     <Filter Include="Source Files\Eve\SpaceObject\Utils"/>
     <Filter Include="Source Files\Eve\Turret"/>
     <Filter Include="Source Files\Eve\UI"/>
@@ -718,6 +719,15 @@
     </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\IEveSpaceObjectChild.h">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierLookAtCamera.h">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierSRT.h">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\IEveChildTransformModifier.h">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
     </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Utils\EveCustomMask.h">
       <Filter>Source Files\Eve\SpaceObject\Utils</Filter>
@@ -2455,6 +2465,18 @@
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\EveCloudEditableVolume_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierLookAtCamera.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierLookAtCamera_Blue.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierSRT.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierSRT_Blue.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Utils\EveCustomMask.cpp">
       <Filter>Source Files\Eve\SpaceObject\Utils</Filter>
