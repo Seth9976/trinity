@@ -15,17 +15,8 @@ bool TriDevice::DeviceExists()
 	return renderContext.IsValid();
 }
 
-void TriDevice::SetDefaultRenderStates()
-{
-}
-
 void TriDevice::UpdateCursor()
 {
-}
-
-bool TriDevice::DoLowLevelDeviceReset( const Tr2PresentParametersAL& pp )
-{
-	return true;
 }
 
 bool TriDevice::DeviceSupportsVertexTexture()

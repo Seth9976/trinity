@@ -15,8 +15,6 @@ TRI_REGISTER_SETTING( "emulateDriverReset",		g_emulateDriverReset );
 CCP_STATS_DECLARED_ELSEWHERE( presentTime );
 
 
-void TriDevice::SetDefaultRenderStates() {}
-
 void TriDevice::UpdateCursor() {}
 
 void TriDevice::HandleRenderTick(  Be::Time realTime, Be::Time simTime )
@@ -164,11 +162,6 @@ bool TriDevice::DeviceExists()
 
 // Show or hide the cursor
 void TriDevice::DoShowCursor( bool show ) {}
-
-bool TriDevice::DoLowLevelDeviceReset( const Tr2PresentParametersAL& pp )
-{
-	return true;
-}
 
 bool TriDevice::DeviceSupportsVertexTexture()
 {

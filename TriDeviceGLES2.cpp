@@ -9,8 +9,6 @@
 
 CCP_STATS_DECLARED_ELSEWHERE( presentTime );
 
-void TriDevice::SetDefaultRenderStates() {}
-
 void TriDevice::UpdateCursor() {}
 
 void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
@@ -77,11 +75,6 @@ void TriDevice::DoShowCursor( bool show ) {}
 bool TriDevice::DeviceSupportsVertexTexture()
 {
 	//TODO?
-	return true;
-}
-
-bool TriDevice::DoLowLevelDeviceReset( const Tr2PresentParametersAL& pp )
-{
 	return true;
 }
 

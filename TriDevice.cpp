@@ -228,6 +228,11 @@ bool TriDevice::CreateSimpleDevice(
 	mHwnd = hwnd;
 	mDeviceLost = false;
 
+	if( !SetPresentParameters( mAdapter, mPresentParam ) )
+	{
+		return false;
+	}
+
 	if( !InitD3DDevice() )
 	{
 		return false;
@@ -266,8 +271,6 @@ bool TriDevice::InitD3DDevice()
 	mViewport.height	= int( mHeight );
 	mViewport.minZ		= 0;
 	mViewport.maxZ		= 1.0f;
-
-	SetDefaultRenderStates();
 
 	mDeviceLost = false;
 	return true;
@@ -322,6 +325,11 @@ bool TriDevice::ChangeDevice(
 		return false;
 	}
 	
+	if( !SetPresentParameters( mAdapter, mPresentParam ) )
+	{
+		return false;
+	}
+
 	InitD3DDevice();
 		
 	PrepareDeviceResources(); //call python to recreate its stuff.
@@ -803,11 +811,11 @@ bool TriDevice::ResetDevice( unsigned adapter, const Tr2PresentParametersAL* pp 
 		pp = &mPresentParam;
 	}
 
-	if( !DoLowLevelDeviceReset( *pp ) )
+	if( !SetPresentParameters( adapter, *pp ) )
 	{
 		return false;
 	}
-		
+
 	// success! 
 	mWidth = pp->mode.width;
 	mHeight = pp->mode.height;
@@ -969,14 +977,22 @@ PyObject* TriDevice::PyResetDeviceResources( PyObject* args )
 }
 #endif
 
-void TriDevice::PrepareDeviceResources()
+bool TriDevice::SetPresentParameters( unsigned adapter, const Tr2PresentParametersAL& pp )
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 
-	// NB: Unchecked return.
-	// Also, why are we calling this?
-	renderContext.SetPresentParameters( mAdapter, mPresentParam );
+	auto hr = renderContext.SetPresentParameters( adapter, pp );
+	if( FAILED( hr ) )
+	{
+		LogAllLiveResources( TRISTORAGE_VIDEOMEMORY );
+		TriError::ReportError( hr, Clsid(), "Device Reset failed" );
+		return false;
+	}
+	return true;
+}
 
+void TriDevice::PrepareDeviceResources()
+{
 	// Rebuild C++ device resources
 	const ResourceSet& rs = GetResourcesRegistered();
 	for( auto i = rs.cbegin(); i!= rs.cend(); ++i )

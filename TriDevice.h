@@ -273,11 +273,12 @@ private:
 	void DoReleaseDevice();
 
 	bool ResetDevice( unsigned adapter, const Tr2PresentParametersAL* pp );
-	bool DoLowLevelDeviceReset( const Tr2PresentParametersAL& );
 
 	void HandleRenderTick( Be::Time realTime, Be::Time simTime );
 
 	void DeviceLost();
+
+	bool SetPresentParameters( unsigned adapter, const Tr2PresentParametersAL& pp );
 
 	static void LogAllLiveResources( Tr2ALMemoryTypes flags = AL_MEMORY_VIDEO | AL_MEMORY_MANAGED );
 
@@ -289,8 +290,6 @@ private:
 	
 	int mAdapter;	
 	PresentationParameters mPresentParam;
-
-	void SetDefaultRenderStates();
 
 	//Stuff here deals with lost devices.
 	bool m_ignoreInvalidate; //to avoid recursion when deleting memory

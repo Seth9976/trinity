@@ -17,72 +17,6 @@ using namespace Tr2RenderContextEnum;
 
 CCP_STATS_DECLARED_ELSEWHERE( presentTime );
 
-bool TriDevice::DoLowLevelDeviceReset( const Tr2PresentParametersAL& presentationParameters )
-{
-	D3DPRESENT_PARAMETERS pp;
-	pp.BackBufferWidth = presentationParameters.mode.width;
-	pp.BackBufferHeight = presentationParameters.mode.height;
-	pp.BackBufferFormat = ConvertToD3D9Format( presentationParameters.mode.format );
-	pp.BackBufferCount = presentationParameters.backBufferCount;
-	pp.MultiSampleType = D3DMULTISAMPLE_TYPE( presentationParameters.msaaType );
-    pp.MultiSampleQuality = presentationParameters.msaaQuality;
-	pp.SwapEffect = presentationParameters.swapEffect == SWAP_EFFECT_DISCARD ? D3DSWAPEFFECT_DISCARD : D3DSWAPEFFECT_COPY;
-	pp.hDeviceWindow = HWND( presentationParameters.outputWindow );
-    pp.Windowed = presentationParameters.windowed ? TRUE : FALSE;
-	pp.EnableAutoDepthStencil = presentationParameters.depthStencilFormat != DSFMT_UNKNOWN;
-	pp.AutoDepthStencilFormat = ConvertToD3D9DepthStencilFormat( presentationParameters.depthStencilFormat );
-    pp.Flags = 0;
-	pp.FullScreen_RefreshRateInHz = presentationParameters.windowed ? 0 : presentationParameters.mode.refreshRateDenominator;
-	switch( presentationParameters.presentInterval )
-	{
-	case PRESENT_INTERVAL_IMMEDIATE:
-		pp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-		break;
-	case PRESENT_INTERVAL_TWO:
-		pp.PresentationInterval = D3DPRESENT_INTERVAL_TWO;
-		break;
-	case PRESENT_INTERVAL_THREE:
-		pp.PresentationInterval = D3DPRESENT_INTERVAL_THREE;
-		break;
-	case PRESENT_INTERVAL_FOUR:
-		pp.PresentationInterval = D3DPRESENT_INTERVAL_FOUR;
-		break;
-	default:
-		pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
-	}
-
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	HRESULT hr = renderContext.m_d3dDevice9->Reset( &pp );
-	if( FAILED( hr ) )
-	{
-		CCP_LOGERR( "Device reset attempt failed - %X: %s", hr, DXGetErrorString( hr ) );
-		hr = renderContext.m_d3dDevice9->Reset( &pp );
-	}
-	if( FAILED( hr ) )
-	{
-		CCP_LOGERR( "Second device reset attempt failed - %X: %s", hr, DXGetErrorString( hr ) );
-
-		// This does nothing except for in dev9
-		LogAllLiveResources( TRISTORAGE_VIDEOMEMORY );
-		TriError::ReportError( hr, Clsid(), "Device Reset failed" );
-		return false;
-	}
-
-	return true;
-}
-
-void TriDevice::SetDefaultRenderStates()
-{
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-	renderContext.m_d3dDevice9->SetRenderState( D3DRS_INDEXEDVERTEXBLENDENABLE, FALSE );
-	renderContext.m_d3dDevice9->SetRenderState( D3DRS_LOCALVIEWER, TRUE );
-	renderContext.m_d3dDevice9->SetRenderState( D3DRS_NORMALIZENORMALS, TRUE );
-	renderContext.m_d3dDevice9->SetRenderState( D3DRS_DITHERENABLE, FALSE );	
-	renderContext.m_d3dDevice9->SetRenderState( D3DRS_SPECULARENABLE, FALSE );
-	renderContext.m_d3dDevice9->SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );	
-}
-
 void TriDevice::UpdateCursor()
 {	
 #if BLUE_WITH_PYTHON
@@ -128,7 +62,7 @@ void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
 		}
 	}
 
-	HRESULT hr = renderContext.m_d3dDevice9->TestCooperativeLevel();
+	HRESULT hr = renderContext.TestCooperativeLevel();
 	switch( hr )
 	{
 	case E_DEVICELOST:

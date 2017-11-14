@@ -13,15 +13,6 @@ using namespace Tr2RenderContextEnum;
 
 CCP_STATS_DECLARED_ELSEWHERE( presentTime );
 
-bool TriDevice::DoLowLevelDeviceReset( const Tr2PresentParametersAL& presentationParameters )
-{
-	return true;
-}
-
-void TriDevice::SetDefaultRenderStates()
-{
-}
-
 void TriDevice::UpdateCursor()
 {	
 }
