@@ -523,24 +523,6 @@ const EveSOFDataMgr::FactionSpotlightSetColorData* EveSOFDNA::GetFactionSpotligh
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Return the factional group-spriteset-data by a given groupindex
-// --------------------------------------------------------------------------------
-const EveSOFDataMgr::FactionSpriteSetColorData* EveSOFDNA::GetFactionSpriteSetData( int groupIndex ) const
-{
-	// -1 is null
-	if( groupIndex != -1 )
-	{
-		auto finder = m_factionData->spriteSetsColor.find( groupIndex );
-		if( finder != m_factionData->spriteSetsColor.end() )
-		{
-			return &finder->second;
-		}
-	}
-	return nullptr;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
 //   Return the factional group-child-data by a given groupindex
 // --------------------------------------------------------------------------------
 const EveSOFDataMgr::FactionChildData* EveSOFDNA::GetFactionChildData( int groupIndex ) const

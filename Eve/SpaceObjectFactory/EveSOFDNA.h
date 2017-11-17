@@ -102,7 +102,6 @@ public:
 	const EveSOFDataMgr::FactionDecalData* GetFactionDecalData( int groupIndex ) const;
 	const EveSOFDataMgr::FactionPlaneSetColorData* GetFactionPlaneSetData( int groupIndex ) const;
 	const EveSOFDataMgr::FactionSpotlightSetColorData* GetFactionSpotlightSetData( int groupIndex ) const;
-	const EveSOFDataMgr::FactionSpriteSetColorData* GetFactionSpriteSetData( int groupIndex ) const;
 	const EveSOFDataMgr::FactionChildData* GetFactionChildData( int groupIndex ) const;
 
 	// get color data

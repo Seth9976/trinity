@@ -562,20 +562,11 @@ void EveSOF::SetupSpriteSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) c
 					// color data?
 					const Color* spriteSetColors = dna->GetColorSpriteSet();
 
-					// faction data?
-					const EveSOFDataMgr::FactionSpriteSetColorData* factionSpriteData = dna->GetFactionSpriteSetData( itemData->groupIndex );
-					if( !factionSpriteData )
-					{
-						// This spriteset item is not used for this faction.
-//						continue;
-					}
-
 					// create spriteset items
 					EveSpriteSetItemPtr spriteSetItem;
 					spriteSetItem.CreateInstance();
 
-					// set it up the per-faction data
-//					spriteSetItem->m_color = factionSpriteData->color;
+					// set it up the colorset data
 					spriteSetItem->m_color = spriteSetColors[itemData->colorType];
 
 					// set it up the per-hull data
@@ -870,20 +861,11 @@ void EveSOF::SetupSpriteLineSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna
 					// color data?
 					const Color* spriteSetColors = dna->GetColorSpriteSet();
 
-					// faction data?
-					const EveSOFDataMgr::FactionSpriteSetColorData* factionSpriteData = dna->GetFactionSpriteSetData( itemData->groupIndex );
-					if( !factionSpriteData )
-					{
-						// This spritelineset item is not used for this faction.
-//						continue;
-					}
-
 					// create spritelineset items
 					EveSpriteLineSetItemPtr spriteLineSetItem;
 					spriteLineSetItem.CreateInstance();
 
-					// set it up the per-faction data
-//					spriteLineSetItem->m_color = factionSpriteData->color;
+					// set it up the colorset data
 					spriteLineSetItem->m_color = spriteSetColors[itemData->colorType];
 
 					// set it up the per-hull data

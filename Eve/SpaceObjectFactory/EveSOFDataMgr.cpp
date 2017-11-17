@@ -868,18 +868,6 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 		}
 	}
 
-	// sprite set colors
-	fd.spriteSetsColor.clear();
-	for( auto sscit = srcData->m_spriteSets.begin(); sscit != srcData->m_spriteSets.end(); ++sscit )
-	{
-		EveSOFDataFactionSpriteSetPtr spriteSetData = (*sscit);
-
-		FactionSpriteSetColorData sscd;
-		sscd.color = spriteSetData->m_color;
-
-		fd.spriteSetsColor[spriteSetData->m_groupIndex] = sscd;
-	}
-
 	// spotlight set colors
 	fd.spotlightSetsColors.clear();
 	for( auto spotcit = srcData->m_spotlightSets.begin(); spotcit != srcData->m_spotlightSets.end(); ++spotcit )

@@ -329,8 +329,6 @@ public:
 		ColorData colorData;
 		// visibility data
 		std::set<uint32_t> visibilityData;
-		// spritesets
-		std::map<int, FactionSpriteSetColorData> spriteSetsColor;
 		// spotlight sets
 		std::map<int, FactionSpotlightSetColorData> spotlightSetsColors;
 		// plane sets
