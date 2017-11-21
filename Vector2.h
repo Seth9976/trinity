@@ -356,4 +356,10 @@ inline const Vector2 operator*( float f, const Vector2& other )
 
 #endif
 
+// ----------------------------------------------------------------------------------
+inline float Length( const Vector2& v )
+{
+	return std::sqrt( v.x * v.x + v.y * v.y );
+}
+
 #endif // VECTOR2_H

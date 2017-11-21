@@ -793,6 +793,48 @@ inline Vector4 Transform( const Vector4& point, const Matrix& transform )
 }
 
 // --------------------------------------------------------------------------------------
+inline void TransformCoords( void* coords, size_t count, size_t stride, const Matrix& transform )
+{
+	auto stream = static_cast<uint8_t*>( coords );
+	for( size_t i = 0; i < count; ++i )
+	{
+		*reinterpret_cast<Vector3*>( stream ) = TransformCoord( *reinterpret_cast<Vector3*>( stream ), transform );
+		stream += stride;
+	}
+}
+
+// --------------------------------------------------------------------------------------
+inline void TransformCoords( Vector3* coords, size_t size, const Matrix& transform )
+{
+	for( size_t i = 0; i < size; ++i )
+	{
+		coords[i] = TransformCoord( coords[i], transform );
+	}
+}
+
+// --------------------------------------------------------------------------------------
+template <size_t Size>
+inline void TransformCoords( Vector3 coords[Size], const Matrix& transform )
+{
+	for( size_t i = 0; i < Size; ++i )
+	{
+		coords[i] = TransformCoord( coords[i], transform );
+	}
+}
+
+// --------------------------------------------------------------------------------------
+template <typename OutIter, typename InIter>
+inline void TransformCoords( OutIter dest, InIter first, InIter last, const Matrix& transform )
+{
+	while( first != last )
+	{
+		*dest = TransformCoord( *first, transform );
+		++dest;
+		++first;
+	}
+}
+
+// --------------------------------------------------------------------------------------
 inline Matrix TransformationMatrix(
 	const Vector3* scalingCenter,
 	const Quaternion* scalingRotation,
