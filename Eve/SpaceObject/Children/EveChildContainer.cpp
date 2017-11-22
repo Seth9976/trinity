@@ -99,6 +99,10 @@ void EveChildContainer::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2Qu
 	{
 		return;
 	}
+	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
+	{
+		return;
+	}
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
 		(*it)->AddQuadsToQuadRenderer( frustum, quadRenderer );
@@ -182,6 +186,14 @@ void EveChildContainer::ChangeLOD( Tr2Lod lod )
 
 void EveChildContainer::GetLights( Tr2LightManager& lightManager ) const
 {
+	if( !m_display )
+	{
+		return;
+	}
+	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
+	{
+		return;
+	}
 	XMMATRIX worldTransform = m_worldTransform;
 	float scaling = XMVectorGetX( XMVectorAdd( XMVector3LengthEst( m_worldTransform.GetX() ), 
 		XMVectorAdd( XMVector3LengthEst( m_worldTransform.GetY() ), XMVector3LengthEst( m_worldTransform.GetZ() ) ) ) ) / 3.f;
