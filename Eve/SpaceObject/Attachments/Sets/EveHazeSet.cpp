@@ -25,8 +25,9 @@ struct HazeVertex
 	Vector4 color;
 	uint8_t index;
 	uint8_t boneIndex;
-	// cppcheck-suppress unusedStructMember 
+	// cppcheck-suppress unusedStructMember
 	uint8_t padding0;
+	// cppcheck-suppress unusedStructMember
 	uint8_t padding1;
 };
 
