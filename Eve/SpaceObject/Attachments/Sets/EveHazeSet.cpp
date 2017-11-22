@@ -1,0 +1,280 @@
+////////////////////////////////////////////////////////////
+//
+//    Created:   November 2017
+//    Copyright: CCP 2017
+//
+#include "StdAfx.h"
+#include "TriRenderBatch.h"
+#include "TriFrustum.h"
+#include "Shader/Tr2Effect.h"
+#include "EveHazeSet.h"
+#include "EveHazeSetItem.h"
+#include "Utilities/BoundingSphere.h"
+#include "Tr2PickingHelperBatch.h"
+#include "Tr2DebugRenderer.h"
+
+// vertex layout struct
+struct HazeVertex
+{
+	Vector4 transform1;
+	Vector4 transform2;
+	Vector4 transform3;
+	Vector4 invTransform1;
+	Vector4 invTransform2;
+	Vector4 invTransform3;
+	Vector4 color;
+	uint8_t index;
+	uint8_t boneIndex;
+	uint8_t padding1;
+	uint8_t padding0;
+};
+
+
+using namespace Tr2RenderContextEnum;
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Initialize data members
+// --------------------------------------------------------------------------------
+EveHazeSet::EveHazeSet( IRoot* lockobj ) :
+	PARENTLOCK( m_hazes ),
+	m_display( true ),
+	m_vertexCount( 0 ),
+	m_vertexDeclHandle( Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
+{
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Cleanup
+// --------------------------------------------------------------------------------
+EveHazeSet::~EveHazeSet()
+{
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Set the main effect of this set from the outside
+// --------------------------------------------------------------------------------
+void EveHazeSet::SetEffect( Tr2EffectPtr effect )
+{
+	m_effect = effect;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   If loading from a .red file, we now can start creating resources
+// --------------------------------------------------------------------------------
+bool EveHazeSet::Initialize()
+{
+	PrepareResources();
+	return true;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   We have to free all device stuff, so release vertex declaration and free
+//   all the vertex buffer
+// --------------------------------------------------------------------------------
+void EveHazeSet::ReleaseResources( TriStorage s )
+{
+	m_vertexDeclHandle = Tr2EffectStateManager::UNINITIALIZED_DECLARATION;
+	m_vertexBuffer.Destroy();
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   (Re)-allocate all device stuff: create a vertex declaration for the instanced
+//   rendering and a vertexbuffer
+// --------------------------------------------------------------------------------
+bool EveHazeSet::OnPrepareResources()
+{
+	// Always clear the transform cache
+	m_cachedTransforms.clear();
+
+	if( m_vertexBuffer.IsValid() )
+	{
+		return true;
+	}
+
+	if( m_hazes.empty() )
+	{
+		return true;
+	}
+
+	// register vertex declaration
+	static Tr2VertexDefinition s_hazeVertexDecl;
+	if( s_hazeVertexDecl.empty() )
+	{
+		Tr2VertexDefinition& vd = s_hazeVertexDecl;
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 0 );
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 1 );
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 2 );
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 3 );
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 4 );
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 5 );
+		vd.Add( vd.FLOAT32_4, vd.COLOR );
+		vd.Add( vd.UBYTE_4, vd.TEXCOORD, 6 );
+	}
+	m_vertexDeclHandle = Tr2EffectStateManager::GetVertexDeclarationHandle( s_hazeVertexDecl );
+	if( m_vertexDeclHandle == Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
+	{
+		return false;
+	}
+
+	// prepare buffers
+	m_vertexCount = 24 * (unsigned int)m_hazes.GetSize();
+	std::vector<HazeVertex> verts( m_vertexCount );
+
+	// some index helpers to create a box
+	static uint8_t s_boxInds[6][4] = {
+		{  0,  1,  2,  3 },
+		{  7,  6,  5,  4 },
+		{  0,  4,  5,  1 },
+		{  3,  2,  6,  7 },
+		{  1,  5,  6,  2 },
+		{  4,  0,  3,  7 } };
+
+	// fill it
+	unsigned int n = (unsigned int)m_hazes.GetSize();
+	for( unsigned int i = 0; i < n; ++i )
+	{
+		// build transformation matrix out of the individual item data
+		Matrix itemTransform = TransformationMatrix( m_hazes[i]->m_scaling, m_hazes[i]->m_rotation, m_hazes[i]->m_position );
+		Matrix invItemTransform = Inverse( itemTransform );
+		for( unsigned int s = 0; s < 6; ++s )
+		{
+			for( unsigned int j = 0; j < 4; ++j )
+			{
+				HazeVertex& vertex = verts[i * 24 + s * 4 + j];
+
+				vertex.transform1 = Vector4( itemTransform._11, itemTransform._21, itemTransform._31, itemTransform._41 );
+				vertex.transform2 = Vector4( itemTransform._12, itemTransform._22, itemTransform._32, itemTransform._42 );
+				vertex.transform3 = Vector4( itemTransform._13, itemTransform._23, itemTransform._33, itemTransform._43 );
+				vertex.invTransform1 = Vector4( invItemTransform._11, invItemTransform._21, invItemTransform._31, invItemTransform._41 );
+				vertex.invTransform2 = Vector4( invItemTransform._12, invItemTransform._22, invItemTransform._32, invItemTransform._42 );
+				vertex.invTransform3 = Vector4( invItemTransform._13, invItemTransform._23, invItemTransform._33, invItemTransform._43 );
+				vertex.color = Vector4( m_hazes[i]->m_color.r, m_hazes[i]->m_color.g, m_hazes[i]->m_color.b, m_hazes[i]->m_color.a );
+				vertex.index = s_boxInds[s][j];
+				vertex.boneIndex = m_hazes[i]->m_boneIndex;
+			}
+		}
+		// We cache this for updating view distance info
+		m_cachedTransforms.push_back( itemTransform );
+	}
+
+	USE_MAIN_THREAD_RENDER_CONTEXT();
+	CR_RETURN_VAL( m_vertexBuffer.Create( m_vertexCount * sizeof( HazeVertex ), USAGE_IMMUTABLE, &verts[0], renderContext ), false );
+
+	return true;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Setup rendering and call DIP
+// --------------------------------------------------------------------------------
+void EveHazeSet::SubmitGeometry( Tr2RenderContext& renderContext )
+{
+	renderContext.m_esm.ApplyVertexDeclaration( m_vertexDeclHandle );
+	renderContext.m_esm.ApplyStreamSource( 0, m_vertexBuffer, 0, sizeof( HazeVertex ) );
+	auto ib = Tr2Renderer::GetQuadListIndexBuffer( m_vertexCount / 4 );
+	if( !ib )
+	{
+		return;
+	}
+	renderContext.m_esm.ApplyIndexBuffer( *ib );
+	renderContext.SetTopology( TOP_TRIANGLES );
+	renderContext.DrawIndexedPrimitive( m_vertexCount, 0, m_vertexCount / 2 );
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Trinity's way of providing batches to render
+// --------------------------------------------------------------------------------
+void EveHazeSet::GetBatches( ITriRenderBatchAccumulator* accumulator, TriBatchType batchType, const Tr2PerObjectData* perObjectData )
+{
+	Rebuild();
+
+	if( !m_vertexBuffer.IsValid() )
+	{
+		return;
+	}
+
+	if( m_vertexDeclHandle == Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
+	{
+		return;
+	}
+
+	if( !m_display )
+	{
+		return;
+	}
+
+	// only additive
+	if( batchType == TRIBATCHTYPE_ADDITIVE )
+	{
+		if( m_effect )
+		{
+			TriForwardingBatch* batch = accumulator->Allocate<TriForwardingBatch>();
+			if( batch )
+			{
+				batch->SetPerObjectData( perObjectData );
+				batch->SetShaderMaterial( m_effect );
+				batch->SetGeometryProvider( this );
+				accumulator->Commit( batch );
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Rebuild resources after adding/removing/changing individual hazes
+// --------------------------------------------------------------------------------
+void EveHazeSet::Rebuild()
+{
+	ReleaseResources( 0 );
+	PrepareResources();
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Add a new haze (aka item) to this set
+// Arguments:
+//   the new haze
+// --------------------------------------------------------------------------------
+void EveHazeSet::AddHazeItem( EveHazeSetItemPtr item )
+{
+	m_hazes.Insert( -1, item );
+}
+
+// --------------------------------------------------------------------------------
+void EveHazeSet::GetPickingBatches( ITriRenderBatchAccumulator* batches, uint16_t& areaIDOffset, const Tr2PerObjectData* perObjectData )
+{
+	for( auto it = m_cachedTransforms.begin(); it != m_cachedTransforms.end(); ++it )
+	{
+		if( auto batch = batches->Allocate<Tr2PickingHelperBatch>() )
+		{
+			batch->SetPerObjectData( perObjectData );
+			batch->AddBox( *it );
+			batch->SetAreaID( areaIDOffset );
+			batches->Commit( batch );
+		}
+		else
+		{
+			break;
+		}
+		++areaIDOffset;
+	}
+}
+
+// --------------------------------------------------------------------------------
+void EveHazeSet::RenderDebugInfo( const Matrix& worldTransform, Tr2DebugRenderer& renderer )
+{
+	for( auto it = m_hazes.begin(); it != m_hazes.end(); ++it )
+	{
+		Matrix t( XMMatrixTransformation( Vector3( 0, 0, 0 ), Quaternion( 0, 0, 0, 1 ), ( *it )->m_scaling, Vector3( 0, 0, 0 ), ( *it )->m_rotation, ( *it )->m_position ) );
+		renderer.DrawBox( *it, t * worldTransform, Vector3( -0.5f, -0.5f, -0.5f ), Vector3( 0.5f, 0.5f, 0.5f ), Tr2DebugRenderer::Wireframe, Tr2DebugColor( 0xff00ffff, 0x2200ffff ) );
+		renderer.DrawBox( *it, t * worldTransform, Vector3( -0.5f, -0.5f, -0.5f ), Vector3( 0.5f, 0.5f, 0.5f ), Tr2DebugRenderer::Solid, 0 );
+	}
+}
