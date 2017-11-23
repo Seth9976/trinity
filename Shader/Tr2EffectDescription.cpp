@@ -129,6 +129,8 @@ bool Tr2EffectDescription::Read( const void* data,
 				return false;
 			}
 
+			uint32_t shaderHandles[Tr2RenderContextEnum::SHADER_TYPE_COUNT];
+
 			for( int stageIx = 0; stageIx < stageCount; ++stageIx )
 			{
 				Tr2RenderContextEnum::ShaderType type;
@@ -209,6 +211,7 @@ bool Tr2EffectDescription::Read( const void* data,
 					shadowShaderCode,
 					shadowShaderSize,
 					pass.stageInputs[type].inputDefinition );
+				shaderHandles[stageIx] = pass.stageInputs[type].m_shader;
 
 				if( pass.stageInputs[type].m_shader == unsigned( -1 ) )
 				{
@@ -439,6 +442,14 @@ bool Tr2EffectDescription::Read( const void* data,
 						pass.stageInputs[type].uavs[registerIndex] = resource;
 					}
 				}
+			}
+
+			pass.shaderProgram = Tr2EffectStateManager::RegisterShaderProgram( shaderHandles, stageCount );
+			if( pass.shaderProgram == unsigned( -1 ) )
+			{
+				CCP_LOGERR( "Error creating shader program in effect \"%s\".", effectName );
+				techniques.clear();
+				return false;
 			}
 
 			uint8_t stateCount;

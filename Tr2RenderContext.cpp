@@ -410,14 +410,12 @@ void Tr2RenderContextBase::RenderBatchesWithOverride( ITriRenderBatchAccumulator
 		{
 			D3DPERF_EVENT1(L"Pass %i", passIx);
 
+			shaderForThisBatch->ApplyShaderOverride( technique, 0, *overrideShader, passIx, *renderContext );
+
 			const uint32_t shaderMaskAS = mode == TriRenderBatch::DO_NOT_USE_OVERRIDE_SHADERS ? Tr2RenderContext::SHADER_TYPE_MASK : ( Tr2RenderContext::SHADER_TYPE_MASK & ~( 1 << PIXEL_SHADER ) );
 			const uint32_t shaderMask = shaderMaskAS & shaderForThisBatch->GetShaderTypeMask( technique );
 			for( uint32_t shaderType = SHADER_TYPE_FIRST; shaderType < SHADER_TYPE_COUNT; ++shaderType )
 			{
-				if( shaderMaskAS & ( 1 << shaderType ) )
-				{
-					shaderForThisBatch->ApplyShader( technique, 0, ShaderType( shaderType ), *renderContext );
-				}
 				if( shaderMask & ( 1 << shaderType ) )
 				{
 					shaderForThisBatch->ApplySamplerStates( technique, 0, ShaderType( shaderType ), *renderContext );
@@ -431,7 +429,6 @@ void Tr2RenderContextBase::RenderBatchesWithOverride( ITriRenderBatchAccumulator
 
 			if( mode != TriRenderBatch::DO_NOT_USE_OVERRIDE_SHADERS )
 			{
-				overrideShader->ApplyShader( 0, passIx, PIXEL_SHADER, *renderContext );
 				overrideShader->ApplyRenderStates( 0, passIx, *renderContext );
 				overrideShader->ApplySamplerStates( 0, passIx, PIXEL_SHADER, *renderContext );
 

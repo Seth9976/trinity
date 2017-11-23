@@ -197,6 +197,7 @@ struct Tr2Pass
 	// Handle to render state setup
 	unsigned int renderStates;
 	unsigned int shaderTypeMask;
+	unsigned int shaderProgram;
 };
 
 struct Tr2EffectTechnique

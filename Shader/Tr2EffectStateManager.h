@@ -78,7 +78,7 @@ public:
 		const Tr2TextureAL& texture, 
 		Tr2RenderContextEnum::ColorSpace colorSpace = Tr2RenderContextEnum::COLOR_SPACE_LINEAR );
 	void UnsetAllTextures();
-	void ApplyShader( Tr2RenderContextEnum::ShaderType type, uint32_t ix );
+	void ApplyShaderProgram( uint32_t ix );
 
 	void ApplyStreamSource( uint32_t stream, const Tr2VertexBufferAL & buffer, uint32_t offset, uint32_t stride );
 	void ApplyIndexBuffer( const Tr2IndexBufferAL & indices );
@@ -97,6 +97,9 @@ public:
 		const void* patchedBytecode, 
 		uint32_t patchedBytecodeSize, 
 		const Tr2ShaderInputDefinition& inputDefinition );
+	static uint32_t RegisterShaderProgram( uint32_t* shaders, size_t count );
+	static uint32_t RegisterShaderProgramOverride( uint32_t originalProgram, uint32_t overrideProgram );
+
 
 	static uint32_t RegisterRenderStateSetup( 
 		const Tr2RenderStateSetup& rss );
@@ -135,8 +138,7 @@ private:
 		
 		std::pair<Tr2ObjectALOpaquePointer, Tr2RenderContextEnum::ColorSpace> m_samplerTextures[Tr2RenderContextEnum::SHADER_TYPE_COUNT][SAMPLER_MAX_COUNT];
 		uint32_t m_samplerSetupBinding[Tr2RenderContextEnum::SHADER_TYPE_COUNT][SAMPLER_MAX_COUNT];
-		uint32_t m_shader[Tr2RenderContextEnum::SHADER_TYPE_COUNT];
-		uint32_t m_pixelShader;
+		uint32_t m_shaderProgram;
 
 		uint32_t m_vertexDeclaration;
 

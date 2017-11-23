@@ -160,11 +160,12 @@ void Tr2Shader::ApplyAllStateForPass( uint32_t techniqueIndex, uint32_t passInde
 
 	const Tr2Pass& pass = technique.passes[passIndex];
 
+	renderContext.m_esm.ApplyShaderProgram( pass.shaderProgram );
+
 	for( unsigned i = SHADER_TYPE_FIRST; i != SHADER_TYPE_COUNT; ++i )
 	{
-		if( technique.shaderTypeMask & ( 1 << i ) )
+		if( pass.shaderTypeMask & ( 1 << i ) )
 		{
-			renderContext.m_esm.ApplyShader( ShaderType( i ), pass.stageInputs[i].m_shader );
 			for( Tr2SamplerSetupMap::const_iterator it = pass.stageInputs[i].samplers.begin(); 
 				it != pass.stageInputs[i].samplers.end(); ++it )
 			{
@@ -177,6 +178,15 @@ void Tr2Shader::ApplyAllStateForPass( uint32_t techniqueIndex, uint32_t passInde
 	}
 
 	renderContext.m_esm.ApplyRenderStates( pass.renderStates );
+}
+
+// --------------------------------------------------------------------------------------
+void Tr2Shader::ApplyShaderOverride( uint32_t techniqueIndex, uint32_t passIndex, const Tr2Shader& overrideShader, uint32_t overridePassIndex, Tr2RenderContext &renderContext ) const
+{
+	auto program = m_effect.techniques[techniqueIndex].passes[passIndex].shaderProgram;
+	auto overrideProgram = overrideShader.m_effect.techniques[0].passes[overridePassIndex].shaderProgram;
+
+	renderContext.m_esm.ApplyShaderProgram( Tr2EffectStateManager::RegisterShaderProgramOverride( program, overrideProgram ) );
 }
 
 // --------------------------------------------------------------------------------------
@@ -202,14 +212,6 @@ void Tr2Shader::ApplySamplerStates( uint32_t techniqueIndex, uint32_t passIndex,
 			it->first, 
 			it->second.handle );
 	}
-}
-
-// --------------------------------------------------------------------------------------
-void Tr2Shader::ApplyShader( uint32_t techniqueIndex, uint32_t passIndex, Tr2RenderContextEnum::ShaderType type, Tr2RenderContext &renderContext ) const
-{
-	auto& technique = m_effect.techniques[techniqueIndex];
-	auto& pass = technique.passes[passIndex];
-	renderContext.m_esm.ApplyShader( type, pass.stageInputs[type].m_shader );
 }
 
 // --------------------------------------------------------------------------------------

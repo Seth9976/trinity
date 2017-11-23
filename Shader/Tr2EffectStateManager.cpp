@@ -15,7 +15,8 @@ namespace {
 	typedef std::vector<std::pair<Tr2VertexDefinition, Tr2VertexLayoutAL*>>	VertexLayoutMap_t;
 	VertexLayoutMap_t	s_vertexLayoutMap;
 
-	std::vector<Tr2ShaderAL*>			s_shaders[ Tr2RenderContextEnum::SHADER_TYPE_COUNT ];
+	std::vector<Tr2ShaderAL*> s_shaders;
+	std::vector<std::pair<Tr2ShaderProgramAL*, std::vector<uint32_t>>> s_shaderPrograms;
 
 	std::vector<std::pair<Tr2SamplerDescription, Tr2SamplerStateAL*>> s_samplerSetups;
 
@@ -266,9 +267,8 @@ void Tr2EffectStateManager::CurrentValues::Reset()
 			m_samplerTextures[j][i] = std::make_pair( nullptr, Tr2RenderContextEnum::COLOR_SPACE_LINEAR );
 			m_samplerSetupBinding[j][i] = UNKNOWN;
 		}
-	 
-		m_shader[j] = UNKNOWN;
 	}
+	m_shaderProgram = UNKNOWN;
 
 	m_renderingMode = (Tr2EffectStateManager::RenderingMode)UNKNOWN;
 	m_renderStateSetup = UNKNOWN;
@@ -322,9 +322,13 @@ uint32_t Tr2EffectStateManager::RegisterShader(
 	uint32_t patchedBytecodeSize, 
 	const Tr2ShaderInputDefinition& inputDefinition )
 {
-	for( size_t i = 0; i != s_shaders[type].size(); ++i )
+	for( size_t i = 0; i != s_shaders.size(); ++i )
 	{
-		const Tr2ShaderAL& existing = *s_shaders[type][i];
+		const Tr2ShaderAL& existing = *s_shaders[i];
+		if( existing.GetType() != type )
+		{
+			continue;
+		}
 
 		uint32_t bufferSize = 0;
 		const void* buffer;
@@ -355,9 +359,94 @@ uint32_t Tr2EffectStateManager::RegisterShader(
 								inputDefinition )
 				, UNKNOWN );
 
-	s_shaders[type].push_back( shader.release() );
+	s_shaders.push_back( shader.release() );
 
-	return (uint32_t)s_shaders[type].size() - 1;
+	return (uint32_t)s_shaders.size() - 1;
+}
+
+uint32_t Tr2EffectStateManager::RegisterShaderProgram( uint32_t* shaders, size_t count )
+{
+	if( !count )
+	{
+		return UNKNOWN;
+	}
+	std::vector<uint32_t> shaderHandles;
+	shaderHandles.resize( count );
+	std::vector<Tr2ShaderAL*> args;
+	args.resize( count );
+	for( size_t i = 0; i < count; ++i )
+	{
+		if( shaders[i] >= s_shaders.size() )
+		{
+			return UNKNOWN;
+		}
+		shaderHandles[i] = shaders[i];
+		args[i] = s_shaders[shaders[i]];
+	}
+	for( size_t i = 0; i < s_shaderPrograms.size(); ++i )
+	{
+		if( s_shaderPrograms[i].second == shaderHandles )
+		{
+			return uint32_t( i );
+		}
+	}
+
+	std::unique_ptr<Tr2ShaderProgramAL> shader( new Tr2ShaderProgramAL );
+	USE_MAIN_THREAD_RENDER_CONTEXT();
+	CR_RETURN_VAL( shader->Create( &args[0], count, renderContext ), UNKNOWN );
+
+	s_shaderPrograms.push_back( std::make_pair( shader.release(), shaderHandles ) );
+
+	return (uint32_t)s_shaderPrograms.size() - 1;
+}
+
+uint32_t Tr2EffectStateManager::RegisterShaderProgramOverride( uint32_t originalProgram, uint32_t overrideProgram )
+{
+	if( originalProgram >= s_shaderPrograms.size() )
+	{
+		return UNKNOWN;
+	}
+	if( overrideProgram >= s_shaderPrograms.size() )
+	{
+		return UNKNOWN;
+	}
+
+	uint32_t pixelShader = UNKNOWN;
+	auto& op = s_shaderPrograms[overrideProgram].second;
+	for( auto it = op.begin(); it != op.end(); ++it )
+	{
+		if( *it >= s_shaders.size() )
+		{
+			return UNKNOWN;
+		}
+		if( s_shaders[*it]->GetType() == PIXEL_SHADER )
+		{
+			pixelShader = *it;
+		}
+	}
+	if( pixelShader == UNKNOWN )
+	{
+		return UNKNOWN;
+	}
+
+	std::vector<uint32_t> args = s_shaderPrograms[originalProgram].second;
+	for( auto it = args.begin(); it != args.end(); ++it )
+	{
+		if( *it >= s_shaders.size() )
+		{
+			return UNKNOWN;
+		}
+		if( s_shaders[*it]->GetType() == PIXEL_SHADER )
+		{
+			*it = pixelShader;
+			pixelShader = -1;
+		}
+	}
+	if( args.empty() )
+	{
+		return UNKNOWN;
+	}
+	return RegisterShaderProgram( &args[0], args.size() );
 }
 
 
@@ -382,14 +471,11 @@ void Tr2EffectStateManager::SetRenderStateOverride( Tr2RenderContextEnum::Render
 
 void Tr2EffectStateManager::Shutdown()
 {
-	for( int i = 0; i < SHADER_TYPE_COUNT; ++i )
+	for( auto it = s_shaders.begin(); it != s_shaders.end(); ++it )
 	{
-		for( auto it = s_shaders[i].begin(); it != s_shaders[i].end(); ++it )
-		{
-			delete *it;
-		}
-		s_shaders[i].clear();
+		delete *it;
 	}
+	s_shaders.clear();
 }
 
 void Tr2EffectStateManager::BeginManagedRendering()
@@ -398,13 +484,7 @@ void Tr2EffectStateManager::BeginManagedRendering()
 
 	m_currentValues.Reset();
 
-	for( int i = 0; i < SHADER_TYPE_COUNT; ++i )
-	{
-		if( SHADER_TYPE_EXISTS( i ) )
-		{
-			m_renderContext.SetShader( nullShader[i] );
-		}
-	}
+	m_renderContext.SetShaderProgram( nullSP );
 
 	m_isManagedRendering = true;
 
@@ -577,28 +657,25 @@ void Tr2EffectStateManager::UnsetAllTextures()
 	}
 }
 
-void Tr2EffectStateManager::ApplyShader( ShaderType type, uint32_t ix )
+void Tr2EffectStateManager::ApplyShaderProgram( uint32_t ix )
 {
-	
-
 	if( m_isManagedRendering )
 	{
-		if( ix == m_currentValues.m_shader[type] )
+		if( ix == m_currentValues.m_shaderProgram )
 		{
 			return;
 		}
 
-		m_currentValues.m_shader[type] = ix;
+		m_currentValues.m_shaderProgram = ix;
 	}
 
-	if( ix < s_shaders[type].size() )
+	if( ix < s_shaderPrograms.size() )
 	{
-		D3DPERF_EVENT( L"ApplyShader" );
-		m_renderContext.SetShader( *s_shaders[type][ix] );
+		m_renderContext.SetShaderProgram( *s_shaderPrograms[ix].first );
 	}
 	else
 	{
-		m_renderContext.SetShader( nullShader[type] );
+		m_renderContext.SetShaderProgram( nullSP );
 	}
 }
 
@@ -822,14 +899,16 @@ void Tr2EffectStateManager::ReleaseDeviceResources( TriStorage s )
 		}
 		m_currentValues.Reset();
 
-		for( int i = 0; i < SHADER_TYPE_COUNT; ++i )
+		for( auto it = s_shaders.begin(); it != s_shaders.end(); ++it )
 		{
-			for( auto it = s_shaders[i].begin(); it != s_shaders[i].end(); ++it )
-			{
-				delete *it;
-			}
-			s_shaders[i].clear();
+			delete *it;
 		}
+		s_shaders.clear();
+		for( auto it = s_shaderPrograms.begin(); it != s_shaderPrograms.end(); ++it )
+		{
+			delete it->first;
+		}
+		s_shaderPrograms.clear();
 
 		s_renderStateSetups.erase( s_renderStateSetups.begin() + RM_COUNT, s_renderStateSetups.end() );
 		m_renderStates.clear();

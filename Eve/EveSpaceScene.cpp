@@ -1841,10 +1841,6 @@ void EveSpaceScene::RenderMainPass( Tr2RenderContext& renderContext )
 	renderContext.SetReadOnlyDepth( false );
 
 	renderContext.m_esm.EndManagedRendering();
-
-	// Don't leave vertex/pixel shaders assigned - this is so we don't clash with classic rendering.
-	CR( renderContext.SetShader( nullShader[PIXEL_SHADER] ) );
-	CR( renderContext.SetShader( nullShader[VERTEX_SHADER] ) );	
 }
 
 // --------------------------------------------------------------------------------------
@@ -2021,10 +2017,6 @@ void EveSpaceScene::Render3DUI( Tr2RenderContext& renderContext )
 	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_OPAQUE );
 
 	ClearBatches( m_secondaryBatches );
-
-	// Don't leave vertex/pixel shaders assigned - this is so we don't clash with classic rendering.
-	CR( renderContext.SetShader( nullShader[PIXEL_SHADER] ) );
-	CR( renderContext.SetShader( nullShader[VERTEX_SHADER] ) );	
 }
 
 void EveSpaceScene::PopulateAndApplyPerFrameData( Tr2RenderContext& renderContext ) 
