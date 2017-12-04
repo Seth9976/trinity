@@ -90,6 +90,7 @@ private:
 
 	float m_pauseTime;
 	bool m_paused;
+	float m_totalPauseOffset;
 
 	const char* m_trackMaskName;
 };

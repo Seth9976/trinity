@@ -155,6 +155,7 @@ private:
 	float GetAnimationTime();
 	bool m_paused;
 	float m_pauseTime;
+	float m_totalPauseOffset;
 
 	granny_file_info* GetFileInfo() const;
 	Tr2GrannyAnimationLayer* GetAnimationLayer( const char* name );

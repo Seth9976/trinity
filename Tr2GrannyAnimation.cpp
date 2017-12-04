@@ -33,7 +33,8 @@ Tr2GrannyAnimation::Tr2GrannyAnimation( IRoot* lockobj ) :
 	m_aimingBone( false ),
 	m_aimBone( "" ),
 	m_paused( false ),
-	m_pauseTime( 0.f )
+	m_pauseTime( 0.f ),
+	m_totalPauseOffset( 0.f )
 {
 }
 
@@ -1067,7 +1068,7 @@ float Tr2GrannyAnimation::GetAnimationTime()
 	{
 		return m_pauseTime;
 	}
-	return Tr2Renderer::GetAnimationTime();
+	return Tr2Renderer::GetAnimationTime() - m_totalPauseOffset;
 }
 
 void Tr2GrannyAnimation::TogglePauseAnimations()
@@ -1075,12 +1076,13 @@ void Tr2GrannyAnimation::TogglePauseAnimations()
 	if ( m_paused )
 	{
 		m_paused = false;
+		m_totalPauseOffset = Tr2Renderer::GetAnimationTime() - m_pauseTime;
 		m_pauseTime = 0.0;
 	}
 	else
 	{
 		m_paused = true;
-		m_pauseTime = Tr2Renderer::GetAnimationTime();
+		m_pauseTime = Tr2Renderer::GetAnimationTime() - m_totalPauseOffset;
 	}
 	for( auto it = m_animationLayers.begin(); it != m_animationLayers.end(); it++ )
 	{

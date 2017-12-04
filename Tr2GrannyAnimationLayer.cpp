@@ -19,7 +19,8 @@ Tr2GrannyAnimationLayer::Tr2GrannyAnimationLayer() :
 	m_basePose( nullptr ),
 	m_skewRate( 0.f ),
 	m_pauseTime( 0.f ),
-	m_paused( false )
+	m_paused( false ),
+	m_totalPauseOffset( 0.f )
 {
 }
 
@@ -37,7 +38,8 @@ Tr2GrannyAnimationLayer::Tr2GrannyAnimationLayer( float defaultBoneWeight ) :
 	m_basePose( nullptr ),
 	m_skewRate( 0.f ),
 	m_pauseTime( 0.f ),
-	m_paused( false )
+	m_paused( false ),
+	m_totalPauseOffset( 0.f )
 {
 }
 
@@ -55,7 +57,8 @@ Tr2GrannyAnimationLayer::Tr2GrannyAnimationLayer( float defaultBoneWeight, float
 	m_basePose( nullptr ),
 	m_skewRate( 0.f ),
 	m_pauseTime( 0.f ),
-	m_paused( false )
+	m_paused( false ),
+	m_totalPauseOffset( 0.f )
 {
 }
 
@@ -121,7 +124,7 @@ float Tr2GrannyAnimationLayer::GetLayerAnimationTime()
 	{
 		return m_pauseTime;
 	}
-	return Tr2Renderer::GetAnimationTime();
+	return Tr2Renderer::GetAnimationTime() - m_totalPauseOffset;
 }
 
 
@@ -130,12 +133,13 @@ void Tr2GrannyAnimationLayer::TogglePauseAnimation()
 	if ( m_paused )
 	{
 		m_paused = false;
+		m_totalPauseOffset = Tr2Renderer::GetAnimationTime() - m_pauseTime;
 		m_pauseTime = 0.0;
 	}
 	else
 	{
 		m_paused = true;
-		m_pauseTime = Tr2Renderer::GetAnimationTime();
+		m_pauseTime = Tr2Renderer::GetAnimationTime() - m_totalPauseOffset;
 	}
 }
 
