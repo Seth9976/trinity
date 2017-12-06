@@ -249,10 +249,6 @@ bool Tr2PrimitiveScene::RenderPicking(
 const std::vector<ITr2Renderable*>& Tr2PrimitiveScene::GetPickingObjectsToRender( const Vector3& dirWorld )
 {
 	m_pickingObjects.clear();
-	// Allow the user to filter out the picking so certain objects do not 
-	// get rendered for picking
-	bool found = false;
-	// Be sure that view dependant data is updated before we render for picking
 	for( auto it = m_primitives.begin(); it != m_primitives.end(); ++it )
 	{		
 		((Tr2PrimitiveSet*)(*it))->UpdateTransform();
