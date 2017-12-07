@@ -549,7 +549,7 @@ BLUE_REGISTER_ENUM_EX( "BuildClass", EveSOFDataHull::BuildClass, EveSOFBuildClas
 
 Be::VarChooser EveSOFImpactEffectTypeChooser[] =
 {
-	{ "None", BeCast( EveSOFDataHull::IMPACTEFFECT_NONE ), "No impact effects" },
+	{ "Nothing", BeCast( EveSOFDataHull::IMPACTEFFECT_NONE ), "No impact effects" },
 	{ "Ellipsoid", BeCast( EveSOFDataHull::IMPACTEFFECT_ELLIPSOID ), "Use ellipsoid for shield" },
 	{ "Hull", BeCast( EveSOFDataHull::IMPACTEFFECT_HULL), "Use ellipsoid for hull" },
 	{ 0 }
@@ -784,12 +784,12 @@ BLUE_REGISTER_ENUM_EX( "EveSOFDataPatternLayerProjectionType", EveSOFDataPattern
 
 Be::VarChooser EveSOFDataPatternLayerMaterialSourceChooser[] =
 {
-	{	"Material 1", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL1 ), "Base material #1" },
-	{	"Material 2", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL2 ), "Base material #2" },
-	{	"Material 3", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL3 ), "Base material #3" },
-	{	"Material 4", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL4 ), "Base material #4" },
-	{	"Pattern Material 1", BeCast( EveSOFDataPatternLayer::SOURCE_PATTERN1 ), "Pattern material 1" },
-	{	"Pattern Material 2", BeCast( EveSOFDataPatternLayer::SOURCE_PATTERN2 ), "Pattern material 2" },
+	{	"Material1", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL1 ), "Base material #1" },
+	{	"Material2", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL2 ), "Base material #2" },
+	{	"Material3", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL3 ), "Base material #3" },
+	{	"Material4", BeCast( EveSOFDataPatternLayer::SOURCE_MATERIAL4 ), "Base material #4" },
+	{	"PatternMaterial1", BeCast( EveSOFDataPatternLayer::SOURCE_PATTERN1 ), "Pattern material 1" },
+	{	"PatternMaterial2", BeCast( EveSOFDataPatternLayer::SOURCE_PATTERN2 ), "Pattern material 2" },
 	{ 0 }
 };
 BLUE_REGISTER_ENUM_EX( "EveSOFDataPatternLayerMaterialSource", EveSOFDataPatternLayer::MaterialSource, EveSOFDataPatternLayerMaterialSourceChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
