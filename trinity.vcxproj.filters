@@ -429,18 +429,6 @@
     <ClInclude Include="TriViewport.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3d.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="version.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -1384,6 +1372,18 @@
       <Filter>Source Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="Utilities\StringUtils.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Vector2.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Vector3.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Vector3d.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Vector4.h">
       <Filter>Source Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="Wod\WodBakingScene.h">

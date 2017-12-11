@@ -2796,10 +2796,6 @@
     <ClInclude Include="TriVariable.h"/>
     <ClInclude Include="TriView.h"/>
     <ClInclude Include="TriViewport.h"/>
-    <ClInclude Include="Vector2.h"/>
-    <ClInclude Include="Vector3.h"/>
-    <ClInclude Include="Vector3d.h"/>
-    <ClInclude Include="Vector4.h"/>
     <ClInclude Include="version.h"/>
     <ClInclude Include="Curves\Tr2BoneMatrixCurve.h"/>
     <ClInclude Include="Curves\Tr2CurveColor.h"/>
@@ -3115,6 +3111,10 @@
     <ClInclude Include="Utilities\Plane.h"/>
     <ClInclude Include="Utilities\Quaternion.h"/>
     <ClInclude Include="Utilities\StringUtils.h"/>
+    <ClInclude Include="Utilities\Vector2.h"/>
+    <ClInclude Include="Utilities\Vector3.h"/>
+    <ClInclude Include="Utilities\Vector3d.h"/>
+    <ClInclude Include="Utilities\Vector4.h"/>
     <ClInclude Include="Wod\WodBakingScene.h"/>
     <ClInclude Include="Wod\WodPlaceableRes.h"/>
   </ItemGroup>
