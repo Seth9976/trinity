@@ -119,7 +119,7 @@ class Tr2RingIndexBuffer: public Tr2DynamicRingBuffer
 public:
 	Tr2RingIndexBuffer();
 
-	bool Create( uint32_t numberOfIndices, Tr2RenderContextEnum::IndexBufferBitcount bitCount );
+	bool Create( uint32_t numberOfIndices, uint32_t indexSize );
 
 	Tr2BufferAL& GetBuffer();
 
@@ -131,7 +131,7 @@ protected:
 	virtual bool OnPrepareResources();
 private:
 	Tr2BufferAL m_buffer;
-	Tr2RenderContextEnum::IndexBufferBitcount m_bitCount;
+	uint32_t m_indexSize;
 };
 
 #endif

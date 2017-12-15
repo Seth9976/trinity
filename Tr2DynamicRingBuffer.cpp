@@ -445,7 +445,7 @@ bool Tr2RingVertexBuffer::OnPrepareResources()
 
 
 Tr2RingIndexBuffer::Tr2RingIndexBuffer()
-	:m_bitCount( IB_32BIT )
+	:m_indexSize( 4 )
 {
 }
 
@@ -454,17 +454,17 @@ Tr2RingIndexBuffer::Tr2RingIndexBuffer()
 //   Creates a new ring index buffer.
 // Arguments:
 //   numberOfIndices - Number of indices in the buffer
-//   bitCount - Type of indices
+//   indexSize - Index size in bytes (2 or 4)
 // Return Value:
 //   true If the buffer was successfully created
 //   false Otherwise
 // --------------------------------------------------------------------------------------
-bool Tr2RingIndexBuffer::Create( uint32_t numberOfIndices, Tr2RenderContextEnum::IndexBufferBitcount bitCount )
+bool Tr2RingIndexBuffer::Create( uint32_t numberOfIndices, uint32_t indexSize )
 {
+	CCP_ASSERT( indexSize == 2 || indexSize == 4 );
 	ReleaseResources( TRISTORAGE_ALL );
-	m_bitCount = bitCount;
-	uint32_t indexSize = m_bitCount == IB_32BIT ? 4 : 2;
-	m_bufferSize = numberOfIndices * indexSize;
+	m_indexSize = indexSize;
+	m_bufferSize = numberOfIndices * m_indexSize;
 	return PrepareResources();
 }
 
@@ -512,10 +512,9 @@ void Tr2RingIndexBuffer::ReleaseResources( TriStorage s )
 ALResult Tr2RingIndexBuffer::CreateBuffer( uint32_t size )
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	uint32_t indexSize = m_bitCount == IB_32BIT ? 4 : 2;
 	return m_buffer.Create( 
-		indexSize, 
-		size / indexSize, 
+		m_indexSize,
+		size / m_indexSize,
 		Tr2GpuUsage::INDEX_BUFFER, 
 		Tr2CpuUsage::WRITE_OFTEN, 
 		nullptr, 

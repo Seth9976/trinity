@@ -1239,7 +1239,7 @@ bool Tr2Sprite2dScene::OnPrepareResources()
 		return false;
 	}
 
-	if( !m_indexBuffer.Create( indexCount, Tr2RenderContextEnum::IB_32BIT ) )
+	if( !m_indexBuffer.Create( indexCount, 4 ) )
 	{
 		CCP_LOGERR( "Tr2Sprite2dScene::OnPrepareResources failed to create streaming index buffer" );
 		return false;

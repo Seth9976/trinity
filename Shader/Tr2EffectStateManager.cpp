@@ -753,9 +753,9 @@ void Tr2EffectStateManager::ReleaseDeviceResources( TriStorage s )
 		{
 			for( uint32_t i = 0; i < VERTEX_STREAM_MAX_COUNT; ++i )
 			{
-				m_renderContext.SetStreamSource( i, nullVB, 0, 0 );
+				m_renderContext.SetStreamSource( i, Tr2BufferAL(), 0, 0 );
 			}
-			m_renderContext.SetIndices( nullIB );
+			m_renderContext.SetIndices( Tr2BufferAL() );
 
 #if( TRINITY_PLATFORM==TRINITY_DIRECTX9 )
 			// ... ehm.. what about the other platforms

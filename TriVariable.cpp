@@ -87,7 +87,7 @@ void TriVariable::ApplyUav(
 		}
 		else
 		{
-			renderContext.SetUav( stage, registerIndex, nullGB );
+			renderContext.SetUav( stage, registerIndex, Tr2BufferAL() );
 		}
 		break;
 	}
@@ -104,7 +104,7 @@ void TriVariable::ApplyUav(
 		}
 		else
 		{
-			renderContext.SetUav( stage, registerIndex, nullGB );
+			renderContext.SetUav( stage, registerIndex, Tr2BufferAL() );
 		}
 		break;
 	}

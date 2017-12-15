@@ -992,7 +992,7 @@ bool Tr2Renderer::RunComputeShader( Tr2Material* effect,
 			const Tr2EffectResourceMap& uavs = stage.uavs;
 			for( auto it = uavs.begin(); it != uavs.end(); ++it )
 			{
-				CR_RETURN_VAL( renderContext.SetUav( COMPUTE_SHADER, it->first, nullGB ), false );
+				CR_RETURN_VAL( renderContext.SetUav( COMPUTE_SHADER, it->first, Tr2BufferAL() ), false );
 			}
 			result = true;
 		}
@@ -1042,7 +1042,7 @@ bool Tr2Renderer::RunComputeShader(
 			const Tr2EffectResourceMap& uavs = stage.uavs;
 			for( auto it = uavs.begin(); it != uavs.end(); ++it )
 			{
-				CR_RETURN_VAL( renderContext.SetUav( COMPUTE_SHADER, it->first, nullGB ), false );
+				CR_RETURN_VAL( renderContext.SetUav( COMPUTE_SHADER, it->first, Tr2BufferAL() ), false );
 			}
 			result = true;
 		}
@@ -1094,7 +1094,7 @@ bool Tr2Renderer::RunComputeShaderIndirect( Tr2Material* effect, Tr2BufferAL& in
 			const Tr2EffectResourceMap& uavs = stage.uavs;
 			for( auto it = uavs.begin(); it != uavs.end(); ++it )
 			{
-				CR_RETURN_VAL( renderContext.SetUav( COMPUTE_SHADER, it->first, nullGB ), false );
+				CR_RETURN_VAL( renderContext.SetUav( COMPUTE_SHADER, it->first, Tr2BufferAL() ), false );
 			}
 		}
 	}
