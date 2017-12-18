@@ -13,6 +13,7 @@ such as picking into the scene etc. will probably be added here."
 void TriDevice::RefreshDeviceResources()
 {
 	ReleaseDeviceResources( TRISTORAGE_ALL );
+	SetPresentParameters( mAdapter, mPresentParam );
 	PrepareDeviceResources();
 }
 
