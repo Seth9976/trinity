@@ -362,7 +362,7 @@ void EveCamera::Update( Be::Time t )
 	// Find the interest point of the camera (probably the ship)
 	Vector3 vecCamIntr(parentPosition);
 	Vector3 toInterest = vecCamIntr - vecCamPos;
-	Vector3 side = Vector3(1.0f,0.0f,0.0f);
+	Vector3 side;
 	Vector3 up = Vector3(0.0f,1.0f,0.0f);
 	
 	toInterest = Normalize( toInterest );
