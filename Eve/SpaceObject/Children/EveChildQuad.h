@@ -65,8 +65,8 @@ private:
 		Vector4 m_localTransform1;
 		Vector4 m_localTransform2;
 
-		D3DXFLOAT16 m_color[4];
-		D3DXFLOAT16 m_brightness[2];
+		Float_16 m_color[4];
+		Float_16 m_brightness[2];
 	};
 
 	BlueSharedString m_name;

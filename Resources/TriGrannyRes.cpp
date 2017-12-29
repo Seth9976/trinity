@@ -506,8 +506,7 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 					{
 						uint8_t* __restrict pBase = static_cast<uint8_t*>( pVertexData ) + *vertexIx * 12;
 
-						Vector3 delta;
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &delta ), reinterpret_cast<const D3DXFLOAT16*>( pDelta ), 3 );
+						Vector3 delta = *reinterpret_cast<const Vector3_16*>( pDelta );
 
 						*reinterpret_cast<Vector3*>( pBase ) += weight * delta;
 					}
@@ -545,15 +544,12 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 					{
 						uint8_t* const __restrict pBase = pComponentBase + *vertexIx * bytesPerVertex;					
 
-						Vector3 base;
-						Vector3 delta;
-
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &base ), reinterpret_cast<const D3DXFLOAT16*>( pBase ), 3 );
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &delta ), reinterpret_cast<const D3DXFLOAT16*>( pDelta ), 3 );
+						Vector3 base = *reinterpret_cast<const Vector3_16*>( pBase );
+						Vector3 delta = *reinterpret_cast<const Vector3_16*>( pDelta );
 
 						base += weight * delta;
 
-						D3DXFloat32To16Array( reinterpret_cast<D3DXFLOAT16*>( pBase ), reinterpret_cast<float*>( &base ), 3 );
+						*reinterpret_cast<Vector3_16*>( pBase ) = base;
 					}
 				}
 				else
@@ -563,14 +559,12 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 					{
 						uint8_t* const __restrict pBase = pComponentBase + *vertexIx * bytesPerVertex;					
 
-						Vector3 base;
+						Vector3 base = *reinterpret_cast<const Vector3_16*>( pBase );
 						const Vector3 &delta = *reinterpret_cast<const Vector3*>( pDelta );
-
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &base ), reinterpret_cast<const D3DXFLOAT16*>( pBase ), 3 );
 						
 						base += weight * delta;
 
-						D3DXFloat32To16Array( reinterpret_cast<D3DXFLOAT16*>( pBase ), reinterpret_cast<float*>( &base ), 3 );
+						*reinterpret_cast<Vector3_16*>( pBase ) = base;
 					}
 				}
 				else
@@ -582,8 +576,7 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 
 						Vector3& base = *reinterpret_cast<Vector3*>( pBase );
 
-						Vector3 delta;
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &delta ), reinterpret_cast<const D3DXFLOAT16*>( pDelta ), 3 );
+						Vector3 delta = *reinterpret_cast<const Vector3_16*>( pDelta );
 
 						base += weight * delta;
 					}
@@ -624,8 +617,7 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 
 					if( blendTypeInfos[ DOI_POS ].isHalfPrecision )
 					{
-						Vector3 delta;
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &delta ), reinterpret_cast<const D3DXFLOAT16*>( pDelta ), 3 );
+						Vector3 delta = *reinterpret_cast<const Vector3_16*>( pDelta );
 
 						*reinterpret_cast<Vector3*>( pDst ) += weights[j] * delta;
 					}
@@ -657,16 +649,13 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 
 					if( typeInfos[componentIx].isHalfPrecision )
 					{
-						Vector3 base;
-						Vector3 delta;
-
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &base ), reinterpret_cast<const D3DXFLOAT16*>( pBase ), 3 );
-						D3DXFloat16To32Array( reinterpret_cast<float*>( &delta ), reinterpret_cast<const D3DXFLOAT16*>( pDelta ), 3 );
+						Vector3 base = *reinterpret_cast<const Vector3_16*>( pBase );
+						Vector3 delta = *reinterpret_cast<const Vector3_16*>( pDelta );
 
 						base += weights[j] * delta;
 
-						D3DXFloat32To16Array( reinterpret_cast<D3DXFLOAT16*>( pBase ), reinterpret_cast<float*>( &base ), 3 );
-						D3DXFloat32To16Array( reinterpret_cast<D3DXFLOAT16*>( pDelta ), reinterpret_cast<float*>( &delta ), 3 );
+						*reinterpret_cast<Vector3_16*>( pBase ) = base;
+						*reinterpret_cast<Vector3_16*>( pDelta ) = delta;
 					}
 					else
 					{
@@ -759,8 +748,7 @@ bool TriGrannyRes::GetVertexPositions( unsigned meshIx, std::vector<float>& xyz 
 		float* out = &xyz[0];
 		for( unsigned i = 0; i < vertexCount; ++i, pComponentBase += bytesPerVertex )
 		{
-			Vector3 base;
-			D3DXFloat16To32Array( (float*)&base,  (const D3DXFLOAT16*)pComponentBase, 3 );
+			Vector3 base = *reinterpret_cast<const Vector3_16*>( pComponentBase );
 			*out++ = base.x;
 			*out++ = base.y;
 			*out++ = base.z;

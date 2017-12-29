@@ -20,7 +20,7 @@ namespace
 struct ImposterVertex
 {
 	Vector4 position; // w - bounding sphere radius
-	D3DXVECTOR2_16F texCoord;
+	Vector2_16 texCoord;
 };
 
 }
@@ -52,7 +52,7 @@ void Tr2ImpostorManager::ImpostorAtlas::Resize( uint32_t width, uint32_t height,
 		for( uint32_t i = 0; i < xCount; ++i )
 		{
 
-			m_free.push_back( D3DXVECTOR2_16F( float( i * itemWidth ) / width, float( j * itemHeight ) / height ) );
+			m_free.push_back( Vector2_16( float( i * itemWidth ) / width, float( j * itemHeight ) / height ) );
 		}
 	}
 }
@@ -66,7 +66,7 @@ void Tr2ImpostorManager::ImpostorAtlas::Resize( uint32_t width, uint32_t height,
 //   true If texcoord was reserved
 //   false If the atlas is full
 // --------------------------------------------------------------------------------------
-bool Tr2ImpostorManager::ImpostorAtlas::Reserve( D3DXVECTOR2_16F& coord )
+bool Tr2ImpostorManager::ImpostorAtlas::Reserve( Vector2_16& coord )
 {
 	if( m_free.empty() )
 	{
@@ -83,7 +83,7 @@ bool Tr2ImpostorManager::ImpostorAtlas::Reserve( D3DXVECTOR2_16F& coord )
 // Arguments:
 //   coord - Returned texcoord
 // --------------------------------------------------------------------------------------
-void Tr2ImpostorManager::ImpostorAtlas::Drop( D3DXVECTOR2_16F coord )
+void Tr2ImpostorManager::ImpostorAtlas::Drop( Vector2_16 coord )
 {
 	m_free.push_back( coord );
 }

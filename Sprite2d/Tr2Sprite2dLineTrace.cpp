@@ -105,7 +105,7 @@ void Tr2Sprite2dLineTrace::GatherSprites( Tr2Sprite2dScene* renderer )
 			const Color& toColor = (*it)->m_color;
 
 			Vector2 d = toPos - fromPos;
-			float curLength = D3DXVec2Length( &d );
+			float curLength = Length( d );
 			length += curLength;
 			float relativeLength = length / m_length;
 
@@ -155,8 +155,8 @@ void Tr2Sprite2dLineTrace::GatherSprites( Tr2Sprite2dScene* renderer )
 							const Vector2& toPos2 = (*nextIt)->m_position;
 							Vector2 d2 = toPos2 - toPos;
 
-							D3DXVec2Normalize( &d, &d );
-							D3DXVec2Normalize( &d2, &d2 );
+							d = Normalize( d );
+							d2 = Normalize( d2 );
 
 							capAngleTo = atan2(d2.y,d2.x) - atan2(d.y,d.x);
 						}
@@ -258,7 +258,7 @@ float Tr2Sprite2dLineTrace::CalcLength()
 		const Vector2& toPos = (*it)->m_position;
 
 		Vector2 d = toPos - fromPos;
-		length += D3DXVec2Length( &d );
+		length += Length( d );
 
 		fromPos = toPos;
 	}
@@ -266,7 +266,7 @@ float Tr2Sprite2dLineTrace::CalcLength()
 	if( m_isLoop )
 	{
 		Vector2 d = m_vertices[0]->m_position - fromPos;
-		length += D3DXVec2Length( &d );
+		length += Length( d );
 	}
 
 	return length;
@@ -294,8 +294,8 @@ void Tr2Sprite2dLineTrace::AddSegment(
 	float capAngleTo )
 {
 	Vector2 d = to - from;
-	float segmentLength = D3DXVec2Length( &d );
-	D3DXVec2Normalize( &d, &d );
+	float segmentLength = Length( d );
+	d = Normalize( d );
 
 	// calculate texture offset
 	float texOffset1 = m_textureOffsetAccum / m_textureWidth - m_textureOffset;

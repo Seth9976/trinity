@@ -99,8 +99,8 @@ static void CopyInt64( void* srcVar, void* dstVar, float scale, const Vector4& o
 
 static void CopyVector2( void* srcVar, void* dstVar, float scale, const Vector4& offset )
 {
-	D3DXVec2Scale( static_cast<Vector2*>( dstVar ), static_cast<Vector2*>( srcVar ), scale );
 	Vector2 &d = *static_cast<Vector2*>( dstVar );
+	d = *static_cast<Vector2*>( srcVar ) * scale;
 	d.x += offset.x;
 	d.y += offset.y;
 }

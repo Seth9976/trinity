@@ -155,7 +155,7 @@ bool ExtractVertices( TriGeometryResMeshData* mesh, std::vector<Vector2>& spheri
 		Vector3 p1;
 		if( position->m_dataType == vd.FLOAT16_4 )
 		{
-			D3DXFloat16To32Array( reinterpret_cast<float*>( &p1 ), reinterpret_cast<const D3DXFLOAT16*>( pVertices + position->m_offset + i * vertSize ), 3 );
+			p1 = *reinterpret_cast<const Vector3_16*>( pVertices + position->m_offset + i * vertSize );
 		}
 		else
 		{

@@ -4,6 +4,7 @@
 
 #ifdef _WIN32
 
+#include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 
@@ -954,6 +955,17 @@ inline Vector4 Transform( const Vector3& point, const Matrix& transform )
 		point.x * transform._12 + point.y * transform._22 + point.z * transform._32 + transform._42,
 		point.x * transform._13 + point.y * transform._23 + point.z * transform._33 + transform._43,
 		transform._14 + transform._24 + transform._34 + transform._44 );
+}
+
+// ----------------------------------------------------------------------------------
+inline Vector4 Transform( const Vector2& v, const Matrix& m )
+{
+	Vector4 out;
+	out.x = v.x * m._11 + v.y * m._21 + m._41;
+	out.y = v.x * m._12 + v.y * m._22 + m._42;
+	out.z = v.x * m._13 + v.y * m._23 + m._43;
+	out.w = v.x * m._14 + v.y * m._24 + m._44;
+	return out;
 }
 
 // --------------------------------------------------------------------------------------

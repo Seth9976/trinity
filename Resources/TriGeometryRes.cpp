@@ -146,7 +146,7 @@ static void ConvertDataToVector3( Tr2VertexDefinition::DataType elementType, con
 	{
 	case Tr2VertexDefinition::FLOAT16_4:
 		{
-			D3DXFloat16To32Array( (float*)dest, (const D3DXFLOAT16 *)src, 3 );
+			*reinterpret_cast<Vector3*>( dest ) = *static_cast<const Vector3_16*>( src );
 			break;
 		}
 	case Tr2VertexDefinition::FLOAT32_3:
@@ -1367,7 +1367,7 @@ void TriGeometryRes::ProcessMeshVerticesWithUV( int meshIx, PerVertexUVCallback 
 		{
 			if( texcoord->m_dataType == decl.FLOAT16_2 )
 			{
-				D3DXFloat16To32Array( reinterpret_cast<float*>( &uv1 ), reinterpret_cast<const D3DXFLOAT16*>( pVertices + texcoord->m_offset + j * vertSize ), 2 );
+				uv1 = *reinterpret_cast<const Vector2_16*>( pVertices + texcoord->m_offset + j * vertSize );
 			}
 			else
 			{

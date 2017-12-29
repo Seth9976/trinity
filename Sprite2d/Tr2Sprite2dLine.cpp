@@ -52,8 +52,8 @@ void Tr2Sprite2dLine::GatherSprites( Tr2Sprite2dScene* renderer )
 		Vector2 to = m_translationTo + m_translation;
 
 		Vector2 d = m_translationTo - m_translationFrom;
-		float segmentLength = D3DXVec2Length(&d);
-		D3DXVec2Normalize( &d, &d );
+		float segmentLength = Length( d );
+		d = Normalize( d );
 
 		// Rotate 90 degrees
 		Vector2 normal;

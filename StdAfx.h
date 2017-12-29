@@ -94,7 +94,7 @@ using std::max;
 #include "Utilities/Matrix.h"
 #include "Utilities/Color.h"
 #include "Utilities/Quaternion.h"
-
+#include "Utilities/Float16.h"
 
 #ifdef _WIN32
 #include "D3DFundamentalTypes.h"

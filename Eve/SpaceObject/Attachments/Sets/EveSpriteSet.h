@@ -32,12 +32,12 @@ public:
 	struct PoolVertex
 	{
 		Vector3 position;
-		D3DXFLOAT16 activation;
-		D3DXFLOAT16 blinkPhase;
-		D3DXFLOAT16 blinkRate;
-		D3DXFLOAT16 minScale;
-		D3DXFLOAT16 maxScale;
-		D3DXFLOAT16 falloff;
+		Float_16 activation;
+		Float_16 blinkPhase;
+		Float_16 blinkRate;
+		Float_16 minScale;
+		Float_16 maxScale;
+		Float_16 falloff;
 		uint32_t color;
 		uint32_t warpColor;
 

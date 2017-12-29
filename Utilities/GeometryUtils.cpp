@@ -69,7 +69,7 @@ void GetMeshVertexPosition(	granny_mesh* grannyMesh, unsigned index,
 	switch( positionType )
 	{
 	case Tr2VertexDefinition::FLOAT16_4:
-		D3DXFloat16To32Array( (float*)&position, (const D3DXFLOAT16*)(positionPtr ), 3 );
+		position = *reinterpret_cast<const Vector3_16*>( positionPtr );
 		break;
 
 	case Tr2VertexDefinition::FLOAT32_3:

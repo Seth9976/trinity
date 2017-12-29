@@ -106,7 +106,6 @@ Matrix Tr2Sprite2dTransform::GetTransformationMatrix()
 Vector2 Tr2Sprite2dTransform::TransformPoint(float x, float y)
 {
 #ifdef __ORBIS__
-	// TODO: Implement D3DXVec2Transform
 	return Vector2( 0.0f, 0.0f );
 #else
 	Matrix m;
@@ -115,9 +114,8 @@ Vector2 Tr2Sprite2dTransform::TransformPoint(float x, float y)
 	Vector2 absRotationCenter( floor( m_rotationCenter.x * m_displayWidth + 0.5f ), floor( m_rotationCenter.y * m_displayHeight + 0.5f ) );
 	m = Transformation2DMatrix( &absScalingCenter, m_scalingRotation, &m_scale, &absRotationCenter, m_rotation, NULL );
 
-	Vector4 ret = Vector4();
 	Vector2 vec = Vector2(x, y);
-	D3DXVec2Transform(&ret, &vec, &m);
+	Vector4 ret = Transform( vec, m );
 	return Vector2(ret.x, ret.y);
 #endif
 }

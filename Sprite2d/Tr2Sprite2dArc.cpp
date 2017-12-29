@@ -244,8 +244,7 @@ void Tr2Sprite2dArc::GatherSprites( Tr2Sprite2dScene* renderer )
 					to.x = cos( m_startAngle ) * (innerRadius - 2.0f) + m_translation.x;
 					to.y = sin( m_startAngle ) * (innerRadius - 2.0f) + m_translation.y;
 
-					Vector2 d = from - to;
-					D3DXVec2Normalize( &d, &d );
+					Vector2 d = Normalize( from - to );
 
 					// Rotate 90 degrees
 					Vector2 normal;
@@ -301,8 +300,7 @@ void Tr2Sprite2dArc::GatherSprites( Tr2Sprite2dScene* renderer )
 					to.x = cos( m_endAngle ) * (innerRadius - 2.0f) + m_translation.x;
 					to.y = sin( m_endAngle ) * (innerRadius - 2.0f) + m_translation.y;
 
-					Vector2 d = from - to;
-					D3DXVec2Normalize( &d, &d );
+					Vector2 d = Normalize( from - to );
 
 					// Rotate 90 degrees
 					Vector2 normal;

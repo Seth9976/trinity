@@ -84,12 +84,12 @@ private:
 		Vector4 m_transform1;
 		Vector4 m_transform2;
 		Vector4 m_transform3;
-		D3DXFLOAT16 m_spriteColor[3];
-		D3DXFLOAT16 m_activation;
-		D3DXFLOAT16 m_flareColor[3];
-		D3DXFLOAT16 _unused;
-		D3DXFLOAT16 m_scale[3];
-		D3DXFLOAT16 m_boosterGainInfluence;
+		Float_16 m_spriteColor[3];
+		Float_16 m_activation;
+		Float_16 m_flareColor[3];
+		Float_16 _unused;
+		Float_16 m_scale[3];
+		Float_16 m_boosterGainInfluence;
 
 		static const Tr2VertexDefinition& GetDefinition();
 	};
@@ -99,10 +99,10 @@ private:
 		Vector4 m_transform1;
 		Vector4 m_transform2;
 		Vector4 m_transform3;
-		D3DXFLOAT16 m_color[3];
-		D3DXFLOAT16 m_activation;
-		D3DXFLOAT16 m_boosterGainInfluence;
-		D3DXFLOAT16 _unused;
+		Float_16 m_color[3];
+		Float_16 m_activation;
+		Float_16 m_boosterGainInfluence;
+		Float_16 _unused;
 
 		static const Tr2VertexDefinition& GetDefinition();
 	};

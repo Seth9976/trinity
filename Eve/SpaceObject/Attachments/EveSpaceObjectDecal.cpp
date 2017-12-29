@@ -521,9 +521,9 @@ void EveSpaceObjectDecal::CreateDecalIndexBuffer( TriGeometryResPtr geomRes )
 		if( vertexPositionCompressed )
 		{
 			Vector3 pos[3];
-			D3DXFloat16To32Array( reinterpret_cast<float*>( &pos[0] ), reinterpret_cast<const D3DXFLOAT16*>( originalVertices + index0 * meshData->m_bytesPerVertex ), 3 );
-			D3DXFloat16To32Array( reinterpret_cast<float*>( &pos[1] ), reinterpret_cast<const D3DXFLOAT16*>( originalVertices + index1 * meshData->m_bytesPerVertex ), 3 );
-			D3DXFloat16To32Array( reinterpret_cast<float*>( &pos[2] ), reinterpret_cast<const D3DXFLOAT16*>( originalVertices + index2 * meshData->m_bytesPerVertex ), 3 );
+			pos[0] = *reinterpret_cast<const Vector3_16*>( originalVertices + index0 * meshData->m_bytesPerVertex );
+			pos[1] = *reinterpret_cast<const Vector3_16*>( originalVertices + index1 * meshData->m_bytesPerVertex );
+			pos[2] = *reinterpret_cast<const Vector3_16*>( originalVertices + index2 * meshData->m_bytesPerVertex );
 			if( IntersectTriangleAABB( pos, pos + 1, pos + 2, aabbMin, aabbMax ) )
 			{
 				if( IntersectTriangleOrientedBox( pos, pos + 1, pos + 2, m_invDecalMatrix ) )

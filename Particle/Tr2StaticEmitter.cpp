@@ -202,8 +202,8 @@ void Tr2StaticEmitter::DoSpawn()
 					else if( j->isFloat16 )
 					{
 						std::copy( 
-							reinterpret_cast<D3DXFLOAT16*>( data + j->inOffset ), 
-							reinterpret_cast<D3DXFLOAT16*>( data + j->inOffset ) + j->length, 
+							reinterpret_cast<Float_16*>( data + j->inOffset ),
+							reinterpret_cast<Float_16*>( data + j->inOffset ) + j->length,
 							particle[j->buffer] + j->offset );
 					}
 					else

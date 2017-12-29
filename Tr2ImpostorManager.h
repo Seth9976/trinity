@@ -106,7 +106,7 @@ private:
 	struct Impostor
 	{
 		// top-left corned of the billboard image in the atlas
-		D3DXVECTOR2_16F texcoord;
+		Vector2_16 texcoord;
 		// current impostor hash
 		ITr2ImpostorSource::ImpostorHash hash;
 		// impostor hash the billboard was rendered with
@@ -125,11 +125,11 @@ private:
 		ImpostorAtlas();
 
 		void Resize( uint32_t width, uint32_t height, uint32_t itemWidth, uint32_t itemHeight );
-		bool Reserve( D3DXVECTOR2_16F& coord );
-		void Drop( D3DXVECTOR2_16F coord );
+		bool Reserve( Vector2_16& coord );
+		void Drop( Vector2_16 coord );
 	private:
 		// Free (unoccupied) texcoords
-		TrackableStdVector<D3DXVECTOR2_16F> m_free;
+		TrackableStdVector<Vector2_16> m_free;
 	};
 
 	virtual bool OnPrepareResources();

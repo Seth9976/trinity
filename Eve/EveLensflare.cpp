@@ -152,7 +152,7 @@ void EveLensflare::PrepareRender( const TriFrustum& frustum )
 	direction.x /= direction.w;
 	direction.y /= direction.w;
     float distanceToEdge = 1 - std::min( 1 - std::abs( direction.x ), 1 - std::abs( direction.y ) );
-	float distanceToCenter = D3DXVec2Length( reinterpret_cast<Vector2*>( &direction ) );
+	float distanceToCenter = Length( *reinterpret_cast<Vector2*>( &direction ) );
 	float radialAngle = atan2( direction.y, direction.x ) + TRI_PI;
 
 	for( auto it = m_distanceToEdgeCurves.begin(); it != m_distanceToEdgeCurves.end(); ++it )
