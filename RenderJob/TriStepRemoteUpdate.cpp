@@ -129,6 +129,20 @@ TriStepRemoteUpdate::~TriStepRemoteUpdate(void)
 	}
 }
 
+
+namespace
+{
+	struct Dx9Viewport
+	{
+		uint32_t X;
+		uint32_t Y;
+		uint32_t Width;
+		uint32_t Height;
+		float MinZ;
+		float MaxZ;
+	};
+}
+
 TriStepResult TriStepRemoteUpdate::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	// Lock and read
@@ -143,7 +157,7 @@ TriStepResult TriStepRemoteUpdate::Execute( Be::Time realTime, Be::Time simTime,
 				// Read data	
 				Matrix projMat;
 				Matrix viewMat;
-				D3DVIEWPORT9 viewport;
+				Dx9Viewport viewport;
 				int offset = 0;
 
 				memcpy((void*)&projMat, m_sharedMemory, 64);

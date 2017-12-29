@@ -881,8 +881,8 @@ bool TriGeometryRes::SetupMeshes( granny_file_info* gi )
 				if( mbi )
 				{
 					CCP_ASSERT( groupIx < mbi->areaCount );
-					area.m_minBounds = Vector3( mbi->areaInfos[groupIx].bounds.min );
-					area.m_maxBounds = Vector3( mbi->areaInfos[groupIx].bounds.max );
+					area.m_minBounds = *reinterpret_cast<Vector3*>( &mbi->areaInfos[groupIx].bounds.min[0] );
+					area.m_maxBounds = *reinterpret_cast<Vector3*>( &mbi->areaInfos[groupIx].bounds.max[0] );
 					area.m_vertexCount = mbi->areaInfos[groupIx].vertexCount;
 				}
 				else

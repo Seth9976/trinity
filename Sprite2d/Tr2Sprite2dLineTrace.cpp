@@ -511,13 +511,13 @@ void Tr2Sprite2dLineTrace::AddRoundJoint(
 	if( capAngleTo < 0.0f )
 	{
 		fanBase = 2 + (uint16_t)fanVertexBase - 4;
-		fanBaseTranslation = v2.position;
+		fanBaseTranslation = v2.position.GetXY();
 		sign = -1.0f;
 	}
 	else if( capAngleTo > 0.0f )
 	{
 		fanBase = 3 + (uint16_t)fanVertexBase - 4;
-		fanBaseTranslation = v3.position;
+		fanBaseTranslation = v3.position.GetXY();
 	}
 
 	// calculate joint angle
@@ -620,15 +620,15 @@ void Tr2Sprite2dLineTrace::AddMiterJoint(
 	if( capAngleTo < 0.0f )
 	{
 		fanBase = 2 + (uint16_t)fanVertexBase - 4;
-		basePoint = v2.position;
-		topPoint = v3.position;
+		basePoint = v2.position.GetXY();
+		topPoint = v3.position.GetXY();
 		sign = -1.0f;
 	}
 	else if( capAngleTo > 0.0f )
 	{
 		fanBase = 3 + (uint16_t)fanVertexBase - 4;
-		basePoint = v3.position;
-		topPoint = v2.position;
+		basePoint = v3.position.GetXY();
+		topPoint = v2.position.GetXY();
 	}
 
 	// calculate joint angle

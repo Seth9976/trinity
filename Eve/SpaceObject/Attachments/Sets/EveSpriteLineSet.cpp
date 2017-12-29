@@ -130,12 +130,12 @@ bool EveSpriteLineSet::OnPrepareResources()
 				// fill static pool data
 				vtx->position = pos;
 				vtx->warpColor = vtx->color = ( ( spriteLine->m_color & 0xff0000 ) >> 16 ) | ( spriteLine->m_color & 0xff00ff00 ) | ( ( spriteLine->m_color & 0xff ) << 16 );
-				vtx->blinkPhase = spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i;
-				vtx->blinkRate = spriteLine->m_blinkRate;
-				vtx->minScale = spriteLine->m_minScale;
-				vtx->maxScale = spriteLine->m_maxScale;
-				vtx->falloff = spriteLine->m_falloff;
-				vtx->activation = 1.f;
+				vtx->blinkPhase = Float_16( spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i );
+				vtx->blinkRate = Float_16( spriteLine->m_blinkRate );
+				vtx->minScale = Float_16( spriteLine->m_minScale );
+				vtx->maxScale = Float_16( spriteLine->m_maxScale );
+				vtx->falloff = Float_16( spriteLine->m_falloff );
+				vtx->activation = Float_16( 1.f );
 
 				// fill animated pool data
 				spr->position = pos;
@@ -169,12 +169,12 @@ bool EveSpriteLineSet::OnPrepareResources()
 				// fill static pool data
 				vtx->position = pos;
 				vtx->warpColor = vtx->color = ( ( spriteLine->m_color & 0xff0000 ) >> 16 ) | ( spriteLine->m_color & 0xff00ff00 ) | ( ( spriteLine->m_color & 0xff ) << 16 );
-				vtx->blinkPhase = spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i;
-				vtx->blinkRate = spriteLine->m_blinkRate;
-				vtx->minScale = spriteLine->m_minScale;
-				vtx->maxScale = spriteLine->m_maxScale;
-				vtx->falloff = spriteLine->m_falloff;
-				vtx->activation = 1.f;
+				vtx->blinkPhase = Float_16( spriteLine->m_blinkPhase + spriteLine->m_blinkPhaseShift * (float)i );
+				vtx->blinkRate = Float_16( spriteLine->m_blinkRate );
+				vtx->minScale = Float_16( spriteLine->m_minScale );
+				vtx->maxScale = Float_16( spriteLine->m_maxScale );
+				vtx->falloff = Float_16( spriteLine->m_falloff );
+				vtx->activation = Float_16( 1.f );
 
 				// fill animated pool data
 				spr->position = pos;
@@ -256,7 +256,7 @@ void EveSpriteLineSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const M
 
 	for( size_t i = 0; i < n; ++i )
 	{
-		m_buffer[i].activation = activation;
+		m_buffer[i].activation = Float_16( activation );
 	}
 
 	quadRenderer.AddQuads( m_effectHash, &m_buffer[0], m_buffer.size() );

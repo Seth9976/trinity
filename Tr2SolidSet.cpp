@@ -156,11 +156,11 @@ void Tr2SolidSet::AddTriangle( const Vector3& position1, const Vector4& color1, 
 	TriangleData newTriangle;
 
 	newTriangle.m_position1 = position1;
-	newTriangle.m_color1 = (float*)&color1;
+	newTriangle.m_color1 = color1;
 	newTriangle.m_position2 = position2;
-	newTriangle.m_color2 = (float*)&color2;
+	newTriangle.m_color2 = color2;
 	newTriangle.m_position3 = position3;
-	newTriangle.m_color3 = (float*)&color3;
+	newTriangle.m_color3 = color3;
 
 	Vector3 dir13(position1 - position3);
 	Vector3 dir21(position2 - position1);

@@ -419,8 +419,8 @@ bool Tr2GrannyAnimation::InitializeBoundingInfo()
 				GrannyBoneBindingBounds bounds;
 				GrannyFindBoneByName( m_skeleton, bb[boneIdx].BoneName, &bounds.m_boneIndex );
 
-				Vector3 minBounds( bb[boneIdx].OBBMin );
-				Vector3 maxBounds( bb[boneIdx].OBBMax );
+				Vector3 minBounds( *reinterpret_cast<Vector3*>( bb[boneIdx].OBBMin ) );
+				Vector3 maxBounds( *reinterpret_cast<Vector3*>( bb[boneIdx].OBBMax ) );
 				bounds.m_corners[0] = minBounds;
 				bounds.m_corners[1] = maxBounds;
 				bounds.m_corners[2] = Vector3( minBounds.x, minBounds.y, maxBounds.z );
@@ -462,8 +462,8 @@ bool Tr2GrannyAnimation::GetDynamicBounds( Vector4& boundingSphere, Vector3 &aab
 	const granny_file_info* fi = GetFileInfo();
 	if( fi )
 	{
-		aabbMin += Vector3( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
-		aabbMax += Vector3( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
+		aabbMin += *reinterpret_cast<Vector3*>( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
+		aabbMax += *reinterpret_cast<Vector3*>( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
 		boundingSphere.x += fi->Models[ m_modelIndex ]->InitialPlacement.Position[0];
 		boundingSphere.y += fi->Models[ m_modelIndex ]->InitialPlacement.Position[1];
 		boundingSphere.z += fi->Models[ m_modelIndex ]->InitialPlacement.Position[2];
@@ -478,7 +478,7 @@ void Tr2GrannyAnimation::RenderBones( const Matrix& modelTransform )
 	Matrix initialTranslation;
 	if( fi )
 	{
-		initialPlacement = Vector3( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
+		initialPlacement = *reinterpret_cast<Vector3*>( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
 	}
 	initialTranslation = TranslationMatrix( initialPlacement );
 	
@@ -512,7 +512,7 @@ void Tr2GrannyAnimation::RenderDynamicBounds( const Matrix& modelTransform )
 	Matrix initialTranslation;
 	if( fi )
 	{
-		initialPlacement = Vector3( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
+		initialPlacement = *reinterpret_cast<Vector3*>( fi->Models[ m_modelIndex ]->InitialPlacement.Position );
 	}
 	initialTranslation = TranslationMatrix( initialPlacement );
 

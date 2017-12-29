@@ -79,9 +79,9 @@ void EveSpriteSet::AddBoosterGlowToQuadRenderer( Tr2QuadRenderer& quadRenderer, 
 		uint32_t( n ), 
 		world );
 
-	Float_16 zDirX = world.GetZ().x;
-	Float_16 zDirY = world.GetZ().y;
-	Float_16 zDirZ = world.GetZ().z;
+	Float_16 zDirX( world.GetZ().x );
+	Float_16 zDirY( world.GetZ().y );
+	Float_16 zDirZ( world.GetZ().z );
 	uint32_t gain = std::min( uint32_t( boosterGain * 255.f ), 255u ) << 24;
 	uint32_t warp = std::min( uint32_t( warpIntensity * 255.f ), 255u ) << 24;
 
@@ -152,7 +152,7 @@ void EveSpriteSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matri
 			}
 		}
 	}
-	Float_16 activation16 = activation * m_intensity;
+	Float_16 activation16( activation * m_intensity );
 	for( size_t i = 0; i < n; ++i )
 	{
 		m_buffer[i].activation = activation16;
@@ -262,11 +262,11 @@ void EveSpriteSet::Rebuild()
 			( ( color & 0xff0000 ) >> 16 ) |
 			( color & 0xff00ff00 ) |
 			( ( color & 0xff ) << 16 );
-		vertex.blinkPhase = sprite->m_blinkPhase;
-		vertex.blinkRate = sprite->m_blinkRate;
-		vertex.minScale = sprite->m_minScale;
-		vertex.maxScale = sprite->m_maxScale;
-		vertex.falloff = sprite->m_falloff;
+		vertex.blinkPhase = Float_16( sprite->m_blinkPhase );
+		vertex.blinkRate = Float_16( sprite->m_blinkRate );
+		vertex.minScale = Float_16( sprite->m_minScale );
+		vertex.maxScale = Float_16( sprite->m_maxScale );
+		vertex.falloff = Float_16( sprite->m_falloff );
 	}
 
 	m_spriteData.resize( n );

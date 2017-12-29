@@ -149,10 +149,10 @@ void GetProjectedCubeBounds(  AxisAlignedBoundingBox& box, const Matrix& worldVi
 		points[i].y = std::min( std::max( points[i].y, -1.f ), 1.f );
 	}
 
-	box = AxisAlignedBoundingBox( Vector3( &points[0].x ), Vector3( &points[0].x ) );
+	box = AxisAlignedBoundingBox( points[0].GetXYZ(), points[0].GetXYZ() );
 	for( int i = 0; i < count; ++i )
 	{
-		box.IncludePoint( Vector3( &points[i].x ) );
+		box.IncludePoint( points[i].GetXYZ() );
 	}
 }
 

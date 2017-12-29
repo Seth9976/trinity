@@ -178,12 +178,12 @@ void EveChildQuad::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpace
 	m_quad.m_localTransform0 = Vector4( m_localTransform._11, m_localTransform._21, m_localTransform._31, m_localTransform._41 );
 	m_quad.m_localTransform1 = Vector4( m_localTransform._12, m_localTransform._22, m_localTransform._32, m_localTransform._42 );
 	m_quad.m_localTransform2 = Vector4( m_localTransform._13, m_localTransform._23, m_localTransform._33, m_localTransform._43 );
-	m_quad.m_color[0] = m_color.r;
-	m_quad.m_color[1] = m_color.g;
-	m_quad.m_color[2] = m_color.b;
-	m_quad.m_color[3] = m_color.a;
-	m_quad.m_brightness[0] = m_brightness;
-	m_quad.m_brightness[1] = 0;
+	m_quad.m_color[0] = Float_16( m_color.r );
+	m_quad.m_color[1] = Float_16( m_color.g );
+	m_quad.m_color[2] = Float_16( m_color.b );
+	m_quad.m_color[3] = Float_16( m_color.a );
+	m_quad.m_brightness[0] = Float_16( m_brightness );
+	m_quad.m_brightness[1] = Float_16( 0 );
 }
 
 void EveChildQuad::GetLocalToWorldTransform( Matrix& transform ) const

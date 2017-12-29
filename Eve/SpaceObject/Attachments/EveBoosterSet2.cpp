@@ -507,7 +507,7 @@ void EveBoosterSet2Renderable::CalculateSplineData( float deltaT )
 		int ringIdx = m_trailsOffsetLatest;
 		for( unsigned int i = 0; i < EVE_MAX_CONTROL_POINT_COUNT; ++i )
 		{
-			m_trailsControlPositions[ i ] =  parentPos + m_trailsOffsets[ ringIdx ];
+			m_trailsControlPositions[ i ] =  parentPos + Vector3( m_trailsOffsets[ ringIdx ] );
 
 			ringIdx -= (unsigned int)( m_trailsTimeDelta / EVE_POSITION_OFFSET_DELTAT );
 			if( ringIdx < 0 )

@@ -2,15 +2,106 @@
 
 #include "Vector3.h"
 
-#ifdef _WIN32
+struct Plane
+{
+	Plane();
+	Plane( float a, float b, float c, float d );
 
-typedef D3DXPLANE Plane;
+	// assignment operators
+	Plane& operator *= ( float );
+	Plane& operator /= ( float );
 
-#else
+	// unary operators
+	Plane operator + () const;
+	Plane operator - () const;
 
-#include "CcpMath/include/Plane.h"
+	// binary operators
+	Plane operator * ( float ) const;
+	Plane operator / ( float ) const;
 
-#endif
+	bool operator == ( const Plane& ) const;
+	bool operator != ( const Plane& ) const;
+
+	float a, b, c, d;
+};
+
+
+// --------------------------------------------------------------------------------------
+inline Plane::Plane()
+{
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane::Plane( float a_, float b_, float c_, float d_ )
+	:a( a_ ),
+	b( b_ ),
+	c( c_ ),
+	d( d_ )
+{
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane& Plane::operator *= ( float scale )
+{
+	a *= scale;
+	b *= scale;
+	c *= scale;
+	d *= scale;
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane& Plane::operator /= ( float div )
+{
+	float scale = 1.0f / div;
+	a *= scale;
+	b *= scale;
+	c *= scale;
+	d *= scale;
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane Plane::operator + () const
+{
+	return *this;
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane Plane::operator - () const
+{
+	return Plane( -a, -b, -c, -d );
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane Plane::operator * ( float scale ) const
+{
+	return Plane( a * scale, b * scale, c * scale, d * scale );
+}
+
+// --------------------------------------------------------------------------------------
+inline Plane Plane::operator / ( float div ) const
+{
+	float scale = 1.0f / div;
+	return Plane( a * scale, b * scale, c * scale, d * scale );
+}
+
+// --------------------------------------------------------------------------------------
+inline bool Plane::operator == ( const Plane& other ) const
+{
+	return a == other.a && b == other.b && c == other.c && d == other.d;
+}
+
+// --------------------------------------------------------------------------------------
+inline bool Plane::operator != ( const Plane& other ) const
+{
+	return a != other.a || b != other.b || c != other.c || d != other.d;
+}
+
+
+// --------------------------------------------------------------------------------------
+inline Plane operator * ( float scale, const Plane& plane )
+{
+	return plane * scale;
+}
 
 // --------------------------------------------------------------------------------------
 inline std::pair<bool, Vector3> IntersectLine(

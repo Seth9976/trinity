@@ -624,6 +624,7 @@ BlueSharedString Tr2Effect::GetOption( const BlueSharedString& name ) const
 
 static Tr2SamplerDescription CreateSamplerDescription( const Tr2SamplerOverride& samplerOverride )
 {
+	Color color( 0.f, 0.f, 0.f, 0.f );
 	return Tr2SamplerDescription(
 		samplerOverride.filter,
 		samplerOverride.filter,
@@ -635,7 +636,7 @@ static Tr2SamplerDescription CreateSamplerDescription( const Tr2SamplerOverride&
 		samplerOverride.lodBias,
 		samplerOverride.maxAnisotropy,
 		Tr2RenderContextEnum::CMP_NEVER,
-		Color( 0.f, 0.f, 0.f, 0.f ),
+		&color.r,
 		float( samplerOverride.maxMipLevel ),
 		FLT_MAX
 		);

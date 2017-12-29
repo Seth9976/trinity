@@ -175,9 +175,9 @@ void Tr2LineSet::AddLine( const Vector3& position1, const Vector4& color1, const
 	LineData newLine;
 
 	newLine.m_position1 = position1;
-	newLine.m_color1 = (float*)&color1;
+	newLine.m_color1 = color1;
 	newLine.m_position2 = position2;
-	newLine.m_color2 = (float*)&color2;
+	newLine.m_color2 = color2;
 
 	m_lines.push_back( newLine );
 }

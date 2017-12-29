@@ -15,9 +15,6 @@ using namespace Tr2RenderContextEnum;
 
 
 CCP_STATS_DECLARE( textureResBytes, "Trinity/textureResBytes", false, CST_MEMORY, "Size of memory occupied by textures." );
-#if DEPRECATED_ENABLED
-BLUE_REGISTER_ENUM_EX( "TRIFORMAT", D3DFORMAT, TriFormat, ENUM_REG_VALUES_ON_MODULE | ENUM_REG_ENUM_OBJECT_ON_MODULE );
-#endif
 
 float g_imageWarnLoadTime = 1.00f;
 TRI_REGISTER_SETTING( "imageWarnLoadTime", g_imageWarnLoadTime );

@@ -167,7 +167,7 @@ public:
 			packedCoefficients[i + 3].w = -s_packCoefficient2 * XMVectorGetByIndex( coefficients[7], i );
 		}
 
-		packedCoefficients[6] = XMVectorScale( coefficients[8], s_packCoefficient4 );
+		packedCoefficients[6] = Vector4( XMVectorScale( coefficients[8], s_packCoefficient4 ) );
 		packedCoefficients[6].w = 1.0f;
 	}
 

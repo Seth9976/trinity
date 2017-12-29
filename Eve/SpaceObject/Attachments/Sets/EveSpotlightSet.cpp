@@ -146,14 +146,14 @@ void EveSpotlightSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Ma
 			glow.m_transform1 = Vector4( m._11, m._21, m._31, m._41 );
 			glow.m_transform2 = Vector4( m._12, m._22, m._32, m._42 );
 			glow.m_transform3 = Vector4( m._13, m._23, m._33, m._43 );
-			glow.m_activation = activation;
-			glow.m_boosterGainInfluence = 1 + ( boosterGain - 1 ) * m_spotlightData[i].boosterGainInfluence;
+			glow.m_activation = Float_16( activation );
+			glow.m_boosterGainInfluence = Float_16( 1 + ( boosterGain - 1 ) * m_spotlightData[i].boosterGainInfluence );
 
 			auto& cone = m_coneBuffer[i];
 			cone.m_transform1 = Vector4( m._11, m._21, m._31, m._41 );
 			cone.m_transform2 = Vector4( m._12, m._22, m._32, m._42 );
 			cone.m_transform3 = Vector4( m._13, m._23, m._33, m._43 );
-			cone.m_activation = activation;
+			cone.m_activation = Float_16( activation );
 			cone.m_boosterGainInfluence = glow.m_boosterGainInfluence;
 		}
 	}
@@ -176,14 +176,14 @@ void EveSpotlightSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Ma
 			glow.m_transform1 = Vector4( m._11, m._21, m._31, m._41 );
 			glow.m_transform2 = Vector4( m._12, m._22, m._32, m._42 );
 			glow.m_transform3 = Vector4( m._13, m._23, m._33, m._43 );
-			glow.m_activation = activation;
-			glow.m_boosterGainInfluence = 1 + ( boosterGain - 1 ) * data.boosterGainInfluence;
+			glow.m_activation = Float_16( activation );
+			glow.m_boosterGainInfluence = Float_16( 1 + ( boosterGain - 1 ) * data.boosterGainInfluence );
 
 			auto& cone = m_coneBuffer[i];
 			cone.m_transform1 = Vector4( m._11, m._21, m._31, m._41 );
 			cone.m_transform2 = Vector4( m._12, m._22, m._32, m._42 );
 			cone.m_transform3 = Vector4( m._13, m._23, m._33, m._43 );
-			cone.m_activation = activation;
+			cone.m_activation = Float_16( activation );
 			cone.m_boosterGainInfluence = glow.m_boosterGainInfluence;
 		}
 	}
@@ -212,24 +212,24 @@ void EveSpotlightSet::Rebuild()
 	for( int i = 0; i < n; ++i )
 	{
 		auto& vertex = m_coneBuffer[i];
-		vertex.m_color[0] = m_spotlightItems[i]->m_coneColor.r;
-		vertex.m_color[1] = m_spotlightItems[i]->m_coneColor.g;
-		vertex.m_color[2] = m_spotlightItems[i]->m_coneColor.b;
+		vertex.m_color[0] = Float_16( m_spotlightItems[i]->m_coneColor.r );
+		vertex.m_color[1] = Float_16( m_spotlightItems[i]->m_coneColor.g );
+		vertex.m_color[2] = Float_16( m_spotlightItems[i]->m_coneColor.b );
 	}
 
 
 	for( int i = 0; i < n; ++i )
 	{
 		auto& vertex = m_glowBuffer[i];
-		vertex.m_spriteColor[0] = m_spotlightItems[i]->m_spriteColor.r;
-		vertex.m_spriteColor[1] = m_spotlightItems[i]->m_spriteColor.g;
-		vertex.m_spriteColor[2] = m_spotlightItems[i]->m_spriteColor.b;
-		vertex.m_flareColor[0] = m_spotlightItems[i]->m_flareColor.r;
-		vertex.m_flareColor[1] = m_spotlightItems[i]->m_flareColor.g;
-		vertex.m_flareColor[2] = m_spotlightItems[i]->m_flareColor.b;
-		vertex.m_scale[0] = m_spotlightItems[i]->m_spriteScale.x;
-		vertex.m_scale[1] = m_spotlightItems[i]->m_spriteScale.y;
-		vertex.m_scale[2] = m_spotlightItems[i]->m_spriteScale.z;
+		vertex.m_spriteColor[0] = Float_16( m_spotlightItems[i]->m_spriteColor.r );
+		vertex.m_spriteColor[1] = Float_16( m_spotlightItems[i]->m_spriteColor.g );
+		vertex.m_spriteColor[2] = Float_16( m_spotlightItems[i]->m_spriteColor.b );
+		vertex.m_flareColor[0] = Float_16( m_spotlightItems[i]->m_flareColor.r );
+		vertex.m_flareColor[1] = Float_16( m_spotlightItems[i]->m_flareColor.g );
+		vertex.m_flareColor[2] = Float_16( m_spotlightItems[i]->m_flareColor.b );
+		vertex.m_scale[0] = Float_16( m_spotlightItems[i]->m_spriteScale.x );
+		vertex.m_scale[1] = Float_16( m_spotlightItems[i]->m_spriteScale.y );
+		vertex.m_scale[2] = Float_16( m_spotlightItems[i]->m_spriteScale.z );
 	}
 }
 

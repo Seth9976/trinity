@@ -79,12 +79,9 @@ using std::max;
 #endif
 
 #ifdef _WIN32
-#include <d3dx9math.h>
 #include <xnamath.h>
 #else
 #include "CcpMath/include/xnamath.h"
-#include "CcpMath/include/Plane.h"
-#include "CcpMath/include/Float16.h"
 #endif
 
 #include "Utilities/Vector2.h"

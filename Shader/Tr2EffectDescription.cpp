@@ -409,7 +409,7 @@ bool Tr2EffectDescription::Read( const void* data,
 						mipLODBias,
 						maxAnisotropy,
 						comparisonFunc,
-						borderColor,
+						&borderColor.r,
 						minLOD,
 						maxLOD );
 

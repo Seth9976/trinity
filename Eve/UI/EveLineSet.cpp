@@ -248,9 +248,9 @@ unsigned int EveLineSet::AddLine( const Vector3& position1, const Vector4& color
 	EveLineData newLine;
 
 	newLine.m_position1 = position1;
-	newLine.m_color1 = (float*)&color1;
+	newLine.m_color1 = color1;
 	newLine.m_position2 = position2;
-	newLine.m_color2 = (float*)&color2;
+	newLine.m_color2 = color2;
 
 	m_lines.push_back( newLine );
 	return (unsigned int)m_lines.size() - 1;
@@ -310,8 +310,8 @@ void EveLineSet::ChangeLine( unsigned int id, const Vector3& position1, const Ve
 		EveLineData& line = m_lines[id];
 		line.m_position1 = position1;
 		line.m_position2 = position2;
-		line.m_color1 = (float*)&color1;
-		line.m_color2 = (float*)&color2;
+		line.m_color1 = color1;
+		line.m_color2 = color2;
 	}
 }
 
@@ -320,8 +320,8 @@ void EveLineSet::ChangeLineColor( unsigned int id, const Vector4& color1, const 
 	if( id < m_lines.size() )
 	{
 		EveLineData& line = m_lines[id];
-		line.m_color1 = (float*)&color1;
-		line.m_color2 = (float*)&color2;
+		line.m_color1 = color1;
+		line.m_color2 = color2;
 	}
 }
 

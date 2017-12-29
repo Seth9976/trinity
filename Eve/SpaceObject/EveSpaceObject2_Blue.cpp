@@ -99,8 +99,8 @@ PyObject* EveSpaceObject2::PyTransformLocators( PyObject* self, PyObject* args )
 			Vector3 position;
 			Quaternion rotation;
 
-			if( !PyTuple_Check( item ) || !BlueExtractVector( PyTuple_GET_ITEM( item, 0 ), position, 3 ) || 
-				!BlueExtractVector( PyTuple_GET_ITEM( item, 1 ), rotation, 4 ) || !PyInt_Check( PyTuple_GET_ITEM( item, 2 ) ) )
+			if( !PyTuple_Check( item ) || !BlueExtractVector( PyTuple_GET_ITEM( item, 0 ), &position.x, 3 ) || 
+				!BlueExtractVector( PyTuple_GET_ITEM( item, 1 ), &rotation.x, 4 ) || !PyInt_Check( PyTuple_GET_ITEM( item, 2 ) ) )
 			{
 				Py_DECREF( item );
 				return PyErr_SetString( PyExc_TypeError, "arument must be a sequence of (position, rotation, boneIndex) tuples" ), nullptr;

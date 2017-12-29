@@ -746,9 +746,9 @@ unsigned int Tr2CurveLineSet::AddStraightLine( const Vector3& position1, const V
 
 	newLine.type = LINETYPE_STRAIGHT;
 	newLine.position1 = position1;
-	newLine.color1 = ( float* )&color1;
+	newLine.color1 = color1;
 	newLine.position2 = position2;
-	newLine.color2 = ( float* )&color2;
+	newLine.color2 = color2;
 	newLine.intermediatePosition = Vector3( 0.f, 0.f, 0.f );
 	newLine.width = width;
 	newLine.multiColor = Color( 0.f, 0.f, 0.f, 0.f );
@@ -781,9 +781,9 @@ unsigned int Tr2CurveLineSet::AddCurvedLineCrt( const Vector3& position1, const 
 
 	newLine.type = LINETYPE_CURVED;
 	newLine.position1 = position1;
-	newLine.color1 = ( float* )&color1;
+	newLine.color1 = color1;
 	newLine.position2 = position2;
-	newLine.color2 = ( float* )&color2;
+	newLine.color2 = color2;
 	newLine.intermediatePosition = middle;
 	newLine.width = width;
 	newLine.multiColor = Color( 0.f, 0.f, 0.f, 0.f );
@@ -854,9 +854,9 @@ unsigned int Tr2CurveLineSet::AddSpheredLineCrt( const Vector3& position1, const
 
 	newLine.type = LINETYPE_SPHERED;
 	newLine.position1 = position1;
-	newLine.color1 = ( float* )&color1;
+	newLine.color1 = color1;
 	newLine.position2 = position2;
-	newLine.color2 = ( float* )&color2;
+	newLine.color2 = color2;
 	newLine.intermediatePosition = center;
 	newLine.width = width;
 	newLine.multiColor = Color( 0.f, 0.f, 0.f, 0.f );
@@ -944,8 +944,8 @@ void Tr2CurveLineSet::ChangeLineColor( unsigned int id, const Vector4& color1, c
 	if( isValidLineID( id ) )
 	{
 		LineData& line = m_lines[id];
-		line.color1 = (float*)&color1;
-		line.color2 = (float*)&color2;
+		line.color1 = color1;
+		line.color2 = color2;
 	}
 }
 
@@ -1064,7 +1064,7 @@ void Tr2CurveLineSet::ChangeLineMultiColor( unsigned int id, const Vector4& colo
 	if( isValidLineID( id ) )
 	{
 		LineData& line = m_lines[id];
-		line.multiColor = (float*)&color;
+		line.multiColor = color;
 		line.multiColorBorder = border;
 	}
 }
@@ -1084,7 +1084,7 @@ void Tr2CurveLineSet::ChangeLineAnimation( unsigned int id, const Vector4& color
 	if( isValidLineID( id ) )
 	{
 		LineData& line = m_lines[id];
-		line.overlayColor = (float*)&color;
+		line.overlayColor = color;
 		line.animationSpeed = speed;
 		line.animationScale = scale;
 	}

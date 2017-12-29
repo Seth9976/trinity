@@ -405,8 +405,8 @@ void EveTurretSet::InitializeDynamicBounds( granny_file_info* fi, granny_skeleto
 				GrannyBoneBindingBounds bounds;
 				GrannyFindBoneByName( skeleton, bb[boneIdx].BoneName, &bounds.m_boneIndex );
 
-				Vector3 minBounds( bb[boneIdx].OBBMin );
-				Vector3 maxBounds( bb[boneIdx].OBBMax );
+				Vector3 minBounds( *reinterpret_cast<Vector3*>( bb[boneIdx].OBBMin ) );
+				Vector3 maxBounds( *reinterpret_cast<Vector3*>( bb[boneIdx].OBBMax ) );
 				bounds.m_corners[0] = minBounds;
 				bounds.m_corners[1] = maxBounds;
 				bounds.m_corners[2] = Vector3( minBounds.x, minBounds.y, maxBounds.z );
@@ -467,8 +467,8 @@ bool EveTurretSet::GetDynamicBounds( const SingleTurretData& turret, Vector4* bo
 	{
 		if( aabbMin && aabbMax )
 		{
-			*aabbMin += Vector3( fi->Models[ 0 ]->InitialPlacement.Position );
-			*aabbMax += Vector3( fi->Models[ 0 ]->InitialPlacement.Position );
+			*aabbMin += *reinterpret_cast<Vector3*>( fi->Models[ 0 ]->InitialPlacement.Position );
+			*aabbMax += *reinterpret_cast<Vector3*>( fi->Models[ 0 ]->InitialPlacement.Position );
 		}
 		if( boundingSphere )
 		{
@@ -512,7 +512,7 @@ void EveTurretSet::RenderDynamicBounds()
 
 		if( fi )
 		{
-			initialPlacement = Vector3( fi->Models[ 0 ]->InitialPlacement.Position );
+			initialPlacement = *reinterpret_cast<Vector3*>( fi->Models[ 0 ]->InitialPlacement.Position );
 		}
 		initialTranslation = TranslationMatrix( initialPlacement );
 
@@ -1197,7 +1197,7 @@ void EveTurretSet::ModifySystemBoneTransform( SystemBones bone, const Vector3* t
 			height *= m_trackingInfluence;
 			// it's a pos extension with a scale
 			Vector3 pos = Vector3( 0.f, height * m_sysBoneHeight, 0.f ) + Vector3( transform->Position[0], transform->Position[1], transform->Position[2] );
-			GrannySetTransform( transform, pos, transform->Orientation, (float*)transform->ScaleShear );
+			GrannySetTransform( transform, &pos.x, transform->Orientation, (float*)transform->ScaleShear );
 		}
 		break;
 	case SYSBONE_SCALED_PITCH01:

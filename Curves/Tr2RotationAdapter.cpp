@@ -99,28 +99,28 @@ Quaternion* Tr2RotationAdapter::GetValueAt( Quaternion* in, double time )
 // --------------------------------------------------------------------------------
 Quaternion* Tr2RotationAdapter::GetValueDotAt( Quaternion* in, Be::Time time )
 {
-	*in = Vector3( 0, 0, 0 );
+	*in = Quaternion( 0, 0, 0, 1 );
 	return in;
 }
 
 // --------------------------------------------------------------------------------
 Quaternion* Tr2RotationAdapter::GetValueDotAt( Quaternion* in, double time )
 {
-	*in = Vector3( 0, 0, 0 );
+	*in = Quaternion( 0, 0, 0, 1 );
 	return in;
 }
 
 // --------------------------------------------------------------------------------
 Quaternion* Tr2RotationAdapter::GetValueDoubleDotAt( Quaternion* in, Be::Time )
 {
-	*in = Vector3( 0, 0, 0 );
+	*in = Quaternion( 0, 0, 0, 1 );
 	return in;
 }
 
 // --------------------------------------------------------------------------------
 Quaternion* Tr2RotationAdapter::GetValueDoubleDotAt( Quaternion* in, double )
 {
-	*in = Vector3( 0, 0, 0 );
+	*in = Quaternion( 0, 0, 0, 1 );
 	return in;
 }
 

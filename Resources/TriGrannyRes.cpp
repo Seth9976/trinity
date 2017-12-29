@@ -549,7 +549,7 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 
 						base += weight * delta;
 
-						*reinterpret_cast<Vector3_16*>( pBase ) = base;
+						*reinterpret_cast<Vector3_16*>( pBase ) = Vector3_16( base );
 					}
 				}
 				else
@@ -564,7 +564,7 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 						
 						base += weight * delta;
 
-						*reinterpret_cast<Vector3_16*>( pBase ) = base;
+						*reinterpret_cast<Vector3_16*>( pBase ) = Vector3_16( base );
 					}
 				}
 				else
@@ -654,8 +654,8 @@ bool TriGrannyRes::BakeBlendshape( unsigned int meshIx, const std::vector<float>
 
 						base += weights[j] * delta;
 
-						*reinterpret_cast<Vector3_16*>( pBase ) = base;
-						*reinterpret_cast<Vector3_16*>( pDelta ) = delta;
+						*reinterpret_cast<Vector3_16*>( pBase ) = Vector3_16( base );
+						*reinterpret_cast<Vector3_16*>( pDelta ) = Vector3_16( delta );
 					}
 					else
 					{
@@ -1204,7 +1204,7 @@ bool TriGrannyRes::SaveToGr2( const std::string& path )
 	return result;
 }
 
-void GetPosition( granny_uint8* pVerts, int vIx, bool isPositionHalfPrecision, int bytesPerVertex, granny_real32 * pos )
+void GetPosition( granny_uint8* pVerts, int vIx, bool isPositionHalfPrecision, int bytesPerVertex, Vector3& pos )
 {
 	if( isPositionHalfPrecision )
 	{

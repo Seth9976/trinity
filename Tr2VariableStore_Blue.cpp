@@ -142,11 +142,11 @@ static PyObject* PyRegisterVariable( PyObject* self, PyObject* args )
 	{
 		variable = pThis->RegisterVariable( name, valFloat );
 	}
-	else if( BlueExtractVector( valueArg, valVector2, 2 ) )
+	else if( BlueExtractVector( valueArg, &valVector2.x, 2 ) )
 	{
 		variable = pThis->RegisterVariable( name, valVector2 );
 	}
-	else if( BlueExtractVector( valueArg, valVector3, 3 ) )
+	else if( BlueExtractVector( valueArg, &valVector3.x, 3 ) )
 	{
 		variable = pThis->RegisterVariable( name, valVector3 );
 	}
@@ -158,7 +158,7 @@ static PyObject* PyRegisterVariable( PyObject* self, PyObject* args )
 	{
 		variable = pThis->RegisterVariable( name, valMatrix );
 	}
-	else if( BlueExtractVector( valueArg, valColor, 4 ) )
+	else if( BlueExtractVector( valueArg, &valColor.r, 4 ) )
 	{
 		variable = pThis->RegisterVariable( name, valColor );
 	}
