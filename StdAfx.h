@@ -78,24 +78,8 @@ using std::max;
 #define FASTCALL
 #endif
 
-#ifdef _WIN32
-#include <xnamath.h>
-#else
-#include "CcpMath/include/xnamath.h"
-#endif
 
-#include "Utilities/Vector2.h"
-#include "Utilities/Vector3.h"
-#include "Utilities/Vector4.h"
-#include "Utilities/Plane.h"
-#include "Utilities/Matrix.h"
-#include "Utilities/Color.h"
-#include "Utilities/Quaternion.h"
-#include "Utilities/Float16.h"
-
-#ifdef _WIN32
-#include "D3DFundamentalTypes.h"
-#endif
+#include "CcpMath/include/CcpMath.h"
 
 #include "include/Tr2WindowHandle.h"
 #include "TrinityAL/include/TrinityAL.h"

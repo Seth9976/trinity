@@ -3,9 +3,6 @@
 #ifndef Tr2BoneMatrixCurve_h
 #define Tr2BoneMatrixCurve_h
 
-// Trinity headers
-#include "Utilities/Matrix.h"
-
 #include "include/Tr2Curve.h"
 #include "Tr2SkinnedObject.h"
 

@@ -2,8 +2,6 @@
 #ifndef OBB_H
 #define OBB_H
 
-#include "Vector3.h"
-
 class TriFrustum;
 
 // --------------------------------------------------------------------------------------

@@ -3,10 +3,6 @@
 #ifndef Tr2ConstantBufferFormats_h
 #define Tr2ConstantBufferFormats_h
 
-// Trinity headers
-#include "Utilities/Matrix.h"
-#include "Utilities/Vector2.h"
-
 class Tr2RenderContext;
 
 struct Tr2PerFrameShadowPSData

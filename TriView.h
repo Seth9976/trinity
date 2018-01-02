@@ -3,8 +3,6 @@
 #define TriView_h
 
 
-#include "Utilities/Matrix.h"
-
 // --------------------------------------------------------------------------------------
 // Description:
 //   Blue-exposed wrapper around a view matrix.

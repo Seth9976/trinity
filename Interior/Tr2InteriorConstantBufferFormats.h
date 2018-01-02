@@ -4,10 +4,7 @@
 #define Tr2InteriorConstantBufferFormats_h
 
 // Trinity headers
-#include "Utilities/Color.h"
-#include "Utilities/Matrix.h"
 #include "Tr2ConstantBufferFormats.h"
-#include "Utilities/Vector4.h"
 
 // maximum number of pointlights per object
 #define MAX_INTERIOR_LIGHTS_PER_OBJECT (10)

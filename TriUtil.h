@@ -298,4 +298,40 @@ inline Color TriGammaToLinear( const Color &value )
 	return Color( result.x, result.y, result.z, result.w );
 }
 
+inline bool IsMatch( Be::Var* value, const Vector3& t )
+{
+	return ( Be::Var* )&t == value;
+}
+
+// --------------------------------------------------------------------------------------
+inline bool IsMatch( Be::Var* value, const Vector4& t )
+{
+	return ( Be::Var* )&t == value;
+}
+
+// --------------------------------------------------------------------------------------
+inline bool IsMatch( Be::Var* value, const Matrix& t )
+{
+	return ( Be::Var* )&t == value;
+}
+
+// --------------------------------------------------------------------------------------
+inline bool IsMatch( Be::Var* value, const Color& t )
+{
+	return ( Be::Var* )&t == value;
+}
+
+// --------------------------------------------------------------------------------------
+inline bool IsMatch( Be::Var* value, const Quaternion& t )
+{
+	return ( Be::Var* )&t == value;
+}
+
+// --------------------------------------------------------------------------------------
+template<>
+inline void BlueGetNullValue( Quaternion& resultRef )
+{
+	resultRef = IdentityQuaternion();
+}
+
 #endif //defined TRIUTIL_H

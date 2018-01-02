@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "TriTransformParameter.h"
-#include "Utilities/Matrix.h"
 #include "Tr2Renderer.h"
 #include "include/TriMath.h"
 

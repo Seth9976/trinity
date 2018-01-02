@@ -3,8 +3,6 @@
 #define _TRIPROJECTION_H_
 
 
-#include "Utilities/Matrix.h"
-
 const char TRIPROJECTION_FOV = 1;
 const char TRIPROJECTION_OFF_CENTER = 2;
 const char TRIPROJECTION_ORTHO = 3;

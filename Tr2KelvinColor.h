@@ -3,7 +3,6 @@
 #ifndef Tr2KelvinColor_h
 #define Tr2KelvinColor_h
 
-#include "Utilities/Color.h"
 #include "Utilities/Vector3d.h"
 
 // Standard Illuminants

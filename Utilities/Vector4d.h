@@ -2,8 +2,6 @@
 #ifndef Vector4d_H
 #define Vector4d_H
 
-#include "Vector4.h"
-
 // --------------------------------------------------------------------------------------
 // Description:
 //   This structure represents a 4-vector of doubles.  Unlike Vector4, it does not

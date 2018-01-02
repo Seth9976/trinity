@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "EveSpaceObject2.h"
 #include "TriConstants.h"
-#include "Utilities/Vector3.h"
 #include "Tr2GrannyAnimation.h"
 #include "Utilities/MatrixUtils.h"
 

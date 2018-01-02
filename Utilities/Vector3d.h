@@ -2,8 +2,6 @@
 #ifndef Vector3d_H
 #define Vector3d_H
 
-#include "Vector3.h"
-
 // --------------------------------------------------------------------------------------
 // Description:
 //   This structure represents a 3-vector of doubles.  Unlike Vector3, it does not
