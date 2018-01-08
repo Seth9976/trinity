@@ -9,8 +9,6 @@ BLUE_DECLARE( Tr2Effect );
 Tr2Mesh::Tr2Mesh( IRoot* lockobj ) : 
 	PARENTLOCK( m_lodResources ),
 	m_deferGeometryLoad( false ),
-	m_immutable( false ),
-	m_computeAccess( false ),
 	m_isLoading( false ),
 	m_resourceLoadCbId( 0 ),
 	m_resourcePrepCbId( 0 ),
@@ -113,35 +111,13 @@ void Tr2Mesh::SetMeshResPath( const char* path )
 	OnModified( (Be::Var*)&m_meshResPath );
 }
 
-namespace {
-
-struct ImmutableHelper : IBlueResManNotifications
-{
-	bool m_immutable;
-	bool m_computeAccess;
-
-	ImmutableHelper( bool immutable, bool computeAccess ) 
-	: m_immutable( immutable ) 
-	, m_computeAccess( computeAccess )
-	{}
-
-	void OnResourceCreated( void* res )
-	{
-		static_cast<TriGeometryRes*>(res)->m_immutable = m_immutable;
-		static_cast<TriGeometryRes*>(res)->m_computeAccess = m_computeAccess;
-	}
-};
-
-}
-
 void Tr2Mesh::InitializeGeometryResource()
 {
 	TriGeometryResPtr res;
 
 	if( !m_meshResPath.empty() )
 	{
-		ImmutableHelper helper( m_immutable, m_computeAccess );
-		BeResMan->GetResource( m_meshResPath.c_str(), m_geomResourceEx.c_str(), res, &helper );
+		BeResMan->GetResource( m_meshResPath.c_str(), m_geomResourceEx.c_str(), res );
 		m_isLoading = true;
 
 		if( m_resourceLoadCbId )

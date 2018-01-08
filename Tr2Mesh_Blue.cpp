@@ -57,21 +57,6 @@ const Be::ClassInfo* Tr2Mesh::ExposeToBlue()
 		)
 		MAP_ATTRIBUTE( "deferGeometryLoad", m_deferGeometryLoad, "Defers geometry load when loading mesh objects", Be::READWRITE | Be::NOTIFY | Be::PERSIST )
 		MAP_ATTRIBUTE
-		( 
-			"immutable", 
-			m_immutable, 
-			"Can the geometry be stored in immutable buffers? Note this needs to\n"
-			"set before loading, changes will not trigger an auto-reload of gr2.", 
-			Be::READWRITE | Be::PERSIST 
-		)
-		MAP_ATTRIBUTE
-		( 
-			"computeAccess", 
-			m_computeAccess, 
-			"If true, make the VB/IB visible to compute shaders (experimental).", 
-			Be::READWRITE | Be::PERSIST 
-		)
-		MAP_ATTRIBUTE
 		(
 			"isLoading", 
 			m_isLoading, 

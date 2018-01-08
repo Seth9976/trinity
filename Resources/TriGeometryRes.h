@@ -86,8 +86,6 @@ struct TriGeometryResMeshData
 	TriGeometryResMeshData();
 	~TriGeometryResMeshData();
 
-	bool BuildCollisionData();
-
 	std::string m_name;
 	TrackableStdVector<TriGeometryResAreaData> m_areas;
 	unsigned int m_vertexDeclaration;
@@ -132,19 +130,6 @@ struct TriGeometryResModelData
 	float m_orientation[4];
 };
 
-enum TriGeometryCollisionResultFlags
-{
-	COLLISION_RESULT_ANY,
-	COLLISION_RESULT_CLOSEST,
-};
-
-enum TriGeometryCollisionCullingFlags
-{
-	COLLISION_CULL_CCW,
-	COLLISION_CULL_CW,
-	COLLISION_CULL_NONE,
-};
-
 BLUE_CLASS( TriGeometryRes ):
 	public BlueAsyncRes,
 	public ICacheable,
@@ -161,8 +146,6 @@ public:
 	void RecalculateBoundingBox();
 	void RecalculateBoundingSphere();
 	Be::Result<std::string> CalculateBoundingBoxFromTransform( unsigned int meshIx, const Matrix& transform, std::pair<Vector3, Vector3>& bounds );
-
-	void SetIsDynamic( bool isDynamic );
 
 	unsigned int GetMeshCount();
 	Be::Result<std::string> GetMeshName( unsigned int ix, std::string& name );
@@ -210,12 +193,6 @@ public:
 		int* boneIndexNear,
 		int* boneIndexFar,
 		unsigned int areaIx=-1 );
-	
-	bool GetIntersectionPointAndNormal( 
-		const Vector3* pos, 
-		const Vector3* dir, 
-		Vector3* hitpoint, 
-		Vector3* normal );
 
 	bool GetIntersectionPointNormalBone( 
 		const Vector3* pos, 
@@ -225,37 +202,16 @@ public:
 		int* boneIndex,
 		unsigned int areaIx=-1 );
 
-	std::pair<bool, std::pair<Vector3, Vector3>> GetIntersectionPointAndNormalFromScript( const Vector3& pos, const Vector3& dir );
 	std::pair<bool, std::pair<int, std::pair<Vector3, Vector3>>> GetIntersectionPointNormalBoneFromScript( const Vector3& pos, const Vector3& dir );
 	std::pair<bool, std::pair<int, std::pair<Vector3, Vector3>>> GetAreaIntersectionPointNormalBoneFromScript( const Vector3& pos, const Vector3& dir, unsigned int areaIx );
-
-	std::pair<float, Vector3> GetClosestVertex( const Vector3& pos );
 
 	bool GetBoundingBox( unsigned int meshIx, Vector3& min, Vector3& max ) const;
 	Be::Result<std::string> GetBoundingBoxFromScript( unsigned int meshIx, std::pair<Vector3, Vector3>& bounds ) const;
 	bool GetAreaBoundingBox( unsigned int meshIx, unsigned int areaIx, Vector3& min, Vector3& max ) const;
-	bool GetAreaBasis( unsigned int meshIx, unsigned int areaIx, Vector3& pointOnTriangle, Vector3& edge1, Vector3& edge2 ) const;
 	bool GetBoundingSphere( unsigned int meshIx, Vector4& sphere );
 	Be::Result<std::string> GetBoundingSphereFromScript( unsigned int meshIx, std::pair<Vector3, float>& bounds );
 
 	void PrepareFromGrannyRes( TriGrannyRes* g );
-	void PrepareFromBuffers( Tr2BufferAL&& vb, Tr2BufferAL&& ib, unsigned int vertexDeclaration, unsigned int bytesPerVertex, const TriGeometryResAreaData* areas, size_t areaCount );
-
-	bool GetRayAreaIntersection( const Vector3& rayOrigin, 
-								 const Vector3& rayDirection, 
-								 unsigned int meshIx, 
-								 unsigned int areaIx, 
-								 TriGeometryCollisionResultFlags resultFlags, 
-								 TriGeometryCollisionCullingFlags culling, 
-								 Vector3& position, 
-								 Vector2& uv );
-
-	std::pair<bool, std::pair<Vector3, Vector2>> GetRayAreaIntersectionFromScript( const Vector3& rayOrigin, 
-		const Vector3& rayDirection, 
-		unsigned int meshIx, 
-		unsigned int areaIx, 
-		TriGeometryCollisionResultFlags resultFlags, 
-		TriGeometryCollisionCullingFlags culling );
 
 	BlueStdResult GetMeshVertexElements( size_t meshIndex, std::vector<std::pair<uint32_t, uint32_t>>& elements ) const;
 
@@ -305,23 +261,11 @@ public:
 
 	granny_file_info* GetGrannyInfo();
 	
-	static void PrepareGrannyFileGeometry( granny_file_info* gi );
 	static bool SaveMeshToGrannyFile( TriGeometryResMeshData* pMesh, const char* filename );
-
-	float GetMeshSurfaceArea( int meshIx );
-
-    // Insert custom dynamically generated mesh. Ownership of inserted object 
-    // is moved to this class. Returns index to inserted mesh within this container. 
-    // TODO How should this be done? - tatu
-    int PushMesh( TriGeometryResMeshData* mesh );
 
 	//	Iterator functions for processing mesh data
 	typedef void( *PerTriangleCallback )( void* context, const Vector3& p1, const Vector3& p2, const Vector3& p3 );
 	void ProcessMeshTriangles( int meshIx, PerTriangleCallback cb, void* cbContext );
-
-	//	Iterator functions for processing mesh data
-	typedef void( *PerVertexCallback )( void* context, const Vector3& p1, const Vector3& n1 );
-	void ProcessMeshVertices( int meshIx, PerVertexCallback cb, void* cbContext );
 
 	void ReverseIndexBuffer( unsigned int meshIx, Tr2RenderContext& renderContext );
 
@@ -330,8 +274,6 @@ public:
 	// name for logging/debugging
 	std::string m_name;
 
-	bool	m_immutable;
-	bool	m_computeAccess;
 	TriGrannyResPtr m_sourceGranny;
 
 private:
@@ -342,12 +284,8 @@ private:
 	TrackableStdVector<TriGeometryResModelData*> m_models;
 	TrackableStdVector<TriGeometryResSkeletonData*> m_skeletons;
 
-	bool m_isDynamicGeometry;
 	granny_file* m_pGrannyFile;
 	granny_file_info* m_inMemoryInfo;
-
-	typedef void (*PerVertexUVCallback)( void* context, const Vector3& p1, const Vector3& n1, const Vector2& uv1 );
-	void ProcessMeshVerticesWithUV( int meshIx, PerVertexUVCallback cb, void* cbContext );
 
 private:
 	// Provide the functions that do the actual work of loading and preparing.
@@ -370,7 +308,6 @@ private:
 	bool CreateMeshesFromGrannyFile( granny_file_info* gi, Tr2PrimaryRenderContext& renderContext );
 	bool CreateMeshFromGrannyMesh( granny_mesh* myMesh, TriGeometryResMeshData* pMesh, Tr2PrimaryRenderContext& renderContext, void* pVBOverride = NULL );
 	bool CreateD3DVertexBuffer( TriGeometryResMeshData* pMesh, int vtxCount, int bytesPerVtx, const granny_mesh* mesh, const void* pSrc, const granny_data_type_definition* grnVtxDecl, bool fullFloat, Tr2PrimaryRenderContext& renderContext );
-	bool CreateSystemVertexBuffer( TriGeometryResMeshData* pMesh, int vtxCount, int bytesPerVtx, const granny_mesh* mesh, const void* pSrc, const granny_data_type_definition* grnVtxDecl, bool fullFloat );
 };
 
 TYPEDEF_BLUECLASS_WR_SHUTDOWN(TriGeometryRes);

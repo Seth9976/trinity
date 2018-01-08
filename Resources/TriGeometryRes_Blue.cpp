@@ -5,71 +5,15 @@
 
 BLUE_DEFINE( TriGeometryRes );
 
-static Be::VarChooser TriGeometryCollisionResultFlagsChooser[] =
-{
-	{
-		"ANY",     
-		BeCast( COLLISION_RESULT_ANY ),     
-		"Collision function will return the first intersection it finds"
-	},
-	{
-		"CLOSEST",     
-		BeCast( COLLISION_RESULT_CLOSEST ),     
-		"Collision function will return the closest intersection to ray origin"
-	},
-	{ 0 },
-};
-
-BLUE_REGISTER_ENUM_EX( "TriGeometryCollisionResultFlags", 
-					  TriGeometryCollisionResultFlags, 
-					  TriGeometryCollisionResultFlagsChooser, 
-					  ENUM_REG_ENUM_OBJECT_ON_MODULE );
-
-static Be::VarChooser TriGeometryCollisionCullingFlagsChooser[] =
-{
-	{
-		"CCW",     
-		BeCast( COLLISION_CULL_CCW ),     
-		"CCW culling"
-	},
-	{
-		"CW",     
-		BeCast( COLLISION_CULL_CW ),     
-		"CW culling"
-	},
-	{
-		"NONE",     
-		BeCast( COLLISION_CULL_NONE ),     
-		"None culling"
-	},
-	{ 0 },
-};
-
-BLUE_REGISTER_ENUM_EX( "TriGeometryCollisionCullingFlags", 
-					  TriGeometryCollisionCullingFlags, 
-					  TriGeometryCollisionCullingFlagsChooser, 
-					  ENUM_REG_ENUM_OBJECT_ON_MODULE );
-
 IBlueResource* CreateStaticGeometryResource( const wchar_t* name )
 {
 	TriGeometryResPtr p;
 	p.CreateInstance();
-	p->SetIsDynamic( false );
-	p->m_name = CW2A( name );
-	return p.Detach();
-}
-
-IBlueResource* CreateDynamicGeometryResource( const wchar_t* name )
-{
-	TriGeometryResPtr p;
-	p.CreateInstance();
-	p->SetIsDynamic( true );
 	p->m_name = CW2A( name );
 	return p.Detach();
 }
 
 BLUE_REGISTER_RESOURCE_EXTENSION( L"gr2", CreateStaticGeometryResource );
-BLUE_REGISTER_RESOURCE_EXTENSION( L"gr2dyn", CreateDynamicGeometryResource );
 
 
 const Be::ClassInfo* TriGeometryRes::ExposeToBlue()
@@ -82,7 +26,6 @@ const Be::ClassInfo* TriGeometryRes::ExposeToBlue()
 		MAP_INTERFACE( ITr2GpuBuffer )
 		MAP_ICACHEABLE_METHODS()
 
-		MAP_ATTRIBUTE( "isDynamicGeometry", m_isDynamicGeometry, "is for dynamic geometry (cpu skinning)", Be::READ )
 		MAP_PROPERTY_READONLY
 		(
 			"modelCount",
@@ -102,12 +45,6 @@ const Be::ClassInfo* TriGeometryRes::ExposeToBlue()
 			"Gets the count of animations in this geometry resource"
 		)
 		MAP_ATTRIBUTE( "name", m_name, "Name for debugging/logging", Be::READWRITE )
-
-		MAP_METHOD_AND_WRAP( 
-			"GetMeshSurfaceArea", 
-			GetMeshSurfaceArea,
-			"Gets the surface area for a particular meshID"
-			"\n:param meshID: the mesh to calculate the surface area for")
 		
 		MAP_METHOD_AND_WRAP
 		(
@@ -199,30 +136,6 @@ const Be::ClassInfo* TriGeometryRes::ExposeToBlue()
 			Reload, 
 			"Forces a reload from disk"
 		)
-		
-		MAP_METHOD_AND_WRAP
-		(
-			"GetRayAreaIntersection", 
-			GetRayAreaIntersectionFromScript, 
-			"Perform ray - area geometry intersection test"
-			"\nReturns (position, uv) tuple with intersection position and texture UV coordinates "
-			"or None if no intersection is found"
-			"\n:param origin: Ray origin (3-tuple)"
-			"\n:param direction: Ray direction (3-tuple)"
-			"\n:param meshIndex: Mesh index"
-			"\n:param reaIndex: Area index"
-			"\n:param resultFlags: Result flags (member of TriGeometryCollisionResultFlags), closest collision by default"
-			"\n:param cullingFlags: Culling flags (member of TriGeometryCollisionCullingFlags), no culling by default"
-		)
-
-		MAP_METHOD_AND_WRAP
-		(
-			"GetIntersectionPointAndNormal", 
-			GetIntersectionPointAndNormalFromScript,
-			"( pos, dir ) ->( near, far )\nGet the near intersection points and the normal between a ray and the geometry.\n"
-			":param pos: ray origin\n"
-			":param direction: ray direction\n"
-		)
 
 		MAP_METHOD_AND_WRAP
 		(
@@ -241,14 +154,6 @@ const Be::ClassInfo* TriGeometryRes::ExposeToBlue()
 			":param pos: ray origin\n"
 			":param direction: ray direction\n"
 			":param areaIx: the mesh area index\n"
-		)
-
-		MAP_METHOD_AND_WRAP
-		(
-			"GetClosestVertex", 
-			GetClosestVertex,
-			"( pos ) ->( dist, pos )\nGet the closest vertex of this model to the given point.\n"
-			":param pos: position"
 		)
 
 		MAP_METHOD_AND_WRAP

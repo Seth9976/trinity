@@ -15,8 +15,6 @@ void GetMeshVertexPosition(granny_mesh* grannyMesh, unsigned int index, Vector3 
 void ConvertShort4ToVector3( const void * src, Vector3* dest );
 void ConvertUByte4ToVector3( const void * src, Vector3* dest );
 
-void NormalizeGrannyFile( granny_file_info* gi );
-
 // Read a Granny file inside a structured exception handler.
 // This might help recover from reading a corrupt file.
 granny_file* ProtectedGrannyReadEntireFileFromMemory( const wchar_t* path, uint32_t dataSize, void* data );

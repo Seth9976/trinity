@@ -77,8 +77,6 @@ private:
 protected:
 	std::string m_meshResPath;
 	bool m_deferGeometryLoad;
-	bool m_immutable;
-	bool m_computeAccess;
 	TriGeometryResPtr m_geometryResource;
 	std::string m_geomResourceEx;
 

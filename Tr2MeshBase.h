@@ -66,7 +66,6 @@ public:
 
 	virtual bool GetBoundingBox( Vector3& min, Vector3& max ) const;
 	virtual bool GetAreaBoundingBox( unsigned int areaIx, Vector3& min, Vector3& max ) const;
-	bool GetAreaBasis( unsigned int areaIx, Vector3& pointOnTriangle, Vector3& edge1, Vector3& edge2 ) const;
 	virtual bool GetBoundingSphere( Vector4& sphere );
 
 	bool BindToRig( const std::string* boneList, const int numBones, TriGeometryResSkeletonData* renderRig, bool forceRebind = false );

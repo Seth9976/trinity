@@ -4,7 +4,6 @@
 
 #include "Utilities/GeometryUtils.h"
 
-extern bool g_geometryResNormalizeOnLoad;
 extern float g_grannyWarnLoadTime;
 
 granny_data_type_definition TriPackedGeometryDataType[] = {
@@ -66,16 +65,8 @@ BlueAsyncRes::LoadingResult TriGrannyRes::DoLoad()
 			m_grannyFile = NULL;
 		}
 
-		BeTimer t;
-
 		CCP_STATS_ZONE( __FUNCTION__ " reading Granny file" );
 		m_grannyFile = ProtectedGrannyReadEntireFileFromMemory( m_path.c_str(), (uint32_t)m_dataSize, m_data );
-
-		const float secs = (float)t.GetSeconds();
-		if( secs > g_grannyWarnLoadTime )
-		{
-			CCP_LOGWARN( "TriGrannyRes - GrannyRead '%S' took %f seconds", GetPath(), secs );
-		}
 	}
 
     if( !m_grannyFile )
@@ -88,11 +79,6 @@ BlueAsyncRes::LoadingResult TriGrannyRes::DoLoad()
 	{
 		CCP_LOGERR( "TriGrannyRes::GetGrannyMesh: Granny file has no file info" );
 		return LR_FAILED;
-	}
-
-	if( g_geometryResNormalizeOnLoad && fi->ArtToolInfo )
-	{
-		NormalizeGrannyFile( fi );
 	}
 
 	m_memoryUsage = 0;

@@ -82,8 +82,6 @@ public:
 
 	void RenderBones( const Matrix& modelTransform );
 
-	std::pair<TriGeometryRes*, std::map<std::pair<TriGeometryRes*, uint32_t>, uint32_t>> CreateStaticGeometry( std::vector<TriGeometryRes*> grannies );
-
 	int GetMeshBoneCount() const;
 	const granny_matrix_3x4* GetMeshBoneMatrixList() const;
 

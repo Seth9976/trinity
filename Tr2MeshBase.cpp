@@ -235,18 +235,6 @@ bool Tr2MeshBase::GetAreaBoundingBox( unsigned int areaIx, Vector3& min, Vector3
 	return GetGeometryResource()->GetAreaBoundingBox( m_meshIndex, areaIx, min, max );
 }
 
-bool Tr2MeshBase::GetAreaBasis( unsigned int areaIx, Vector3& pointOnTriangle, Vector3& edge1, Vector3& edge2 ) const
-{
-	// Bail out if we don't have a geometry resource
-	if( !GetGeometryResource() )
-	{
-		return false;
-	}
-
-	// Get the bounding box from the geometry resource
-	return GetGeometryResource()->GetAreaBasis( m_meshIndex, areaIx, pointOnTriangle, edge1, edge2 );
-}
-
 void Tr2MeshBase::GetBatches( ITriRenderBatchAccumulator* batches, 
 	const Tr2MeshAreaVector* areas, 
 	const Tr2PerObjectData* data,

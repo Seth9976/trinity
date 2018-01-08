@@ -9,17 +9,9 @@
 
 #include "Utilities/GeometryUtils.h"
 #include "Utilities/BoundingSphere.h"
+#include "Utilities/BoundingBox.h"
 
 using namespace Tr2RenderContextEnum;
-
-bool g_geometryResNormalizeOnLoad = false;
-TRI_REGISTER_SETTING( "geometryResNormalizeOnLoad", g_geometryResNormalizeOnLoad );
-
-bool g_geometryResForce32bitIndex = false;
-TRI_REGISTER_SETTING( "geometryResForce32bitIndex", g_geometryResForce32bitIndex );
-
-float g_grannyWarnLoadTime = 1.00f;
-TRI_REGISTER_SETTING( "grannyWarnLoadTime", g_grannyWarnLoadTime );
 
 CCP_STATS_DECLARE( geometryResBytes, "Trinity/geometryResBytes", false, CST_MEMORY, "Size of memory occupied by geometry resources." );
 
@@ -83,47 +75,6 @@ granny_data_type_definition MeshBoundsInfoType[] =
 
 //
 //////////////////////////////////////////////////////////////////////////
-
-static void InitializeBounds( Vector3& min, Vector3& max )
-{
-	min.x = FLT_MAX;
-	min.y = FLT_MAX;
-	min.z = FLT_MAX;
-
-	max.x = -FLT_MAX;
-	max.y = -FLT_MAX;
-	max.z = -FLT_MAX;
-}
-
-static void UpdateBounds( Vector3& min, Vector3& max, const Vector3& pos )
-{
-	if( pos.x < min.x )
-	{
-		min.x = pos.x;
-	}
-	if( pos.x > max.x )
-	{
-		max.x = pos.x;
-	}
-
-	if( pos.y < min.y )
-	{
-		min.y = pos.y;
-	}
-	if( pos.y > max.y )
-	{
-		max.y = pos.y;
-	}
-
-	if( pos.z < min.z )
-	{
-		min.z = pos.z;
-	}
-	if( pos.z > max.z )
-	{
-		max.z = pos.z;
-	}
-}
 
 static void CopyGrannyName( std::string& dest, const char* src )
 {
@@ -190,10 +141,7 @@ TriGeometryRes::TriGeometryRes(IRoot* lockobj) :
 	m_meshes( "TriGeometryRes/m_meshes" ),
 	m_models( "TriGeometryRes/m_models" ),
 	m_skeletons( "TriGeometryRes/m_skeletons" ),
-	m_isDynamicGeometry( false ),
 	m_inMemoryInfo( NULL ),
-	m_immutable( false ),
-	m_computeAccess( false ),
 	m_data( nullptr ),
 	m_dataSize( 0 )
 {
@@ -230,11 +178,6 @@ void TriGeometryRes::ClearGrannyData()
 		GrannyFreeFile( m_pGrannyFile );
 		m_pGrannyFile = 0;
 	}
-}
-
-void TriGeometryRes::SetIsDynamic( bool isDynamic )
-{
-	m_isDynamicGeometry = isDynamic;
 }
 
 granny_file_info* TriGeometryRes::GetGrannyInfo()
@@ -392,101 +335,6 @@ bool TriGeometryRes::GetAreaBoundingBox( unsigned int meshIx, unsigned int areaI
 	return true;
 }
 
-
-bool TriGeometryRes::GetAreaBasis( unsigned int meshIx, unsigned int areaIx, Vector3& pointOnTriangle, Vector3& edge1, Vector3& edge2 ) const
-{
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	// Bail out if the mesh index is out of range
-	if( meshIx >= m_meshes.size() )
-	{
-		return false;
-	}
-
-	// Get a handle to the mesh data
-	TriGeometryResMeshData* pMesh = m_meshes[meshIx];
-
-	// Bail out if the mesh data is NULL
-	if( !pMesh )
-	{
-		return false;
-	}
-
-	// Bail out if the area index is out of range
-	if( areaIx >= pMesh->m_areas.size() )
-	{
-		return false;
-	}
-
-	if( !pMesh->m_vertexBuffer.IsValid() || !pMesh->m_indexBuffer.IsValid() )
-	{
-		return false;
-	}
-
-	const TriGeometryResAreaData& area = pMesh->m_areas[areaIx];
-
-	const uint8_t* pVertices;
-	const uint8_t* pIndices;
-
-	int vertSize = pMesh->m_bytesPerVertex;
-	if( FAILED( pMesh->m_vertexBuffer.MapForReading( pVertices, renderContext ) ) )
-	{
-		return false;
-	}
-	ON_BLOCK_EXIT( [&]{ pMesh->m_vertexBuffer.UnmapForReading( renderContext ); } );
-	if( FAILED( pMesh->m_indexBuffer.MapForReading( pIndices, renderContext ) ) )
-	{
-		return false;
-	}
-	ON_BLOCK_EXIT( [&]{ pMesh->m_indexBuffer.UnmapForReading( renderContext ); } );
-
-	const uint16_t* pShortIndices = (uint16_t*)pIndices;
-	const uint32_t* pLongIndices = (uint32_t*)pIndices;
-	
-	Tr2VertexDefinition decl;
-	if ( !Tr2EffectStateManager::GetVertexDeclarationElements( pMesh->m_vertexDeclaration, decl ) )
-	{
-		return false;
-	}
-
-	const Tr2VertexDefinition::Item* const position = decl.Find( decl.POSITION );
-	if( !position )
-	{
-		return false;
-	}
-	
-
-	unsigned int index1 = 0;
-	unsigned int index2 = 0;
-	unsigned int index3 = 0;
-	Vector3 p1;
-	Vector3 p2;
-	Vector3 p3;
-	unsigned int startIndex = area.m_firstIndex;
-	if( pMesh->m_indexBuffer.GetDesc().stride == 2 )
-	{
-		index1 = pShortIndices[startIndex];
-		index2 = pShortIndices[startIndex+1];
-		index3 = pShortIndices[startIndex+2];
-	}
-	else
-	{
-		index1 = pLongIndices[startIndex];
-		index2 = pLongIndices[startIndex+1];
-		index3 = pLongIndices[startIndex+2];
-	}
-
-	ConvertDataToVector3( position->m_dataType, pVertices + index1 * vertSize, &p1);
-	ConvertDataToVector3( position->m_dataType, pVertices + index2 * vertSize, &p2);
-	ConvertDataToVector3( position->m_dataType, pVertices + index3 * vertSize, &p3);
-
-	// Compute edges & get a point on the triangle
-	edge1 = p1 - p3;
-	edge2 = p2 - p3;
-	pointOnTriangle = p1;
-
-	return true;
-}
 
 bool TriGeometryRes::GetBoundingSphere( unsigned int meshIx, Vector4& sphere )
 {
@@ -651,7 +499,7 @@ void TriGeometryRes::DetermineAreaBoundsAndVertCount( TriGeometryResAreaData& ar
 	Tr2VertexDefinition::DataType positionType;
 	GetVertexPositionOffsetAndType( myMesh, positionOffset, positionType );
 
-	InitializeBounds( area.m_minBounds, area.m_maxBounds );
+	BoundingBoxInitialize( area.m_minBounds, area.m_maxBounds );
 
 	std::set<int> vertexIndicesSeen;
 
@@ -674,7 +522,7 @@ void TriGeometryRes::DetermineAreaBoundsAndVertCount( TriGeometryResAreaData& ar
 		Vector3 vertexPosition;
 		GetMeshVertexPosition(myMesh, index, vertexPosition, (unsigned int) bytesPerVertex, positionOffset, positionType);
 
-		UpdateBounds( area.m_minBounds, area.m_maxBounds, vertexPosition );
+		BoundingBoxUpdate( area.m_minBounds, area.m_maxBounds, vertexPosition );
 	}
 
 	area.m_vertexCount = (int)vertexIndicesSeen.size();
@@ -835,7 +683,7 @@ bool TriGeometryRes::SetupMeshes( granny_file_info* gi )
 			}
 		}
 
-		InitializeBounds( pMesh->m_minBounds, pMesh->m_maxBounds );
+		BoundingBoxInitialize( pMesh->m_minBounds, pMesh->m_maxBounds );
 		pMesh->m_boundingSphere = Vector4( 0.f, 0.f, 0.f, 0.f );
 		 
 		if( myMesh->PrimaryTopology )
@@ -866,15 +714,11 @@ bool TriGeometryRes::SetupMeshes( granny_file_info* gi )
 				// only re-map the bone indices if there is a skeleton...
 				if( gi->SkeletonCount )
 				{
-					// no re-map if this a dynamic mesh -> unnecessary! no bone limit...
-					if( !m_isDynamicGeometry )
+					if( myMesh->BoneBindingCount > TR2_MAX_BONES_PER_MESHAREA )
 					{
-						if( myMesh->BoneBindingCount > TR2_MAX_BONES_PER_MESHAREA )
-						{
-							DetermineAreaBones( area, myMesh, bytesPerVertex );
-							// flag this re-bone-mapping
-							pMesh->m_hasPerMeshAreaBoneBindings = true;
-						}
+						DetermineAreaBones( area, myMesh, bytesPerVertex );
+						// flag this re-bone-mapping
+						pMesh->m_hasPerMeshAreaBoneBindings = true;
 					}
 				}
 
@@ -893,8 +737,7 @@ bool TriGeometryRes::SetupMeshes( granny_file_info* gi )
 				// if the area doesn't have any verts, the bounding box is invalid, so DON't use it!
 				if( area.m_primitiveCount )
 				{
-					UpdateBounds( pMesh->m_minBounds, pMesh->m_maxBounds, area.m_minBounds );
-					UpdateBounds( pMesh->m_minBounds, pMesh->m_maxBounds, area.m_maxBounds );
+					BoundingBoxUpdate( pMesh->m_minBounds, pMesh->m_maxBounds, area.m_minBounds, area.m_maxBounds );
 				}
 			}
 		}
@@ -970,16 +813,6 @@ void TriGeometryRes::SetupSkeletons( granny_file_info* gi )
 	}
 }
 
-void TriGeometryRes::PrepareGrannyFileGeometry( granny_file_info* gi )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-
-	if( g_geometryResNormalizeOnLoad && gi->ArtToolInfo )
-	{
-		NormalizeGrannyFile( gi );
-	}
-}
-
 bool TriGeometryRes::InitializeFromMemory( granny_file_info* gfi )
 {
 	return ReadGrannyFile( gfi );
@@ -1010,19 +843,11 @@ bool TriGeometryRes::ReadGrannyFile( granny_file_info* gi )
 
 		CCP_STATS_ZONE( __FUNCTION__ " reading Granny file" );
 
-		BeTimer t;
-	
 		m_pGrannyFile = ProtectedGrannyReadEntireFileFromMemory( m_path.c_str(), m_dataSize, data );
 
 		if( !m_pGrannyFile )
 		{
 			return false;
-		}
-
-		const float secs = (float)t.GetSeconds();
-		if( secs > g_grannyWarnLoadTime )
-		{
-			CCP_LOGWARN( "TriGeometryRes - GrannyRead '%S' took %f seconds", GetPath(), secs );
 		}
 
 		gi = GrannyGetFileInfo( m_pGrannyFile );
@@ -1033,8 +858,6 @@ bool TriGeometryRes::ReadGrannyFile( granny_file_info* gi )
 		m_pGrannyFile = NULL;
 		m_inMemoryInfo = gi;
 	}
-
-    PrepareGrannyFileGeometry( gi );
 
 	// BeResMan->AddGeometryDataRead( m_dataSize );
 
@@ -1070,31 +893,6 @@ void TriGeometryRes::PrepareFromGrannyRes( TriGrannyRes* g )
 	CreateMeshesFromGrannyFile( gi, renderContext );
 
 	m_sourceGranny = g;
-
-	SetPrepared( true );
-	SetGood( true );
-}
-
-void TriGeometryRes::PrepareFromBuffers( Tr2BufferAL&& vb, Tr2BufferAL&& ib, unsigned int vertexDeclaration, unsigned int bytesPerVertex, const TriGeometryResAreaData* areas, size_t areaCount )
-{
-	m_meshes.resize( 1 );
-	TriGeometryResMeshData* mesh = CCP_NEW( "pMesh" ) TriGeometryResMeshData;
-	m_meshes[0] = mesh;
-
-	mesh->m_areas.insert( mesh->m_areas.begin(), areas, areas + areaCount );
-	mesh->m_vertexDeclaration = vertexDeclaration;
-	mesh->m_bytesPerVertex = bytesPerVertex;
-	mesh->m_vertexCount = vb.GetSize() / bytesPerVertex;
-	mesh->m_primitiveCount = ib.GetDesc().count / 3;
-	mesh->m_vertexBuffer = std::move( vb );
-	mesh->m_indexBuffer = std::move( ib );
-
-	InitializeBounds( mesh->m_minBounds, mesh->m_maxBounds );
-	for( auto it = mesh->m_areas.begin(); it != mesh->m_areas.end(); ++it )
-	{
-		UpdateBounds( mesh->m_minBounds, mesh->m_maxBounds, it->m_minBounds );
-		UpdateBounds( mesh->m_minBounds, mesh->m_maxBounds, it->m_maxBounds );
-	}
 
 	SetPrepared( true );
 	SetGood( true );
@@ -1271,142 +1069,12 @@ void TriGeometryRes::ProcessMeshTriangles( int meshIx, PerTriangleCallback cb, v
 	}
 }
 
-void TriGeometryRes::ProcessMeshVertices( int meshIx, PerVertexCallback cb, void* cbContext )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	int i = meshIx;
-
-	if( m_meshes[i] == NULL || !m_meshes[i]->m_vertexBuffer.IsValid() )
-	{
-		return;
-	}
-
-	const uint8_t* pVertices;
-
-	int numVerts = m_meshes[i]->m_vertexCount;
-	int vertSize = m_meshes[i]->m_bytesPerVertex;
-	if (FAILED( m_meshes[i]->m_vertexBuffer.MapForReading( pVertices, renderContext ) ) )
-	{
-		return;
-	}
-	ON_BLOCK_EXIT( [&]{ m_meshes[i]->m_vertexBuffer.UnmapForReading( renderContext ); } );
-
-	Tr2VertexDefinition decl;
-	if ( !Tr2EffectStateManager::GetVertexDeclarationElements( m_meshes[i]->m_vertexDeclaration, decl ) )
-	{
-		return;
-	}
-
-	const Tr2VertexDefinition::Item* const position = decl.Find( decl.POSITION );
-	const Tr2VertexDefinition::Item* const normal   = decl.Find( decl.NORMAL );
-	
-	if( !position || !normal )
-	{
-		return;
-	}
-	
-	for( int j = 0; j < numVerts; j++ )
-	{
-
-		Vector3 p1;
-		ConvertDataToVector3( position->m_dataType, pVertices +vertSize *j + position->m_offset, &p1 );
-
-		Vector3 n1;
-		ConvertDataToVector3( normal->m_dataType, pVertices +vertSize *j + normal->m_offset, &n1 );
-
-		( *cb )( cbContext, p1, n1 );
-	}
-}
-
-void TriGeometryRes::ProcessMeshVerticesWithUV( int meshIx, PerVertexUVCallback cb, void* cbContext )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-
-	int i = meshIx;
-
-	if( m_meshes[i] == NULL || !m_meshes[i]->m_vertexBuffer.IsValid() )
-	{
-		return;
-	}
-
-	const uint8_t* pVertices;
-
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	int numVerts = m_meshes[i]->m_vertexCount;
-	int vertSize = m_meshes[i]->m_bytesPerVertex;
-	if (FAILED(m_meshes[i]->m_vertexBuffer.MapForReading( pVertices, renderContext )))
-	{
-		return;
-	}
-	ON_BLOCK_EXIT( [&]{ m_meshes[i]->m_vertexBuffer.UnmapForReading( renderContext ); } );
-
-	Tr2VertexDefinition decl;
-	if ( !Tr2EffectStateManager::GetVertexDeclarationElements( m_meshes[i]->m_vertexDeclaration, decl ) )
-	{
-		return;
-	}
-
-	const Tr2VertexDefinition::Item* const position = decl.Find( decl.POSITION );
-	const Tr2VertexDefinition::Item* const normal   = decl.Find( decl.NORMAL );
-	const Tr2VertexDefinition::Item* const texcoord = decl.Find( decl.TEXCOORD );
-
-	if( !position || !normal )
-	{
-		return;
-	}
-	
-	for ( int j = 0; j < numVerts; j++ )
-	{
-
-		Vector3 p1;
-		ConvertDataToVector3( position->m_dataType, pVertices +vertSize *j + position->m_offset, &p1 );
-
-		Vector3 n1;
-		ConvertDataToVector3( normal->m_dataType, pVertices +vertSize *j + normal->m_offset, &n1 );
-
-		Vector2 uv1( 0.0f, 0.0f );
-		if( texcoord )
-		{
-			if( texcoord->m_dataType == decl.FLOAT16_2 )
-			{
-				uv1 = *reinterpret_cast<const Vector2_16*>( pVertices + texcoord->m_offset + j * vertSize );
-			}
-			else
-			{
-				uv1 = *reinterpret_cast<const Vector2*>( pVertices + texcoord->m_offset + j * vertSize );
-			}
-		}
-
-		(*cb)( cbContext, p1, n1, uv1 );
-	}
-}
-
-bool TriGeometryRes::GetIntersectionPointAndNormal( const Vector3* pos, const Vector3* dir, Vector3* hitpoint, Vector3* normal )
-{
-	Vector3 farPoint;
-	Vector3 farPointNormal;
-	int farBoneIndex;
-	int nearBoneIndex;
-	return GetIntersectionPoints( pos, dir, hitpoint, normal, &farPoint, &farPointNormal, &nearBoneIndex, &farBoneIndex );
-}
-
 bool TriGeometryRes::GetIntersectionPointNormalBone( const Vector3* pos, const Vector3* dir, Vector3* hitpoint, Vector3* normal, int* boneIndex, unsigned int areaIx )
 {
 	Vector3 farPoint;
 	Vector3 farPointNormal;
 	int farBoneIndex;
 	return GetIntersectionPoints( pos, dir, hitpoint, normal, &farPoint, &farPointNormal, boneIndex, &farBoneIndex, areaIx );
-}
-
-std::pair<bool, std::pair<Vector3, Vector3>> TriGeometryRes::GetIntersectionPointAndNormalFromScript( const Vector3& pos, const Vector3& dir )
-{
-	Vector3 hitpoint( 0.0f, 0.0f, 0.0f );
-	Vector3 normal( 0.0f, 0.0f, 0.0f );
-	bool result = GetIntersectionPointAndNormal( &pos, &dir, &hitpoint, &normal );
-	return std::make_pair( result, std::make_pair( hitpoint, normal ) );
 }
 
 std::pair<bool, std::pair<int, std::pair<Vector3, Vector3>>> TriGeometryRes::GetIntersectionPointNormalBoneFromScript( const Vector3& pos, const Vector3& dir )
@@ -1623,59 +1291,6 @@ bool TriGeometryRes::GetIntersectionPoints( const Vector3* pos, const Vector3*di
 	return result;
 }
 
-std::pair<float, Vector3> TriGeometryRes::GetClosestVertex( const Vector3& pos )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	std::pair<float, Vector3> result = std::make_pair( -1.f, Vector3( 0.f, 0.f, 0.f ) );
-	float currentDist = FLT_MAX;
-	Vector3 currentPos = Vector3( 0.f, 0.f, 0.f );
-	for ( size_t i = 0; i < m_meshes.size(); ++i )
-	{
-		if( m_meshes[i] == NULL )
-		{
-			continue;
-		}
-
-		const uint8_t* pVertices;
-		int vertSize = m_meshes[i]->m_bytesPerVertex;
-		if( FAILED( m_meshes[i]->m_vertexBuffer.MapForReading( pVertices, renderContext ) ) )
-		{
-			return result;
-		}
-		ON_BLOCK_EXIT( [&]{ m_meshes[i]->m_vertexBuffer.UnmapForReading( renderContext ); } );
-		
-		Tr2VertexDefinition decl;
-		if ( !Tr2EffectStateManager::GetVertexDeclarationElements( m_meshes[i]->m_vertexDeclaration, decl ) )
-		{
-			return result;
-		}
-		const Tr2VertexDefinition::Item* const position = decl.Find( decl.POSITION );
-		if( !position )
-		{
-			return result;
-		}
-
-		for ( unsigned int j = 0; j < m_meshes[i]->m_vertexCount; ++j )
-		{
-			Vector3 vtx;
-			ConvertDataToVector3( position->m_dataType, pVertices + j * vertSize, &vtx );
-			Vector3 vec = vtx - pos;
-			float d = LengthSq( vec );
-			if( d < currentDist )
-			{
-				currentDist = d;
-				currentPos = vtx;
-			}
-		}
-	}
-
-	result = std::make_pair( sqrtf( currentDist ), currentPos );
-	return result;
-}
-
 unsigned int TriGeometryRes::GetSkeletonCount() const
 {
 	return (unsigned int)m_skeletons.size();
@@ -1716,25 +1331,6 @@ void TriGeometryRes::ReleaseResourcesHelper()
 	m_memoryUse = 0;
 }
 
-void CalcTriangleSurfaceArea( void* context, const Vector3& p1, const Vector3& p2, const Vector3& p3 )
-{
-	float* area = (float*)context;
-
-	Vector3 v1 = p2 - p1;
-	Vector3 v2 = p3 - p1;
-
-	Vector3 t = Cross( v1, v2 );
-
-	*area += 0.5f * Length( t );
-}
-
-float TriGeometryRes::GetMeshSurfaceArea( int meshIx )
-{
-	float result = 0.0f;
-	ProcessMeshTriangles( meshIx, CalcTriangleSurfaceArea, &result );
-	return result;
-}
-
 unsigned int TriGeometryResSkeletonData::FindJoint( const char* name )
 {
 	unsigned int jointCount = (unsigned int)m_joints.size();
@@ -1757,283 +1353,6 @@ void TriGeometryRes::Reload()
 	BlueAsyncRes::Reload();
 }
 
-int TriGeometryRes::PushMesh( TriGeometryResMeshData* mesh )
-{
-	m_meshes.push_back( mesh );
-	SetPrepared( true );
-	SetGood( true );
-	return (int)m_meshes.size() - 1;
-}
-
-// -------------------------------------------------------------
-// Description:
-//   Checks of intersection between a ray and an axis-aligned
-//	 bounding box.
-// Arguments:
-//   rayOrigin - Ray origin.
-//   rayDirection - Ray direction.
-//   boundsMin - Min bounds of the bounding box.
-//   boundsMax - Max bounds of the bounding box.
-// Return Value:
-//   true If the ray intersects the bounding box
-//   false If the ray does not intersect the bounding box
-// -------------------------------------------------------------
-static bool IntersectRayAxisAlignedBox( const Vector3& rayOrigin, 
-										const Vector3& rayDirection, 
-										const Vector3& boundsMin, 
-										const Vector3& boundsMax ) 
-{
-	float tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-	float denx = 1.0f / rayDirection.x;
-	float deny = 1.0f / rayDirection.y;
-	float denz = 1.0f / rayDirection.z;
-
-	if( denx  >= 0) 
-	{
-		tmin = ( boundsMin.x - rayOrigin.x ) * denx;
-		tmax = ( boundsMax.x - rayOrigin.x ) * denx;
-	}
-	else 
-	{
-		tmin = ( boundsMax.x - rayOrigin.x ) * denx;
-		tmax = ( boundsMin.x - rayOrigin.x ) * denx;
-	}
-	if( deny >= 0) 
-	{
- 		tymin = ( boundsMin.y - rayOrigin.y ) * deny;
-		tymax = ( boundsMax.y - rayOrigin.y ) * deny;
-	}
-	else 
-	{
-		tymin = ( boundsMax.y - rayOrigin.y ) * deny;
-		tymax = ( boundsMin.y - rayOrigin.y ) * deny;
-	}
-	if( tmin > tymax || tymin > tmax )
-	{
-		return false;
-	}
-	if( tymin > tmin )
-	{
-		tmin = tymin;
-	}
-	if( tymax < tmax )
-	{
-		tmax = tymax;
-	}
-	if( denz >= 0) 
-	{
-		tzmin = ( boundsMin.z - rayOrigin.z ) * denz;
-		tzmax = ( boundsMax.z - rayOrigin.z ) * denz;
-	}
-	else 
-	{
-		tzmin = ( boundsMax.z - rayOrigin.z ) * denz;
-		tzmax = ( boundsMin.z - rayOrigin.z ) * denz;
-	}
-	if( tmin > tzmax || tzmin > tmax )
-	{
-		return false;
-	}
-	return true;
-}
-
-// -------------------------------------------------------------
-// Description:
-//   Checks of intersection between a ray and mesh area.
-// Arguments:
-//   rayOrigin - Ray origin.
-//   rayDirection - Ray direction.
-//   meshIx - Index of the mesh.
-//   areaIx - Index of the area of the mesh
-//   resultFlags - Result flags (either return any intersection
-//		or the closest to ray origin).
-//   culling - Culling mode for trinagles (CCW, CW or NONE).
-//   position - (out) point of intersection
-//   uv - (out) texture UV coordinate at the point of intersection.
-// Return Value:
-//   true If the ray intersects geometry area
-//   false Otherwise
-// -------------------------------------------------------------
-bool TriGeometryRes::GetRayAreaIntersection( const Vector3& rayOrigin, 
-											 const Vector3& rayDirection, 
-											 unsigned int meshIx, 
-											 unsigned int areaIx, 
-											 TriGeometryCollisionResultFlags resultFlags, 
-											 TriGeometryCollisionCullingFlags culling, 
-											 Vector3& position, 
-											 Vector2& uv )
-{
-	if( !m_isGood )
-	{
-		return false;
-	}
-
-	if( meshIx >= m_meshes.size() )
-	{
-		return false;
-	}
-
-	TriGeometryResMeshData* pMesh = m_meshes[meshIx];
-	if( !pMesh )
-	{
-		return false;
-	}
-
-	if( areaIx >= pMesh->m_areas.size() )
-	{
-		return false;
-	}
-
-	if( !IntersectRayAxisAlignedBox( rayOrigin, rayDirection, pMesh->m_minBounds, pMesh->m_maxBounds ) )
-	{
-		return false;
-	}
-
-	if( !pMesh->BuildCollisionData() )
-	{
-		return false;
-	}
-
-	const TriGeometryResAreaData& area = pMesh->m_areas[areaIx];
-
-	int bestIndex;
-	XMVECTOR bestT, bestU, bestV;
-	XMVECTOR bestPosition;
-	bool found = false;
-
-	unsigned index = area.m_firstIndex;
-
-	static const XMVECTOR epsilon =
-	{
-		1e-20f, 1e-20f, 1e-20f, 1e-20f
-	};
-	XMVECTOR zero = XMVectorZero();
-	XMVECTOR origin = rayOrigin;
-	XMVECTOR direction = XMVector3Normalize( rayDirection );
-
-	for( int i = 0; i < area.m_primitiveCount; ++i )
-	{
-		XMVECTOR v0 = pMesh->m_collisionData.m_positions[pMesh->m_collisionData.m_indexes[index++]];
-		XMVECTOR v1 = pMesh->m_collisionData.m_positions[pMesh->m_collisionData.m_indexes[index++]];
-		XMVECTOR v2 = pMesh->m_collisionData.m_positions[pMesh->m_collisionData.m_indexes[index++]];
-
-		XMVECTOR e1 = v1 - v0;
-		XMVECTOR e2 = v2 - v0;
-
-		// p = Direction ^ e2;
-		XMVECTOR p = XMVector3Cross( direction, e2 );
-
-		// det = e1 * p;
-		XMVECTOR det = XMVector3Dot( e1, p );
-
-		XMVECTOR u, v, t;
-
-		if( XMVector3GreaterOrEqual( det, epsilon ) && culling != COLLISION_CULL_CW )
-		{
-			// Determinate is positive (front side of the triangle).
-			XMVECTOR s = XMVectorSubtract( origin, v0 );
-
-			// u = s * p;
-			u = XMVector3Dot( s, p );
-
-			XMVECTOR noIntersection = XMVectorLess( u, zero );
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorGreater( u, det ) );
-
-			// q = s ^ e1;
-			XMVECTOR q = XMVector3Cross( s, e1 );
-
-			// v = Direction * q;
-			v = XMVector3Dot( direction, q );
-
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorLess( v, zero ) );
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorGreater( u + v, det ) );
-
-			// t = e2 * q;
-			t = XMVector3Dot( e2, q );
-
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorLess( t, zero ) );
-
-			if( XMVector4EqualInt( noIntersection, XMVectorTrueInt() ) )
-			{
-				continue;
-			}
-		}
-		else if( XMVector3LessOrEqual( det, -epsilon ) && culling != COLLISION_CULL_CCW )
-		{
-			// Determinate is negative (back side of the triangle).
-			XMVECTOR s = XMVectorSubtract( origin, v0 );
-
-			// u = s * p;
-			u = XMVector3Dot( s, p );
-
-			XMVECTOR noIntersection = XMVectorGreater( u, zero );
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorLess( u, det ) );
-
-			// q = s ^ e1;
-			XMVECTOR q = XMVector3Cross( s, e1 );
-
-			// v = Direction * q;
-			v = XMVector3Dot( direction, q );
-
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorGreater( v, zero ) );
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorLess( u + v, det ) );
-
-			// t = e2 * q;
-			t = XMVector3Dot( e2, q );
-
-			noIntersection = XMVectorOrInt( noIntersection, XMVectorGreater( t, zero ) );
-
-			if ( XMVector4EqualInt( noIntersection, XMVectorTrueInt() ) )
-			{
-				continue;
-			}
-		}
-		else
-		{
-			continue;
-		}
-
-		if( !found || XMVector3Less( bestT, t ) )
-		{
-			XMVECTOR inv_det = XMVectorReciprocal( det );
-			bestIndex = i;
-			bestT = XMVectorMultiply( t, inv_det );
-			bestU = XMVectorMultiply( u, inv_det );
-			bestV = XMVectorMultiply( v, inv_det );
-			bestPosition = XMVectorMultiplyAdd( direction, bestT, origin );
-			found = true;
-
-			if( resultFlags == COLLISION_RESULT_CLOSEST )
-			{
-				break;
-			}
-		}
-	}
-	if( found )
-	{
-		const Vector2& v0 = pMesh->m_collisionData.m_texCoords[pMesh->m_collisionData.m_indexes[area.m_firstIndex + bestIndex * 3]];
-		const Vector2& v1 = pMesh->m_collisionData.m_texCoords[pMesh->m_collisionData.m_indexes[area.m_firstIndex + bestIndex * 3 + 1]];
-		const Vector2& v2 = pMesh->m_collisionData.m_texCoords[pMesh->m_collisionData.m_indexes[area.m_firstIndex + bestIndex * 3 + 2]];
-
-		Vector2 u = v1 - v0;
-		Vector2 v = v2 - v0;
-		uv = v0 + u * XMVectorGetX( bestU ) + v * XMVectorGetX( bestV );
-
-		position = bestPosition;
-	}
-	return found;
-}
-
-
-std::pair<bool, std::pair<Vector3, Vector2>> TriGeometryRes::GetRayAreaIntersectionFromScript( const Vector3& rayOrigin, const Vector3& rayDirection, unsigned int meshIx, unsigned int areaIx, TriGeometryCollisionResultFlags resultFlags, TriGeometryCollisionCullingFlags culling )
-{
-	Vector3 position;
-	Vector2 uv;
-	bool found = GetRayAreaIntersection( rayOrigin, rayDirection, meshIx, areaIx, resultFlags, culling, position, uv );
-	
-	return std::make_pair( found, std::make_pair( position, uv ) );
-}
 
 TriGeometryResSkeletonData::TriGeometryResSkeletonData() :
 	m_joints( "TriGeometryResSkeletonData/m_joints" )
@@ -2071,102 +1390,6 @@ TriGeometryResMeshData::~TriGeometryResMeshData()
 	{
 		CCP_ALIGNED_FREE( m_collisionData.m_positions );
 	}
-}
-
-// -------------------------------------------------------------
-// Description:
-//   Builds collision-specific arrays with vertex positions, 
-//	 UV coordinates and vertex indexes.
-// Return Value:
-//   true If collision arrays were constructed and are ready
-//		to be used
-//   false Otherwise
-// -------------------------------------------------------------
-bool TriGeometryResMeshData::BuildCollisionData()
-{
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	if( m_collisionData.m_positions == NULL || m_collisionData.m_texCoords == NULL )
-	{
-		if( !m_vertexBuffer.IsValid() )
-		{
-			return false;
-		}
-
-		Tr2VertexDefinition decl;
-		if( !Tr2EffectStateManager::GetVertexDeclarationElements( m_vertexDeclaration, decl ) )
-		{
-			return false;
-		}
-
-		auto position = decl.Find( decl.POSITION, 0 );
-		auto texture  = decl.Find( decl.TEXCOORD, 0 );
-
-		if( !position || !texture )
-		{
-			return false;
-		}
-		
-		const char* data;
-		CR_RETURN_VAL( m_vertexBuffer.MapForReading( data, renderContext ), false );
-		ON_BLOCK_EXIT( [&]{ m_vertexBuffer.UnmapForReading( renderContext ); } );
-
-		if( m_collisionData.m_positions == NULL )
-		{
-			m_collisionData.m_positions = reinterpret_cast<XMVECTOR*>( CCP_ALIGNED_MALLOC( "m_collisionData.m_positions", sizeof( XMVECTOR ) * m_vertexCount, 16 ) );
-			for( unsigned int i = 0; i < m_vertexCount; ++i )
-			{
-				const Vector3* pos3 = reinterpret_cast<const Vector3*>( data + position->m_offset + i * m_bytesPerVertex );
-				m_collisionData.m_positions[i] = *pos3;
-			}
-		}
-		if( m_collisionData.m_texCoords == NULL )
-		{
-			m_collisionData.m_texCoords = CCP_NEW( "TriGeometryCollisionData::m_texCoords" ) Vector2[m_vertexCount];
-			if( m_collisionData.m_texCoords == nullptr )
-			{
-				CCP_LOGWARN( "Out of memory in TriGeometryRes::BuildCollisionData" );
-				return false;
-			}
-			for( unsigned int i = 0; i < m_vertexCount; ++i )
-			{
-				const Vector2* uv = reinterpret_cast<const Vector2*>( data + texture->m_offset + i * m_bytesPerVertex );
-				m_collisionData.m_texCoords[i] = *uv;
-			}
-		}
-	}
-	if( m_collisionData.m_indexes == NULL )
-	{
-		if( !m_indexBuffer.IsValid() )
-		{
-			return false;
-		}
-
-		const char* data;
-		CR_RETURN_VAL( m_indexBuffer.MapForReading( data, renderContext ), false );
-		ON_BLOCK_EXIT( [&]{ m_indexBuffer.UnmapForReading( renderContext ); } );
-
-		m_collisionData.m_indexes = CCP_NEW( "TriGeometryCollisionData::m_indexes" ) unsigned[m_primitiveCount * 3];
-		if( m_collisionData.m_indexes == nullptr )
-		{
-			CCP_LOGWARN( "Out of memory in TriGeometryRes::BuildCollisionData" );
-			return false;
-		}
-
-		if( m_indexBuffer.GetDesc().stride == 2 )
-		{
-			auto indexes = reinterpret_cast<const uint16_t*>( data );
-			for( unsigned int i = 0; i < m_primitiveCount * 3; ++i )
-			{
-				m_collisionData.m_indexes[i] = *indexes++;
-			}
-		}
-		else
-		{
-			memcpy( m_collisionData.m_indexes, data, sizeof( uint32_t ) * m_primitiveCount * 3 );
-		}
-	}
-	return true;
 }
 
 // -------------------------------------------------------------
@@ -2574,48 +1797,21 @@ bool TriGeometryRes::CreateMeshFromGrannyMesh( granny_mesh* myMesh, TriGeometryR
 		// Granny file has 32 bit indices - make sure we really need that,
 		// otherwise they're converted by Granny in GrannyCopyMeshIndices.
 
-		if( g_geometryResForce32bitIndex || vertexCount > 65535 )
+		if( vertexCount > 65535 )
 		{
 			bytesPerIndex = 4;
 		}
 	}
 
+	if( !CreateD3DVertexBuffer( pMesh, vertexCount, bytesPerVertex, myMesh, pSrc, grannyVertexDecl, forceFullFloat, renderContext ) )
+	{
+		return false;
+	}
 	
-
-	// here we distinct the mesh creation between dynamic and static:
-	// for static geometry we can create a d3d buffer right here, it ca be shared
-	// for dynamic geometry we need a shared buffer in system-memory, which we read from during cpu skinning
-	if( m_isDynamicGeometry )
-	{
-		if( !CreateSystemVertexBuffer( pMesh, vertexCount, bytesPerVertex, myMesh, pSrc, grannyVertexDecl, forceFullFloat ) )
-		{
-			return false;
-		}
-	}
-	else
-	{
-		if( !CreateD3DVertexBuffer( pMesh, vertexCount, bytesPerVertex, myMesh, pSrc, grannyVertexDecl, forceFullFloat, renderContext ) )
-		{
-			return false;
-		}
-	}
-
-
 	// create d3d index buffer, this one is shared, either for dynamic or static geometry
 	Tr2BufferAL d3dIB;
 	int ibSize = indexCount * bytesPerIndex;
 
-	if( m_immutable )
-	{
-		CCP_ASSERT( indexCount > 0 );
-
-		std::vector<char> tempBuffer( indexCount * bytesPerIndex );
-
-		GrannyCopyMeshIndices ( myMesh, bytesPerIndex, &tempBuffer[0] );
-		USE_MAIN_THREAD_RENDER_CONTEXT();
-		CR_RETURN_VAL( d3dIB.Create( bytesPerIndex, indexCount, Tr2GpuUsage::INDEX_BUFFER, Tr2CpuUsage::READ, &tempBuffer[0], renderContext ), false );
-	}
-	else
 	{
 		std::vector<char> tempBuffer( indexCount * bytesPerIndex );
 		GrannyCopyMeshIndices( myMesh, bytesPerIndex, &tempBuffer[0] );
@@ -2675,35 +1871,6 @@ bool TriGeometryRes::CreateD3DVertexBuffer(
 		return false;
 	}
 
-	if( m_immutable || m_computeAccess )
-	{
-		std::vector<char> tempBuffer;
-		const void* vertices = pSrc;
-		if( fullFloat )
-		{
-			tempBuffer.resize( vtxCount * bytesPerVtx );
-			vertices = &tempBuffer[0];
-
-			granny_data_type_definition* pSrcFmt = GrannyGetMeshVertexType( mesh );
-			GrannyConvertVertexLayouts( vtxCount, pSrcFmt, pSrc, grnVtxDecl, &tempBuffer[0] );
-		}
-		
-		CR_RETURN_VAL( 
-			pMesh->m_vertexBuffer.Create( 
-				bytesPerVtx,
-				vtxCount, 
-				Tr2GpuUsage::VERTEX_BUFFER | ( m_computeAccess ? Tr2GpuUsage::UNORDERED_ACCESS : Tr2GpuUsage::NONE ),
-				Tr2CpuUsage::READ,
-				vertices, 
-				renderContext )
-			, false );
-
-		return true;
-	}
-
-
-
-
 	auto& vb = pMesh->m_vertexBuffer;
 	if( fullFloat )
 	{
@@ -2717,96 +1884,6 @@ bool TriGeometryRes::CreateD3DVertexBuffer(
 		CR_RETURN_VAL( vb.Create( bytesPerVtx, vtxCount, Tr2GpuUsage::VERTEX_BUFFER, Tr2CpuUsage::READ | Tr2CpuUsage::WRITE, pSrc, renderContext ), false );
 	}
 
-	return true;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------
-bool TriGeometryRes::CreateSystemVertexBuffer(
-	TriGeometryResMeshData* pMesh,
-	int vtxCount,
-	int bytesPerVtx,
-	const granny_mesh* mesh,
-	const void* pSrc,
-	const granny_data_type_definition* grnVtxDecl,
-	bool fullFloat )
-{
-	CCP_STATS_ZONE( __FUNCTION__ );
-
-	if( pMesh == NULL )
-	{
-		return false;
-	}
-
-	// alloc special data for shared system-memory vertexlayoutinfo and the vertexbuffer itself
-	pMesh->m_pVertexData = static_cast<TriGeometryResVertexData*>( CCP_MALLOC( "TriGeometryRes/pMesh/m_pVertexData", sizeof( TriGeometryResVertexData ) ) );
-	if( !pMesh->m_pVertexData )
-	{
-		return false;
-	}
-	TriGeometryResVertexData* pVtxData = pMesh->m_pVertexData;
-	memset( pVtxData, 0, sizeof( TriGeometryResVertexData ) );
-	// alloc buffer for the vertices itself
-	pVtxData->m_pBuffer = (granny_uint8*)CCP_MALLOC( "TriGeometryRes/pMesh/m_pVertexData/m_pBuffer", vtxCount * bytesPerVtx );
-	if( !pVtxData->m_pBuffer )
-	{
-		CCP_FREE( pMesh->m_pVertexData );
-		return false;
-	}
-
-	// The version of Granny we're using is very slow in copying vertices
-	// Only use it if we need any conversion to take place - otherwise
-	// do a straight memcpy
-	if( fullFloat )
-	{
-		granny_data_type_definition* pSrcFmt = GrannyGetMeshVertexType( mesh );
-		GrannyConvertVertexLayouts( vtxCount, pSrcFmt, pSrc, grnVtxDecl, pVtxData->m_pBuffer );
-	}
-	else
-	{
-		memcpy( pVtxData->m_pBuffer, pSrc, vtxCount * bytesPerVtx );
-	}
-
-	// pre-calc some pointers into the vertex for fast access later during cpu skinning
-	unsigned int boneIndexOffset = GetVertexComponentOffset( mesh, GrannyVertexBoneIndicesName );
-	if( boneIndexOffset != -1 )
-	{
-		pVtxData->m_pBoneIndex0 = pVtxData->m_pBuffer + boneIndexOffset + 0;
-		pVtxData->m_pBoneIndex1 = pVtxData->m_pBuffer + boneIndexOffset + 1;
-		pVtxData->m_pBoneIndex2 = pVtxData->m_pBuffer + boneIndexOffset + 2;
-		pVtxData->m_pBoneIndex3 = pVtxData->m_pBuffer + boneIndexOffset + 3;
-	}
-	unsigned int boneWeightOffset = GetVertexComponentOffset( mesh, GrannyVertexBoneWeightsName );
-	if( boneWeightOffset != -1 )
-	{
-		pVtxData->m_pBoneWeight0 = pVtxData->m_pBuffer + boneWeightOffset + 0;
-		pVtxData->m_pBoneWeight1 = pVtxData->m_pBuffer + boneWeightOffset + 1;
-		pVtxData->m_pBoneWeight2 = pVtxData->m_pBuffer + boneWeightOffset + 2;
-		pVtxData->m_pBoneWeight3 = pVtxData->m_pBuffer + boneWeightOffset + 3;
-	}
-	unsigned int positionOffset = GetVertexComponentOffset( mesh, GrannyVertexPositionName );
-	if( positionOffset != -1 )
-	{
-		pVtxData->m_pSrcPosition = pVtxData->m_pBuffer + positionOffset;
-		pVtxData->m_dstPositionOffset = positionOffset;
-	}
-	unsigned int normalOffset = GetVertexComponentOffset( mesh, GrannyVertexNormalName );
-	if( normalOffset != -1 )
-	{
-		pVtxData->m_pSrcNormal = pVtxData->m_pBuffer + normalOffset;
-		pVtxData->m_dstNormalOffset = normalOffset;
-	}
-	unsigned int tangentOffset = GetVertexComponentOffset( mesh, GrannyVertexTangentName );
-	if( tangentOffset != -1 )
-	{
-		pVtxData->m_pSrcTangent = pVtxData->m_pBuffer + tangentOffset;
-		pVtxData->m_dstTangentOffset = tangentOffset;
-	}
-	unsigned int binormalOffset = GetVertexComponentOffset( mesh, GrannyVertexBinormalName );
-	if( binormalOffset != -1 )
-	{
-		pVtxData->m_pSrcBinormal = pVtxData->m_pBuffer + binormalOffset;
-		pVtxData->m_dstBinormalOffset = binormalOffset;
-	}
 	return true;
 }
 
