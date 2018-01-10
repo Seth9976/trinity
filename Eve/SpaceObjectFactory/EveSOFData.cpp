@@ -23,7 +23,8 @@ EveSOFData::~EveSOFData()
 
 
 EveSOFDataAreaMaterial::EveSOFDataAreaMaterial( IRoot* lockobj ) :
-	m_generalGlowColor( 0.f, 0.f, 0.f, 0.f )
+	m_generalGlowColor( 0.f, 0.f, 0.f, 0.f ),
+	m_glowColorType( EveSOFDataFactionColorSet::TYPE_MTL_HULL_GLOW )
 {}
 
 

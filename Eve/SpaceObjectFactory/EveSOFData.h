@@ -104,6 +104,44 @@ public:
 TYPEDEF_BLUECLASS( EveSOFDataTransform );
 BLUE_DECLARE_VECTOR( EveSOFDataTransform );
 
+BLUE_CLASS( EveSOFDataFactionColorSet ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataFactionColorSet( IRoot* lockobj = NULL );
+	~EveSOFDataFactionColorSet() {}
+
+	// color type
+	enum ColorType
+	{
+		TYPE_PRIMARY = 0,
+		TYPE_SECONDARY,
+		TYPE_TERTIARY,
+		TYPE_REACTOR,
+		TYPE_WHITE,
+		TYPE_YELLOW,
+		TYPE_ORANGE,
+		TYPE_RED,
+		TYPE_BLUE,
+		TYPE_GREEN,
+		TYPE_CYAN,
+		TYPE_TEMP_HAZE,
+
+		TYPE_MTL_HULL_GLOW,
+		TYPE_MTL_GLASS_GLOW,
+		TYPE_MTL_REACTOR_GLOW,
+		TYPE_MTL_DARKHULL_GLOW,
+		TYPE_MTL_HULL_HEAT_GLOW,
+
+		TYPE_MAX,
+	};
+
+	// color data
+	Color m_colors[TYPE_MAX];
+};
+TYPEDEF_BLUECLASS( EveSOFDataFactionColorSet );
+
 BLUE_CLASS( EveSOFDataAreaMaterial ) :
 	public IRoot
 {
@@ -125,6 +163,7 @@ public:
 	// data
 	std::string m_material[MATERIAL_MAX];
 	Color m_generalGlowColor;
+	EveSOFDataFactionColorSet::ColorType m_glowColorType;
 };
 TYPEDEF_BLUECLASS( EveSOFDataAreaMaterial );
 
@@ -156,37 +195,6 @@ public:
 };
 TYPEDEF_BLUECLASS( EveSOFDataArea );
 
-BLUE_CLASS( EveSOFDataFactionColorSet ) :
-	public IRoot
-{
-public:
-	EXPOSE_TO_BLUE();
-	EveSOFDataFactionColorSet( IRoot* lockobj = NULL );
-	~EveSOFDataFactionColorSet() {}
-
-	// color type
-	enum ColorType
-	{
-		TYPE_PRIMARY = 0,
-		TYPE_SECONDARY,
-		TYPE_TERTIARY,
-		TYPE_REACTOR,
-		TYPE_WHITE,
-		TYPE_YELLOW,
-		TYPE_ORANGE,
-		TYPE_RED,
-		TYPE_BLUE,
-		TYPE_GREEN,
-		TYPE_CYAN,
-		TYPE_TEMP_HAZE,
-
-		TYPE_MAX,
-	};
-
-	// color data
-	Color m_colors[TYPE_MAX];
-};
-TYPEDEF_BLUECLASS( EveSOFDataFactionColorSet );
 
 
 
