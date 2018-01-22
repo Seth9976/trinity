@@ -36,7 +36,7 @@ void Tr2DepthStencil::py__init__(
 long Tr2DepthStencil::Create( unsigned width, unsigned height, DepthStencilFormat dsFormat, unsigned msaaType, unsigned msaaQuality, Tr2RenderContextEnum::ExFlag flags )
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	auto hr = m_depthStencil.Create( width, height, dsFormat, Tr2MsaaDesc( msaaType, msaaQuality ), flags, renderContext ).GetResult();
+	auto hr = m_depthStencil.CreateDepthStencil( width, height, dsFormat, Tr2MsaaDesc( msaaType, msaaQuality ), flags, renderContext ).GetResult();
 	if( SUCCEEDED( hr ) )
 	{
 		m_width = width;
@@ -54,16 +54,16 @@ long Tr2DepthStencil::Create( unsigned width, unsigned height, DepthStencilForma
 
 Tr2TextureAL* Tr2DepthStencil::GetTexture()
 {
-	if( m_depthStencil.IsValid() && m_depthStencil.GetTexture().IsValid() )
+	if( m_depthStencil.IsValid() && Tr2GpuUsage::HasFlag( m_depthStencil.GetGpuUsage(), Tr2GpuUsage::SHADER_RESOURCE ) )
 	{
-		return  &m_depthStencil.GetTexture();
+		return  &m_depthStencil;
 	}
 	return nullptr;
 }
 
 bool Tr2DepthStencil::IsReadable() const
 {
-	return m_depthStencil.GetTexture().IsValid() && m_depthStencil.GetMsaaDesc().samples < 2;
+	return Tr2GpuUsage::HasFlag( m_depthStencil.GetGpuUsage(), Tr2GpuUsage::SHADER_RESOURCE );
 }
 
 bool Tr2DepthStencil::IsValid() const
@@ -95,10 +95,6 @@ void Tr2DepthStencil::Destroy()
 // --------------------------------------------------------------------------------------
 bool Tr2DepthStencil::HasALObject( int type, size_t object )
 {
-	if( type == OT_DEPTH_STENCIL )
-	{
-		return m_depthStencil == *reinterpret_cast<Tr2DepthStencilAL*>( object );
-	}
 	return false;
 }
 
@@ -140,7 +136,7 @@ uint32_t Tr2DepthStencil::GetMsaaQuality() const
 // --------------------------------------------------------------------------------------
 Tr2RenderContextEnum::DepthStencilFormat Tr2DepthStencil::GetFormat() const
 {
-	return m_depthStencil.GetFormat();
+	return m_format;
 }
 
 // --------------------------------------------------------------------------------------
@@ -159,7 +155,7 @@ bool Tr2DepthStencil::OnPrepareResources()
 	{
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 
-		m_depthStencil.Create( m_width, m_height, m_format, m_msaa, m_flags, renderContext );
+		m_depthStencil.CreateDepthStencil( m_width, m_height, m_format, m_msaa, m_flags, renderContext );
 	}
 	return true;
 }

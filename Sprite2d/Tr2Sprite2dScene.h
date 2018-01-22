@@ -65,7 +65,7 @@ public:
 	void PopClipRectangle();
 	const Tr2Sprite2dClipRect& GetClipRectangle() const;
 
-	void StartLayer( Tr2RenderTargetAL& rt );
+	void StartLayer( Tr2TextureAL& rt );
 	void EndLayer( float x, float y, float width, float height, ITr2Sprite2dTexture* secondaryTexture );
 	void RunJob( TriRenderJob* job );
 
@@ -264,7 +264,7 @@ private:
 		TransformStack_t* transformStack;
 		DepthStack_t* depthStack;
 		ClipStack_t* clipStack;
-		Tr2RenderTargetAL* renderTargetTexture;
+		Tr2TextureAL* renderTargetTexture;
 		Tr2AtlasTexturePtr renderTargetWrapper;
 	};
 

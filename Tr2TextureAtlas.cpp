@@ -910,7 +910,7 @@ void Tr2TextureAtlas::PaintEmptyArea( Tr2TextureAtlasArea* area )
 	void* rgba = nullptr;
 	uint32_t pitch = 0;
 	CR_RETURN( m_texture.Lock( 0, rgba, pitch, LOCK_WRITEONLY, renderContext ) );
-	ON_BLOCK_EXIT( [&]{ m_texture.Unlock( renderContext ); } );
+	ON_BLOCK_EXIT( [&]{ m_texture.UnmapForWriting( renderContext ); } );
 
 	uint8_t *dst = (uint8_t*)rgba;
 
@@ -1070,7 +1070,7 @@ bool Tr2TextureAtlas::CopyTextureIntoAtlas( Tr2AtlasTexture* tex )
 	void* srcData = nullptr;
 	unsigned srcPitch = 0;
 	CR_RETURN_VAL( tex->GetTexture()->Lock( 0, srcData, srcPitch, LOCK_READONLY, renderContext ), false );
-	ON_BLOCK_EXIT( [&]{ tex->GetTexture()->Unlock( renderContext ); } );
+	ON_BLOCK_EXIT( [&]{ tex->GetTexture()->UnmapForReading( renderContext ); } );
 
 	std::vector<unsigned char> pixels;
 	unsigned pitch = 0;
@@ -1460,7 +1460,7 @@ void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext )
 		destRow += m_texture.GetWidth() * 4;
 		row += sourcePitch;
 	}
-	m_texture.Unlock( renderContext );
+	m_texture.UnmapForReading( renderContext );
 	sourcePitch = m_texture.GetWidth() * 4;
 
 	uint32_t destPitch = sourcePitch / 2;
@@ -1512,7 +1512,7 @@ void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext )
 					dst += destPitch;
 					dstRow += sysDestPitch;
 				}
-				m_texture.Unlock( renderContext );
+				m_texture.UnmapForWriting( renderContext );
 			}
 			updated = true;
 		}

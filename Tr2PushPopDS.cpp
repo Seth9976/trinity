@@ -9,7 +9,7 @@ Tr2PushPopDS::Tr2PushPopDS()
 	Tr2Renderer::PushDepthStencilBuffer( renderContext );
 }
 
-Tr2PushPopDS::Tr2PushPopDS( const Tr2DepthStencilAL& ds )
+Tr2PushPopDS::Tr2PushPopDS( const Tr2TextureAL& ds )
 : m_renderContext( nullptr )
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
@@ -22,7 +22,7 @@ Tr2PushPopDS::Tr2PushPopDS( Tr2RenderContext& renderContext )
 	Tr2Renderer::PushDepthStencilBuffer( renderContext );
 }
 
-Tr2PushPopDS::Tr2PushPopDS( const Tr2DepthStencilAL& ds, Tr2RenderContext& renderContext )
+Tr2PushPopDS::Tr2PushPopDS( const Tr2TextureAL& ds, Tr2RenderContext& renderContext )
 : m_renderContext( &renderContext )
 {
 	Tr2Renderer::PushDepthStencilBuffer( ds, renderContext );

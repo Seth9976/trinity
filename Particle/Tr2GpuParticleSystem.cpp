@@ -773,7 +773,7 @@ void Tr2GpuParticleSystem::UpdateGpuEmitterParams( Tr2RenderContext& renderConte
 	{
 		*reinterpret_cast<EmitterParamsGpu*>( reinterpret_cast<uint8_t*>( data ) + i * pitch ) = m_emitterParams[i];
 	}
-	texture->Unlock( renderContext );
+	texture->UnmapForWriting( renderContext );
 
 	m_variableStore->RegisterVariable( "EmittersSize", Vector2( float( m_emitterParamsTexture->GetWidth() ), float( m_emitterParamsTexture->GetHeight() ) ) );
 }

@@ -1025,7 +1025,7 @@ bool Tr2Renderer::PushDepthStencilBuffer( Tr2RenderContext& renderContext )
 	return SUCCEEDED( renderContext.PushDepthStencil() );
 }
 
-bool Tr2Renderer::PushDepthStencilBuffer( const Tr2DepthStencilAL& ds, Tr2RenderContext& renderContext )
+bool Tr2Renderer::PushDepthStencilBuffer( const Tr2TextureAL& ds, Tr2RenderContext& renderContext )
 {
 	renderContext.PushDepthStencil();
 
@@ -1047,12 +1047,12 @@ void Tr2Renderer::PushRenderTarget( unsigned slot, Tr2RenderContext& renderConte
 	renderContext.PushRenderTarget( slot );
 }
 
-void Tr2Renderer::PushRenderTarget( const Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext )
+void Tr2Renderer::PushRenderTarget( const Tr2TextureAL& rt, Tr2RenderContext& renderContext )
 {
 	PushRenderTarget( rt, 0, renderContext );
 }
 
-void Tr2Renderer::PushRenderTarget( const Tr2RenderTargetAL& rt, unsigned slot, Tr2RenderContext& renderContext )
+void Tr2Renderer::PushRenderTarget( const Tr2TextureAL& rt, unsigned slot, Tr2RenderContext& renderContext )
 {
 	renderContext.PushRenderTarget( slot );
 	Tr2Renderer::SetRenderTarget( slot, rt, renderContext );
@@ -1681,7 +1681,7 @@ const Tr2Viewport& Tr2Renderer::GetDeviceViewport()
 	return s_viewportOnDevice;
 }
 
-bool Tr2Renderer::SetRenderTarget( unsigned int index, const Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext, bool updateViewport )
+bool Tr2Renderer::SetRenderTarget( unsigned int index, const Tr2TextureAL& rt, Tr2RenderContext& renderContext, bool updateViewport )
 {
 	if( FAILED( renderContext.SetRenderTarget( rt, index ) ) )
 	{
@@ -1704,7 +1704,7 @@ bool Tr2Renderer::SetRenderTarget( unsigned int index, const Tr2RenderTargetAL& 
 	return true;
 }
 
-bool Tr2Renderer::SetDepthStencilBuffer( const Tr2DepthStencilAL& ds, Tr2RenderContext& renderContext )
+bool Tr2Renderer::SetDepthStencilBuffer( const Tr2TextureAL& ds, Tr2RenderContext& renderContext )
 {
 	if( !SUCCEEDED( renderContext.SetDepthStencil( ds ) ) )
 	{

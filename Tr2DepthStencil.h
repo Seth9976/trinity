@@ -54,10 +54,10 @@ public:
 	uint32_t GetMsaaQuality() const;
 	Tr2RenderContextEnum::DepthStencilFormat GetFormat() const;
 
-	Tr2DepthStencilAL	m_depthStencil;
+	Tr2TextureAL m_depthStencil;
 
-	operator Tr2DepthStencilAL&() { return m_depthStencil; }	// avoid m_depthStencil->m_depthStencil all over the place
-	operator const Tr2DepthStencilAL&() const { return m_depthStencil; }
+	operator Tr2TextureAL&() { return m_depthStencil; }	// avoid m_depthStencil->m_depthStencil all over the place
+	operator const Tr2TextureAL&() const { return m_depthStencil; }
 	
 	std::string m_name;
 protected:

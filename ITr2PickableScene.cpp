@@ -113,7 +113,7 @@ void ITr2PickableScene::PickObject( Tr2RenderContext& renderContext, int x, int 
 
 				BufferResults buffer;
 
-				void* data;
+				const void* data;
 				uint32_t pitch;
 				if( pickBuffer.PrepareGetResults( data, pitch, renderContext ) )
 				{

@@ -712,7 +712,7 @@ void Tr2Sprite2dScene::SetTexture( unsigned ix, Tr2AtlasTexturePtr tex, Tr2Sprit
 		{
 			if( tex->GetRenderTarget() )
 			{
-				texAL = &tex->GetRenderTarget()->GetTexture();
+				texAL = tex->GetRenderTarget();
 			}
 		}
 	}
@@ -1117,7 +1117,7 @@ void Tr2Sprite2dScene::IssueDrawCall()
 							{
 								if( m_texture[i]->GetRenderTarget() )
 								{
-									texAL = &m_texture[i]->GetRenderTarget()->GetTexture();
+									texAL = m_texture[i]->GetRenderTarget();
 								}
 							}
 						}
@@ -1536,7 +1536,7 @@ bool Tr2Sprite2dScene::IsInsideTriangle( const Vector2& pointIn, const Vector2& 
 	return true;
 }
 
-void Tr2Sprite2dScene::StartLayer( Tr2RenderTargetAL& rt )
+void Tr2Sprite2dScene::StartLayer( Tr2TextureAL& rt )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 	USE_MAIN_THREAD_RENDER_CONTEXT();

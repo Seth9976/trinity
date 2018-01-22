@@ -19,7 +19,7 @@ struct Tr2PushPopRT
 	// Description:
 	// push the given renderTarget, pop when going out of scope.
 	// -------------------------------------------------------------
-	Tr2PushPopRT( const Tr2RenderTargetAL& rt, uint32_t slot = 0 );
+	Tr2PushPopRT( const Tr2TextureAL& rt, uint32_t slot = 0 );
 
 	// -------------------------------------------------------------
 	// Description:
@@ -31,7 +31,7 @@ struct Tr2PushPopRT
 	// Description:
 	// push the given renderTarget, pop when out of scope.
 	// -------------------------------------------------------------
-	Tr2PushPopRT( const Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext, uint32_t slot = 0 );
+	Tr2PushPopRT( const Tr2TextureAL& rt, Tr2RenderContext& renderContext, uint32_t slot = 0 );
 
 	~Tr2PushPopRT();
 

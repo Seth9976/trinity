@@ -12,9 +12,7 @@ const Be::VarChooser Tr2RenderContextEnum_ObjectType_Chooser[] =
 {
 #define OP_ITEM(x)	{ #x, BeCast( OT_ ## x ), #x " AL object type" },
 	OP_ITEM( CONSTANT_BUFFER )
-	OP_ITEM( DEPTH_STENCIL )
 	OP_ITEM( RENDER_CONTEXT )
-	OP_ITEM( RENDER_TARGET )
 	OP_ITEM( SHADER )
 	OP_ITEM( SAMPLER_STATE )
 	OP_ITEM( TEXTURE )

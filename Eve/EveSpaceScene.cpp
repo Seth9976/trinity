@@ -2783,7 +2783,7 @@ void EveSpaceScene::GetPickingResults( Tr2PickBuffer& pickBuffer, Tr2RenderConte
 									   unsigned short& objId, 
 					                   unsigned short& areaId, float& depth )
 {
-	void* data;
+	const void* data;
 	uint32_t pitch;
 	if( pickBuffer.PrepareGetResults( data, pitch, renderContext ) )
 	{

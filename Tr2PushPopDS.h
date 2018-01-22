@@ -18,7 +18,7 @@ struct Tr2PushPopDS
 	// Description:
 	// push the given depthStencil, pop the old one back when going out of scope.
 	// -------------------------------------------------------------
-	Tr2PushPopDS( const Tr2DepthStencilAL& ds );
+	Tr2PushPopDS( const Tr2TextureAL& ds );
 
 	// -------------------------------------------------------------
 	// Description:
@@ -30,7 +30,7 @@ struct Tr2PushPopDS
 	// Description:
 	// push the given depthStencil, pop the old one back when going out of scope.
 	// -------------------------------------------------------------
-	Tr2PushPopDS( const Tr2DepthStencilAL& ds, Tr2RenderContext& renderContext );
+	Tr2PushPopDS( const Tr2TextureAL& ds, Tr2RenderContext& renderContext );
 
 	~Tr2PushPopDS();
 

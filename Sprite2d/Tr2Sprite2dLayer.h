@@ -44,7 +44,7 @@ private:
 	ITr2Sprite2dTexture* GetTextureSecondary() const;
 
 private:
-	Tr2RenderTargetAL m_renderTarget;
+	Tr2TextureAL m_renderTarget;
 	
 	// If m_clearBackground is set, background is cleared to this color
 	Color m_backgroundColor;

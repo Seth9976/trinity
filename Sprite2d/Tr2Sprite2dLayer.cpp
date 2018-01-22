@@ -90,7 +90,7 @@ bool Tr2Sprite2dLayer::OnPrepareResources()
 	}
 
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	HRESULT hr = m_renderTarget.Create(		
+	HRESULT hr = m_renderTarget.CreateRenderTarget(		
 		(uint32_t)m_displayWidth, 
 		(uint32_t)m_displayHeight,
 		1, 

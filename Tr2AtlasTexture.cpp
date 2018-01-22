@@ -68,12 +68,12 @@ Tr2TextureAL* Tr2AtlasTexture::GetTexture()
 // Return Value:
 //   texture atlas render target
 // --------------------------------------------------------------------------------------
-Tr2RenderTargetAL* Tr2AtlasTexture::GetRenderTarget()
+Tr2TextureAL* Tr2AtlasTexture::GetRenderTarget()
 {
 	return m_renderTarget;
 }
 
-void Tr2AtlasTexture::SetRenderTarget( Tr2RenderTargetAL* rt )
+void Tr2AtlasTexture::SetRenderTarget( Tr2TextureAL* rt )
 {
 	m_renderTarget = rt;
 	m_isGood = 1;
@@ -403,7 +403,7 @@ void Tr2AtlasTexture::UnlockBuffer()
 		return;
 	}
 
-	CR( texture->Unlock( renderContext ) );
+	texture->UnmapForWriting( renderContext );
 
 	m_isLocked = false;
 	SetGood( true );

@@ -112,9 +112,9 @@ private:
 
 	Tr2TextureReferencePtr		m_noShadowTexture;
 	Tr2RenderTargetPtr			m_shadowMapRT;
-	Tr2DepthStencilAL			m_shadowMapDS;
+	Tr2TextureAL			m_shadowMapDS;
 
-	Tr2RenderTargetAL			m_filterBlurRT;
+	Tr2TextureAL			m_filterBlurRT;
 	Tr2EffectPtr				m_filterBlurEffect;
 
 	bool m_backupReadOnlyDepth;

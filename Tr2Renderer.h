@@ -232,17 +232,17 @@ public:
 	// ***** Note: consider Tr2PushPopRT instead *****
 	static void PushRenderTarget( Tr2RenderContext& renderContext );	// does not set any RT, just stores the current one so it can be safely changed later
 	static void PushRenderTarget( unsigned slot, Tr2RenderContext& renderContext );	// does not set any RT, just stores the current one so it can be safely changed later
-	static void PushRenderTarget( const Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext );
-	static void PushRenderTarget( const Tr2RenderTargetAL& rt, unsigned slot, Tr2RenderContext& renderContext );
+	static void PushRenderTarget( const Tr2TextureAL& rt, Tr2RenderContext& renderContext );
+	static void PushRenderTarget( const Tr2TextureAL& rt, unsigned slot, Tr2RenderContext& renderContext );
 	static void PopRenderTarget( Tr2RenderContext& renderContext );
 	static void PopRenderTarget( unsigned slot, Tr2RenderContext& renderContext );
-	static bool SetRenderTarget( unsigned int index, const Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext, bool updateViewport = true );
+	static bool SetRenderTarget( unsigned int index, const Tr2TextureAL& rt, Tr2RenderContext& renderContext, bool updateViewport = true );
 
 	// ***** Note: consider Tr2PushPopDS instead *****
 	static bool PushDepthStencilBuffer( Tr2RenderContext& renderContext );	// does not set a DS, just stores it so it can be safely changed later
-	static bool PushDepthStencilBuffer( const Tr2DepthStencilAL& ds, Tr2RenderContext& renderContext );
+	static bool PushDepthStencilBuffer( const Tr2TextureAL& ds, Tr2RenderContext& renderContext );
 	static void PopDepthStencilBuffer( Tr2RenderContext& renderContext );
-	static bool SetDepthStencilBuffer( const Tr2DepthStencilAL& ds, Tr2RenderContext& renderContext );
+	static bool SetDepthStencilBuffer( const Tr2TextureAL& ds, Tr2RenderContext& renderContext );
 
 	static void PushProjection();
 	static void PopProjection();

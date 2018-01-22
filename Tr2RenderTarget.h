@@ -43,7 +43,7 @@ public:
 
 	virtual Tr2TextureAL* GetTexture();
 
-	void Attach( Tr2RenderTargetAL* renderTarget, IRoot* owner );
+	void Attach( Tr2TextureAL* renderTarget, IRoot* owner );
 	bool IsAttached() const;
 
 	bool IsValid() const;
@@ -60,11 +60,11 @@ public:
 	long GenerateMipMaps();
 	long Resolve( Tr2RenderTarget* destination );
 	
-	Tr2RenderTargetAL& GetRenderTarget();
-	const Tr2RenderTargetAL& GetRenderTarget() const;
+	Tr2TextureAL& GetRenderTarget();
+	const Tr2TextureAL& GetRenderTarget() const;
 
-	operator Tr2RenderTargetAL&() { return GetRenderTarget(); }
-	operator const Tr2RenderTargetAL&() const { return GetRenderTarget(); }
+	operator Tr2TextureAL&() { return GetRenderTarget(); }
+	operator const Tr2TextureAL&() const { return GetRenderTarget(); }
 
 	uintptr_t GetSharedHandle() const;
 	
@@ -73,8 +73,8 @@ protected:
 	virtual void ReleaseResources( TriStorage s );
 	virtual bool OnPrepareResources();
 private:
-	Tr2RenderTargetAL m_renderTarget;
-	Tr2RenderTargetAL* m_attachedRenderTarget;
+	Tr2TextureAL m_renderTarget;
+	Tr2TextureAL* m_attachedRenderTarget;
 	BlueWeakRef<IRoot> m_attachedOwner;
 
 	uint32_t m_width;

@@ -52,7 +52,7 @@ long Tr2RenderTarget::Create(
 	{
 		return E_INVALIDARG;
 	}
-	auto hr = m_renderTarget.Create(
+	auto hr = m_renderTarget.CreateRenderTarget(
 		width,
 		height,
 		mipLevelCount,
@@ -80,9 +80,9 @@ long Tr2RenderTarget::Create(
 Tr2TextureAL* Tr2RenderTarget::GetTexture()
 {
 	auto& rt = GetRenderTarget();
-	if( rt.IsValid() && rt.GetTexture().IsValid() )
+	if( rt.IsValid() && Tr2GpuUsage::HasFlag( rt.GetGpuUsage(), Tr2GpuUsage::SHADER_RESOURCE ) )
 	{
-		return  &rt.GetTexture();
+		return  &rt;
 	}
 	return nullptr;
 }
@@ -97,7 +97,7 @@ Tr2TextureAL* Tr2RenderTarget::GetTexture()
 //   owner - Render target owner object: Tr2RenderTarget locks it so that AL renderTarget
 //     is not deleted before this Tr2RenderTarget
 // --------------------------------------------------------------------------------------
-void Tr2RenderTarget::Attach( Tr2RenderTargetAL* renderTarget, IRoot* owner )
+void Tr2RenderTarget::Attach( Tr2TextureAL* renderTarget, IRoot* owner )
 {
 	Destroy();
 	m_attachedRenderTarget = renderTarget;
@@ -125,7 +125,7 @@ bool Tr2RenderTarget::IsAttached() const
 // Return Value:
 //   Referenced render target 
 // --------------------------------------------------------------------------------------
-Tr2RenderTargetAL& Tr2RenderTarget::GetRenderTarget()
+Tr2TextureAL& Tr2RenderTarget::GetRenderTarget()
 {
 	if( IsAttached() )
 	{
@@ -140,7 +140,7 @@ Tr2RenderTargetAL& Tr2RenderTarget::GetRenderTarget()
 // Return Value:
 //   Referenced render target 
 // --------------------------------------------------------------------------------------
-const Tr2RenderTargetAL& Tr2RenderTarget::GetRenderTarget() const
+const Tr2TextureAL& Tr2RenderTarget::GetRenderTarget() const
 {
 	if( IsAttached() )
 	{
@@ -167,7 +167,7 @@ void Tr2RenderTarget::Destroy()
 
 bool Tr2RenderTarget::IsReadable() const
 {
-	return GetRenderTarget().GetTexture().IsValid() && GetRenderTarget().GetMsaaDesc().samples < 2;
+	return GetRenderTarget().IsValid() && Tr2GpuUsage::HasFlag( GetRenderTarget().GetGpuUsage(), Tr2GpuUsage::SHADER_RESOURCE );
 }
 
 long Tr2RenderTarget::GenerateMipMaps()
@@ -201,10 +201,6 @@ long Tr2RenderTarget::Resolve( Tr2RenderTarget* destination )
 // --------------------------------------------------------------------------------------
 bool Tr2RenderTarget::HasALObject( int type, size_t object )
 {
-	if( type == OT_RENDER_TARGET )
-	{
-		return GetRenderTarget() == *reinterpret_cast<Tr2RenderTargetAL*>( object );
-	}
 	return false;
 }
 
@@ -301,7 +297,7 @@ bool Tr2RenderTarget::OnPrepareResources()
 	{
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 
-		m_renderTarget.Create(
+		m_renderTarget.CreateRenderTarget(
 			m_width,
 			m_height,
 			m_mipCount,

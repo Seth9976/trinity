@@ -143,7 +143,7 @@ Tr2TextureAL* TriTextureRes::GetTexture()
 	{
 		if( !m_texture || !m_texture->IsValid() )
 		{
-			SetTexture( m_wrappedRenderTarget->GetRenderTarget().GetTexture() );
+			SetTexture( m_wrappedRenderTarget->GetRenderTarget() );
 		}
 	}
 	else
@@ -151,7 +151,7 @@ Tr2TextureAL* TriTextureRes::GetTexture()
 	{
 		if( !m_texture || !m_texture->IsValid() )
 		{
-			SetTexture( m_wrappedDepthStencil->m_depthStencil.GetTexture() );
+			SetTexture( m_wrappedDepthStencil->m_depthStencil );
 		}
 	}
 	
@@ -429,7 +429,7 @@ bool TriTextureRes::SetTextureFromRT( Tr2RenderTarget* renderTarget )
 	if( renderTarget && renderTarget->IsValid() )
 	{
 		m_isTextureResizable = false;
-		SetTexture( renderTarget->GetRenderTarget().GetTexture() );		
+		SetTexture( renderTarget->GetRenderTarget() );		
 	}
 
 	return true;
@@ -477,8 +477,7 @@ bool TriTextureRes::CreateFromRT( Tr2RenderTarget* renderTarget, unsigned width,
 		}
 
 		Tr2TextureSubresource dst;
-		dst.m_right  = width;
-		dst.m_bottom = height;
+		dst.SetRect( 0, 0, width, height );
 		if( FAILED( m_ownTexture.CopySubresourceRegion( Tr2TextureSubresource(), *renderTarget, dst, renderContext ) ) )
 		{
 			m_ownTexture.Destroy();
@@ -489,11 +488,11 @@ bool TriTextureRes::CreateFromRT( Tr2RenderTarget* renderTarget, unsigned width,
 	{
 		// No mipmaps, just locking the RT and initializing a new texture with its contents using initialData should work.
 		Tr2SubresourceData srd;
-		if( FAILED( rt.Lock( 0, nullptr, srd.m_sysMem, srd.m_sysMemPitch, renderContext ) ) )
+		if( FAILED( rt.MapForReading( Tr2TextureSubresource( 0 ), srd.m_sysMem, srd.m_sysMemPitch, renderContext ) ) )
 		{
 			return false;
 		}
-		ON_BLOCK_EXIT( [&] { rt.Unlock( renderContext ); } );
+		ON_BLOCK_EXIT( [&] { rt.UnmapForReading( renderContext ); } );
 	
 		srd.m_sysMemSlicePitch = rt.GetHeight() * srd.m_sysMemPitch;
 
@@ -559,7 +558,7 @@ BlueStdResult TriTextureRes::CreateFromTexture( TriTextureRes* texture )
 
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 	
-	Tr2BitmapDimensions bd( other );
+	Tr2BitmapDimensions bd( other.GetDesc() );
 
 	CR_RETURN_VAL( 
 		m_ownTexture.Create2D( width, height, other.GetTrueMipCount(), other.GetFormat(), USAGE_CPU_READ, nullptr, renderContext ),
@@ -584,7 +583,7 @@ bool TriTextureRes::SetTextureFromDS( Tr2DepthStencil* depthStencil )
 	if( depthStencil && depthStencil->IsValid() )
 	{
 		m_isTextureResizable = false;
-		SetTexture( depthStencil->m_depthStencil.GetTexture() );		
+		SetTexture( depthStencil->m_depthStencil );		
 	}
 
 	return true;
@@ -610,7 +609,7 @@ bool TriTextureRes::Create(	uint32_t width,
 									renderContext )
 			, false );
 
-	*static_cast<Tr2BitmapDimensions*>( this ) = m_ownTexture;
+	*static_cast<Tr2BitmapDimensions*>( this ) = m_ownTexture.GetDesc();
 
 	m_memoryUse = 0;
 	auto trueMipCount = GetTrueMipCount();
@@ -646,7 +645,7 @@ bool TriTextureRes::SetTexture( Tr2TextureAL& texture )
 		return true;
 	}
 
-	*static_cast<Tr2BitmapDimensions*>( this ) = texture;
+	*static_cast<Tr2BitmapDimensions*>( this ) = texture.GetDesc();
 	m_texture = &texture;
 		
 	// Estimate memory use for the resource cache.
@@ -677,20 +676,5 @@ bool TriTextureRes::SetTexture( Tr2TextureAL& texture )
 // --------------------------------------------------------------------------------------
 bool TriTextureRes::HasALObject( int type, size_t object )
 {
-	switch( type )
-	{
-	case OT_TEXTURE:
-		return m_texture == reinterpret_cast<Tr2TextureAL*>( object );
-	case OT_RENDER_TARGET:
-		if( m_wrappedRenderTarget )
-		{
-			return m_wrappedRenderTarget->GetRenderTarget() == *reinterpret_cast<Tr2RenderTargetAL*>( object );
-		}
-	case OT_DEPTH_STENCIL:
-		if( m_wrappedDepthStencil )
-		{
-			return m_wrappedDepthStencil->m_depthStencil == *reinterpret_cast<Tr2DepthStencilAL*>( object );
-		}
-	}
 	return false;
 }

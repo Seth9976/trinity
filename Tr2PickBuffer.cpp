@@ -10,7 +10,6 @@ Tr2PickBuffer::Tr2PickBuffer( IRoot* lockobj, Tr2RenderContextEnum::PixelFormat 
 	m_format( format ),
 	m_clearColor( 0xFFFFFFFF )
 {
-	m_pickTarget.SetHintLockOften();
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -41,8 +40,8 @@ bool Tr2PickBuffer::OnPrepareResources()
 
 	// create the pixel buffer as a rendertarget
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	CR( m_pickTarget.Create( bufferWidth, bufferHeight, 1, m_format, Tr2MsaaDesc(), 0, EX_NONE, renderContext ) );
-	CR( m_depthBuffer.Create( bufferWidth, bufferHeight, Tr2RenderContextEnum::DSFMT_D24S8, Tr2MsaaDesc(), EX_NONE, renderContext ) );
+	CR( m_pickTarget.CreateRenderTarget( bufferWidth, bufferHeight, 1, m_format, Tr2MsaaDesc(), 0, EX_NONE, renderContext ) );
+	CR( m_depthBuffer.CreateDepthStencil( bufferWidth, bufferHeight, Tr2RenderContextEnum::DSFMT_D24S8, Tr2MsaaDesc(), EX_NONE, renderContext ) );
 
 	return true;
 }
@@ -76,7 +75,7 @@ bool Tr2PickBuffer::EndRendering( Tr2RenderContext& renderContext )
 }
 
 // ------------------------------------------------------------------------------------------------------
-bool Tr2PickBuffer::PrepareGetResults( void*& data, uint32_t& pitch, Tr2RenderContext& renderContext )
+bool Tr2PickBuffer::PrepareGetResults( const void*& data, uint32_t& pitch, Tr2RenderContext& renderContext )
 {
 	if( !m_pickTarget.IsValid() )
 	{
@@ -84,7 +83,7 @@ bool Tr2PickBuffer::PrepareGetResults( void*& data, uint32_t& pitch, Tr2RenderCo
 		return false;
 	}
 
-	HRESULT hr = m_pickTarget.Lock( 0, nullptr, data, pitch, renderContext );
+	HRESULT hr = m_pickTarget.MapForReading( Tr2TextureSubresource( 0 ), data, pitch, renderContext );
 
 	return SUCCEEDED( hr );
 }
@@ -96,5 +95,5 @@ void Tr2PickBuffer::UnlockBuffer( Tr2RenderContext& renderContext )
 		// This could happen if device is lost
 		return;
 	}
-	m_pickTarget.Unlock( renderContext );
+	m_pickTarget.UnmapForReading( renderContext );
 }

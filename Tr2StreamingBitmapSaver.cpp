@@ -209,11 +209,11 @@ ALResult Tr2StreamingBitmapSaver::CopyFromRenderTargetRegion(
 	unsigned height = min( unsigned( bottom - top ), m_rowsPerBatch - offsetY );
 
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-	void* data;
+	const void* data;
 	unsigned srcPitch;
 	HRESULT hr;
 
-	if( FAILED( hr = rt->GetRenderTarget().Lock( 0, nullptr, data, srcPitch, renderContext ) ) )
+	if( FAILED( hr = rt->GetRenderTarget().MapForReading( Tr2TextureSubresource( 0 ), data, srcPitch, renderContext ) ) )
 	{
 		CCP_LOGWARN( "Tr2StreamingBitmapSaver::CopyFromRenderTargetRegion: failed to lock renderTarget" );
 		return hr;
@@ -233,7 +233,7 @@ ALResult Tr2StreamingBitmapSaver::CopyFromRenderTargetRegion(
 		memcpy( dst, src, pitch );
 	}
 
-	rt->GetRenderTarget().Unlock( renderContext );
+	rt->GetRenderTarget().UnmapForReading( renderContext );
 
 	return S_OK;
 }

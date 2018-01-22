@@ -208,7 +208,7 @@ bool TriShadowMap::OnPrepareResources()
 
 	if( m_filterVsm && !m_filterBlurRT.IsValid() )
 	{
-		CR_RETURN_VAL( m_filterBlurRT.Create(	
+		CR_RETURN_VAL( m_filterBlurRT.CreateRenderTarget(	
 			m_size, 
 			m_size, 
 			1, 
@@ -233,7 +233,7 @@ bool TriShadowMap::OnPrepareResources()
 	}
 	if( !m_shadowMapDS.IsValid() )
 	{
-		CR_RETURN_VAL( m_shadowMapDS.Create( m_size, m_size, DSFMT_AUTO, Tr2MsaaDesc(), EX_NONE, renderContext ), false );
+		CR_RETURN_VAL( m_shadowMapDS.CreateDepthStencil( m_size, m_size, DSFMT_AUTO, Tr2MsaaDesc(), EX_NONE, renderContext ), false );
 	}
 
 	if( m_shadowSizeHandle )
@@ -246,7 +246,7 @@ bool TriShadowMap::OnPrepareResources()
 
 Tr2TextureAL& TriShadowMap::GetTexture()
 {
-	return m_shadowMapRT->GetRenderTarget().GetTexture();
+	return m_shadowMapRT->GetRenderTarget();
 }
 
 void TriShadowMap::SetShadowTexture( bool useBlankTexture )
@@ -349,7 +349,7 @@ void TriShadowMap::EndShadowRendering()
 
 		m_invInputSizeHandle->SetValue( Vector2( 0, 1.0f / m_size ) );
 		Tr2Renderer::SetRenderTarget( 0, *m_shadowMapRT, renderContext );
-		Tr2Renderer::DrawTexture( m_filterBlurEffect, m_filterBlurRT.GetTexture() );
+		Tr2Renderer::DrawTexture( m_filterBlurEffect, m_filterBlurRT );
 	}
 
 	m_shadowMapRT->GetRenderTarget().GenerateMipMaps( renderContext );

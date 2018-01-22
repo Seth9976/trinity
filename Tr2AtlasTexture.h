@@ -40,8 +40,8 @@ public:
 	// Get the D3D texture behind the atlas texture. Use GetTextureWindow
 	// to get the uv-offsets to apply when rendering.
 	Tr2TextureAL* GetTexture();
-	Tr2RenderTargetAL* GetRenderTarget();
-	void SetRenderTarget( Tr2RenderTargetAL* rt );
+	Tr2TextureAL* GetRenderTarget();
+	void SetRenderTarget( Tr2TextureAL* rt );
 
 	// Get texture window for rendering this texture out of the atlas
 	void GetTextureWindow( Vector4& tw );
@@ -135,7 +135,7 @@ private:
 
 	// It is ok to have raw pointer to Tr2AtlasTexture::m_renderTarget since
 	// since T2AtlasTexture lifetime is bound to it.
-	Tr2RenderTargetAL *m_renderTarget;
+	Tr2TextureAL *m_renderTarget;
 
 	// Bounds of this texture within the D3D texture
 	unsigned int m_x;

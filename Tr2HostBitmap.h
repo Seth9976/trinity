@@ -26,9 +26,9 @@ public:
 
 	virtual void Destroy();
 
-	bool CopyFromRenderTarget( Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext );
-	bool CopyFromRenderTarget( Tr2RenderTargetAL& rt, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext );
-	bool CopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2RenderTargetAL& rt, Tr2RenderContext& renderContext );
+	bool CopyFromRenderTarget( Tr2TextureAL& rt, Tr2RenderContext& renderContext );
+	bool CopyFromRenderTarget( Tr2TextureAL& rt, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext );
+	bool CopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2TextureAL& rt, Tr2RenderContext& renderContext );
 	bool CopyFromTexture( Tr2TextureAL& texture, Tr2RenderContext& renderContext );
 	bool CopyFromTextureRes  ( TriTextureRes& res, Tr2RenderContext& renderContext );
 	bool CreateFromHeightData( const std::vector<float>& data, int32_t width, int32_t height );
@@ -62,7 +62,7 @@ private:
 	bool CopyFaceFromRenderTargetPython( unsigned face, Tr2RenderTarget* rt );
 	bool CopyFromTextureResPython( TriTextureRes* tr );
 
-	bool SharedCopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2RenderTargetAL& rt, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext );
+	bool SharedCopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2TextureAL& rt, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext );
 
 #if BLUE_WITH_PYTHON
 	PyObject* PyApplyConvFilter ( PyObject* args );

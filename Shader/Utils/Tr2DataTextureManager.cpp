@@ -152,7 +152,7 @@ void Tr2DataTextureManager::Update( EveUpdateContext& updateContext )
 				pixelOffset += block->blockLength + 1;
 			}
 		}
-		m_dataTexture->GetTexture()->Unlock( renderContext );
+		m_dataTexture->GetTexture()->UnmapForWriting( renderContext );
 	}
 
 	// keep track of some numbers, just for debugging

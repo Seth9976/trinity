@@ -809,11 +809,11 @@ Tr2DebugObjectReference Tr2DebugRenderer::Pick( float& depth, Tr2RenderContext& 
 		return nullptr;
 	}
 
-	void* data;
+	const void* data;
 	uint32_t pitch;
 	if( m_pickBuffer.PrepareGetResults( data, pitch, renderContext ) )
 	{
-		float* pixels = static_cast<float*>( data );
+		const float* pixels = static_cast<const float*>( data );
 		uint32_t index = uint32_t( pixels[0] + 0.5f );
 		bool isLine = pixels[1] != 0;
 		depth = pixels[2];

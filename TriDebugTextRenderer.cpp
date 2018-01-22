@@ -254,7 +254,7 @@ void TriDebugTextRenderer::DrawText( TriDebugFont font, const char* string, cons
 				( alpha << 24 );
 		}
 	}
-	m_texture.Unlock( renderContext );
+	m_texture.UnmapForWriting( renderContext );
 #else
 	Rect size = { 0, 0, 0, s_charHeight[font] };
 	int rowWidth = 0;
@@ -333,7 +333,7 @@ void TriDebugTextRenderer::DrawText( TriDebugFont font, const char* string, cons
 			offsetX += s_charWidths[font][*ch];
 		}
 	}
-	m_texture.Unlock( renderContext );
+	m_texture.UnmapForWriting( renderContext );
 #endif
 	// Calculate actual text position in render target
 	int x, y;

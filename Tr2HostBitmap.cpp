@@ -30,12 +30,12 @@ ALResult Tr2HostBitmap::ChangeFormatFromScript( Tr2RenderContextEnum::PixelForma
 	return ChangeFormat( format ) ? S_OK : E_FAIL;
 }
 
-bool Tr2HostBitmap::CopyFromRenderTarget( Tr2RenderTargetAL& rtAL, Tr2RenderContext& renderContext )
+bool Tr2HostBitmap::CopyFromRenderTarget( Tr2TextureAL& rtAL, Tr2RenderContext& renderContext )
 {
 	return m_type == TEX_TYPE_2D ? SharedCopyFaceFromRenderTarget( CUBEMAP_FACE_FIRST, rtAL, nullptr, 0, 0, renderContext ) : false;
 }
 
-bool Tr2HostBitmap::CopyFromRenderTarget( Tr2RenderTargetAL& rtAL, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext )
+bool Tr2HostBitmap::CopyFromRenderTarget( Tr2TextureAL& rtAL, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext )
 {
 	return m_type == TEX_TYPE_2D ? SharedCopyFaceFromRenderTarget( CUBEMAP_FACE_FIRST, rtAL, srcRect, offsetX, offsetY, renderContext ) : false;
 }
@@ -50,20 +50,20 @@ bool Tr2HostBitmap::CopyFromRenderTargetPython( Tr2RenderTarget* rt )
 	return CopyFromRenderTarget( *rt, renderContext );
 }
 
-bool Tr2HostBitmap::CopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2RenderTargetAL& rtAL, Tr2RenderContext& renderContext )
+bool Tr2HostBitmap::CopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2TextureAL& rtAL, Tr2RenderContext& renderContext )
 {
 	return m_type == TEX_TYPE_CUBE ? SharedCopyFaceFromRenderTarget( face, rtAL, nullptr, 0, 0, renderContext ) : false;
 }
 
-bool Tr2HostBitmap::SharedCopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2RenderTargetAL& rtAL, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext )
+bool Tr2HostBitmap::SharedCopyFaceFromRenderTarget( Tr2RenderContextEnum::CubemapFace face, Tr2TextureAL& rtAL, const int* srcRect, int offsetX, int offsetY, Tr2RenderContext& renderContext )
 {
 	bool alphaConvert = false;
-	if( !CheckForMatch( rtAL, srcRect == nullptr, alphaConvert, "CopyFromRenderTarget" ) )
+	if( !CheckForMatch( rtAL.GetDesc(), srcRect == nullptr, alphaConvert, "CopyFromRenderTarget" ) )
 	{
 		return false;
 	}
 
-	if( !rtAL.GetTexture().IsValid() || IsCompressed() )
+	if( !rtAL.IsValid() || IsCompressed() )
 	{
 		CCP_LOGWARN( "CopyFromRenderTarget: invalid source" );
 		return false;
@@ -110,9 +110,9 @@ bool Tr2HostBitmap::SharedCopyFaceFromRenderTarget( Tr2RenderContextEnum::Cubema
 
 	for( unsigned mipLevel = 0; mipLevel != mipCount; ++mipLevel )
 	{
-		void* data;
+		const void* data;
 		unsigned srcPitch;
-		if( FAILED( rtAL.Lock( mipLevel, nullptr, data, srcPitch, renderContext ) ) )
+		if( FAILED( rtAL.MapForReading( Tr2TextureSubresource( mipLevel ), data, srcPitch, renderContext ) ) )
 		{
 			CCP_LOGWARN( "SharedCopyFaceFromRenderTarget: failed to lock renderTarget level %d", mipLevel );
 			return false;
@@ -158,7 +158,7 @@ bool Tr2HostBitmap::SharedCopyFaceFromRenderTarget( Tr2RenderContextEnum::Cubema
 		left    /= 2;
 		top     /= 2;
 	
-		rtAL.Unlock( renderContext );
+		rtAL.UnmapForReading( renderContext );
 	}
 	return true;
 }
@@ -199,7 +199,7 @@ bool Tr2HostBitmap::CopyFromTexture( Tr2TextureAL& texture, Tr2RenderContext& re
 
 	bool alphaConvert = false;
 
-	if( GetType() != texture.GetType() || !CheckForMatch( texture, true, alphaConvert, "CopyFromTextureRes" ) )
+	if( GetType() != texture.GetType() || !CheckForMatch( texture.GetDesc(), true, alphaConvert, "CopyFromTextureRes" ) )
 	{
 		return false;
 	}
@@ -256,7 +256,7 @@ bool Tr2HostBitmap::CopyFromTexture( Tr2TextureAL& texture, Tr2RenderContext& re
 			}
 
 
-			texture.Unlock( renderContext );
+			texture.UnmapForReading( renderContext );
 		}
 	}
 
@@ -286,7 +286,7 @@ bool Tr2HostBitmap::CopyFromTextureRes ( TriTextureRes& res, Tr2RenderContext& r
 
 	if( res.GetTexture() )
 	{
-		if( !res.GetTexture()->IsValid() || GetType() != res.GetTexture()->GetType() || !CheckForMatch( *res.GetTexture(), true, alphaConvert, "CopyFromTextureRes" ) )
+		if( !res.GetTexture()->IsValid() || GetType() != res.GetTexture()->GetType() || !CheckForMatch( res.GetTexture()->GetDesc(), true, alphaConvert, "CopyFromTextureRes" ) )
 		{
 			return false;
 		}
@@ -300,18 +300,18 @@ bool Tr2HostBitmap::CopyFromTextureRes ( TriTextureRes& res, Tr2RenderContext& r
 	{
 		for( uint32_t mipLevel = 0; mipLevel != mipCount; ++mipLevel )
 		{
-			void* srcData = nullptr; 
+			const void* srcData = nullptr; 
 			uint32_t srcPitch = 0;
 
 			HRESULT hr = E_FAIL;
 
 			if( res.m_wrappedRenderTarget )
 			{
-				hr = res.m_wrappedRenderTarget->GetRenderTarget().Lock( mipLevel, nullptr, srcData, srcPitch, renderContext );
+				hr = res.m_wrappedRenderTarget->GetRenderTarget().MapForReading( Tr2TextureSubresource( mipLevel ), srcData, srcPitch, renderContext );
 			}
 			else if( res.GetTexture() )
 			{
-				hr = res.GetTexture()->Lock( face, mipLevel, nullptr, srcData, srcPitch, LOCK_READONLY, renderContext );
+				hr = res.GetTexture()->MapForReading( Tr2TextureSubresource( face, mipLevel ), srcData, srcPitch, renderContext );
 			}
 			if( FAILED( hr ) || srcData == nullptr )
 			{
@@ -355,11 +355,11 @@ bool Tr2HostBitmap::CopyFromTextureRes ( TriTextureRes& res, Tr2RenderContext& r
 
 			if( res.m_wrappedRenderTarget )
 			{
-				res.m_wrappedRenderTarget->GetRenderTarget().Unlock( renderContext );
+				res.m_wrappedRenderTarget->GetRenderTarget().UnmapForReading( renderContext );
 			}
 			else if( res.GetTexture() )
 			{
-				res.GetTexture()->Unlock( renderContext );
+				res.GetTexture()->UnmapForReading( renderContext );
 			}
 		}
 	}
