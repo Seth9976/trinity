@@ -209,7 +209,7 @@ void EveChildParticleSphere::Update( const EveUpdateContext& updateContext )
 		break;
 	}
 
-	auto previousReferencePosition = TransformCoord( m_previousOrigin - originShift, Inverse( m_worldTransform ) );
+	auto previousReferencePosition = TransformCoord( m_previousOrigin + originShift, Inverse( m_worldTransform ) );
 
 	ApplyConstraint( previousReferencePosition, Normalize( velocity ) );
 	AddParticles( previousReferencePosition, Normalize( velocity ) );
@@ -296,7 +296,6 @@ void EveChildParticleSphere::ApplyConstraint( const Vector3& previousReferencePo
 		Tr2ParticleStreamIterator<float> lifetime( particles, strides, m_lifetimeElement );
 
 		XMVECTOR originShift = previousReferencePosition;
-		XMVECTOR referencePosition = Vector3( 0, 0, 0 );
 		XMVECTOR constVelocity = velocityDirection;
 		XMVECTOR oneOverRadius2 = XMVectorReplicate( 1.f / ( m_radius * m_radius ) );
 
@@ -305,16 +304,83 @@ void EveChildParticleSphere::ApplyConstraint( const Vector3& previousReferencePo
 			XMVECTOR localPosition = XMVectorAdd( XMLoadFloat3A( position ), originShift );
 			XMStoreFloat3A( position, localPosition );
 
-			localPosition = XMVectorSubtract( localPosition, referencePosition );
 			XMStoreFloat(
 				lifetime,
-				XMVectorMin( XMVectorMultiply( XMVector3LengthSq( localPosition ), oneOverRadius2 ), XMVectorSplatOne() ) );
+				XMVectorMultiply( XMVector3LengthSq( localPosition ), oneOverRadius2 ) );
 
 			XMStoreFloat3A( velocity, constVelocity );
+
+			if( *lifetime.Get() >= 1 )
+			{
+				float* particle[Tr2ParticleElementData::COUNT];
+				for( unsigned j = 0; j < Tr2ParticleElementData::COUNT; ++j )
+				{
+					particle[j] = particles[j] + strides[j] * i;
+				}
+				FillParticleData( particle, previousReferencePosition, velocityDirection );
+			}
 		}
 	};
 
 	m_particleSystem->ApplyConstraint( constraint );
+}
+
+// -----------------------------------------------------------------------------
+void EveChildParticleSphere::FillParticleData( float** particle, const Vector3& previousReferencePosition, const Vector3& velocityDirection )
+{
+	auto randf = []()
+	{
+		return float( rand() ) / RAND_MAX;
+	};
+
+	if( m_positionElement.m_bufferType != Tr2ParticleElementData::COUNT )
+	{
+		float distance;
+		Vector3 localPosition;
+		for( int32_t i = 0; i < 10; ++i )
+		{
+			localPosition = Normalize( Vector3( randf() - 0.5f, randf() - 0.5f, randf() - 0.5f ) );
+			if( i == 9 || previousReferencePosition == Vector3( 0, 0, 0 ) )
+			{
+				distance = m_radius;
+				localPosition *= distance;
+			}
+			else
+			{
+				float minDistance = std::max( 0.f, m_radius - Length( previousReferencePosition ) );
+				distance = minDistance + randf() * ( m_radius - minDistance );
+				localPosition *= distance;
+				if( Length( localPosition - previousReferencePosition ) < m_radius )
+				{
+					continue;
+				}
+			}
+			break;
+		}
+		auto position = reinterpret_cast<Vector3*>( particle[m_positionElement.m_bufferType] + m_positionElement.m_offset );
+		*position = localPosition;
+		if( m_lifetimeElement.m_bufferType != Tr2ParticleElementData::COUNT )
+		{
+			auto lifetime = particle[m_lifetimeElement.m_bufferType] + m_lifetimeElement.m_offset;
+			lifetime[0] = std::min( 1.f, distance * distance / m_radius / m_radius );
+			lifetime[1] = std::numeric_limits<float>::max() / 10;
+		}
+	}
+	else if( m_lifetimeElement.m_bufferType != Tr2ParticleElementData::COUNT )
+	{
+		auto lifetime = particle[m_lifetimeElement.m_bufferType] + m_lifetimeElement.m_offset;
+		*lifetime = 1;
+	}
+	if( m_velocityElement.m_bufferType != Tr2ParticleElementData::COUNT )
+	{
+		auto velocity = reinterpret_cast<Vector3*>( particle[m_velocityElement.m_bufferType] + m_velocityElement.m_offset );
+		*velocity = velocityDirection;
+	}
+
+	for( auto it = begin( m_generators ); it != end( m_generators ); ++it )
+	{
+		( *it )->Generate( nullptr, nullptr, particle );
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -333,54 +399,7 @@ void EveChildParticleSphere::AddParticles( const Vector3& previousReferencePosit
 	float* particle[Tr2ParticleElementData::COUNT];
 	while( m_particleSystem->InsertParticle( particle ) )
 	{
-		if( m_positionElement.m_bufferType != Tr2ParticleElementData::COUNT )
-		{
-			float distance;
-			Vector3 localPosition;
-			for( int32_t i = 0; i < 10; ++i )
-			{
-				localPosition = Normalize( Vector3( randf() - 0.5f, randf() - 0.5f, randf() - 0.5f ) );
-				if( i == 9 || previousReferencePosition == Vector3( 0, 0, 0 ) )
-				{
-					distance = m_radius;
-					localPosition *= distance;
-				}
-				else
-				{
-					float minDistance = std::max( 0.f, m_radius - Length( previousReferencePosition ) );
-					distance = minDistance + randf() * ( m_radius - minDistance );
-					localPosition *= distance;
-					if( Length( localPosition - previousReferencePosition ) < m_radius )
-					{
-						continue;
-					}
-				}
-				break;
-			}
-			auto position = reinterpret_cast<Vector3*>( particle[m_positionElement.m_bufferType] + m_positionElement.m_offset );
-			*position = localPosition;
-			if( m_lifetimeElement.m_bufferType != Tr2ParticleElementData::COUNT )
-			{
-				auto lifetime = particle[m_lifetimeElement.m_bufferType] + m_lifetimeElement.m_offset;
-				lifetime[0] = std::min( 1.f, distance * distance / m_radius / m_radius );
-				lifetime[1] = std::numeric_limits<float>::max() / 10;
-			}
-		}
-		else if( m_lifetimeElement.m_bufferType != Tr2ParticleElementData::COUNT )
-		{
-			auto lifetime = particle[m_lifetimeElement.m_bufferType] + m_lifetimeElement.m_offset;
-			*lifetime = 1;
-		}
-		if( m_velocityElement.m_bufferType != Tr2ParticleElementData::COUNT )
-		{
-			auto velocity = reinterpret_cast<Vector3*>( particle[m_velocityElement.m_bufferType] + m_velocityElement.m_offset );
-			*velocity = velocityDirection;
-		}
-
-		for( auto it = begin( m_generators ); it != end( m_generators ); ++it )
-		{
-			( *it )->Generate( nullptr, nullptr, particle );
-		}
+		FillParticleData( particle, previousReferencePosition, velocityDirection );
 		m_particleSystem->DoneInsertingParticle();
 	}
 }

@@ -361,15 +361,10 @@ void EveSpaceScene::Update( Be::Time realTime, Be::Time simTime )
 	{
 		CCP_STATS_ZONE( "UpdateSyncronous" );
 
-		m_cameraAttachmentParent->SetTransform( Tr2Renderer::GetInverseViewTransform() );
-		m_cameraAttachmentParent->UpdateSyncronous( m_updateContext );
-
 		for( IEveSpaceObject2Vector::const_iterator it = m_objects.begin(); it != m_objects.end(); ++it )
 		{
 			(*it)->UpdateSyncronous( m_updateContext );
 		}
-
-		m_cameraAttachmentParent->UpdateAsyncronous( m_updateContext );
 
 		for( IEveSpaceObject2Vector::const_iterator it = m_uiObjects.begin(); it != m_uiObjects.end(); ++it )
 		{
@@ -1285,6 +1280,10 @@ void EveSpaceScene::GatherBatches( Tr2RenderContext& renderContext )
 	{
 		CCP_STATS_ZONE( "UpdateVisibility" );
 		Tr2ParallelDo( m_objects.begin(), m_objects.end(), [&]( IEveSpaceObject2* obj ) { obj->UpdateVisibility( frustum, identity ); } );
+
+		m_cameraAttachmentParent->SetTransform( Tr2Renderer::GetInverseViewTransform() );
+		m_cameraAttachmentParent->UpdateSyncronous( m_updateContext );
+		m_cameraAttachmentParent->UpdateAsyncronous( m_updateContext );
 		m_cameraAttachmentParent->UpdateVisibility( frustum, identity );
 
 		Tr2ParallelDo( m_planets.begin(), m_planets.end(), [&]( EvePlanet* obj ) { obj->UpdateZOnlyVisibility( frustum ); } );

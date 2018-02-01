@@ -54,6 +54,7 @@ private:
 	void Update( const EveUpdateContext& updateContext );
 	void ApplyConstraint( const Vector3& previousReferencePosition, const Vector3& velocityDirection );
 	void AddParticles( const Vector3& previousReferencePosition, const Vector3& velocityDirection );
+	void FillParticleData( float** particle, const Vector3& previousReferencePosition, const Vector3& velocityDirection );
 
 	Tr2InstancedMeshPtr m_mesh;
 	Tr2ParticleSystemPtr m_particleSystem;
