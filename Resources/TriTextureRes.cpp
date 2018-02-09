@@ -468,7 +468,7 @@ bool TriTextureRes::CreateFromRT( Tr2RenderTarget* renderTarget, unsigned width,
 			USE_MAIN_THREAD_RENDER_CONTEXT();
 			CR_RETURN_VAL( m_ownTexture.Create( 
 				Tr2BitmapDimensions( width, height, bd.GetTrueMipCount(), rt.GetFormat() ), 
-				Tr2GpuUsage::SHADER_RESOURCE,
+				Tr2GpuUsage::SHADER_RESOURCE | Tr2GpuUsage::COPY_DESTINATION,
 				Tr2CpuUsage::READ | Tr2CpuUsage::WRITE,
 				renderContext ), false );
 		}
@@ -495,7 +495,7 @@ bool TriTextureRes::CreateFromRT( Tr2RenderTarget* renderTarget, unsigned width,
 
 		CR_RETURN_VAL( m_ownTexture.Create( 
 			Tr2BitmapDimensions( width, height, 1, rt.GetFormat() ), 
-			Tr2GpuUsage::SHADER_RESOURCE,
+			Tr2GpuUsage::SHADER_RESOURCE | Tr2GpuUsage::COPY_DESTINATION,
 			Tr2CpuUsage::READ, 
 			&srd, 
 			renderContext ), false );	
