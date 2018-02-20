@@ -290,10 +290,13 @@ void EveSpaceScene::Update( Be::Time realTime, Be::Time simTime )
 	m_updateContext.SetDataTextureManager( m_dataTextureMgr );
 
 	{
-		EveTransformVector::const_iterator it;
-		for( it = m_backgroundObjects.begin(); it != m_backgroundObjects.end(); ++it )
+		for( auto it = m_backgroundObjects.begin(); it != m_backgroundObjects.end(); ++it )
 		{
-			(*it)->Update( m_updateContext );
+			( *it )->UpdateSyncronous( m_updateContext );
+		}
+		for( auto it = m_backgroundObjects.begin(); it != m_backgroundObjects.end(); ++it )
+		{
+			( *it )->UpdateAsyncronous( m_updateContext );
 		}
 	}
 
@@ -1673,11 +1676,11 @@ bool EveSpaceScene::RenderBackgroundPass( Tr2RenderContext& renderContext )
 	// backgroundobjects
 	if( !m_backgroundObjects.empty() )
 	{
-		for( EveTransformVector::iterator it = m_backgroundObjects.begin(); it != m_backgroundObjects.end(); ++it )
+		for( auto it = m_backgroundObjects.begin(); it != m_backgroundObjects.end(); ++it )
 		{
-			EveTransform* obj = *it;
+			auto obj = *it;
 			obj->UpdateVisibility( frustum, IdentityMatrix() );
-			obj->GetRenderables( visible );	
+			obj->GetRenderables( visible, nullptr );	
 		}
 		if( !visible.empty() )
 		{

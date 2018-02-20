@@ -349,7 +349,7 @@ protected:
 	// main shadow map
 	TriShadowMapPtr m_shadowMap;
 
-	PEveTransformVector		m_backgroundObjects;
+	PIEveSpaceObject2Vector	m_backgroundObjects;
 	PEvePlanetVector		m_planets;
 	PIEveSpaceObject2Vector m_objects;
 	PIEveSpaceObject2Vector m_uiObjects;
