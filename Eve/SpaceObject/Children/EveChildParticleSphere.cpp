@@ -26,7 +26,7 @@ namespace
 		{
 			static const unsigned mask = ( 1 << Tr2RenderContextEnum::VERTEX_SHADER );
 			FillAndSetConstants( 
-				*buffers[Tr2RenderContextEnum::VERTEX_SHADER], 
+				*buffers[m_bufferType],
 				&m_data, 
 				sizeof( m_data ), 
 				mask, 
@@ -40,6 +40,7 @@ namespace
 			Matrix m_worldInverseTranspose;
 		} m_data;
 
+		int32_t m_bufferType;
 		int32_t m_register;
 	};
 }
@@ -188,6 +189,7 @@ Tr2PerObjectData* EveChildParticleSphere::GetPerObjectData( ITriRenderBatchAccum
 		return NULL;
 	}
 
+	data->m_bufferType = m_useSpaceObjectData ? Tr2RenderContextEnum::VERTEX_SHADER : Tr2RenderContextEnum::CBUFFER_FFE;
 	data->m_register = m_useSpaceObjectData ? Tr2Renderer::GetPerObjectVSStartRegister() : Tr2Renderer::GetPerObjectVSFFEStartRegister();
 	data->m_data.m_world = Transpose( m_worldTransform );
 	data->m_data.m_worldInverseTranspose = Inverse( m_worldTransform );
