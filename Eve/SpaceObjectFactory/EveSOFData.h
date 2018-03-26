@@ -1036,13 +1036,9 @@ public:
 
 	// data
 	EveSOFDataBoosterPtr m_booster;
-
-	// specific hull area data
-	Color m_hullPrimaryHeatColor;
+	// colors
 	EveSOFDataFactionColorSet::ColorType m_hullPrimaryHeatColorType;
-	Color m_hullReactorHeatColor;
 	EveSOFDataFactionColorSet::ColorType m_hullReactorHeatColorType;
-
 	// impact effect
 	EveSOFDataRaceDamagePtr m_damage;
 };
