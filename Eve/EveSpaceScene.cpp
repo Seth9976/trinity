@@ -1677,6 +1677,12 @@ bool EveSpaceScene::RenderBackgroundPass( Tr2RenderContext& renderContext )
 			
 			RenderOpaqueBatches( m_secondaryBatches, renderContext );
 			RenderTransparentBatches( m_secondaryBatches, renderContext );
+
+			if( m_secondaryBatches[TRIBATCHTYPE_OPAQUE]->GetBatchCount() || m_secondaryBatches[TRIBATCHTYPE_DECAL]->GetBatchCount() )
+			{
+				Tr2Renderer::ClearDepthBuffer( 0.f );
+			}
+
 			ClearBatches( m_secondaryBatches );
 		}
 		visible.clear();
