@@ -75,6 +75,12 @@ bool EveLocatorSets::HasName( const char* name ) const
 }
 
 // --------------------------------------------------------------------------------
+bool EveLocatorSets::HasName( const BlueSharedString& name ) const
+{
+	return m_name == name;
+}
+
+// --------------------------------------------------------------------------------
 // Description:
 //   Give out pointer to list
 // --------------------------------------------------------------------------------

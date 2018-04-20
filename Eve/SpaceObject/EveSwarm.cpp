@@ -943,33 +943,15 @@ void EveSwarm::EnableSwarmForceDebug( bool enable )
 }
 
 // --------------------------------------------------------------------------------
-// Description:
-//   Override from EveSpaceObject2
-// --------------------------------------------------------------------------------
-Vector3 EveSwarm::GetObjectSpaceDamageLocatorPosition( uint32_t index ) const
+void EveSwarm::GetLocatorInObjectSpace( Vector3& position, Vector3& direction, const Locator& locator ) const
 {
-	Vector3 position = EveShip2::GetObjectSpaceDamageLocatorPosition( index );
-	if( !m_count )
+	EveShip2::GetLocatorInObjectSpace( position, direction, locator );
+	if( m_count )
 	{
-		return position;
+		Matrix localTransform = *m_renderables[m_targetIndex]->GetWorldTransform() * m_invWorldTransform;
+		position = TransformCoord( position, localTransform );
+		direction = TransformNormal( direction, localTransform );
 	}
-	Matrix localTransform = *m_renderables[m_targetIndex]->GetWorldTransform() * m_invWorldTransform;
-	return TransformCoord( position, localTransform );
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Override from EveSpaceObject2
-// --------------------------------------------------------------------------------
-Vector3 EveSwarm::GetObjectSpaceDamageLocatorDirection( uint32_t index ) const
-{
-	Vector3 direction = EveShip2::GetObjectSpaceDamageLocatorDirection( index );
-	if( !m_count )
-	{
-		return direction;
-	}
-	Matrix localTransform = *m_renderables[m_targetIndex]->GetWorldTransform() * m_invWorldTransform;
-	return TransformNormal( direction, localTransform );
 }
 
 // --------------------------------------------------------------------------------
@@ -978,28 +960,43 @@ Vector3 EveSwarm::GetObjectSpaceDamageLocatorDirection( uint32_t index ) const
 // --------------------------------------------------------------------------------
 bool EveSwarm::GetDamageLocatorPosition( Vector3* out, int index, bool inWorldSpace )
 {
-	CCP_STATS_ZONE( __FUNCTION__ );
 	if( !m_count )
 	{
 		return EveShip2::GetDamageLocatorPosition( out, index, inWorldSpace );
 	}
-	if( ( index < 0 ) || ( index >= int( GetLocatorsForSet( "damage" )->size() ) ) )
+
+	if( index >= 0 )
 	{
-		if( inWorldSpace )
+		auto damageLocators = GetLocatorsForSet( BlueSharedString( "damage" ) );
+		if( damageLocators && index < int( damageLocators->size() ) )
 		{
-			*out = m_renderables[m_targetIndex]->GetWorldTransform()->GetTranslation();
+			const Locator& damageLocator = ( *damageLocators )[index];
+
+			Vector3 position, direction;
+			GetLocatorInObjectSpace( position, direction, damageLocator );
+
+			if( inWorldSpace )
+			{
+				*out = XMVector3TransformCoord( direction, m_worldTransform );
+			}
+			else
+			{
+				*out = position;
+			}
+			return true;
 		}
-		else
-		{
-			Matrix localTransform = *m_renderables[m_targetIndex]->GetWorldTransform() * m_invWorldTransform;
-			*out = localTransform.GetTranslation();
-		}
-		return false;
 	}
 
-	*out = inWorldSpace ? GetTransformedDamageLocator( index ) : GetObjectSpaceDamageLocatorPosition( index );
-	
-	return true;
+	if( inWorldSpace )
+	{
+		*out = m_renderables[m_targetIndex]->GetWorldTransform()->GetTranslation();
+	}
+	else
+	{
+		Matrix localTransform = *m_renderables[m_targetIndex]->GetWorldTransform() * m_invWorldTransform;
+		*out = localTransform.GetTranslation();
+	}
+	return false;
 }
 
 // --------------------------------------------------------------------------------

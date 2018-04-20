@@ -36,6 +36,7 @@ public:
 	void Append( const Locator* locators, size_t count );
 
 	bool HasName( const char* name ) const;
+	bool HasName( const BlueSharedString& name ) const;
 	const LocatorStructureList* GetLocators() const;
 	const char* GetName() const;
 private:

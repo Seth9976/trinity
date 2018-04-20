@@ -324,9 +324,8 @@ public:
 	void RemoveOverlayEffect( EveMeshOverlayEffect* newOverlayEffect );
 	void AddLocatorSet( const char* name, const Locator* locators, size_t locatorCount );
 	Vector3 GetDamageLocator( uint32_t index ) const;
-	Vector3 GetDamageLocatorDirection( uint32_t index ) const;
-	Vector3 GetDamageLocatorDirectionLocal( uint32_t index ) const { return GetDamageLocatorDirection( index ); }
-	const LocatorStructureList* GetLocatorsForSet( const char* setName ) const;
+	Vector3 GetDamageLocatorDirectionLocal( uint32_t index ) const;
+	const LocatorStructureList* GetLocatorsForSet( const BlueSharedString& setName ) const;
 	void MergeToLocatorSet( const EveLocatorSets& locatorSet );
 
 	void AddCustomMask( EveCustomMaskPtr newCustomMask );
@@ -376,8 +375,6 @@ protected:
 
 	// damage locators
 	Vector3 GetTransformedDamageLocator( uint32_t index );
-	Vector3 GetTransformedDamageLocatorDirection( uint32_t index );
-	bool IsDamageLocatorFacingPosition( uint32_t index, const Vector3& posInObjectSpace );
 
 	void PrepareForAnimation();
 	void FreeAnimationData();
@@ -555,8 +552,7 @@ protected:
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Object space damage locator information
-	virtual Vector3 GetObjectSpaceDamageLocatorPosition( uint32_t index ) const;
-	virtual Vector3 GetObjectSpaceDamageLocatorDirection( uint32_t index ) const;
+	virtual void GetLocatorInObjectSpace( Vector3& position, Vector3& direction, const Locator& locator ) const;
 
 	
 	/////////////////////////////////////////////////////////////////////////////////////

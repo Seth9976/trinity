@@ -231,9 +231,8 @@ protected:
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Object space damage locator information
-	Vector3 GetObjectSpaceDamageLocatorPosition( uint32_t index ) const;
-	Vector3 GetObjectSpaceDamageLocatorDirection( uint32_t index ) const;
-	bool GetDamageLocatorPosition( Vector3* out, int index, bool inWorldSpace );
+	virtual void GetLocatorInObjectSpace( Vector3& position, Vector3& direction, const Locator& locator ) const;
+	virtual bool GetDamageLocatorPosition( Vector3* out, int index, bool inWorldSpace );
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// EveShip2 override

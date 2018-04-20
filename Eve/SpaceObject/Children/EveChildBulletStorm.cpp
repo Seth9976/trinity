@@ -163,7 +163,7 @@ void EveChildBulletStorm::Rebuild()
 	}
 
 	// get the specified locator set from the sourceobject, if it has it
-	const LocatorStructureList* locatorList = m_sourceObject->GetLocatorsForSet( m_sourceLocatorSet.c_str() );
+	const LocatorStructureList* locatorList = m_sourceObject->GetLocatorsForSet( BlueSharedString( m_sourceLocatorSet.c_str() ) );
 	if( !locatorList )
 	{
 		return;
