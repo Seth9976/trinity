@@ -104,6 +104,7 @@ bool TriShadowMap::OnModified( Be::Var* value )
 		m_size = std::max( 1u, m_size );
 		// if the size or state of the shadow map has changed we must nearly
 		// re-create this whole shadow module
+		m_shadowMapRT->Destroy();
 		ReleaseResources( TRISTORAGE_ALL );
 		PrepareResources();
 
