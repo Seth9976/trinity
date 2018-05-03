@@ -132,3 +132,8 @@ Color Tr2ImageRes::GetPixelColor( int x, int y ) const
 	}
 	return color;
 }
+
+const ImageIO::HostBitmap& Tr2ImageRes::GetBitmap() const
+{
+	return m_bitmap;
+}

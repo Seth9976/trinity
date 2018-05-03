@@ -13,6 +13,7 @@ IBlueResource* CreateTr2ImageRes( const wchar_t* name )
 BLUE_REGISTER_RESOURCE_EXTENSION( L"pngraw", CreateTr2ImageRes );
 BLUE_REGISTER_RESOURCE_EXTENSION( L"ddsraw", CreateTr2ImageRes );
 BLUE_REGISTER_RESOURCE_EXTENSION( L"sddraw", CreateTr2ImageRes );
+BLUE_REGISTER_RESOURCE_EXTENSION( L"tgaraw", CreateTr2ImageRes );
 
 const Be::ClassInfo* Tr2ImageRes::ExposeToBlue()
 {

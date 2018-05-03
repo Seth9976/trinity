@@ -40,6 +40,8 @@ public:
 	// Get the color value at the given pixel
 	Color GetPixelColor( int x, int y ) const;
 
+	const ImageIO::HostBitmap& GetBitmap() const;
+
 protected:
 	LoadingResult DoLoad();
 	bool DoPrepare();
