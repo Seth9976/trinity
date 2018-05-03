@@ -48,7 +48,7 @@ BLUE_REGISTER_RESOURCE_EXTENSION( L"ctr", CreateTextureResource );
 bool IsCtrPath( const wchar_t* name )
 {
 	auto length = wcslen( name );
-	return length > 4 && _wcsicmp( name + length - 4, L".ctr" ) == 0;
+	return length > 4 && wcscmp( name + length - 4, L".ctr" ) == 0;
 }
 
 } // end of anonymous namespace
