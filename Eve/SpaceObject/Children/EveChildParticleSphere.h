@@ -36,10 +36,7 @@ public:
 	void GetLocalToWorldTransform( Matrix& transform ) const;
 	void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
 	void ChangeLOD( Tr2Lod lod ) {};
-	void PlayCurveSet( const std::string& name ) {};
-	void StopCurveSet( const std::string& name ) {};
 	void GetLights( Tr2LightManager& lightManager ) const {};
-	float GetCurveSetDuration( const std::string& name ) const { return 0; }
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2Renderable

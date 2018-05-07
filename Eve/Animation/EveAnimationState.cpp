@@ -109,11 +109,11 @@ void EveAnimationState::UpdateDuration( EveAnimationStateMachine* sm, EveSpaceOb
 	{
 		maxCurveDuration = max( maxCurveDuration, so->GetCurveSetDuration( (*it)->m_name ) );
 	}
-	if( m_child )
+	if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( m_child.p ) )
 	{
 		for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
 		{
-			maxCurveDuration = max( maxCurveDuration, m_child->GetCurveSetDuration( ( *it )->m_name ) );
+			maxCurveDuration = max( maxCurveDuration, owner->GetCurveSetDuration( ( *it )->m_name ) );
 		}
 	}
 
@@ -227,18 +227,18 @@ void EveAnimationState::PlayCurves( EveSpaceObject2* owner )
 	{	
 		for( auto it = m_initCurves.cbegin(); it != m_initCurves.cend(); it++ )
 		{
-			owner->PlayCurveSet( (*it)->m_name );
+			owner->PlayCurveSet( (*it)->m_name, false, 0, 0, false );
 		}
 	}
 	for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
 	{
-		owner->PlayCurveSet( (*it)->m_name );
+		owner->PlayCurveSet( (*it)->m_name, false, 0, 0, false );
 	}
-	if( m_child )
+	if( auto csOwner = dynamic_cast<ITr2CurveSetOwner*>( m_child.p ) )
 	{
 		for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
 		{
-			m_child->PlayCurveSet( ( *it )->m_name );
+			csOwner->PlayCurveSet( ( *it )->m_name, false, 0, 0, false );
 		}
 	}
 }
@@ -372,10 +372,13 @@ void EveAnimationState::Cleanup( EveSpaceObject2* owner, Be::Time time )
 	}
 	if( m_child )
 	{
-		for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
+		if( auto csOwner = dynamic_cast<ITr2CurveSetOwner*>( m_child.p ) )
 		{
-			m_child->UpdateCurveSet( ( *it )->m_name, time );
-			m_child->StopCurveSet( ( *it )->m_name );
+			for( auto it = m_curves.cbegin(); it != m_curves.cend(); it++ )
+			{
+				csOwner->UpdateCurveSet( ( *it )->m_name, time );
+				csOwner->StopCurveSet( ( *it )->m_name );
+			}
 		}
 		owner->RemoveFromEffectChildrenList( m_child );
 		m_child.Unlock();

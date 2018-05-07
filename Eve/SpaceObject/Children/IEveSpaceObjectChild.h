@@ -21,11 +21,6 @@ BLUE_INTERFACE( IEveSpaceObjectChild ) : public IRoot
 	virtual void UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent ) = 0;
 
 	virtual void GetLocalToWorldTransform( Matrix& transform ) const = 0;
-
-	virtual void PlayCurveSet( const std::string& name ) = 0;
-	virtual void StopCurveSet( const std::string& name ) = 0;
-	virtual void UpdateCurveSet( const std::string& name, Be::Time time ) {};
-	virtual float GetCurveSetDuration( const std::string& name ) const = 0;
 	
 	virtual bool IsAlwaysOn() const { return false; };	
 

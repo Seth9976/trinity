@@ -68,9 +68,6 @@ public:
 	void GetLocalToWorldTransform( Matrix& transform ) const;
 	void ChangeLOD( Tr2Lod lod ) {};
 	void GetLights( Tr2LightManager& lightManager ) const {};
-	void PlayCurveSet( const std::string& name );
-	void StopCurveSet( const std::string& name );
-	float GetCurveSetDuration( const std::string& name ) const;
 	void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
 
 	/////////////////////////////////////////////////////////////////////////////////////

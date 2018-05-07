@@ -79,9 +79,6 @@ public:
 	virtual void Update( EveUpdateContext& updateContext );
 	virtual void UpdateViewDependentData( const TriFrustum& frustum, const Matrix& parentTransform );
 	Tr2Lod GetLODLevel() const { return TR2_LOD_HIGH; }
-	void PlayCurveSet( const std::string& name ) {}
-	void StopCurveSet( const std::string& name ) {}
-	float GetCurveSetDuration( const std::string& name ) const { return 0.f; } 
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// INotify

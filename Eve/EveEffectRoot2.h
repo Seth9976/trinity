@@ -12,6 +12,7 @@
 #include "Tr2ShLightingManager.h"
 #include "Include/ITriTargetable.h"
 #include "Tr2DebugRenderer.h"
+#include "ITr2CurveSetOwner.h"
 
 BLUE_DECLARE( Tr2PointLight );
 BLUE_DECLARE_VECTOR( Tr2PointLight );
@@ -27,6 +28,7 @@ BLUE_CLASS( EveEffectRoot2 ):
 	public ITr2SecondaryLightSource,
 	public ITriTargetable,
 	public ITr2DebugRenderable,
+	public ITr2CurveSetOwner,
 	public IListNotify
 {
 public:
@@ -78,6 +80,13 @@ public:
 	bool UpdateImpact( Vector3& out, const Vector3& direction, int impactIndex );
 	bool GetImpactPosition( Vector3& out, int locator, const Vector3& posPrev, const Vector3& posNow, float epsilon );
 	bool HasImpactConfigurationShield() const;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ITr2CurveSetOwner
+	virtual void PlayCurveSet( const std::string& name, bool windowed, float fromTime, float toTime, bool looped );
+	virtual void StopCurveSet( const std::string& name );
+	virtual void UpdateCurveSet( const std::string& name, Be::Time time );
+	virtual float GetCurveSetDuration( const std::string& name ) const;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2DebugRenderable

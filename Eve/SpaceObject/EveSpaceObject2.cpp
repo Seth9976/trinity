@@ -2693,9 +2693,19 @@ void EveSpaceObject2::UpdateCurveSet( const std::string& name, Be::Time time )
 			(*it)->Update( time, time );
 		}
 	}
+	for( auto it = m_children.begin(); it != m_children.end(); it++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			owner->UpdateCurveSet( name, time );
+		}
+	}
 	for( auto it = m_effectChildren.begin(); it != m_effectChildren.end(); it++ )
 	{
-		(*it)->UpdateCurveSet( name, time );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			owner->UpdateCurveSet( name, time );
+		}
 	}
 }
 
@@ -2703,22 +2713,36 @@ void EveSpaceObject2::UpdateCurveSet( const std::string& name, Be::Time time )
 // Description:
 //   Play the curve set with the appropriate name
 // --------------------------------------------------------------------------------
-void EveSpaceObject2::PlayCurveSet( const std::string& name )
+void EveSpaceObject2::PlayCurveSet( const std::string& name, bool range, float fromTime, float toTime, bool looped )
 {
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
 	{
 		if( (*it)->GetName() == name )
 		{
+			if( range )
+			{
+				( *it )->SetTimeRange( fromTime, toTime, looped );
+			}
+			else
+			{
+				( *it )->ResetTimeRange();
+			}
 			(*it)->Play();
 		}
 	}
 	for( auto childIt = m_children.begin(); childIt != m_children.end(); childIt++ )
 	{
-		(*childIt)->PlayCurveSet( name );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->PlayCurveSet( name, range, fromTime, toTime, looped );
+		}
 	}
 	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
 	{
-		(*childIt)->PlayCurveSet( name );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->PlayCurveSet( name, range, fromTime, toTime, looped );
+		}
 	}
 }
 
@@ -2737,11 +2761,17 @@ void EveSpaceObject2::StopCurveSet( const std::string& name )
 	}
 	for( auto childIt = m_children.begin(); childIt != m_children.end(); childIt++ )
 	{
-		(*childIt)->StopCurveSet( name );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->StopCurveSet( name );
+		}
 	}
 	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
 	{
-		(*childIt)->StopCurveSet( name );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->StopCurveSet( name );
+		}
 	}
 }
 
@@ -2761,7 +2791,17 @@ float EveSpaceObject2::GetCurveSetDuration( const std::string& name ) const
 	}
 	for( auto childIt = m_children.begin(); childIt != m_children.end(); childIt++ )
 	{
-		maxDuration = max( maxDuration, (*childIt)->GetCurveSetDuration( name ) );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			maxDuration = max( maxDuration, owner->GetCurveSetDuration( name ) );
+		}
+	}
+	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			maxDuration = max( maxDuration, owner->GetCurveSetDuration( name ) );
+		}
 	}
 	return maxDuration;
 }

@@ -11,6 +11,7 @@
 #include "EveChildTransform.h"
 #include "Tr2DebugRenderer.h"
 #include "TransformModifiers/IEveChildTransformModifier.h"
+#include "ITr2CurveSetOwner.h"
 
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE_VECTOR( TriCurveSet );
@@ -22,6 +23,7 @@ BLUE_DECLARE_VECTOR( Tr2PointLight );
 BLUE_CLASS( EveChildContainer ) :
 	public IEveSpaceObjectChild,
 	public EveChildTransform,
+	public ITr2CurveSetOwner,
 	public ITr2DebugRenderable
 {
 public:
@@ -45,7 +47,7 @@ public:
 
 	void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
 
-	void PlayCurveSet( const std::string& name );
+	void PlayCurveSet( const std::string& name, bool windowed, float fromTime, float toTime, bool looped );
 	void StopCurveSet( const std::string& name );
 	void UpdateCurveSet( const std::string& name, Be::Time time );
 	float GetCurveSetDuration( const std::string& name ) const;

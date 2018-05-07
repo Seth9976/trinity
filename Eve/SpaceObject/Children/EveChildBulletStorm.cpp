@@ -301,31 +301,6 @@ void EveChildBulletStorm::GetLocalToWorldTransform( Matrix& transform ) const
 // Description:
 //   Used by state machine to animate state-related stuff
 // --------------------------------------------------------------------------------
-void EveChildBulletStorm::PlayCurveSet( const std::string& name )
-{
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Used by state machine to animate state-related stuff
-// --------------------------------------------------------------------------------
-void EveChildBulletStorm::StopCurveSet( const std::string& name )
-{
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Used by state machine to animate state-related stuff
-// --------------------------------------------------------------------------------
-float EveChildBulletStorm::GetCurveSetDuration( const std::string& name ) const
-{
-	return 0.f;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Used by state machine to animate state-related stuff
-// --------------------------------------------------------------------------------
 void EveChildBulletStorm::Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible )
 {
 }

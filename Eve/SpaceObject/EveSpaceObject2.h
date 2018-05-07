@@ -25,6 +25,7 @@
 #include "Eve/SpaceObject/Utils/EveLocatorSets.h"
 #include "Tr2ImpostorManager.h"
 #include "Tr2DebugRenderer.h"
+#include "ITr2CurveSetOwner.h"
 
 // consts
 #define EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT (0.f)
@@ -154,7 +155,8 @@ BLUE_CLASS( EveSpaceObject2 ):
 	public ITr2SecondaryLightSource,
 	public ITr2ImpostorSource,
 	public ITr2DebugRenderable,
-	public IListNotify
+	public IListNotify,
+	public ITr2CurveSetOwner
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -316,7 +318,7 @@ public:
 
 	// access curve sets
 	void UpdateCurveSet( const std::string& name, Be::Time time );
-	void PlayCurveSet( const std::string& name );
+	void PlayCurveSet( const std::string& name, bool range, float fromTime, float toTime, bool looped );
 	void StopCurveSet( const std::string& name );
 	float GetCurveSetDuration( const std::string& name ) const;
 

@@ -410,12 +410,20 @@ void EveTransform::PlayCurveSets()
 // Description:
 //   Play curve sets with the appropriate name if they exist.
 // --------------------------------------------------------------------------------
-void EveTransform::PlayCurveSet( const std::string& name )
+void EveTransform::PlayCurveSet( const std::string& name, bool range, float fromTime, float toTime, bool looped )
 {
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
 	{
 		if( (*it)->GetName() == name )
 		{
+			if( range )
+			{
+				( *it )->SetTimeRange( fromTime, toTime, looped );
+			}
+			else
+			{
+				( *it )->ResetTimeRange();
+			}
 			(*it)->Play();
 		}
 	}

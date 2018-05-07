@@ -65,7 +65,7 @@ public:
 	// ISimTimeRebaseNotify
 	void OnSimClockRebase( Be::Time oldTime, Be::Time newTime );
 
-	void SetTimeRange( double timeMin, double timeMax );
+	void SetTimeRange( double timeMin, double timeMax, Be::OptionalWithDefaultValue<bool, true> looped = true );
 	void ResetTimeRange();
 	bool HasTimeRange() const;
 	std::pair<double, double> GetTimeRange() const;
@@ -83,6 +83,7 @@ private:
 	bool m_isUsingSimTimeRebase;
 	bool m_useRealTime;
 	bool m_hasTimeRange;
+	bool m_loopedTimeRange;
 
 	double m_startTime;
 	double m_lastTime;

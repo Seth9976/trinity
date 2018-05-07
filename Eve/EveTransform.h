@@ -10,6 +10,7 @@
 #include "TriRenderBatch.h"
 #include "TriObserverLocal.h"
 #include "Tr2DebugRenderer.h"
+#include "ITr2CurveSetOwner.h"
 
 #include "IEveTransform.h"
 #include "IWorldPosition.h"
@@ -34,6 +35,7 @@ BLUE_CLASS( EveTransform ):
 	public ITr2Pickable,
 	public IWorldPosition,
 	public IInitialize,
+	public ITr2CurveSetOwner,
 	public ITr2DebugRenderable
 {
 public:
@@ -95,7 +97,7 @@ public:
 	Tr2Lod GetLODLevel() const;
 
 	void PlayCurveSets();
-	void PlayCurveSet( const std::string& name );
+	void PlayCurveSet( const std::string& name, bool range, float fromTime, float toTime, bool looped );
 	void StopCurveSet( const std::string& name );
 	float GetCurveSetDuration( const std::string& name ) const;
 

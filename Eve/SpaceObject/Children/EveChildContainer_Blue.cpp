@@ -13,6 +13,7 @@ const Be::ClassInfo* EveChildContainer::ExposeToBlue()
     EXPOSURE_BEGIN( EveChildContainer, "" )
         MAP_INTERFACE( EveChildContainer )
 		MAP_INTERFACE( IEveSpaceObjectChild )
+		MAP_INTERFACE( ITr2CurveSetOwner )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE | Be::PERSIST )

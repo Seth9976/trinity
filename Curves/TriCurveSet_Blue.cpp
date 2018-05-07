@@ -1,5 +1,8 @@
 #include "StdAfx.h"
 #include "TriCurveSet.h"
+#include "ITr2CurveSetOwner.h"
+
+BLUE_DEFINE_INTERFACE( ITr2CurveSetOwner );
 
 BLUE_DEFINE( TriCurveSet );
 
@@ -133,14 +136,16 @@ const Be::ClassInfo* TriCurveSet::ExposeToBlue()
 			Apply,
 			"Re-evaluates curves and applies bindings once using curve set current time"
 		)
-		MAP_METHOD_AND_WRAP
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(
 			"SetTimeRange",
 			SetTimeRange,
+			1,
 			"Sets up a temporary time range for curve set. When a curve sets has a time range set\n"
 			"it will loop time inside the range while playing.\n"
 			":param minTime: min time value for the range\n"
-			":param maxTime: max time value for the range"
+			":param maxTime: max time value for the range\n"
+			":param looped: should we loop inside the time range"
 		)
 		MAP_METHOD_AND_WRAP
 		(

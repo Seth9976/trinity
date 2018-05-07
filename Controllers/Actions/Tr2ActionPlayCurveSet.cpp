@@ -7,42 +7,34 @@
 #include "StdAfx.h"
 #include "Tr2ActionPlayCurveSet.h"
 #include "Controllers/Tr2Controller.h"
+#include "ITr2CurveSetOwner.h"
+#include "Curves/TriCurveSet.h"
 
 #include "Eve/SpaceObject/EveSpaceObject2.h"
 #include "Eve/SpaceObject/Children/IEveSpaceObjectChild.h"
 #include "Eve/EveEffectRoot2.h"
 
 
+Tr2ActionPlayCurveSet::Tr2ActionPlayCurveSet( IRoot* )
+	:m_startTime( 0 ),
+	m_endTime( 1 ),
+	m_range( false ),
+	m_looped( false )
+{
+}
+
 void Tr2ActionPlayCurveSet::Start( Tr2Controller& controller )
 {
-	auto owner = controller.GetOwner();
-	if( auto spaceObject = dynamic_cast<EveSpaceObject2*>( owner ) )
+	if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( controller.GetOwner() ) )
 	{
-		spaceObject->PlayCurveSet( m_curveSetName );
-	}
-	else if( auto effectRoot = dynamic_cast<EveSpaceObject2*>( owner ) )
-	{
-		effectRoot->PlayCurveSet( m_curveSetName );
-	}
-	else if( auto child = dynamic_cast<IEveSpaceObjectChild*>( owner ) )
-	{
-		child->PlayCurveSet( m_curveSetName );
+		owner->PlayCurveSet( m_curveSetName, m_range, m_startTime, m_endTime, m_looped );
 	}
 }
 
 void Tr2ActionPlayCurveSet::Stop( Tr2Controller& controller )
 {
-	auto owner = controller.GetOwner();
-	if( auto spaceObject = dynamic_cast<EveSpaceObject2*>( owner ) )
+	if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( controller.GetOwner() ) )
 	{
-		spaceObject->StopCurveSet( m_curveSetName );
-	}
-	else if( auto effectRoot = dynamic_cast<EveSpaceObject2*>( owner ) )
-	{
-		effectRoot->StopCurveSet( m_curveSetName );
-	}
-	else if( auto child = dynamic_cast<IEveSpaceObjectChild*>( owner ) )
-	{
-		child->StopCurveSet( m_curveSetName );
+		owner->StopCurveSet( m_curveSetName );
 	}
 }

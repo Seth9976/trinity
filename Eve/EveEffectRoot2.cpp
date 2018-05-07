@@ -471,6 +471,92 @@ void EveEffectRoot2::SetTransform( const Matrix& transform )
 }
 
 // -----------------------------------------------------------------------------
+void EveEffectRoot2::PlayCurveSet( const std::string& name, bool range, float fromTime, float toTime, bool looped )
+{
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			if( range )
+			{
+				( *it )->SetTimeRange( fromTime, toTime, looped );
+			}
+			else
+			{
+				( *it )->ResetTimeRange();
+			}
+			( *it )->Play();
+		}
+	}
+	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->PlayCurveSet( name, range, fromTime, toTime, looped );
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+void EveEffectRoot2::StopCurveSet( const std::string& name )
+{
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			( *it )->Stop();
+		}
+	}
+	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->StopCurveSet( name );
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+void EveEffectRoot2::UpdateCurveSet( const std::string& name, Be::Time time )
+{
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			( *it )->Update( time, time );
+		}
+	}
+	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			owner->UpdateCurveSet( name, time );
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+float EveEffectRoot2::GetCurveSetDuration( const std::string& name ) const
+{
+	float maxDuration = 0.f;
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			maxDuration = max( maxDuration, ( *it )->GetMaxCurveDuration() );
+		}
+	}
+	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			maxDuration = max( maxDuration, owner->GetCurveSetDuration( name ) );
+		}
+	}
+	return maxDuration;
+}
+
+// -----------------------------------------------------------------------------
 void EveEffectRoot2::GetDebugOptions( Tr2DebugRendererOptions& options )
 {
 	options.insert( "Bounding Sphere" );

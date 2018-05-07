@@ -63,9 +63,6 @@ public:
 	virtual void GetModelCenterWorldPosition( Vector3 &position ) const {}
 	virtual bool GetLocalBoundingBox( Vector3 &min, Vector3 &max ) { return false; }
 	virtual void GetLocalToWorldTransform( Matrix &transform ) const { transform = IdentityMatrix(); }
-	void PlayCurveSet( const std::string& name ) {}
-	void StopCurveSet( const std::string& name ) {}
-	float GetCurveSetDuration( const std::string& name ) const { return 0.f; } 
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITriDeviceResource

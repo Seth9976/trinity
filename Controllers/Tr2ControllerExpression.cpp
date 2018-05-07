@@ -46,12 +46,12 @@ namespace
 
 	float CurveSetTime( const char* name )
 	{
-		EveSpaceObject2Ptr spaceObject = BlueCastPtr( s_owner );
-		if( !spaceObject )
+		ITr2CurveSetOwnerPtr csOwner = BlueCastPtr( s_owner );
+		if( !csOwner )
 		{
 			return 0;
 		}
-		return spaceObject->GetCurveSetDuration( name );
+		return csOwner->GetCurveSetDuration( name );
 	}
 
 	float IsAnimationPlaying( const char* layerName )

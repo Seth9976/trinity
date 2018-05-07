@@ -15,6 +15,7 @@ TriCurveSet::TriCurveSet( IRoot* lockobj ) :
 	m_isUsingSimTimeRebase( false ),
 	m_useRealTime( false ),
 	m_hasTimeRange( false ),
+	m_loopedTimeRange( true ),
 	m_startTime( 0.0 ),
 	m_lastTime( 0.0 ),
 	m_endTime( 0.0 ),
@@ -93,7 +94,14 @@ void TriCurveSet::Update( double time )
 				m_scaledTime = m_timeRangeMin;
 			}
 
-			m_scaledTime = std::fmod( m_scaledTime - m_timeRangeMin, m_timeRangeMax - m_timeRangeMin ) + m_timeRangeMin;
+			if( m_loopedTimeRange )
+			{
+				m_scaledTime = std::fmod( m_scaledTime - m_timeRangeMin, m_timeRangeMax - m_timeRangeMin ) + m_timeRangeMin;
+			}
+			else
+			{
+				m_scaledTime = std::min( m_scaledTime, m_timeRangeMax );
+			}
 		}
 
 		if( (m_endTime > 0.0) && ((m_startTime + m_scaledTime) >= m_endTime) )
@@ -248,11 +256,12 @@ void TriCurveSet::UpdateWithCurrentTime()
 	Update( double(BeOS->GetCurrentFrameTime()) );
 }
 
-void TriCurveSet::SetTimeRange( double timeMin, double timeMax )
+void TriCurveSet::SetTimeRange( double timeMin, double timeMax, Be::OptionalWithDefaultValue<bool, true> looped )
 {
 	m_hasTimeRange = true;
 	m_timeRangeMin = std::min( timeMin, timeMax );
 	m_timeRangeMax = std::max( timeMin, timeMax );
+	m_loopedTimeRange = looped;
 }
 
 void TriCurveSet::ResetTimeRange()

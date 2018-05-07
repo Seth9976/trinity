@@ -136,6 +136,7 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 		MAP_INTERFACE( INotify )
 		MAP_INTERFACE( ITr2SecondaryLightSource )
 		MAP_INTERFACE( ITr2ImpostorSource )
+		MAP_INTERFACE( ITr2CurveSetOwner )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "dna", m_dna, "If created by the SOF, this is the DNA string", Be::READ | Be::PERSIST )

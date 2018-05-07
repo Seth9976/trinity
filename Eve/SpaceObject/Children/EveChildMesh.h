@@ -42,9 +42,6 @@ public:
 	void UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent );
 	void GetLocalToWorldTransform( Matrix& transform ) const;
 	void ChangeLOD( Tr2Lod lod ) {};
-	virtual void PlayCurveSet( const std::string& name ) {};
-	virtual void StopCurveSet( const std::string& name ) {};
-	virtual float GetCurveSetDuration( const std::string& name ) const { return 0; }
 	void GetLights( Tr2LightManager& lightManager ) const {};
 	virtual void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
 	bool IsAlwaysOn() const; 

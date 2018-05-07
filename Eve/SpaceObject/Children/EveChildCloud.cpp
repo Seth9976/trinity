@@ -437,19 +437,6 @@ void EveChildCloud::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpac
 	BoundingSphereFromBox( m_boundingSphere, m_min, m_max, &m_worldTransform );
 }
 
-void EveChildCloud::PlayCurveSet( const std::string& name )
-{
-}
-
-void EveChildCloud::StopCurveSet( const std::string& name )
-{
-}
-
-float EveChildCloud::GetCurveSetDuration( const std::string& name ) const
-{
-	return 0;
-}
-
 void EveChildCloud::GetDebugOptions( Tr2DebugRendererOptions& options )
 {
 	options.insert( "Bounding Box" );

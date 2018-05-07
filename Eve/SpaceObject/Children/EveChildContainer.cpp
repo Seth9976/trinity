@@ -207,7 +207,7 @@ void EveChildContainer::GetLights( Tr2LightManager& lightManager ) const
 	}
 }
 
-void EveChildContainer::PlayCurveSet( const std::string& name )
+void EveChildContainer::PlayCurveSet( const std::string& name, bool range, float fromTime, float toTime, bool looped )
 {
 	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
 	{
@@ -218,13 +218,24 @@ void EveChildContainer::PlayCurveSet( const std::string& name )
 	{
 		if( (*it)->GetName() == name )
 		{
+			if( range )
+			{
+				( *it )->SetTimeRange( fromTime, toTime, looped );
+			}
+			else
+			{
+				( *it )->ResetTimeRange();
+			}
 			(*it)->Play();
 		}
 	}
 
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		(*it)->PlayCurveSet( name );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			owner->PlayCurveSet( name, range, fromTime, toTime, looped );
+		}
 	}
 }
 
@@ -261,7 +272,10 @@ void EveChildContainer::StopCurveSet( const std::string& name )
 
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		(*it)->StopCurveSet( name );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			owner->StopCurveSet( name );
+		}
 	}
 }
 
@@ -276,7 +290,10 @@ void EveChildContainer::UpdateCurveSet( const std::string& name, Be::Time time )
 	}
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		(*it)->UpdateCurveSet( name, time );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			owner->UpdateCurveSet( name, time );
+		}
 	}
 }
 
@@ -298,7 +315,10 @@ float EveChildContainer::GetCurveSetDuration( const std::string& name ) const
 
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		maxDuration = max( maxDuration, (*it)->GetCurveSetDuration( name ) );
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			maxDuration = max( maxDuration, owner->GetCurveSetDuration( name ) );
+		}
 	}
 
 	return maxDuration;
