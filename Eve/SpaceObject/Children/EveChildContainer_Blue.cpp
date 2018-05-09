@@ -14,6 +14,8 @@ const Be::ClassInfo* EveChildContainer::ExposeToBlue()
         MAP_INTERFACE( EveChildContainer )
 		MAP_INTERFACE( IEveSpaceObjectChild )
 		MAP_INTERFACE( ITr2CurveSetOwner )
+		MAP_INTERFACE( IInitialize )
+		MAP_INTERFACE( IListNotify )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE | Be::PERSIST )
@@ -31,8 +33,23 @@ const Be::ClassInfo* EveChildContainer::ExposeToBlue()
 		MAP_ATTRIBUTE( "staticTransform", m_staticTransform, "Does local transform need to be rebuilt every frame.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "observers", m_observers, "List of audio observers", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "lights", m_lights, "List of dynamic lights", Be::READ | Be::PERSIST )
+		MAP_ATTRIBUTE( "controllers", m_controllers, "List of object controllers", Be::READ | Be::PERSIST )
 
 		MAP_METHOD_AND_WRAP( "RebuildLocalTransform", RebuildLocalTransform, "Rebuilds local transform." )
+
+		MAP_METHOD_AND_WRAP(
+			"SetControllerVariable",
+			SetControllerVariable,
+			"Set variable for all applicable controllers\n"
+			":param name: variable name\n"
+			":param value: new variable value\n"
+		)
+
+		MAP_METHOD_AND_WRAP(
+			"StartControllers",
+			StartControllers,
+			"Start all controllers"
+		)
 
     EXPOSURE_END()
 }

@@ -19,11 +19,16 @@ BLUE_DECLARE( TriObserverLocal );
 BLUE_DECLARE_VECTOR( TriObserverLocal );
 BLUE_DECLARE( Tr2PointLight );
 BLUE_DECLARE_VECTOR( Tr2PointLight );
+BLUE_DECLARE_INTERFACE( ITr2Controller );
+BLUE_DECLARE_IVECTOR( ITr2Controller );
+
 
 BLUE_CLASS( EveChildContainer ) :
 	public IEveSpaceObjectChild,
 	public EveChildTransform,
 	public ITr2CurveSetOwner,
+	public IInitialize,
+	public IListNotify,
 	public ITr2DebugRenderable
 {
 public:
@@ -31,7 +36,15 @@ public:
 
 	EveChildContainer( IRoot* lockobj = NULL );
 	~EveChildContainer();
-	
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	// IInitialize
+	bool Initialize();
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	// IListNotify
+	virtual void OnListModified( long event, ssize_t key, ssize_t key2, IRoot* value, const IList* list );
+
 	void UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform, Tr2Lod parentLod );
 	void GetRenderables( std::vector<ITr2Renderable*>& renderables );
 	bool GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query=EVE_BOUNDS_NORMAL ) const;
@@ -58,6 +71,9 @@ public:
 	void GetDebugOptions( Tr2DebugRendererOptions& options );
 	void RenderDebugInfo( Tr2DebugRenderer& renderer );
 
+	void SetControllerVariable( const char* name, float value );
+	void StartControllers();
+
 	PIEveSpaceObjectChildVector m_objects;
 protected:
 	BlueSharedString m_name;
@@ -66,6 +82,8 @@ protected:
 	PTriCurveSetVector m_curveSets;
 	PTriObserverLocalVector m_observers;
 	PTr2PointLightVector m_lights;
+	PITr2ControllerVector m_controllers;
+	TrackableStdUnorderedMap<std::string, float> m_controllerVariables;
 
 	PIEveChildTransformModifierVector m_transformModifiers;
 };

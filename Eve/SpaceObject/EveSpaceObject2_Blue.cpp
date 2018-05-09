@@ -589,6 +589,12 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 			":param value: new variable value\n"
 		)
 
+		MAP_METHOD_AND_WRAP(
+			"StartControllers",
+			StartControllers,
+			"Start all controllers"
+		)
+
 #if BLUE_WITH_PYTHON
 		MAP_METHOD( 
 			"TransformLocators",

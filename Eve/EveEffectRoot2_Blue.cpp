@@ -152,5 +152,11 @@ const Be::ClassInfo* EveEffectRoot2::ExposeToBlue()
 			":param value: new variable value\n"
 		)
 
+		MAP_METHOD_AND_WRAP(
+			"StartControllers",
+			StartControllers,
+			"Start all controllers"
+		)
+
     EXPOSURE_END();
 }

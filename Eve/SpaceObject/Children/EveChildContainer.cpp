@@ -13,6 +13,7 @@
 #include "TriObserverLocal.h"
 #include "Tr2LightManager.h"
 #include "Tr2PointLight.h"
+#include "Controllers/ITr2Controller.h"
 
 
 EveChildContainer::EveChildContainer( IRoot* lockobj ) :
@@ -22,13 +23,53 @@ EveChildContainer::EveChildContainer( IRoot* lockobj ) :
 	PARENTLOCK( m_observers ),
 	PARENTLOCK( m_lights ),
 	PARENTLOCK( m_transformModifiers ),
+	PARENTLOCK( m_controllers ),
+	m_controllerVariables( "EveChildContainer::m_controllerVariables" ),
 	m_display( true ),
 	m_hideOnLowQuality( false )
 {
+	m_controllers.SetNotify( this );
 }
 
 EveChildContainer::~EveChildContainer()
 {
+}
+
+bool EveChildContainer::Initialize()
+{
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->Link( *GetRawRoot() );
+	}
+	return true;
+}
+
+void EveChildContainer::OnListModified( long event, ssize_t key, ssize_t key2, IRoot* value, const IList* list )
+{
+	if( list == &m_controllers && ( event & BELIST_LOADING ) == 0 )
+	{
+		switch( event & BELIST_EVENTMASK )
+		{
+		case BELIST_INSERTED:
+			if( ITr2ControllerPtr controller = BlueCastPtr( value ) )
+			{
+				controller->Link( *GetRawRoot() );
+				for( auto it = begin( m_controllerVariables ); it != end( m_controllerVariables ); ++it )
+				{
+					controller->SetVariable( it->first.c_str(), it->second );
+				}
+			}
+			break;
+		case BELIST_REMOVED:
+			if( ITr2ControllerPtr controller = BlueCastPtr( value ) )
+			{
+				controller->Unlink();
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void EveChildContainer::UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform, Tr2Lod parentLod )
@@ -123,6 +164,10 @@ void EveChildContainer::UpdateSyncronous( EveUpdateContext& updateContext, IEveS
 	for( auto it = m_observers.begin(); it != m_observers.end(); it++ )
 	{
 		(*it)->Update( m_worldTransform );
+	}
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->Update();
 	}
 }
 
@@ -351,3 +396,19 @@ void EveChildContainer::RenderDebugInfo( Tr2DebugRenderer& renderer )
 	}
 }
 
+void EveChildContainer::SetControllerVariable( const char* name, float value )
+{
+	m_controllerVariables[name] = value;
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->SetVariable( name, value );
+	}
+}
+
+void EveChildContainer::StartControllers()
+{
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->Start();
+	}
+}

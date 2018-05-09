@@ -378,6 +378,7 @@ public:
 	void AddExternalParameter( Tr2ExternalParameter* externalParameter );
 
 	void SetControllerVariable( const char* name, float value );
+	void StartControllers();
 
 protected:
 	// LODing
@@ -583,6 +584,7 @@ private:
 	PTr2ExternalParameterVector m_externalParameters;
 
 	PITr2ControllerVector m_controllers;
+	TrackableStdUnorderedMap<std::string, float> m_controllerVariables;
 };
 
 TYPEDEF_BLUECLASS( EveSpaceObject2 );

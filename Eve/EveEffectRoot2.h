@@ -101,6 +101,7 @@ public:
 	void SetTransform( const Matrix& transform );
 
 	void SetControllerVariable( const char* name, float value );
+	void StartControllers();
 private:
 	// general
 	std::string m_name;
@@ -147,6 +148,7 @@ private:
 	PTr2PointLightVector m_lights;
 
 	PITr2ControllerVector m_controllers;
+	TrackableStdUnorderedMap<std::string, float> m_controllerVariables;
 
 	float GetBoundingSphereRadius() { return m_boundingSphere.w; }
 	float m_estimatedSize;

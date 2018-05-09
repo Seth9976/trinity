@@ -187,7 +187,8 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_dynamicBoundingSphereEnabled( false ),
 	m_lastDamageLocatorHit( -1 ),
 	m_worldTransform( XMMatrixIdentity() ),
-	m_invWorldTransform( XMMatrixIdentity() )
+	m_invWorldTransform( XMMatrixIdentity() ),
+	m_controllerVariables( "EveSpaceObject2::m_controllerVariables" )
 {
 	m_positionDelta.CreateInstance();
 
@@ -197,6 +198,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	memset( &m_vsData, 0, sizeof( EveSpaceObjectVSData ) );
 
 	m_controllers.SetNotify( this );
+	m_effectChildren.SetNotify( this );
 }
 
 EveSpaceObject2::~EveSpaceObject2()
@@ -246,6 +248,10 @@ void EveSpaceObject2::OnListModified( long event, ssize_t key, ssize_t key2, IRo
 			if( ITr2ControllerPtr controller = BlueCastPtr( value ) )
 			{
 				controller->Link( *GetRawRoot() );
+				for( auto it = begin( m_controllerVariables ); it != end( m_controllerVariables ); ++it )
+				{
+					controller->SetVariable( it->first.c_str(), it->second );
+				}
 			}
 			break;
 		case BELIST_REMOVED:
@@ -258,7 +264,25 @@ void EveSpaceObject2::OnListModified( long event, ssize_t key, ssize_t key2, IRo
 			break;
 		}
 	}
+	else if( list == &m_effectChildren && ( event & BELIST_LOADING ) == 0 )
+	{
+		switch( event & BELIST_EVENTMASK )
+		{
+		case BELIST_INSERTED:
+			if( IEveSpaceObjectChildPtr child = BlueCastPtr( value ) )
+			{
+				for( auto it = begin( m_controllerVariables ); it != end( m_controllerVariables ); ++it )
+				{
+					child->SetControllerVariable( it->first.c_str(), it->second );
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
+
 void EveSpaceObject2::RegisterSecondaryLightSource( Tr2ShLightingManager& manager )
 {
 	static const Color s_noEmissiveColor( 0.f, 0.f, 0.f, 0.f );
@@ -2999,8 +3023,17 @@ bool EveSpaceObject2::GetImpostorBoundingSphere( Vector4& sphere ) const
 
 void EveSpaceObject2::SetControllerVariable( const char* name, float value )
 {
+	m_controllerVariables[name] = value;
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
 	{
 		( *it )->SetVariable( name, value );
+	}
+}
+
+void EveSpaceObject2::StartControllers()
+{
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->Start();
 	}
 }

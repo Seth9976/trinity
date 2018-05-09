@@ -34,9 +34,11 @@ EveEffectRoot2::EveEffectRoot2( IRoot* lockobj ) :
 	m_changeLOD( false ),
 	m_secondaryLightingSphereRadiusLocal( 0.5f ),
 	m_secondaryLightingSphereRadiusWorld( 0.5f ),
-	m_secondaryLightingEmissiveColor( 0.f, 0.f, 0.f, 0.f )
+	m_secondaryLightingEmissiveColor( 0.f, 0.f, 0.f, 0.f ),
+	m_controllerVariables( "EveEffectRoot2::m_controllerVariables" )
 {
 	m_controllers.SetNotify( this );
+	m_effectChildren.SetNotify( this );
 }
 
 bool EveEffectRoot2::Initialize()
@@ -58,12 +60,33 @@ void EveEffectRoot2::OnListModified( long event, ssize_t key, ssize_t key2, IRoo
 			if( ITr2ControllerPtr controller = BlueCastPtr( value ) )
 			{
 				controller->Link( *GetRawRoot() );
+				for( auto it = begin( m_controllerVariables ); it != end( m_controllerVariables ); ++it )
+				{
+					controller->SetVariable( it->first.c_str(), it->second );
+				}
 			}
 			break;
 		case BELIST_REMOVED:
 			if( ITr2ControllerPtr controller = BlueCastPtr( value ) )
 			{
 				controller->Unlink();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	else if( list == &m_effectChildren && ( event & BELIST_LOADING ) == 0 )
+	{
+		switch( event & BELIST_EVENTMASK )
+		{
+		case BELIST_INSERTED:
+			if( IEveSpaceObjectChildPtr child = BlueCastPtr( value ) )
+			{
+				for( auto it = begin( m_controllerVariables ); it != end( m_controllerVariables ); ++it )
+				{
+					child->SetControllerVariable( it->first.c_str(), it->second );
+				}
 			}
 			break;
 		default:
@@ -590,8 +613,26 @@ void EveEffectRoot2::RenderDebugInfo( Tr2DebugRenderer& renderer )
 // -----------------------------------------------------------------------------
 void EveEffectRoot2::SetControllerVariable( const char* name, float value )
 {
+	m_controllerVariables[name] = value;
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
 	{
 		( *it )->SetVariable( name, value );
+	}
+	for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
+	{
+		( *it )->SetControllerVariable( name, value );
+	}
+}
+
+// -----------------------------------------------------------------------------
+void EveEffectRoot2::StartControllers()
+{
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->Start();
+	}
+	for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
+	{
+		( *it )->StartControllers();
 	}
 }
