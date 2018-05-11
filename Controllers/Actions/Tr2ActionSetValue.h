@@ -27,6 +27,8 @@ public:
 
 	bool IsBindingValid() const;
 	bool IsExpressionValid() const;
+
+	IRootPtr GetDestination() const;
 private:
 	Tr2BindingPoint m_destination;
 	std::string m_value;

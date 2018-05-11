@@ -25,5 +25,7 @@ const Be::ClassInfo* Tr2ActionAnimateValue::ExposeToBlue()
 		MAP_ATTRIBUTE( "curve", m_curve, "Curve to control the destination", Be::READWRITE | Be::PERSIST )
 		MAP_PROPERTY_READONLY( "isBindingValid", IsBindingValid, "Is destination binding valid" )
 		MAP_PROPERTY_READONLY( "isExpressionValid", IsExpressionValid, "Is value expression valid" )
+
+		MAP_METHOD_AND_WRAP( "GetDestination", GetDestination, "Returns destination object" )
 	EXPOSURE_END()
 }

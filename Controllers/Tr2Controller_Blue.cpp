@@ -21,6 +21,7 @@ const Be::ClassInfo* Tr2Controller::ExposeToBlue()
 		MAP_INTERFACE( IListNotify )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "isShared", m_isShared, "If the controller is shared between different models. Only used by tools, validation, etc.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "stateMachines", m_stateMachines, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "variables", m_variables, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "isPlaying", m_isActive, "", Be::READ )

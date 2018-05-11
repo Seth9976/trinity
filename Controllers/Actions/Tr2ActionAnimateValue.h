@@ -36,6 +36,8 @@ public:
 	bool IsExpressionValid() const;
 
 	float GetCurveValue( float time ) const;
+
+	IRootPtr GetDestination() const;
 private:
 	Tr2BindingPoint m_destination;
 	std::string m_value;

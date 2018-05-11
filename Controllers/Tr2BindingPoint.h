@@ -20,6 +20,8 @@ public:
 	void SetValue( float value ) const;
 	bool GetValue( float& value ) const;
 
+	IRootPtr GetBoundObject() const;
+
 	std::string m_path;
 	IRootPtr m_object;
 	std::string m_attribute;

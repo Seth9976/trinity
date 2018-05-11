@@ -52,6 +52,7 @@ private:
 
 	IRoot* m_owner;
 	bool m_isActive;
+	bool m_isShared;
 };
 
 TYPEDEF_BLUECLASS( Tr2Controller );

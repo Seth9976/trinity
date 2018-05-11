@@ -52,7 +52,7 @@ bool Tr2ActionSetValue::OnModified( Be::Var* value )
 	{
 		return true;
 	}
-	if( IsMatch( value, m_destination.m_path ) || IsMatch( value, m_destination.m_attribute ) )
+	if( IsMatch( value, m_destination.m_path ) || IsMatch( value, m_destination.m_attribute ) || IsMatch( value, m_destination.m_object ) )
 	{
 		std::unordered_map<std::string, IRoot*> roots;
 		m_controller->GetBindingPathRoots( roots );
@@ -73,4 +73,9 @@ bool Tr2ActionSetValue::IsBindingValid() const
 bool Tr2ActionSetValue::IsExpressionValid() const
 {
 	return m_evaluator.IsExpressionValid();
+}
+
+IRootPtr Tr2ActionSetValue::GetDestination() const
+{
+	return m_destination.GetBoundObject();
 }

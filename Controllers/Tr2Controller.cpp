@@ -16,7 +16,8 @@ Tr2Controller::Tr2Controller( IRoot* lockobj )
 	PARENTLOCK( m_variables ),
 	m_updateables( "Tr2Controller::m_updateables" ),
 	m_owner( nullptr ),
-	m_isActive( false )
+	m_isActive( false ),
+	m_isShared( false )
 {
 	m_stateMachines.SetNotify( this );
 	m_variables.SetNotify( this );

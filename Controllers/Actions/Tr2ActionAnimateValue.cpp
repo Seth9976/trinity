@@ -101,7 +101,7 @@ bool Tr2ActionAnimateValue::OnModified( Be::Var* value )
 	{
 		return true;
 	}
-	if( IsMatch( value, m_destination.m_path ) || IsMatch( value, m_destination.m_attribute ) )
+	if( IsMatch( value, m_destination.m_path ) || IsMatch( value, m_destination.m_attribute ) || IsMatch( value, m_destination.m_object ) )
 	{
 		std::unordered_map<std::string, IRoot*> roots;
 		m_controller->GetBindingPathRoots( roots );
@@ -131,4 +131,9 @@ float Tr2ActionAnimateValue::GetCurveValue( float time ) const
 		return 0;
 	}
 	return m_curve->GetValueAt( time );
+}
+
+IRootPtr Tr2ActionAnimateValue::GetDestination() const
+{
+	return m_destination.GetBoundObject();
 }

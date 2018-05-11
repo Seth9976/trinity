@@ -119,7 +119,7 @@ namespace
 			return nullptr;
 		}
 
-		static const std::regex tokens( "(\\.[a-zA-Z_][a-zA-Z_0-9]*)|(\\[-?[0-9]+\\])|(\\[\"[^\"]*\"\\]).*" );
+		static const std::regex tokens( "((\\.[a-zA-Z_][a-zA-Z_0-9]*)|(\\[-?[0-9]+\\])|(\\[\"[^\"]*\"\\])).*" );
 		static const std::regex root( "([a-zA-Z_][a-zA-Z_0-9]*).*" );
 
 		auto start = begin( reference );
@@ -135,7 +135,7 @@ namespace
 			return nullptr;
 		}
 		auto object = found->second;
-		start += match.length();
+		start += match[1].length();
 
 		while( object && start != finish )
 		{
@@ -143,19 +143,19 @@ namespace
 			{
 				return nullptr;
 			}
-			if( match[1].length() )
+			if( match[2].length() )
 			{
-				auto attrName = match[1].str().substr( 1 );
+				auto attrName = match[2].str().substr( 1 );
 				object = GetIRootAttribute( object, attrName );
-			}
-			else if( match[2].length() )
-			{
-				auto index = std::atoi( match[2].str().c_str() + 1 );
-				object = GetListElement( object, ssize_t( index ) );
 			}
 			else if( match[3].length() )
 			{
-				auto name = match[3].str();
+				auto index = std::atoi( match[3].str().c_str() + 1 );
+				object = GetListElement( object, ssize_t( index ) );
+			}
+			else if( match[4].length() )
+			{
+				auto name = match[4].str();
 				name = name.substr( 2, name.length() - 4 );
 				object = GetListElement( object, name );
 			}
@@ -163,7 +163,7 @@ namespace
 			{
 				object = nullptr;
 			}
-			start += match.length();
+			start += match[1].length();
 		}
 		return object;
 	}
@@ -261,4 +261,13 @@ bool Tr2BindingPoint::SetDestination( IRoot* object, const char* attribute )
 	m_entry = entry.first;
 	m_destination = entry.second;
 	return true;
+}
+
+IRootPtr Tr2BindingPoint::GetBoundObject() const
+{
+	if( m_resolvedObject )
+	{
+		return m_resolvedObject;
+	}
+	return m_object;
 }
