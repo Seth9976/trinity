@@ -1,0 +1,36 @@
+////////////////////////////////////////////////////////////
+//
+//    Created:   May 2018
+//    Copyright: CCP 2018
+//
+
+#pragma once
+
+#include "ITr2Controller.h"
+
+BLUE_CLASS( Tr2ControllerReference ): 
+	public ITr2Controller,
+	public INotify,
+	public IInitialize
+{
+public:
+	Tr2ControllerReference( IRoot* lockobj = nullptr );
+
+	EXPOSE_TO_BLUE();
+
+	virtual bool Initialize();
+
+	virtual bool OnModified( Be::Var* value );
+
+	virtual void Link( IRoot& owner );
+	virtual void Unlink();
+	virtual void Start();
+	virtual void Stop();
+	virtual void Update();
+	virtual void SetVariable( const char* name, float value );
+private:
+	ITr2ControllerPtr m_controller;
+	std::string m_path;
+};
+
+TYPEDEF_BLUECLASS( Tr2ControllerReference );

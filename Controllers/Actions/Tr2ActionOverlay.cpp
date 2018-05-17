@@ -29,7 +29,7 @@ void Tr2ActionOverlay::Start( Tr2Controller& controller )
 	}
 
 	BeResMan->SetUrgentResourceLoads( true );
-	m_overlay = BlueCastPtr( BeResMan->LoadObject( path.c_str() ) );
+	m_overlay = BeResMan->LoadObject<EveMeshOverlayEffect>( path.c_str() );
 	BeResMan->SetUrgentResourceLoads( false );
 	if( m_overlay )
 	{

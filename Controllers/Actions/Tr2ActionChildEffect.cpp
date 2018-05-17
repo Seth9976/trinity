@@ -31,7 +31,7 @@ void Tr2ActionChildEffect::Start( Tr2Controller& controller )
 	}
 	if( m_addOnStart && !m_child && !m_path.empty() )
 	{
-		m_child = BlueCastPtr( BeResMan->LoadObject( m_path.c_str() ) );
+		m_child = BeResMan->LoadObject<IEveSpaceObjectChild>( m_path.c_str() );
 		if( m_child )
 		{
 			if( !m_childName.empty() )
