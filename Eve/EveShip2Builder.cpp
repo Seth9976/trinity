@@ -121,13 +121,80 @@ void EveShip2Builder::InitializeGrannyFile()
 
 bool EveShip2Builder::CombineGrannyGeometry(int grnResIdx, const Matrix& offsetTransform)
 {
-	TriGrannyResPtr grnRes = m_grannyResources[grnResIdx];
+	// compute offset
+	Vector3 translation = offsetTransform.GetTranslation();
+	Matrix inverseTransform = Inverse(offsetTransform);
 
+	granny_real32 affine[3] = { translation.x, translation.y, translation.z };
+
+	granny_real32 matrix[3][3] = { { offsetTransform._11, offsetTransform._21, offsetTransform._31 },
+	{ offsetTransform._12, offsetTransform._22, offsetTransform._32 },
+	{ offsetTransform._13, offsetTransform._23, offsetTransform._33 } };
+
+	granny_real32 invMatrix[3][3] = { { inverseTransform._11, inverseTransform._21, inverseTransform._31 },
+	{ inverseTransform._12, inverseTransform._22, inverseTransform._32 },
+	{ inverseTransform._13, inverseTransform._23, inverseTransform._33 } };
+
+	return AddGeometry(m_grannyResources[grnResIdx], affine, (granny_real32*)matrix, (granny_real32*)invMatrix);
+}
+
+
+bool EveShip2Builder::CombineHullGeometry()
+{
+	CCP_LOGERR("Start building...");
+
+	if (m_hulls.size() != m_grannyResources.size())
+	{
+		CCP_LOGERR("EveShip2Builder: Hull vector length must match gr2 resource vector length!");
+		return false;
+	}
+
+	InitializeGrannyFile();
+
+	Vector3 offset(0.f, 0.f, 0.f);
+	for (size_t grnResIdx = 0; grnResIdx != m_grannyResources.size(); ++grnResIdx)
+	{
+		EveSOFDataHullPtr sofHull = m_hulls[grnResIdx];
+
+		// compute offset
+		granny_real32* affine = (granny_real32*)&offset;
+		granny_real32 matrix[3][3] = { { 1.f, 0.f, 0.f },{ 0.f, 1.f, 0.f },{ 0.f, 0.f, 1.f } };
+		granny_real32 invMatrix[3][3] = { { 1.f, 0.f, 0.f },{ 0.f, 1.f, 0.f },{ 0.f, 0.f, 1.f } };
+
+		if ( !AddGeometry(m_grannyResources[grnResIdx], affine, (granny_real32*)matrix, (granny_real32*)invMatrix) )
+		{
+			CCP_LOGERR("EveShip2Builder: Failed to add geometry!");
+			return false;
+		}
+
+		// offset is in a locator set on the hull
+		for (auto it = sofHull->m_locatorSets.begin(); it != sofHull->m_locatorSets.end(); ++it)
+		{
+			if ((*it)->m_name == BlueSharedString("next_subsystem"))
+			{
+				if (!(*it)->m_locators.empty())
+				{
+					offset += (*it)->m_locators[0]->m_position;
+				}
+			}
+		}
+	}
+
+	// save it
+	FinalizeGrannyFile(m_outputFilename);
+
+	return true;
+}
+
+bool EveShip2Builder::AddGeometry(const TriGrannyResPtr grnRes, const granny_real32* affine, const granny_real32* matrix, const granny_real32* invMatrix)
+{
+	// grannies must be already loaded
 	if (!grnRes->IsGood())
 	{
 		CCP_LOGERR("EveShip2Builder: GrannyRes failed to load!");
 		return false;
 	}
+
 	granny_file* grannyFile = grnRes->GetGrannyFile();
 	granny_file_info* fileInfo = GrannyGetFileInfo(grannyFile);
 	granny_mesh* grannyMesh = fileInfo->Meshes[0];
@@ -165,20 +232,7 @@ bool EveShip2Builder::CombineGrannyGeometry(int grnResIdx, const Matrix& offsetT
 	memcpy(dstVb, grannyMesh->PrimaryVertexData->Vertices, currentCount * m_vertexSize);
 
 	// offset the geom
-	Vector3 translation = offsetTransform.GetTranslation();
-	Matrix inverseTransform = Inverse(offsetTransform);
-
-	granny_real32 affine[3] = { translation.x, translation.y, translation.z };
-
-	granny_real32 matrix[3][3] = { { offsetTransform._11, offsetTransform._21, offsetTransform._31 },
-								   { offsetTransform._12, offsetTransform._22, offsetTransform._32 },
-								   { offsetTransform._13, offsetTransform._23, offsetTransform._33 } };
-
-	granny_real32 invMatrix[3][3] = { { inverseTransform._11, inverseTransform._21, inverseTransform._31 },
-									  { inverseTransform._12, inverseTransform._22, inverseTransform._32 },
-									  { inverseTransform._13, inverseTransform._23, inverseTransform._33 } };
-
-	GrannyTransformVertices(currentCount, m_grannyVertexData.VertexType, dstVb, affine, (granny_real32*)matrix, (granny_real32*)invMatrix, false, false);
+	GrannyTransformVertices(currentCount, m_grannyVertexData.VertexType, dstVb, affine, matrix, invMatrix, false, false);
 
 	if (m_grannyVertexData.Vertices)
 	{
@@ -247,10 +301,11 @@ bool EveShip2Builder::CombineGrannyGeometry(int grnResIdx, const Matrix& offsetT
 	}
 
 	m_areaOffset += grannyMesh->MaterialBindingCount;
+
 	return true;
 }
 
-void EveShip2Builder::FinalizeGrannyFile( const std::string& outputName )
+void EveShip2Builder::FinalizeGrannyFile( const std::string& outputName, const bool& combineGroups /*= false*/ )
 {
 	CCP_STATS_ZONE(__FUNCTION__);
 
@@ -270,15 +325,23 @@ void EveShip2Builder::FinalizeGrannyFile( const std::string& outputName )
 		return;
 	}
 
-	// Combine all groups into one
-	granny_tri_material_group grannyGroup = granny_tri_material_group(m_grannyGroups[0]);
-	for (size_t grpIdx = 1; grpIdx < m_grannyGroups.size(); grpIdx++)
+	if ( combineGroups )
 	{
-		grannyGroup.TriCount += m_grannyGroups[grpIdx].TriCount;
-	}
+		// Combine all groups into one
+		granny_tri_material_group grannyGroup = granny_tri_material_group(m_grannyGroups[0]);
+		for (size_t grpIdx = 1; grpIdx < m_grannyGroups.size(); grpIdx++)
+		{
+			grannyGroup.TriCount += m_grannyGroups[grpIdx].TriCount;
+		}
 
-	m_grannyTopology.GroupCount = 1;
-	m_grannyTopology.Groups = &grannyGroup;
+		m_grannyTopology.GroupCount = 1;
+		m_grannyTopology.Groups = &grannyGroup;
+	}
+	else
+	{
+		m_grannyTopology.GroupCount = (unsigned int)m_grannyGroups.size();
+		m_grannyTopology.Groups = &m_grannyGroups[0];
+	}
 
 	m_finalGrannyMesh.PrimaryTopology = &m_grannyTopology;
 	m_finalGrannyMesh.PrimaryVertexData = &m_grannyVertexData;

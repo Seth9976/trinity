@@ -24,7 +24,9 @@ protected:
 	void Weld( granny_uint8* referenceVB, int referenceCount, granny_uint8* vb, int count ) const;
 	void InitializeGrannyFile();
 	bool CombineGrannyGeometry(int grnResIdx, const Matrix& offsetTransform);
-	void FinalizeGrannyFile( const std::string& outputName );
+	bool CombineHullGeometry();
+	bool AddGeometry(const TriGrannyResPtr grnRes, const granny_real32* affine, const granny_real32* matrix, const granny_real32* invMatrix);
+	void FinalizeGrannyFile( const std::string& outputName, const bool& combineGroups = false );
 
 	granny_file_info m_grannyFileInfo;
 	granny_mesh m_finalGrannyMesh;
