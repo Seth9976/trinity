@@ -21,7 +21,7 @@ const Be::ClassInfo* Tr2ActionSetValue::ExposeToBlue()
 		MAP_ATTRIBUTE( "path", m_destination.m_path, "Path to the destination object for shared controllers", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 		MAP_ATTRIBUTE( "destination", m_destination.m_object, "Destination object", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 		MAP_ATTRIBUTE( "attribute", m_destination.m_attribute, "Destination attribute name", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
-		MAP_ATTRIBUTE( "value", m_value, "Attribute value expression", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
+		MAP_ATTRIBUTE( "value", m_value, "Attribute value expression\n:jessica-widget: expression", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 
 		MAP_PROPERTY_READONLY( "isExpressionValid", IsExpressionValid, "Is \"value\" expression valid" )
 		MAP_PROPERTY_READONLY( "isBindingValid", IsBindingValid, "Is destination binding valid" )
