@@ -52,7 +52,17 @@ namespace
 		{
 			return 0;
 		}
-		return csOwner->GetCurveSetDuration( name );
+		if( auto slash = strchr( name, '/' ) )
+		{
+			std::string csName = name;
+			std::string rangeName = csName.substr( slash - name + 1 );
+			csName = csName.substr( 0, slash - name );
+			return csOwner->GetRangeDuration( csName, rangeName );
+		}
+		else
+		{
+			return csOwner->GetCurveSetDuration( name );
+		}
 	}
 
 	float IsAnimationPlaying( const char* layerName )

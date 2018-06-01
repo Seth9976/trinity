@@ -2828,9 +2828,9 @@ float EveSpaceObject2::GetCurveSetDuration( const std::string& name ) const
 	float maxDuration = 0.f;
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
 	{
-		if( (*it)->GetName() == name )
+		if( ( *it )->GetName() == name )
 		{
-			maxDuration = max( maxDuration, (*it)->GetMaxCurveDuration() );
+			maxDuration = max( maxDuration, ( *it )->GetMaxCurveDuration() );
 		}
 	}
 	for( auto childIt = m_children.begin(); childIt != m_children.end(); childIt++ )
@@ -2845,6 +2845,34 @@ float EveSpaceObject2::GetCurveSetDuration( const std::string& name ) const
 		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
 		{
 			maxDuration = max( maxDuration, owner->GetCurveSetDuration( name ) );
+		}
+	}
+	return maxDuration;
+}
+
+// --------------------------------------------------------------------------------
+float EveSpaceObject2::GetRangeDuration( const std::string& name, const std::string& rangeName ) const
+{
+	float maxDuration = 0.f;
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			maxDuration = max( maxDuration, ( *it )->GetRangeDuration( rangeName.c_str() ) );
+		}
+	}
+	for( auto childIt = m_children.begin(); childIt != m_children.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			maxDuration = max( maxDuration, owner->GetRangeDuration( name, rangeName ) );
+		}
+	}
+	for( auto childIt = m_effectChildren.begin(); childIt != m_effectChildren.end(); childIt++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *childIt ) )
+		{
+			maxDuration = max( maxDuration, owner->GetRangeDuration( name, rangeName ) );
 		}
 	}
 	return maxDuration;

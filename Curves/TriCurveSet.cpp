@@ -270,6 +270,19 @@ float TriCurveSet::GetMaxCurveDuration() const
 	return maxDuration;
 }
 
+float TriCurveSet::GetRangeDuration( const char* rangeName ) const
+{
+	for( auto it = begin( m_ranges ); it != end( m_ranges ); ++it )
+	{
+		auto range = *it;
+		if( range->m_name == rangeName )
+		{
+			return range->m_endTime - range->m_startTime;
+		}
+	}
+	return 0;
+}
+
 bool TriCurveSet::IsPlaying() const
 {
 	return m_isPlaying;

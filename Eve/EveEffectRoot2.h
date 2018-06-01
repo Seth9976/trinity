@@ -89,6 +89,7 @@ public:
 	virtual void StopCurveSet( const std::string& name );
 	virtual void UpdateCurveSet( const std::string& name, Be::Time time );
 	virtual float GetCurveSetDuration( const std::string& name ) const;
+	virtual float GetRangeDuration( const std::string& name, const std::string& rangeName ) const;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IEveEffectChildrenOwner

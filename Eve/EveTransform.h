@@ -100,6 +100,7 @@ public:
 	void PlayCurveSet( const std::string& name, const std::string& rangeName );
 	void StopCurveSet( const std::string& name );
 	float GetCurveSetDuration( const std::string& name ) const;
+	float GetRangeDuration( const std::string& name, const std::string& rangeName ) const;
 
 	void SetDisplay( bool value ) { m_display = value; };
 

@@ -362,9 +362,9 @@ float EveChildContainer::GetCurveSetDuration( const std::string& name ) const
 	float maxDuration = 0.f;
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
 	{
-		if( (*it)->GetName() == name )
+		if( ( *it )->GetName() == name )
 		{
-			maxDuration = max( maxDuration, (*it)->GetMaxCurveDuration() );
+			maxDuration = max( maxDuration, ( *it )->GetMaxCurveDuration() );
 		}
 	}
 
@@ -373,6 +373,33 @@ float EveChildContainer::GetCurveSetDuration( const std::string& name ) const
 		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
 		{
 			maxDuration = max( maxDuration, owner->GetCurveSetDuration( name ) );
+		}
+	}
+
+	return maxDuration;
+}
+
+float EveChildContainer::GetRangeDuration( const std::string& name, const std::string& rangeName ) const
+{
+	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
+	{
+		return 0.f;
+	}
+
+	float maxDuration = 0.f;
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			maxDuration = max( maxDuration, ( *it )->GetRangeDuration( rangeName.c_str() ) );
+		}
+	}
+
+	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
+	{
+		if( auto owner = dynamic_cast<ITr2CurveSetOwner*>( *it ) )
+		{
+			maxDuration = max( maxDuration, owner->GetRangeDuration( name, rangeName ) );
 		}
 	}
 

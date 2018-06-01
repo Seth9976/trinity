@@ -453,9 +453,24 @@ float EveTransform::GetCurveSetDuration( const std::string& name ) const
 	float maxDuration = 0.f;
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
 	{
-		if( (*it)->GetName() == name )
+		if( ( *it )->GetName() == name )
 		{
-			maxDuration = max( maxDuration, (*it)->GetMaxCurveDuration() );
+			maxDuration = max( maxDuration, ( *it )->GetMaxCurveDuration() );
+		}
+	}
+
+	return maxDuration;
+}
+
+// --------------------------------------------------------------------------------
+float EveTransform::GetRangeDuration( const std::string& name, const std::string& rangeName ) const
+{
+	float maxDuration = 0.f;
+	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
+	{
+		if( ( *it )->GetName() == name )
+		{
+			maxDuration = std::max( maxDuration, ( *it )->GetRangeDuration( rangeName.c_str() ) );
 		}
 	}
 
