@@ -170,11 +170,11 @@ Tr2PerObjectData* EveChildParticleSystem::GetPerObjectData( ITriRenderBatchAccum
 	return data;
 }
 
-void EveChildParticleSystem::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildParticleSystem::UpdateSyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 }
 
-void EveChildParticleSystem::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildParticleSystem::UpdateAsyncronous( EveUpdateContext& updateContext, bool isVisible, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	Matrix localToWorldTransform;
 	if ( spaceObjectParent )
@@ -222,14 +222,21 @@ void EveChildParticleSystem::UpdateAsyncronous( EveUpdateContext& updateContext,
 	if( !m_particleEmitters.empty() )
 	{
 		float emitCountFactor = 1.f;
-		if( m_minScreenSize > 0.f && m_lodSphereRadius > 0.f )
+		if( !isVisible || !m_display )
 		{
-			auto viewProj = Tr2Renderer::GetViewTransform() * Tr2Renderer::GetProjectionTransform();
-			TriFrustum frustum;
-			frustum.DeriveFrustum( &Tr2Renderer::GetViewTransform(), &Tr2Renderer::GetViewPosition(), &Tr2Renderer::GetProjectionTransform(), Tr2Renderer::GetViewport() );
-			if( frustum.GetPixelSizeAccross( &m_lodSphere ) < m_minScreenSize * g_eveSpaceSceneLODFactor )
+			emitCountFactor = 0;
+		}
+		else
+		{
+			if( m_minScreenSize > 0.f && m_lodSphereRadius > 0.f )
 			{
-				emitCountFactor = 0.f;
+				auto viewProj = Tr2Renderer::GetViewTransform() * Tr2Renderer::GetProjectionTransform();
+				TriFrustum frustum;
+				frustum.DeriveFrustum( &Tr2Renderer::GetViewTransform(), &Tr2Renderer::GetViewPosition(), &Tr2Renderer::GetProjectionTransform(), Tr2Renderer::GetViewport() );
+				if( frustum.GetPixelSizeAccross( &m_lodSphere ) < m_minScreenSize * g_eveSpaceSceneLODFactor )
+				{
+					emitCountFactor = 0.f;
+				}
 			}
 		}
 		ITr2GenericEmitter::UpdateArguments args( 

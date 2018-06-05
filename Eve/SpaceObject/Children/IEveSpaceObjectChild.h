@@ -20,12 +20,12 @@ BLUE_INTERFACE( IEveSpaceObjectChild ) : public IRoot
 	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer ) {}
 	virtual void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const {}
 	
-	virtual void UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent ) = 0;
-	virtual void UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent ) = 0;
+	virtual void UpdateSyncronous( EveUpdateContext& updateContext, bool isVisible, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent ) = 0;
+	virtual void UpdateAsyncronous( EveUpdateContext& updateContext, bool isVisible, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent ) = 0;
 
 	virtual void GetLocalToWorldTransform( Matrix& transform ) const = 0;
 	
-	virtual bool IsAlwaysOn() const { return false; };	
+	virtual bool IsAlwaysOn() const { return false; };
 
 	virtual void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible ) = 0;
 

@@ -112,7 +112,7 @@ void EveEffectRoot2::UpdateSyncronous( EveUpdateContext& updateContext )
 
 	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt ) 
 	{
-		(*ecIt)->UpdateSyncronous( updateContext, this, nullptr );
+		(*ecIt)->UpdateSyncronous( updateContext, m_display, this, nullptr );
 	}
 
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
@@ -131,7 +131,7 @@ void EveEffectRoot2::UpdateAsyncronous( EveUpdateContext& updateContext )
 
 	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt ) 
 	{
-		(*ecIt)->UpdateAsyncronous( updateContext, this, nullptr );
+		(*ecIt)->UpdateAsyncronous( updateContext, m_display, this, nullptr );
 	}
 }
 

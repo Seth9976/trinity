@@ -246,7 +246,7 @@ bool EveChildBulletStorm::GetBoundingSphere( Vector4& sphere, BoundingSphereQuer
 // Description:
 //   Syncronous updates happen here
 // --------------------------------------------------------------------------------
-void EveChildBulletStorm::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildBulletStorm::UpdateSyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 }
 
@@ -266,7 +266,7 @@ void EveChildBulletStorm::StopEffect()
 // Description:
 //   Assyncronous updates happen here
 // --------------------------------------------------------------------------------
-void EveChildBulletStorm::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildBulletStorm::UpdateAsyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	// we need to move with our parent
 	if( spaceObjectParent )

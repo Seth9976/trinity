@@ -160,7 +160,7 @@ void EveChildContainer::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2Qu
 	}
 }
 
-void EveChildContainer::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildContainer::UpdateSyncronous( EveUpdateContext& updateContext, bool isVisible, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
 	{
@@ -169,7 +169,7 @@ void EveChildContainer::UpdateSyncronous( EveUpdateContext& updateContext, IEveS
 
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		(*it)->UpdateSyncronous( updateContext, nullptr, this );
+		(*it)->UpdateSyncronous( updateContext, isVisible && m_display, nullptr, this );
 	}
 	for( auto it = m_observers.begin(); it != m_observers.end(); it++ )
 	{
@@ -181,7 +181,7 @@ void EveChildContainer::UpdateSyncronous( EveUpdateContext& updateContext, IEveS
 	}
 }
 
-void EveChildContainer::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildContainer::UpdateAsyncronous( EveUpdateContext& updateContext, bool isVisible, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	if( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() )
 	{
@@ -210,7 +210,7 @@ void EveChildContainer::UpdateAsyncronous( EveUpdateContext& updateContext, IEve
 
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
-		(*it)->UpdateAsyncronous( updateContext, nullptr, this );
+		(*it)->UpdateAsyncronous( updateContext, isVisible && m_display, nullptr, this );
 	}
 	
 	Be::Time time = updateContext.GetTime();

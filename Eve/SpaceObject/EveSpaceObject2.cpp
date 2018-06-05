@@ -358,9 +358,10 @@ void EveSpaceObject2::UpdateSyncronous( EveUpdateContext& updateContext )
 	}
 
 	// trigger syncronous update of attachements here
+	bool displayChildren = m_display && DisplayChildren();
 	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt ) 
 	{
-		(*ecIt)->UpdateSyncronous( updateContext, this, nullptr );
+		(*ecIt)->UpdateSyncronous( updateContext, displayChildren, this, nullptr );
 	}
 	if( m_impactOverlay )
 	{
@@ -455,9 +456,10 @@ void EveSpaceObject2::UpdateAsyncronous( EveUpdateContext& updateContext )
 		(*it)->Update( updateContext );
 	}
 	
-	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt ) 
+	bool displayChildren = m_display && DisplayChildren();
+	for( auto ecIt = m_effectChildren.begin(); ecIt != m_effectChildren.end(); ++ecIt )
 	{
-		(*ecIt)->UpdateAsyncronous( updateContext, this, nullptr );
+		(*ecIt)->UpdateAsyncronous( updateContext, displayChildren, this, nullptr );
 	}
 
 	if( m_impactOverlay )
@@ -1442,9 +1444,10 @@ void EveSpaceObject2::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2Quad
 	{
 		( *it )->AddToQuadRenderer( quadRenderer, m_worldTransform, m_spaceObjectShipData.y, bones, boneCount );
 	}
+	auto displayChildren = DisplayChildren();
 	for( auto it = m_effectChildren.begin(); it != m_effectChildren.end(); ++it )
 	{
-		if( DisplayChildren() || (*it)->IsAlwaysOn() )
+		if( displayChildren || (*it)->IsAlwaysOn() )
 		{
 			(*it)->AddQuadsToQuadRenderer( frustum, quadRenderer );
 		}
@@ -2911,9 +2914,10 @@ void EveSpaceObject2::GetLights( Tr2LightManager& lightManager ) const
 	{
 		( *it )->AddLight( lightManager, worldTransform, 1.0f );
 	}
+	auto displayChildren = DisplayChildren();
 	for( auto it = m_effectChildren.begin(); it != m_effectChildren.end(); ++it )
 	{
-		if( DisplayChildren() || ( *it )->IsAlwaysOn() )
+		if( displayChildren || ( *it )->IsAlwaysOn() )
 		{
 			( *it )->GetLights( lightManager );
 		}

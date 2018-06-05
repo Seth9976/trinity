@@ -112,7 +112,7 @@ bool EveChildParticleSphere::GetBoundingSphere( Vector4& sphere, BoundingSphereQ
 }
 
 // -----------------------------------------------------------------------------
-void EveChildParticleSphere::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2*, IEveSpaceObjectChild* )
+void EveChildParticleSphere::UpdateSyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2*, IEveSpaceObjectChild* )
 {
 	CheckBinding();
 
@@ -126,7 +126,7 @@ void EveChildParticleSphere::UpdateSyncronous( EveUpdateContext& updateContext, 
 }
 
 // -----------------------------------------------------------------------------
-void EveChildParticleSphere::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildParticleSphere::UpdateAsyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	Matrix parent;
 	if( childParent )

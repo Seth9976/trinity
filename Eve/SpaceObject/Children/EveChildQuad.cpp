@@ -153,7 +153,7 @@ float EveChildQuad::GetSortValue()
 }
 
 
-void EveChildQuad::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildQuad::UpdateSyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	if( m_editMode )
 	{
@@ -173,7 +173,7 @@ void EveChildQuad::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceO
 	}
 }
 
-void EveChildQuad::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildQuad::UpdateAsyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	Matrix parentTransform;
 	if ( spaceObjectParent )

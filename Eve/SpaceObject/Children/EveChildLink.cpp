@@ -39,9 +39,9 @@ EveChildLink::~EveChildLink()
 // Description:
 //   Synchronous updates happen here
 // --------------------------------------------------------------------------------
-void EveChildLink::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildLink::UpdateSyncronous( EveUpdateContext& updateContext, bool isVisible, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
-	EveChildMesh::UpdateSyncronous( updateContext, spaceObjectParent, childParent );
+	EveChildMesh::UpdateSyncronous( updateContext, isVisible, spaceObjectParent, childParent );
 
 	// if we have a target, we can calc the direction
 	if( m_target )
@@ -73,7 +73,7 @@ void EveChildLink::UpdateSyncronous( EveUpdateContext& updateContext, IEveSpaceO
 // Description:
 //   Asynchronous updates happen here
 // --------------------------------------------------------------------------------
-void EveChildLink::UpdateAsyncronous( EveUpdateContext& updateContext, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
+void EveChildLink::UpdateAsyncronous( EveUpdateContext& updateContext, bool, IEveSpaceObject2* spaceObjectParent, IEveSpaceObjectChild* childParent )
 {
 	// update the special link curves
 	for( ITriFunctionVector::const_iterator it = m_linkStrengthCurves.begin(); it != m_linkStrengthCurves.end(); ++it )
