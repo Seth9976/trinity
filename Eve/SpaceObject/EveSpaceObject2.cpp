@@ -3080,6 +3080,11 @@ void EveSpaceObject2::SetControllerVariable( const char* name, float value )
 	{
 		( *it )->SetVariable( name, value );
 	}
+	for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
+	{
+		auto child = *it;
+		child->SetControllerVariable( name, value );
+	}
 }
 
 void EveSpaceObject2::StartControllers()
@@ -3087,6 +3092,11 @@ void EveSpaceObject2::StartControllers()
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
 	{
 		( *it )->Start();
+	}
+	for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
+	{
+		auto child = *it;
+		child->StartControllers();
 	}
 }
 

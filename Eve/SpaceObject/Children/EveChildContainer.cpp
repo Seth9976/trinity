@@ -25,6 +25,7 @@ EveChildContainer::EveChildContainer( IRoot* lockobj ) :
 	PARENTLOCK( m_transformModifiers ),
 	PARENTLOCK( m_controllers ),
 	m_controllerVariables( "EveChildContainer::m_controllerVariables" ),
+	m_worldVelocity( 0, 0, 0 ),
 	m_display( true ),
 	m_hideOnLowQuality( false )
 {
@@ -217,6 +218,11 @@ void EveChildContainer::UpdateAsyncronous( EveUpdateContext& updateContext, bool
 	for( auto it = m_curveSets.begin(); it != m_curveSets.end(); it++ )
 	{
 		(*it)->Update( time, time );
+	}
+
+	if( spaceObjectParent )
+	{
+		spaceObjectParent->GetWorldVelocity( m_worldVelocity );
 	}
 }
 
@@ -475,4 +481,9 @@ void EveChildContainer::RemoveFromEffectChildrenList( IEveSpaceObjectChild* chil
 	{
 		m_objects.Remove( index );
 	}
+}
+
+void EveChildContainer::GetWorldVelocity( Vector3& velocity ) const
+{
+	velocity = m_worldVelocity;
 }

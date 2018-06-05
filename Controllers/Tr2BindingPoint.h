@@ -26,9 +26,11 @@ public:
 	IRootPtr m_object;
 	std::string m_attribute;
 protected:
-	bool SetDestination( IRoot* object, const char* attribute );
+	bool SetDestination( IRoot* object, const std::string& attribute );
 private:
 	IRootPtr m_resolvedObject;
+	INotifyPtr m_notifyPtr;
 	const Be::VarEntry* m_entry;
 	Be::Var* m_destination;
+	int32_t m_entryOffset;
 };

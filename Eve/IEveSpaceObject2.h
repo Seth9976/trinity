@@ -34,6 +34,8 @@ BLUE_INTERFACE( IEveSpaceObject2 ) : public IRoot
 	// Get the local to world transform
 	virtual void GetLocalToWorldTransform( Matrix &transform ) const = 0;
 
+	virtual void GetWorldVelocity( Vector3& velocity ) const { velocity = Vector3( 0, 0, 0 ); }
+
 	// Registers an object and its attachments with the quad renderer
 	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer ) {}
 	// Adds quads from space object and its attachments to the quad renderer. ATTENTION: this function is called in-parallel

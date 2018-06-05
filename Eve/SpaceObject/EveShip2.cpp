@@ -43,10 +43,13 @@ void EveShip2::UpdateSyncronous( EveUpdateContext& updateContext )
 	EveMobile::UpdateSyncronous( updateContext );
 	Be::Time time = updateContext.GetTime();
 
-	// need the speed!
-	Vector3 v;
-	GetWorldVelocity( v );
-	m_speed->m_value = Length( v );
+	if( m_ballPosition )
+	{
+		// need the speed!
+		Vector3 v;
+		GetWorldVelocity( v );
+		m_speed->m_value = Length( v );
+	}
 
 	UpdateShipSpeedForAudio();
 

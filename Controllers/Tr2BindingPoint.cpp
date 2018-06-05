@@ -72,6 +72,9 @@ namespace
 		case Be::STDSTRING:
 			value = *reinterpret_cast<const std::string*>( entry.second );
 			return true;
+		case Be::SHAREDSTRING:
+			value = reinterpret_cast<BlueSharedString*>( entry.second )->c_str();
+			return true;
 		default:
 			return false;
 		}
@@ -174,7 +177,8 @@ namespace
 
 Tr2BindingPoint::Tr2BindingPoint()
 	:m_entry( nullptr ),
-	m_destination( nullptr )
+	m_destination( nullptr ),
+	m_entryOffset( -1 )
 {
 }
 
@@ -183,12 +187,12 @@ void Tr2BindingPoint::Link( const std::unordered_map<std::string, IRoot*>& roots
 	Unlink();
 	if( m_path.empty() )
 	{
-		SetDestination( m_object, m_attribute.c_str() );
+		SetDestination( m_object, m_attribute );
 	}
 	else
 	{
 		m_resolvedObject = ResolveReference( m_path, roots );
-		SetDestination( m_resolvedObject, m_attribute.c_str() );
+		SetDestination( m_resolvedObject, m_attribute );
 	}
 }
 
@@ -197,6 +201,8 @@ void Tr2BindingPoint::Unlink()
 	m_entry = nullptr;
 	m_destination = nullptr;
 	m_resolvedObject = nullptr;
+	m_notifyPtr = nullptr;
+	m_entryOffset = -1;
 }
 
 bool Tr2BindingPoint::IsValid() const
@@ -221,8 +227,18 @@ void Tr2BindingPoint::SetValue( float value ) const
 	case Be::BOOL:
 		*reinterpret_cast<bool*>( m_destination ) = value != 0;
 		break;
+	case Be::FLOATARRAY:
+		reinterpret_cast<float*>( m_destination )[m_entryOffset] = value;
+		break;
+	case Be::DOUBLEARRAY:
+		reinterpret_cast<double*>( m_destination )[m_entryOffset] = value;
+		break;
 	default:
 		return;
+	}
+	if( m_notifyPtr )
+	{
+		m_notifyPtr->OnModified( m_destination );
 	}
 }
 
@@ -243,23 +259,94 @@ bool Tr2BindingPoint::GetValue( float& value ) const
 	case Be::BOOL:
 		value = float( *reinterpret_cast<bool*>( m_destination ) ? 1.f : 0.f );
 		break;
+	case Be::FLOATARRAY:
+		value = reinterpret_cast<float*>( m_destination )[m_entryOffset];
+		break;
+	case Be::DOUBLEARRAY:
+		value = float( reinterpret_cast<double*>( m_destination )[m_entryOffset] );
+		break;
 	default:
 		return false;
 	}
 	return true;
 }
 
-bool Tr2BindingPoint::SetDestination( IRoot* object, const char* attribute )
+bool Tr2BindingPoint::SetDestination( IRoot* object, const std::string& attribute )
 {
-	auto entry = FindEntry( object, attribute );
+	m_entry = nullptr;
+	m_destination = nullptr;
+	m_entryOffset = -1;
+	m_notifyPtr = nullptr;
+
+	std::string name;
+	int32_t entryOffset = -1;
+	auto dot = attribute.find( '.' );
+	if( dot != std::string::npos )
+	{
+		name = attribute.substr( 0, dot );
+		auto swizzle = attribute.substr( dot + 1 );
+		if( swizzle.length() != 1 )
+		{
+			return false;
+		}
+		switch( swizzle[0] )
+		{
+		case 'x':
+		case 'r':
+			entryOffset = 0;
+			break;
+		case 'y':
+		case 'g':
+			entryOffset = 1;
+			break;
+		case 'z':
+		case 'b':
+			entryOffset = 2;
+			break;
+		case 'w':
+		case 'a':
+			entryOffset = 3;
+			break;
+		default:
+			return false;
+		}
+	}
+	else
+	{
+		name = attribute;
+		entryOffset = -1;
+	}
+
+	auto entry = FindEntry( object, name.c_str() );
 	if( !entry.second )
 	{
-		m_entry = nullptr;
-		m_destination = nullptr;
 		return false;
 	}
+	switch( entry.first->mType )
+	{
+	case Be::FLOAT:
+	case Be::DOUBLE:
+	case Be::BOOL:
+		if( entryOffset != -1 )
+		{
+			return false;
+		}
+		break;
+	case Be::FLOATARRAY:
+	case Be::DOUBLEARRAY:
+		if( entryOffset == -1 )
+		{
+			return false;
+		}
+		break;
+	default:
+		return false;
+	}
+
 	m_entry = entry.first;
 	m_destination = entry.second;
+	m_entryOffset = entryOffset;
+	m_notifyPtr = BlueCastPtr( object );
 	return true;
 }
 

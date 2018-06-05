@@ -85,12 +85,11 @@ public:
 
 	void SetControllerVariable( const char* name, float value );
 	void StartControllers();
+	void GetWorldVelocity( Vector3& velocity ) const;
 
 	PIEveSpaceObjectChildVector m_objects;
 protected:
 	BlueSharedString m_name;
-	bool m_display;
-	bool m_hideOnLowQuality;
 	PTriCurveSetVector m_curveSets;
 	PTriObserverLocalVector m_observers;
 	PTr2PointLightVector m_lights;
@@ -98,6 +97,9 @@ protected:
 	TrackableStdUnorderedMap<std::string, float> m_controllerVariables;
 
 	PIEveChildTransformModifierVector m_transformModifiers;
+	Vector3 m_worldVelocity;
+	bool m_display;
+	bool m_hideOnLowQuality;
 };
 
 TYPEDEF_BLUECLASS( EveChildContainer );

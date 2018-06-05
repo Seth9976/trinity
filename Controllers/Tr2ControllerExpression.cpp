@@ -10,6 +10,7 @@
 #include "Tr2StateMachine.h"
 #include "Tr2ControllerFloatVariable.h"
 #include "Eve/SpaceObject/EveSpaceObject2.h"
+#include "Eve/SpaceObject/Children/EveChildContainer.h"
 #include "Tr2GrannyAnimation.h"
 #include "Tr2ExpressionTermInfo.h"
 #include <regex>
@@ -86,6 +87,23 @@ namespace
 		return remaining > 0;
 	}
 
+	float ShipSpeed()
+	{
+		if( IEveSpaceObject2Ptr spaceObject = BlueCastPtr( s_owner ) )
+		{
+			Vector3 velocity;
+			spaceObject->GetWorldVelocity( velocity );
+			return Length( velocity );
+		}
+		else if( EveChildContainerPtr child = BlueCastPtr( s_owner ) )
+		{
+			Vector3 velocity;
+			child->GetWorldVelocity( velocity );
+			return Length( velocity );
+		}
+		return 0;
+	}
+
 	bool IsValidVariableName( const char* name )
 	{
 		static std::regex namePattern( "[a-zA-Z_][a-zA-Z_0-9]*" );
@@ -131,6 +149,7 @@ std::string Tr2ControllerExpression::CreateParser( const char* expression, Modif
 	m_expressionParser.DefineFun( "AnimationTime", AnimationTime, false );
 	m_expressionParser.DefineFun( "IsAnimationPlaying", IsAnimationPlaying, false );
 	m_expressionParser.DefineFun( "CurveSetTime", CurveSetTime, false );
+	m_expressionParser.DefineFun( "ShipSpeed", ShipSpeed, false );
 	if( modifyParser )
 	{
 		( *modifyParser )( m_expressionParser );
