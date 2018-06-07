@@ -58,10 +58,6 @@ public:
 	// ITr2DebugRenderable
     virtual void RenderDebugInfo( Tr2DebugRenderer& renderer );
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// Overrides of animation controller
-	virtual bool ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters );
-
 	// re-positions all attached turrets to the corresponding locators
 	void RebuildTurretPositions();
 	// checks and counts the number of locators and/or granny-bones used to position turrets
@@ -69,14 +65,8 @@ public:
 	// Asynch update for turret sets
 	virtual void UpdateTurretsAsyncronous( EveUpdateContext& updateContext );
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// activation
-	void PlayActivationCurve();
-
     /////////////////////////////////////////////////////////////////////////////////////
 	// clip sphere modification
-	void PlayClipSphereFactorCurve();
-	void ModifyClipSphereCurve( const std::map<std::string, float>& parameters );
 	void ResetClipSphereCenter();
 
 protected:
@@ -93,12 +83,6 @@ protected:
 	PEveTurretSetVector m_turretSets;
 	virtual const Matrix* GetTurretTransform( unsigned int turretSetIndex ) const;
 private:
-	/////////////////////////////////////////////////////////////////////////////////////
-	// activation
-	ITriScalarFunctionPtr m_activationStrengthCurve;
-	bool m_playActivationCurve;
-	float m_activationDelta;
-
 	/////////////////////////////////////////////////////////////////////////////////////
 	// dissolve
 	float m_clipSphereFactor;
@@ -127,12 +111,6 @@ private:
 	void ResetTurretLocatorCounter( bool updateTotal );
 	bool GetTurretLocatorCountingInfo( const char* name, unsigned int& current, unsigned int& total ) const;
 	bool ValidateTurretLocatorName( const char* locatorName, unsigned int& locatorsFoundA, unsigned int& locatorsFoundB ) const;
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// clip sphere modification
-	bool m_playClipSphereFactorCurve; 
-	float m_clipSphereFactorDelta;
-	ITriScalarFunctionPtr m_clipSphereFactorCurve;
 };
 
 TYPEDEF_BLUECLASS( EveMobile );

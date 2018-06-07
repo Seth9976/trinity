@@ -20,10 +20,6 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Overrides of EveSpaceObject2 implementations
 	virtual void GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData );
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// Overrides of animation controller
-	virtual bool ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters );
 };
 
 TYPEDEF_BLUECLASS( EveStation2 );

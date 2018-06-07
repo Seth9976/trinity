@@ -41,10 +41,6 @@ public:
 	virtual void RebuildCachedData( BlueAsyncRes* p );
 
 	/////////////////////////////////////////////////////////////////////////////////////
-	// Overrides of animation controller
-	virtual bool ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters );
-
-	/////////////////////////////////////////////////////////////////////////////////////
 	// Overrides of decal data
 	virtual void FillDecalParentData( EveSpaceObjectDecal::ParentData* pd ) const;
 

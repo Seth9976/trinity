@@ -345,32 +345,6 @@ void EveShip2::UpdateShipSpeedForAudio()
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Gets called by the state machine of this object to execute some command.
-// Return Value:
-//   Returns true if this implementation has handled the command.
-// --------------------------------------------------------------------------------
-bool EveShip2::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters )
-{
-	EveAnimationCmd commandType = cmd.m_command;
-
-	switch( commandType )
-	{
-	case ANIM_CMD_TURNOFF_BOOSTERS:
-		return true;
-
-	case ANIM_CMD_TURNON_BOOSTERS:
-		return true;
-
-	default:
-		// not handled here, so pass it up the chain
-		return EveMobile::ExecuteAnimationStateCommand( cmd, parameters );
-	}
-
-	return false;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
 //   Adds ship dynamic lights to the manager.
 // Arguments:
 //   lightManager - light manager

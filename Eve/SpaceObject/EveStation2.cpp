@@ -31,19 +31,3 @@ void EveStation2::GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType 
 {
 	EveSpaceObject2::GetBatches( batches, batchType, perObjectData );
 }
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Gets called by the state machine of this object to execute some command.
-// Return Value:
-//   Returns true if this implementation has handled the command.
-// --------------------------------------------------------------------------------
-bool EveStation2::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters )
-{
-	return EveSpaceObject2::ExecuteAnimationStateCommand( cmd, parameters );
-}
-
-
-
-
-

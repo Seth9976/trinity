@@ -470,14 +470,6 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 
 		MAP_ATTRIBUTE
 		(
-			"animationSequencer",
-			m_animationSequencer,
-			"",
-			Be::READWRITE | Be::NOTIFY
-		)
-
-		MAP_ATTRIBUTE
-		(
 			"animationUpdater",
 			m_animationUpdater,
 			"Granny animation exposure",

@@ -24,7 +24,6 @@
 #include "Tr2GrannyAnimation.h"
 #include "Tr2BindingVector3.h"
 #include "Eve/EveUpdateContext.h"
-#include "Eve/Animation/EveAnimationSequencer.h"
 #include "Shader/Tr2Effect.h"
 #include "Utils/EveCustomMask.h"
 #include "TriSettingsRegistrar.h"
@@ -341,10 +340,6 @@ void EveSpaceObject2::UpdateSyncronous( EveUpdateContext& updateContext )
 	//
 	// Animation
 	//
-	if( m_animationSequencer )
-	{
-		m_animationSequencer->Update( time );
-	}
 	if( m_animationUpdater )
 	{
 		m_animationUpdater->PrePhysicsAnimation( 0, IdentityMatrix() );
@@ -1603,11 +1598,6 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 		m_animationUpdater->PrePhysicsAnimation( 0, IdentityMatrix() );
 	}
 
-	if( m_animationSequencer )
-	{
-		m_animationSequencer->SetOwner( this );
-	}
-
 	if( m_boundingSphereRadius < 0.0f )
 	{
 		CCP_LOGWARN( "Bounding sphere not set for '%s' - calculating from '%s'", m_name.c_str(), m_geometryResFromMesh->GetPath() );
@@ -1621,10 +1611,6 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 
 bool EveSpaceObject2::OnModified( Be::Var* val )
 {
-	if( IsMatch( val, m_animationSequencer ) && m_animationSequencer )
-	{
-		m_animationSequencer->SetOwner( this );
-	}
 	return true;
 }
 
@@ -2879,17 +2865,6 @@ float EveSpaceObject2::GetRangeDuration( const std::string& name, const std::str
 		}
 	}
 	return maxDuration;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Gets called by the state machine of this object to execute some command.
-// Return Value:
-//   Returns true if this implementation has handled the command.
-// --------------------------------------------------------------------------------
-bool EveSpaceObject2::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters )
-{
-	return false;
 }
 
 // --------------------------------------------------------------------------------

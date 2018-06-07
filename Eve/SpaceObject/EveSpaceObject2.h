@@ -16,7 +16,6 @@
 #include "Eve/IEveTransform.h"
 #include "Utilities/Vector3d.h"
 #include "Tr2PersistentPerObjectData.h"
-#include "Eve/Animation/EveAnimationData.h"
 #include "Tr2ShLightingManager.h"
 #include "Eve/SpaceObject/Attachments/EveMeshOverlayEffect.h"
 #include "Eve/SpaceObject/Attachments/EveSpaceObjectDecal.h"
@@ -67,8 +66,6 @@ BLUE_DECLARE( Tr2GPUParticleEmitter );
 BLUE_DECLARE_VECTOR( Tr2GPUParticleEmitter );
 
 BLUE_DECLARE( Tr2BindingVector3 );
-
-BLUE_DECLARE( EveAnimationSequencer );
 
 BLUE_DECLARE( Tr2PointLight );
 BLUE_DECLARE_VECTOR( Tr2PointLight );
@@ -269,10 +266,6 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IWorldPosition
 	bool OnModified( Be::Var* value );
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// animation controller
-	virtual bool ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// decal
@@ -587,7 +580,6 @@ private:
 #endif
 
 	bool m_dynamicBoundingSphereEnabled;
-	EveAnimationSequencerPtr m_animationSequencer;
 
 	PTr2ExternalParameterVector m_externalParameters;
 

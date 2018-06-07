@@ -20,12 +20,8 @@
 // --------------------------------------------------------------------------------
 EveMobile::EveMobile( IRoot* lockobj ) :
 	PARENTLOCK( m_turretSets ),
-	m_activationDelta( 0.f ),
 	m_activationStrenght( 1.f ),
-	m_playActivationCurve( false ),
-	m_playClipSphereFactorCurve( false ),
 	m_clipSphereFactor( 0.f ),
-	m_clipSphereFactorDelta( 0.f ),
 	m_clipSphereCenter( 0.f, 0.f, 0.f )
 {
 	// ship class needs to know if turrets get added or removed
@@ -147,25 +143,7 @@ void EveMobile::PrepareShaderData( EveUpdateContext& updateContext )
 {
 	EveSpaceObject2::PrepareShaderData( updateContext );
 
-	// play activation curve
-	if( m_activationStrengthCurve && m_playActivationCurve )
-	{
-		float deltaT = updateContext.GetDeltaT();
-		m_activationDelta += deltaT;
-		m_activationStrenght = m_activationStrengthCurve->Update( m_activationDelta );
-	}
-
 	m_spaceObjectShipData.y *= m_activationStrenght;
-
-	if( m_clipSphereFactorCurve && m_playClipSphereFactorCurve )
-	{
-		float deltaT = updateContext.GetDeltaT();
-		m_clipSphereFactorDelta += deltaT;
-		m_clipSphereFactor = m_clipSphereFactorCurve->Update( m_clipSphereFactorDelta );
-
-		// This is here so we always have a correct clipsphere center, even when the ANIM_CMD_PLAY_CLIPSPHERE animation state is started when the object is not loaded
-		m_clipSphereCenter = -1.f * GetBoundingSphereCenter();
-	}
 
 	// the m_clipSphereFactor goes from 0.0 to 1.0 and is the "amount" of visibility of this whole
 	// object: 0.0 = fully visible, 1.0 = invisible.
@@ -626,150 +604,7 @@ bool EveMobile::DisplayChildren() const
 }
 
 // --------------------------------------------------------------------------------
-// Description:
-//   Play the objects activationStrengthCurve from the beginning.
-// --------------------------------------------------------------------------------
-void EveMobile::PlayActivationCurve()
-{
-	m_activationDelta = 0.0f;
-	m_playActivationCurve = true;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Play the objects buildingCurve from the beginning.
-// --------------------------------------------------------------------------------
-void EveMobile::PlayClipSphereFactorCurve()
-{
-	m_playClipSphereFactorCurve = true;
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Modifies the clip sphere curve by setting it's length and the time elapsed
-// --------------------------------------------------------------------------------
-void EveMobile::ModifyClipSphereCurve( const std::map<std::string, float>& parameters )
-{
-	m_clipSphereFactorDelta = 0.f;
-	if( parameters.find( "elapsedTime" ) != parameters.end() )
-	{
-		m_clipSphereFactorDelta = parameters.at( "elapsedTime" );
-	}
-
-	float curveLength = 1.0;
-	if( parameters.find( "curveLength" ) != parameters.end() )
-	{
-		curveLength = parameters.at( "curveLength" );
-	}
-	m_clipSphereFactorCurve->ScaleTime( curveLength );
-}
-
-// --------------------------------------------------------------------------------
 void EveMobile::ResetClipSphereCenter()
 {
 	m_clipSphereCenter = -1.0f * GetBoundingSphereCenter();
-}
-
-// --------------------------------------------------------------------------------
-// Description:
-//   Gets called by the state machine of this object to execute some command.
-// Return Value:
-//   Returns true if this implementation has handled the command.
-// --------------------------------------------------------------------------------
-bool EveMobile::ExecuteAnimationStateCommand( const EveAnimationCommand& cmd, const std::map<std::string, float>& parameters )
-{
-	std::string commandData = cmd.m_data;
-	float commandFloatValue = cmd.m_floatValue;
-	EveAnimationCmd commandType = cmd.m_command;
-
-	switch( commandType )
-	{
-	case ANIM_CMD_PLAYACTIVATION:
-		if( !commandData.empty() )
-		{
-			IRootPtr p;
-			p.Attach( BeResMan->LoadObject( commandData.c_str() ) );
-			if( p == NULL )
-			{
-				CCP_LOGERR( "EveMobile: Couldn't find PlayActivationCurve data resource file: %s", commandData.c_str() );
-				return true;
-			}
-
-			ITriScalarFunctionPtr ptr;
-			if( !p->QueryInterface( BlueInterfaceIID<ITriScalarFunction>(), (void**)&ptr ) )
-			{
-				CCP_LOGERR( "EveMobile: PlayActivationCurve resource file %s is not of correct type!", commandData.c_str() );
-				return true;
-			}
-			m_activationStrengthCurve = ptr;
-			PlayActivationCurve();
-		}
-		return true;
-
-	case ANIM_CMD_ACTIVATE_TURRETS:
-		for( auto it = m_turretSets.begin(); it != m_turretSets.end(); it++ )
-		{
-			(*it)->EnterStateIdle();
-		}
-		return true;
-
-	case ANIM_CMD_DEACTIVATE_TURRETS:
-		for( auto it = m_turretSets.begin(); it != m_turretSets.end(); it++ )
-		{
-			(*it)->EnterStateDeactive();
-		}
-		return true;
-
-	case ANIM_CMD_ACTIVATION_STRENGTH_ZERO:
-		m_activationStrenght = 0.f;
-		m_playActivationCurve = false;
-		return true;
-
-	case ANIM_CMD_ACTIVATION_STRENGTH_ONE:
-		m_activationStrenght = 1.f;
-		m_playActivationCurve = false;
-		return true;
-
-	case ANIM_CMD_PLAY_CLIPSPHERE:
-		if( !commandData.empty() )
-		{
-			IRootPtr p;
-			p.Attach( BeResMan->LoadObject( commandData.c_str() ) );
-			if( p == NULL )
-			{
-				CCP_LOGERR( "EveMobile: Couldn't find curve data resource file: %s", commandData.c_str() );
-				return true;
-			}
-
-			ITriScalarFunctionPtr ptr;
-			if( !p->QueryInterface( BlueInterfaceIID<ITriScalarFunction>(), (void**)&ptr ) )
-			{
-				CCP_LOGERR( "EveMobile: Curve resource file %s is not of correct type!", commandData.c_str() );
-				return true;
-			}
-
-			m_clipSphereFactorCurve = ptr;
-
-			m_clipSphereCenter = -1.0f * GetBoundingSphereCenter();
-
-			ModifyClipSphereCurve( parameters );			
-			PlayClipSphereFactorCurve();
-		}
-		return true;
-	case ANIM_CMD_STOP_CLIPSPHERE:
-		m_clipSphereFactor = 0.0f;
-		m_playClipSphereFactorCurve = false;
-		m_clipSphereCenter = Vector3( 0.0, 0.0, 0.0 );
-		return true;
-	case ANIM_CMD_SET_CLIPSPHERE:
-		m_clipSphereFactor = commandFloatValue;
-		m_playClipSphereFactorCurve = false;
-		m_clipSphereCenter = -1.0f * GetBoundingSphereCenter();
-		return true;
-
-	default:
-		// not handled here, so pass it up the chain
-		return EveSpaceObject2::ExecuteAnimationStateCommand( cmd,  parameters );
-	}
-	return false;
 }
