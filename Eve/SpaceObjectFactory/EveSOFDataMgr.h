@@ -210,6 +210,27 @@ public:
 		std::vector<uint32_t> indexBuffer;
 	};
 
+	struct HullDecalSetItemData
+	{
+		EveSOFDataHullDecal::Usage usage;
+		Vector3 position;
+		Quaternion rotation;
+		Vector3 scaling;
+		int boneIndex;
+		int meshIndex;
+		uint32_t glowColorType;
+		std::string shader;
+		std::map<BlueSharedString, TextureData> textures;
+		std::map<BlueSharedString, Vector4> parameters;
+		std::vector<uint32_t> indexBuffer;
+	};
+
+	struct HullDecalSetData
+	{
+		uint32_t visibilityGroup;
+		std::vector<HullDecalSetItemData> items;
+	};
+
 	struct HullChild
 	{
 		std::string redFilePath;
@@ -266,6 +287,7 @@ public:
 		Vector3 shapeEllipsoidCenter;
 		Vector3 shapeEllipsoidRadius;
 		bool isSkinned;
+		bool isUsingDecalSets;
 		bool enableDynamicBoundingSphere;
 		bool castShadow;
 		Vector3 audioPosition;
@@ -274,6 +296,7 @@ public:
 		std::vector<HullPlaneSetData> planeSets;
 		std::vector<HullSpriteLineSetData> spriteLineSets;
 		std::vector<HullHazeSetData> hazeSets;
+		std::vector<HullDecalSetData> hullDecalSets;
 		PatternProjectionData defaultPattern;
 		EveSOFDataHull::ImpactEffectType impactEffectType;
 		std::vector<HullAreas> opaqueAreas;
@@ -579,6 +602,9 @@ private:
 	void GenerateGenericData( GenericData& gd, EveSOFDataGenericPtr srcData ) const;
 	void GenerateMaterialData( MaterialData& rd, EveSOFDataMaterialPtr srcData ) const;
 	void GeneratePatternData( PatternData& rd, EveSOFDataPatternPtr srcData ) const;
+
+	// helper function to get the hash
+	uint32_t GetVisibilityGroupHash( const BlueSharedString visibilityGroup ) const;
 
 	// keep all hull data in a map
 	std::map<std::string, HullData> m_hullData;

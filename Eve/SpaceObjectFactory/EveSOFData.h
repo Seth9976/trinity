@@ -709,6 +709,51 @@ public:
 TYPEDEF_BLUECLASS( EveSOFDataHullDecal );
 BLUE_DECLARE_VECTOR( EveSOFDataHullDecal );
 
+BLUE_CLASS( EveSOFDataHullDecalSetItem ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataHullDecalSetItem( IRoot* lockobj = NULL );
+	~EveSOFDataHullDecalSetItem() {}
+
+
+	// per-hull data of a hull decal
+	std::string m_name;
+	EveSOFDataHullDecal::Usage m_usage;
+	Vector3 m_position, m_scaling;
+	Quaternion m_rotation;
+	std::string m_shader;
+	int m_boneIndex, m_meshIndex;
+	EveSOFDataFactionColorSet::ColorType m_glowColorType;
+	PEveSOFDataTextureVector m_textures;
+	PEveSOFDataParameterVector m_parameters;
+	PEveSOFDataDecalIndexStructureList m_indexBuffer;
+};
+TYPEDEF_BLUECLASS( EveSOFDataHullDecalSetItem );
+BLUE_DECLARE_VECTOR( EveSOFDataHullDecalSetItem );
+
+
+BLUE_CLASS( EveSOFDataHullDecalSet ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataHullDecalSet( IRoot* lockobj = NULL );
+	~EveSOFDataHullDecalSet() {}
+
+	// general
+	std::string m_name;
+	// visibility group name
+	BlueSharedString m_visibilityGroup;
+	// items
+	PEveSOFDataHullDecalSetItemVector m_items;
+};
+
+TYPEDEF_BLUECLASS( EveSOFDataHullDecalSet );
+BLUE_DECLARE_VECTOR( EveSOFDataHullDecalSet );
+
+
 
 BLUE_CLASS( EveSOFDataHullController ) :
 	public IRoot
@@ -771,6 +816,9 @@ public:
 	bool m_isSkinned;
 	bool m_enableDynamicBoundingSphere;
 	bool m_castShadow;
+	
+	// WIP things
+	bool m_useNewDecalSets;
 
 	// materials
 	PEveSOFDataHullAreaVector m_opaqueAreas;
@@ -788,6 +836,7 @@ public:
 	PEveSOFDataHullPlaneSetVector m_planeSets;
 	PEveSOFDataHullSpriteLineSetVector m_spriteLineSets;
 	PEveSOFDataHullHazeSetVector m_hazeSets;
+	PEveSOFDataHullDecalSetVector m_decalSets;
 	ImpactEffectType m_impactEffectType;
 
 	// decals

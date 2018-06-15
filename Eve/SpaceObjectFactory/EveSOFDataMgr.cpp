@@ -26,6 +26,17 @@ EveSOFDataMgr::~EveSOFDataMgr()
 
 }
 
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Generate a hash for the visibility group, keeping this here to reduce 
+//   code duplication
+// --------------------------------------------------------------------------------
+uint32_t EveSOFDataMgr::GetVisibilityGroupHash( const BlueSharedString visibilityGroup ) const
+{
+	return CcpHashFNV1( visibilityGroup.c_str(), std::string(visibilityGroup.c_str()).length() );
+}
+
 // --------------------------------------------------------------------------------
 // Description:
 //   check if hull data is there. Mainly for debug reason!
@@ -457,6 +468,7 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 	hd.shapeEllipsoidCenter = srcData->m_shapeEllipsoidCenter;
 	hd.shapeEllipsoidRadius = srcData->m_shapeEllipsoidRadius;
 	hd.isSkinned = srcData->m_isSkinned;
+	hd.isUsingDecalSets = srcData->m_useNewDecalSets;
 	hd.enableDynamicBoundingSphere = srcData->m_enableDynamicBoundingSphere;
 	hd.castShadow = srcData->m_castShadow;
 	hd.audioPosition = srcData->m_audioPosition;
@@ -497,8 +509,7 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 
 		HullSpriteSetData hssd;
 		hssd.skinned = spriteSetData->m_skinned;
-		std::string visGroupName( spriteSetData->m_visibilityGroup.c_str() );
-		hssd.visibilityGroup = CcpHashFNV1( visGroupName.c_str(), visGroupName.size() );
+		hssd.visibilityGroup = GetVisibilityGroupHash( spriteSetData->m_visibilityGroup );
 		for( auto ssiit = spriteSetData->m_items.begin(); ssiit != spriteSetData->m_items.end(); ++ssiit )
 		{
 			EveSOFDataHullSpriteSetItemPtr spriteSetItemData = (*ssiit);
@@ -590,8 +601,8 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 
 		HullSpriteLineSetData hslsd;
 		hslsd.skinned = spriteLineSetData->m_skinned;
-		std::string visGroupName( spriteLineSetData->m_visibilityGroup.c_str() );
-		hslsd.visibilityGroup = CcpHashFNV1( visGroupName.c_str(), visGroupName.size() );
+		hslsd.visibilityGroup = GetVisibilityGroupHash( spriteLineSetData->m_visibilityGroup );
+
 		for( auto slsiit = spriteLineSetData->m_items.begin(); slsiit != spriteLineSetData->m_items.end(); ++slsiit )
 		{
 			EveSOFDataHullSpriteLineSetItemPtr spriteLineSetItemData = ( *slsiit );
@@ -658,8 +669,8 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 
 		HullDecalData hdd;
 		hdd.useLegacy = hullDecal->m_useLegacy;
-		std::string visGroupName( hullDecal->m_visibilityGroup.c_str() );
-		hdd.visibilityGroup = CcpHashFNV1( visGroupName.c_str(), visGroupName.size() );
+		hdd.visibilityGroup = GetVisibilityGroupHash( hullDecal->m_visibilityGroup );
+
 		hdd.usage = hullDecal->m_usage;
 		hdd.position = hullDecal->m_position;
 		hdd.rotation = hullDecal->m_rotation;
@@ -685,6 +696,46 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 			hdd.parameters[parameterData->m_name] = parameterData->m_value;
 		}
 		hd.hullDecals.push_back( hdd );
+	}
+
+	// hull decal sets
+	hd.hullDecalSets.clear();
+	for( auto hds = srcData->m_decalSets.begin(); hds != srcData->m_decalSets.end(); ++hds )
+	{
+		EveSOFDataHullDecalSetPtr hullDecalSet = (*hds);
+		HullDecalSetData decalSetData;
+		decalSetData.visibilityGroup = GetVisibilityGroupHash( hullDecalSet->m_visibilityGroup );
+		decalSetData.items.clear();
+
+		for( auto hdsi = hullDecalSet->m_items.begin(); hdsi != hullDecalSet->m_items.end(); ++hdsi )
+		{
+			EveSOFDataHullDecalSetItemPtr itemPtr = (*hdsi);
+			HullDecalSetItemData itemData;
+			itemData.boneIndex = itemPtr->m_boneIndex;
+			itemData.glowColorType = itemPtr->m_glowColorType;
+			itemData.indexBuffer.insert( itemData.indexBuffer.begin(), itemPtr->m_indexBuffer.begin(), itemPtr->m_indexBuffer.end() );
+			itemData.meshIndex = itemPtr->m_meshIndex;
+			itemData.position = itemPtr->m_position;
+			itemData.rotation = itemPtr->m_rotation;
+			itemData.scaling = itemPtr->m_scaling;
+			itemData.shader = itemPtr->m_shader;
+			itemData.usage = itemPtr->m_usage;
+
+			for( auto hdtit = itemPtr->m_textures.begin(); hdtit != itemPtr->m_textures.end(); ++hdtit )
+			{
+				EveSOFDataTexturePtr textureData = (*hdtit);
+
+				TextureData td;
+				td.resFilePath = textureData->m_resFilePath;
+				itemData.textures[textureData->m_name] = td;
+			}
+			for( auto hdpit = itemPtr->m_parameters.begin(); hdpit != itemPtr->m_parameters.end(); ++hdpit )
+			{
+				EveSOFDataParameterPtr parameterData = (*hdpit);
+
+				itemData.parameters[parameterData->m_name] = parameterData->m_value;
+			}
+		}
 	}
 
 	// meshareas
@@ -902,6 +953,7 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 	{
 		for( auto vgsit = srcData->m_visibilityGroupSet->m_visibilityGroups.begin(); vgsit != srcData->m_visibilityGroupSet->m_visibilityGroups.end(); ++vgsit )
 		{
+			// Should this also use the GetVisibilityGroupHash function?
 			uint32_t h = CcpHashFNV1( ( *vgsit )->m_str.c_str(), ( *vgsit )->m_str.size() );
 			fd.visibilityData.insert( h );
 		}

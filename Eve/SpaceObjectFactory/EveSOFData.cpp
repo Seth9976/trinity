@@ -242,6 +242,7 @@ EveSOFDataHull::EveSOFDataHull( IRoot* lockobj ) :
 	PARENTLOCK( m_planeSets ),
 	PARENTLOCK( m_spriteLineSets ),
 	PARENTLOCK( m_hazeSets ),
+	PARENTLOCK( m_decalSets ),
 	PARENTLOCK( m_hullDecals ),
 	PARENTLOCK( m_opaqueAreas ),
 	PARENTLOCK( m_decalAreas ),
@@ -261,6 +262,7 @@ EveSOFDataHull::EveSOFDataHull( IRoot* lockobj ) :
 	m_isSkinned( false ),
 	m_enableDynamicBoundingSphere( false ),
 	m_castShadow( true ),
+	m_useNewDecalSets( false ),
 	m_impactEffectType( IMPACTEFFECT_NONE ),
 	m_audioPosition( 0.f, 0.f, 0.f )
 {}
@@ -472,6 +474,24 @@ EveSOFDataHullHazeSetItem::EveSOFDataHullHazeSetItem( IRoot* lockobj ) :
 	m_colorType( EveSOFDataFactionColorSet::TYPE_PRIMARY ),
 	m_hazeBrightness( 1.f ), m_hazeFalloff( 6.f ), m_sourceSize( 0.2f ), m_sourceBrightness( 2.f ),
 	m_boosterGainInfluence( false )
+{}
+
+EveSOFDataHullDecalSet::EveSOFDataHullDecalSet( IRoot* lockobj ):
+	PARENTLOCK( m_items ),
+	m_visibilityGroup( "primary" )
+{}
+
+EveSOFDataHullDecalSetItem::EveSOFDataHullDecalSetItem( IRoot* lockobj ) :
+	m_usage( EveSOFDataHullDecal::USAGE_STANDARD ),
+	m_position( 0.f, 0.f, 0.f ),
+	m_rotation( 0.f, 0.f, 0.f, 1.f ),
+	m_scaling( 1.f, 1.f, 1.f ),
+	m_boneIndex( -1 ),
+	m_meshIndex( -1 ),
+	m_glowColorType( EveSOFDataFactionColorSet::TYPE_PRIMARY ),
+	PARENTLOCK( m_textures ),
+	PARENTLOCK( m_parameters ),
+	PARENTLOCK( m_indexBuffer )
 {}
 
 EveSOFDataFactionVisibilityGroupSet::EveSOFDataFactionVisibilityGroupSet( IRoot* lockobj ) :

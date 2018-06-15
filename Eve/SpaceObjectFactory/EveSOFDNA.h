@@ -73,6 +73,7 @@ public:
 	const Vector3* GetHullShapeEllipsoidCenter() const;
 	const Vector3* GetHullShapeEllipsoidRadius() const;
 	bool IsHullAnimated() const;
+	bool IsHullUsingDecalSets() const;
 	bool DynamicBoundingSphereEnabled() const;
 	bool CastShadow() const;
 	const EveSOFDataMgr::HullBoosterData* GetHullBoosterData( size_t n ) const;
@@ -88,6 +89,7 @@ public:
 	const std::vector<EveSOFDataMgr::HullAnimation>& GetHullAnimations() const;
 	const std::vector<BlueSharedString>& GetHullControllers() const;
 	const std::vector<EveSOFDataMgr::HullDecalData>& GetHullDecals( size_t n ) const;
+	const std::vector<EveSOFDataMgr::HullDecalSetData>& GetHullDecalSets( size_t n ) const;
 	const std::vector<EveSOFDataMgr::HullPlaneSetData>& GetHullPlaneSets( size_t n ) const;
 	const std::vector<EveSOFDataMgr::HullSpotlightSetData>& GetHullSpotlightSets( size_t n ) const;
 	const std::vector<EveSOFDataMgr::HullSpriteSetData>& GetHullSpriteSets( size_t n ) const;

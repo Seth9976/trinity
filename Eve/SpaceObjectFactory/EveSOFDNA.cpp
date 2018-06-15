@@ -707,6 +707,15 @@ const std::vector<EveSOFDataMgr::HullDecalData>& EveSOFDNA::GetHullDecals( size_
 
 // --------------------------------------------------------------------------------
 // Description:
+//   Returns an array of all the decal sets for this hull
+// --------------------------------------------------------------------------------
+const std::vector<EveSOFDataMgr::HullDecalSetData>& EveSOFDNA::GetHullDecalSets( size_t n ) const
+{
+	return m_hullDatas[n]->hullDecalSets;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
 //   Changes the provided texture resource path, maybe modified depending on dna
 // --------------------------------------------------------------------------------
 void EveSOFDNA::ModifyTextureResPath( std::string& resPath, const char* resName ) const
@@ -925,6 +934,15 @@ const Vector3* EveSOFDNA::GetHullAudioPosition( size_t n ) const
 bool EveSOFDNA::IsHullAnimated() const
 {
 	return m_hullDatas[0]->isSkinned;
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Is this hull animated/skinned?
+// --------------------------------------------------------------------------------
+bool EveSOFDNA::IsHullUsingDecalSets() const
+{
+	return m_hullDatas[0]->isUsingDecalSets;
 }
 
 // --------------------------------------------------------------------------------
