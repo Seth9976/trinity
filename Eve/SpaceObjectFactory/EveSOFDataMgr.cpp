@@ -684,6 +684,7 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 				itemData.rotation = itemPtr->m_rotation;
 				itemData.scaling = itemPtr->m_scaling;
 				itemData.usage = itemPtr->m_usage;
+				itemData.logoType = itemPtr->m_logoType;
 
 				for( auto hdtit = itemPtr->m_textures.begin(); hdtit != itemPtr->m_textures.end(); ++hdtit )
 				{
@@ -950,6 +951,29 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 		{
 			// spriteset colors
 			fd.colorData.colors[i] = srcData->m_colorSet->m_colors[i];
+		}
+	}
+
+	// colors
+	if( srcData->m_logoSet )
+	{
+		fd.logoSetData = LogoSetData();
+		for( size_t i = 0; i < EveSOFDataLogoSet::TYPE_MAX; ++i )
+		{
+			// logo information
+			EveSOFDataLogoPtr srcLogo = srcData->m_logoSet->m_logos[i];
+
+			if( srcLogo )
+			{
+				LogoData destLogo = LogoData();
+				destLogo.albedoMapResPath = srcLogo->m_albedoMapResPath;
+				destLogo.fresnelMapResPath = srcLogo->m_fresnelMapResPath;
+				destLogo.normalMapResPath = srcLogo->m_normalMapResPath;
+				destLogo.roughnessMapResPath = srcLogo->m_roughnessMapResPath;
+				destLogo.transparencyMapResPath = srcLogo->m_transparencyMapResPath;
+
+				fd.logoSetData.logos[i] = destLogo;
+			}
 		}
 	}
 

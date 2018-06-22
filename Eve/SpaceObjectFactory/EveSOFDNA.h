@@ -112,6 +112,9 @@ public:
 	// get color data
 	const Color* GetColorSet() const;
 
+	// get logo data
+	const EveSOFDataMgr::LogoData* GetLogo( size_t index ) const;
+
 	// get visibility data
 	bool IsInVisibilityData( uint32_t h ) const;
 

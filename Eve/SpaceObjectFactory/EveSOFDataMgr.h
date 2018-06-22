@@ -219,6 +219,7 @@ public:
 		int boneIndex;
 		int meshIndex;
 		uint32_t glowColorType;
+		EveSOFDataLogoSet::LogoType logoType;
 		std::map<BlueSharedString, TextureData> textures;
 		std::map<BlueSharedString, Vector4> parameters;
 		std::vector<uint32_t> indexBuffer;
@@ -323,6 +324,22 @@ public:
 		Color colors[EveSOFDataFactionColorSet::TYPE_MAX];
 	};
 
+
+	// Logo data structs
+	struct LogoData
+	{
+		std::string transparencyMapResPath;
+		std::string normalMapResPath;
+		std::string fresnelMapResPath;
+		std::string albedoMapResPath;
+		std::string roughnessMapResPath;
+	};
+
+	struct LogoSetData
+	{
+		LogoData logos[EveSOFDataLogoSet::TYPE_MAX];
+	};
+
 	// faction data structs
 	struct FactionSpriteSetColorData
 	{
@@ -370,6 +387,8 @@ public:
 		AreaMaterialData areaMaterials;
 		// color data
 		ColorData colorData;
+		// logo data
+		LogoSetData logoSetData;
 		// visibility data
 		std::set<uint32_t> visibilityData;
 		// spotlight sets

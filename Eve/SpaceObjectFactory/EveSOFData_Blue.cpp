@@ -32,6 +32,18 @@ Be::VarChooser EveSOFDataFactionColorSetTypeChooser[] =
 BLUE_REGISTER_ENUM_EX( "EveSOFDataFactionColorSetType", EveSOFDataFactionColorSet::ColorType, EveSOFDataFactionColorSetTypeChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
 
 
+Be::VarChooser EveSOFDataLogoSetTypeChooser[] =
+{
+	{ "Primary", BeCast( EveSOFDataLogoSet::TYPE_PRIMARY ), "Primary Logo" },
+	{ "Secondary", BeCast( EveSOFDataLogoSet::TYPE_SECONDARY ), "Secondary Logo" },
+	{ "Teritary", BeCast( EveSOFDataLogoSet::TYPE_TERTIARY), "Teritiary Logo" },
+	{ "Marking_01", BeCast( EveSOFDataLogoSet::TYPE_MARKING_01 ), "Marking 01 Logo" },
+	{ "Marking_02", BeCast( EveSOFDataLogoSet::TYPE_MARKING_02 ), "Marking 02 Logo" },
+	{ 0 }
+};
+BLUE_REGISTER_ENUM_EX( "EveSOFDataLogoSetType", EveSOFDataLogoSet::LogoType, EveSOFDataLogoSetTypeChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
+
+
 BLUE_DEFINE( EveSOFDataAreaMaterial );
 const Be::ClassInfo* EveSOFDataAreaMaterial::ExposeToBlue()
 {
@@ -761,9 +773,11 @@ Be::VarChooser EveSOFDecalUsageChooser[] =
 	{ "Cylindrical", BeCast( EveSOFDataHullDecal::USAGE_CYLINDRICAL ), "Cylindrical decal" },
 	{ "GlowCylindrical", BeCast( EveSOFDataHullDecal::USAGE_GLOWCYLINDRICAL ), "Glow cylindrical decal" },
 	{ "Glow", BeCast( EveSOFDataHullDecal::USAGE_GLOWSTANDARD ), "Glow decal" },
+	{ "Logo", BeCast( EveSOFDataHullDecal::USAGE_LOGO), "Logo decal" },
 	{ 0 }
 };
 BLUE_REGISTER_ENUM_EX( "DecalUsage", EveSOFDataHullDecal::Usage, EveSOFDecalUsageChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
+
 
 const Be::ClassInfo* EveSOFDataHullDecal::ExposeToBlue()
 {
@@ -801,12 +815,12 @@ const Be::ClassInfo* EveSOFDataHullDecalSetItem::ExposeToBlue()
 		MAP_ATTRIBUTE( "boneIndex", m_boneIndex, ":jessica-widget: boneindex", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "meshIndex", m_meshIndex, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE_WITH_CHOOSER( "glowColorType", m_glowColorType, "", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFDataFactionColorSetTypeChooser )
+		MAP_ATTRIBUTE_WITH_CHOOSER( "logoType", m_logoType, "", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFDataLogoSetTypeChooser )
 		MAP_ATTRIBUTE( "parameters", m_parameters, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "textures", m_textures, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "indexBuffer", m_indexBuffer, "", Be::READWRITE | Be::PERSIST )
 		EXPOSURE_END()
 }
-
 
 
 BLUE_DEFINE( EveSOFDataHullDecalSet );
@@ -822,6 +836,37 @@ const Be::ClassInfo* EveSOFDataHullDecalSet::ExposeToBlue()
 }
 
 
+BLUE_DEFINE( EveSOFDataLogo );
+const Be::ClassInfo* EveSOFDataLogo::ExposeToBlue()
+{
+	EXPOSURE_BEGIN( EveSOFDataLogo, "" )
+		MAP_INTERFACE( EveSOFDataLogo )
+
+		MAP_ATTRIBUTE( "albedoMapResPath", m_albedoMapResPath, "Respath for the albedo map for a logo.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "fresnelMapResPath", m_fresnelMapResPath, "Respath for the fresnel map for a logo.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "normalMapResPath", m_normalMapResPath, "Respath for the normal map for a logo.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "roughnessMapResPath", m_roughnessMapResPath, "Respath for the roughness map for a logo.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "transparencyMapResPath", m_transparencyMapResPath, "Respath for the transparency map for a logo.", Be::READWRITE | Be::PERSIST )
+		EXPOSURE_END()
+}
+
+
+BLUE_DEFINE( EveSOFDataLogoSet );
+const Be::ClassInfo* EveSOFDataLogoSet::ExposeToBlue()
+{
+	EXPOSURE_BEGIN( EveSOFDataLogoSet, "" )
+		MAP_INTERFACE( EveSOFDataLogoSet )
+
+		MAP_ATTRIBUTE( EveSOFDataLogoSetTypeChooser[TYPE_PRIMARY].mKey, m_logos[TYPE_PRIMARY], ":jessica-group:Logos", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( EveSOFDataLogoSetTypeChooser[TYPE_SECONDARY].mKey, m_logos[TYPE_SECONDARY], ":jessica-group:Logos", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( EveSOFDataLogoSetTypeChooser[TYPE_TERTIARY].mKey, m_logos[TYPE_TERTIARY], ":jessica-group:Logos", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( EveSOFDataLogoSetTypeChooser[TYPE_MARKING_01].mKey, m_logos[TYPE_MARKING_01], ":jessica-group:Logos", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( EveSOFDataLogoSetTypeChooser[TYPE_MARKING_02].mKey, m_logos[TYPE_MARKING_02], ":jessica-group:Logos", Be::READWRITE | Be::PERSIST )
+		
+		EXPOSURE_END()
+}
+
+
 BLUE_DEFINE( EveSOFDataFaction );
 const Be::ClassInfo* EveSOFDataFaction::ExposeToBlue()
 {
@@ -833,6 +878,7 @@ const Be::ClassInfo* EveSOFDataFaction::ExposeToBlue()
 		MAP_ATTRIBUTE( "resPathInsert", m_resPathInsert, "Insert string to build texture res path.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "areaTypes", m_areaTypes, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "colorSet", m_colorSet, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "logoSet", m_logoSet, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "decals", m_decals, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "spotlightSets", m_spotlightSets, "All the groups of spotlight sets.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "planeSets", m_planeSets, "All the groups of plane sets.", Be::READWRITE | Be::PERSIST )

@@ -142,6 +142,47 @@ public:
 };
 TYPEDEF_BLUECLASS( EveSOFDataFactionColorSet );
 
+BLUE_CLASS( EveSOFDataLogo ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataLogo( IRoot* lockobj = NULL );
+	~EveSOFDataLogo() {}
+
+	std::string m_transparencyMapResPath;
+	std::string m_normalMapResPath;
+	std::string m_fresnelMapResPath;
+	std::string m_albedoMapResPath;
+	std::string m_roughnessMapResPath;
+};
+TYPEDEF_BLUECLASS( EveSOFDataLogo );
+
+
+BLUE_CLASS( EveSOFDataLogoSet ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataLogoSet( IRoot* lockobj = NULL );
+	~EveSOFDataLogoSet() {}
+
+	// color type
+	enum LogoType
+	{
+		TYPE_PRIMARY = 0,
+		TYPE_SECONDARY,
+		TYPE_TERTIARY,
+		TYPE_MARKING_01,
+		TYPE_MARKING_02,
+		TYPE_MAX
+	};
+
+	// logo data
+	EveSOFDataLogoPtr m_logos[TYPE_MAX];
+};
+TYPEDEF_BLUECLASS( EveSOFDataLogoSet );
+
 BLUE_CLASS( EveSOFDataAreaMaterial ) :
 	public IRoot
 {
@@ -193,9 +234,6 @@ public:
 	EveSOFDataAreaMaterialPtr m_materials[TYPE_MAX];
 };
 TYPEDEF_BLUECLASS( EveSOFDataArea );
-
-
-
 
 
 // --------------------------------------------------------------------------------
@@ -688,6 +726,7 @@ public:
 		USAGE_CYLINDRICAL,
 		USAGE_GLOWCYLINDRICAL,
 		USAGE_GLOWSTANDARD,
+		USAGE_LOGO,
 
 		USAGE_MAX,
 	};
@@ -717,10 +756,10 @@ public:
 	EveSOFDataHullDecalSetItem( IRoot* lockobj = NULL );
 	~EveSOFDataHullDecalSetItem() {}
 
-
 	// per-hull data of a hull decal
 	std::string m_name;
 	EveSOFDataHullDecal::Usage m_usage;
+	EveSOFDataLogoSet::LogoType m_logoType;
 	Vector3 m_position, m_scaling;
 	Quaternion m_rotation;
 	int m_boneIndex, m_meshIndex;
@@ -1001,6 +1040,7 @@ public:
 	PEveSOFDataFactionChildVector m_children;
 	EveSOFDataFactionVisibilityGroupSetPtr m_visibilityGroupSet;
 	EveSOFDataFactionColorSetPtr m_colorSet;
+	EveSOFDataLogoSetPtr m_logoSet;
 
 	// material usage
 	int m_materialUsageMtl1;

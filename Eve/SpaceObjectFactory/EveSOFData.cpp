@@ -36,6 +36,22 @@ EveSOFDataFactionColorSet::EveSOFDataFactionColorSet( IRoot* lockobj )
 	memset( m_colors, 0, TYPE_MAX * sizeof( Color ) );
 }
 
+EveSOFDataLogo::EveSOFDataLogo( IRoot* lockobj ):
+	m_albedoMapResPath(""),
+	m_fresnelMapResPath( "" ),
+	m_normalMapResPath( "" ),
+	m_roughnessMapResPath( "" ),
+	m_transparencyMapResPath( "" )
+{
+}
+
+EveSOFDataLogoSet::EveSOFDataLogoSet( IRoot* lockobj )
+{
+	for( uint32_t i = 0; i < TYPE_MAX; ++i )
+	{
+		m_logos[i] = EveSOFDataLogoPtr();
+	}
+}
 
 EveSOFDataParameter::EveSOFDataParameter( IRoot* lockobj ) :
 	m_value( 0.f, 0.f, 0.f, 0.f )
@@ -489,6 +505,7 @@ EveSOFDataHullDecalSetItem::EveSOFDataHullDecalSetItem( IRoot* lockobj ) :
 	m_boneIndex( -1 ),
 	m_meshIndex( -1 ),
 	m_glowColorType( EveSOFDataFactionColorSet::TYPE_PRIMARY ),
+	m_logoType( EveSOFDataLogoSet::TYPE_PRIMARY ),
 	PARENTLOCK( m_textures ),
 	PARENTLOCK( m_parameters ),
 	PARENTLOCK( m_indexBuffer )

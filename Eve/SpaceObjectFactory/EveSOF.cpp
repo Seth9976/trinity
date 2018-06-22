@@ -62,6 +62,7 @@ EveSOF::EveSOF( IRoot* lockobj ) :
 	m_decalsEffectName[EveSOFDataHullDecal::USAGE_CYLINDRICAL] = BlueSharedString( "decalcylindricalv5.fx" );
 	m_decalsEffectName[EveSOFDataHullDecal::USAGE_GLOWCYLINDRICAL] = BlueSharedString( "decalglowcylindricalv5.fx" );
 	m_decalsEffectName[EveSOFDataHullDecal::USAGE_GLOWSTANDARD] = BlueSharedString( "decalglowv5.fx" );
+	m_decalsEffectName[EveSOFDataHullDecal::USAGE_LOGO] = BlueSharedString( "decalv5.fx" );
 
 	// pre-register some really needed vars in the global variable store
 	Tr2Variable var1( "DepthMap", (ITr2TextureProvider*)nullptr );
@@ -1817,6 +1818,7 @@ void EveSOF::SetupDecalSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 				// create
 				EveSpaceObjectDecalPtr decal;
 				decal.CreateInstance();
+				
 				// set general datas
 				decal->SetPosition( hdsiit->position + hullOffset );
 				decal->SetRotation( hdsiit->rotation );
@@ -1843,7 +1845,7 @@ void EveSOF::SetupDecalSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 				std::string shaderPath = dna->GetDecalShaderLocationResPath() + std::string( "/" ) + dna->GetShaderPrefix( false ) + m_decalsEffectName[hdsiit->usage].c_str();
 				shader->SetEffectPathName( shaderPath.c_str() );
 
-				// Set the glow color based on the factional glow colors
+				// Set the glow color based on the colors in the colorset
 				if( hdsiit->usage == EveSOFDataHullDecal::USAGE_GLOWSTANDARD || hdsiit->usage == EveSOFDataHullDecal::USAGE_GLOWCYLINDRICAL )
 				{
 					Color decalGlowColor = dna->GetColorSet()[hdsiit->glowColorType];
@@ -1859,19 +1861,6 @@ void EveSOF::SetupDecalSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 				{
 					shader->AddResourceTexture2D( hdtit->first, hdtit->second.resFilePath.c_str() );
 				}
-
-				// then set the factional
-				/*if( fdd )
-				{
-				for( auto fdpit = fdd->parameters.begin(); fdpit != fdd->parameters.end(); ++fdpit )
-				{
-				shader->AddParameterVector4( fdpit->first, &fdpit->second );
-				}
-				for( auto fdtit = fdd->textures.begin(); fdtit != fdd->textures.end(); ++fdtit )
-				{
-				shader->AddResourceTexture2D( fdtit->first, fdtit->second.resFilePath.c_str() );
-				}
-				}*/
 
 				// find data on this shader from generics, we need it!
 				const EveSOFDataMgr::GenericDecalShaderData* shaderData = dna->GetGenericDecalShaderData( m_decalsEffectName[hdsiit->usage] );
@@ -1897,6 +1886,28 @@ void EveSOF::SetupDecalSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) co
 						}
 					}
 				}
+				
+				// Set the logo from the logoset
+				if( hdsiit->usage == EveSOFDataHullDecal::USAGE_LOGO )
+				{
+					const EveSOFDataMgr::LogoData* logo = dna->GetLogo( hdsiit->logoType );
+
+					shader->AddResourceTexture2D( BlueSharedString( "DecalAlbedoMap" ), logo ? logo->albedoMapResPath.c_str() : "" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalFresnelMap" ), logo ? logo->fresnelMapResPath.c_str() : "" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalNormalMap" ), logo ? logo->normalMapResPath.c_str() : "" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalRoughnessMap" ), logo ? logo->roughnessMapResPath.c_str() : "" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalTransparencyMap" ), logo ? logo->transparencyMapResPath.c_str() : "" );
+				}
+				else
+				{
+					// add these as fallback (they won't get overridden if they exist on the decal)
+					shader->AddResourceTexture2D( BlueSharedString( "DecalAlbedoMap" ), "res:/dx9/model/Decal/Notification_Invalid_A.tga" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalFresnelMap" ), "res:/dx9/model/Decal/Notification_Invalid_F.tga" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalNormalMap" ), "res:/dx9/model/Decal/Notification_Invalid_N.tga" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalRoughnessMap" ), "res:/dx9/model/Decal/Notification_Invalid_R.tga" );
+					shader->AddResourceTexture2D( BlueSharedString( "DecalTransparencyMap" ), "res:/dx9/model/Decal/Notification_Invalid_T.tga" );
+				}
+
 
 				// init and add
 				shader->EndUpdate();
