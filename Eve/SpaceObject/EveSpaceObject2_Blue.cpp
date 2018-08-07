@@ -282,14 +282,6 @@ const Be::ClassInfo* EveSpaceObject2::ExposeToBlue()
 
 		MAP_ATTRIBUTE
 		(
-			"spriteLineSets",
-			m_spriteLineSets,
-			"Sprite line sets attached to the object",
-			Be::READWRITE | Be::PERSIST
-		)
-
-		MAP_ATTRIBUTE
-		(
 			"attachments",
 			m_attachments,
 			"Item sets attached to the object",

@@ -7,6 +7,7 @@
 #ifndef EveSpriteLineSet_H
 #define EveSpriteLineSet_H
 
+#include "IEveSpaceObjectAttachment.h"
 #include "EveSpriteLineSetItem.h"
 #include "Eve/SpaceObject/Attachments/Sets/EveSpriteSet.h"
 
@@ -20,6 +21,7 @@ BLUE_DECLARE( Tr2Effect );
 //   This class is for rendering a line made of sprite set blinkies
 // --------------------------------------------------------------------------------
 BLUE_CLASS( EveSpriteLineSet ):
+	public IEveSpaceObjectAttachment,
 	public IInitialize,
 	public Tr2DeviceResource
 {
@@ -40,13 +42,15 @@ private:
 	bool OnPrepareResources();
 
 public:
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	// IEveSpaceObjectAttachment
+	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	virtual void AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& parentTransform, float activation, float boosterGain, const granny_matrix_3x4* bones, size_t boneCount );
+
 	// setup
 	void Setup( Tr2EffectPtr effect, bool isSkinned );
 	void Add( EveSpriteLineSetItemPtr newItem );
-
-	// quad renderer
-	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
-	void AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& world, float activation, const granny_matrix_3x4* bones, size_t boneCount );
 
 	// rebuild resources
 	void Rebuild();

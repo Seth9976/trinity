@@ -204,17 +204,7 @@ void EveSpriteLineSet::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 }
 
 // --------------------------------------------------------------------------------
-// Description:
-//   Adds sprites to render with quad renderer if quad rendering was enabled with 
-//   UseQuadRenderer call.
-// Arguments:
-//   quadRenderer - quad renderer
-//   world - parent local to world transform
-//   activation - parent "activation" state
-//   bones - array of bone transforms
-//   boneCount - number of bones
-// --------------------------------------------------------------------------------
-void EveSpriteLineSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& world, float activation, const granny_matrix_3x4* bones, size_t boneCount )
+void EveSpriteLineSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const Matrix& parentTransform, float activation, float, const granny_matrix_3x4* bones, size_t boneCount )
 {
 	if( !m_display || m_spriteData.empty() )
 	{
@@ -230,7 +220,7 @@ void EveSpriteLineSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const M
 			reinterpret_cast<XMFLOAT3*>( &m_spriteData[0] ),
 			sizeof( EveSpriteSet::SpriteData ),
 			uint32_t( n ),
-			world );
+			parentTransform );
 	}
 	else
 	{
@@ -243,13 +233,13 @@ void EveSpriteLineSet::AddToQuadRenderer( Tr2QuadRenderer& quadRenderer, const M
 				XMVECTOR position = XMVector3TransformCoord( XMLoadFloat3( reinterpret_cast<XMFLOAT3*>( &m_spriteData[i] ) ), m );
 				XMStoreFloat3A(
 					reinterpret_cast<XMFLOAT3*>( &m_buffer[i].position ),
-					XMVector3TransformCoord( position, world ) );
+					XMVector3TransformCoord( position, parentTransform ) );
 			}
 			else
 			{
 				XMStoreFloat3A(
 					reinterpret_cast<XMFLOAT3*>( &m_buffer[i].position ),
-					XMVector3TransformCoord( XMLoadFloat3( reinterpret_cast<XMFLOAT3*>( &m_spriteData[i] ) ), world ) );
+					XMVector3TransformCoord( XMLoadFloat3( reinterpret_cast<XMFLOAT3*>( &m_spriteData[i] ) ), parentTransform ) );
 			}
 		}
 	}

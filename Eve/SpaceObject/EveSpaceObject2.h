@@ -47,10 +47,6 @@ BLUE_DECLARE( EveSpotlightSet );
 BLUE_DECLARE_VECTOR( EveSpotlightSet );
 BLUE_DECLARE( EvePlaneSet );
 BLUE_DECLARE_VECTOR( EvePlaneSet );
-BLUE_DECLARE( EveSpriteLineSet );
-BLUE_DECLARE_VECTOR( EveSpriteLineSet );
-BLUE_DECLARE( EveHazeSet );
-BLUE_DECLARE_VECTOR( EveHazeSet );
 BLUE_DECLARE( Tr2GrannyAnimation );
 BLUE_DECLARE( EveTransform );
 BLUE_DECLARE( EveCustomMask );
@@ -331,7 +327,6 @@ public:
 	void AddSpriteSet( EveSpriteSetPtr newSpriteSet );
 	void AddSpotlightSet( EveSpotlightSetPtr newSpotlightSet );
 	void AddPlaneSet( EvePlaneSetPtr newPlaneSet );
-	void AddSpriteLineSet( EveSpriteLineSetPtr newSpriteLineSet );
 	void AddAttachment( IEveSpaceObjectAttachment* attachment );
 	void AddDecal( EveSpaceObjectDecalPtr newDecal );
 	void AddCurveSet( TriCurveSetPtr newCurveSet );
@@ -542,7 +537,6 @@ protected:
 	PEveSpriteSetVector m_spriteSets;
 	PEveSpotlightSetVector m_spotlightSets;
 	PEvePlaneSetVector m_planeSets;
-	PEveSpriteLineSetVector m_spriteLineSets;
 	PIEveSpaceObjectAttachmentVector m_attachments;
 
 	/////////////////////////////////////////////////////////////////////////////////////

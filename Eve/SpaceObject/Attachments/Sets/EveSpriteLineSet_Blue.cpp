@@ -13,6 +13,7 @@ const Be::ClassInfo* EveSpriteLineSet::ExposeToBlue()
     EXPOSURE_BEGIN( EveSpriteLineSet, "" )
         MAP_INTERFACE( EveSpriteLineSet )
 		MAP_INTERFACE( IInitialize )
+		MAP_INTERFACE( IEveSpaceObjectAttachment )
 
 		MAP_ATTRIBUTE( "display", m_display, "Specifies whether to render this set or not", Be::READWRITE )
 		MAP_ATTRIBUTE( "name", m_name, "Standard name", Be::READWRITE | Be::PERSIST )
