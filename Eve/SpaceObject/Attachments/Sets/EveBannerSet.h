@@ -25,6 +25,7 @@ struct EveBannerItem
 	Vector3 scaling;
 	float angleX;
 	float angleY;
+	int32_t reference;
 };
 
 BLUE_DECLARE_STRUCTURE_LIST( EveBannerItem );
@@ -52,10 +53,13 @@ public:
 	void AddBanner( const EveBannerItem& banner );
 	void SetEffect( Tr2Effect* effect );
 	void AddLodResource( Tr2LodResource* resource );
+	void SetKey( int32_t key );
 	void Rebuild();
 
 	void Render( Tr2RenderContext& renderContext ) const;
 	unsigned int GetPickingID() const;
+
+	int32_t GetReference( size_t index ) const;
 protected:
 	virtual void ReleaseResources( TriStorage s );
 	virtual bool OnPrepareResources();
@@ -66,6 +70,8 @@ private:
 
 	AxisAlignedBoundingBox GetAabb( const granny_matrix_3x4* bones, size_t boneCount ) const;
 	void CreateBannerGeometry( std::vector<Vertex>& vertices, std::vector<uint16_t>& indices, const EveBannerItem& item ) const;
+	void CreateFlatBannerGeometry( std::vector<Vertex>& vertices, std::vector<uint16_t>& indices, const EveBannerItem& item ) const;
+	void CreateCurvedBannerGeometry( std::vector<Vertex>& vertices, std::vector<uint16_t>& indices, const EveBannerItem& item ) const;
 
 	std::string m_name;
 	int32_t m_key;

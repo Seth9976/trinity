@@ -159,6 +159,7 @@ IRootPtr EveSOF::BuildFromDNA( const char* dnaString )
 	SetupPlaneSets( newObj, dna );
 	SetupSpriteLineSets( newObj, dna );
 	SetupHazeSets( newObj, dna );
+	SetupBannerSets( newObj, dna );
 	SetupEffects( newObj, dna );
 
 	// attachments to ship
@@ -992,6 +993,101 @@ void EveSOF::SetupHazeSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) con
 				// put set onto ship
 				obj->AddAttachment( hazeSet );
 			}
+		}
+
+		// next hull needs offset update from hull's locator
+		const Vector3* nextSubsystemOffset = dna->GetHullNextSubsystemOffset( hullIdx );
+		if( nextSubsystemOffset )
+		{
+			hullOffset += *nextSubsystemOffset;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------------
+void EveSOF::SetupBannerSets( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) const
+{
+	CCP_STATS_ZONE( __FUNCTION__ );
+
+	// cycle over all hulls in the multi-hull list
+	Vector3 hullOffset( 0.f, 0.f, 0.f );
+	for( size_t hullIdx = 0; hullIdx < dna->GetMultiHullCount(); ++hullIdx )
+	{
+		auto& hullBannerSets = dna->GetHullBannerSets( hullIdx );
+		for( auto hbsit = begin( hullBannerSets ); hbsit != end( hullBannerSets ); ++hbsit )
+		{
+			auto& bannerSetData = *hbsit;
+
+			EveBannerSetPtr bannerSet;
+
+			for( auto hhsiit = begin( bannerSetData.items ); hhsiit != end( bannerSetData.items ); ++hhsiit )
+			{
+				auto& itemData = *hhsiit;
+
+				if( !dna->IsInVisibilityData( itemData.visibilityGroup ) )
+				{
+					continue;
+				}
+
+				if( !bannerSet )
+				{
+					bannerSet.CreateInstance();
+				}
+
+				bannerSet->AddBanner( itemData.item );
+			}
+
+			if( !bannerSet )
+			{
+				continue;
+			}
+
+			auto& shaderData = dna->GetGenericBannerShaderData();
+
+			Tr2EffectPtr effect;
+			effect.CreateInstance();
+
+			effect->StartUpdate();
+			effect->SetEffectPathName( shaderData.shader.c_str() );
+
+			for( auto pit = begin( shaderData.defaultParameters ); pit != end( shaderData.defaultParameters ); ++pit )
+			{
+				effect->AddParameterVector4( pit->first, &pit->second );
+			}
+			for( auto tit = begin( shaderData.defaultTextures ); tit != end( shaderData.defaultTextures ); ++tit )
+			{
+				effect->AddResourceTexture2D( tit->first, tit->second.resFilePath.c_str() );
+			}
+
+			Tr2LodResourcePtr imageMap;
+			imageMap.CreateInstance();
+			imageMap->SetResourcePath( TR2_LOD_MEDIUM, "res:/texture/global/black.dds" );
+			imageMap->SetResourcePath( TR2_LOD_LOW, "res:/texture/global/black.dds" );
+			effect->AddResourceTexture2DLod( BlueSharedString( "ImageMap" ), imageMap );
+			bannerSet->AddLodResource( imageMap );
+
+			effect->EndUpdate();
+			bannerSet->SetEffect( effect );
+			bannerSet->SetKey( int32_t( bannerSetData.usage ) );
+			bannerSet->Rebuild();
+			obj->AddAttachment( bannerSet );
+
+			static const char* names[] = { "AllianceLogoResPath", "CorpLogoResPath", "CeoPortraitResPath", "VerticalBannerResPath", "HorizontalBannerResPath" };
+			static_assert( sizeof( names ) / sizeof( names[0] ) == EveSOFDataHullBanner::_USAGE_COUNT, "Banner usage names mismatch" );
+
+			const char* externalParamName = nullptr;
+			if( bannerSetData.usage >= 0 && bannerSetData.usage < EveSOFDataHullBanner::_USAGE_COUNT )
+			{
+				externalParamName = names[bannerSetData.usage];
+			}
+
+			Tr2ExternalParameterPtr externalParameter;
+			externalParameter.CreateInstance();
+			externalParameter->SetName( externalParamName );
+			externalParameter->SetDestinationObject( imageMap );
+			externalParameter->SetDestinationAttribute( "highDetailResPath" );
+			externalParameter->Initialize();
+			obj->AddExternalParameter( externalParameter );
 		}
 
 		// next hull needs offset update from hull's locator

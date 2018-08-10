@@ -481,6 +481,12 @@ const EveSwarm::BehaviorProperties* EveSOFDNA::GetGenericSwarmProperties() const
 }
 
 // --------------------------------------------------------------------------------
+const EveSOFDataMgr::GenericBannerShaderData& EveSOFDNA::GetGenericBannerShaderData() const
+{
+	return m_genericData->bannerShader;
+}
+
+// --------------------------------------------------------------------------------
 // Description:
 //   Return the factional group-decal-data by a given groupindex
 // --------------------------------------------------------------------------------
@@ -591,6 +597,12 @@ const std::vector<EveSOFDataMgr::HullSpriteLineSetData>& EveSOFDNA::GetHullSprit
 const std::vector<EveSOFDataMgr::HullHazeSetData>& EveSOFDNA::GetHullHazeSets( size_t n ) const
 {
 	return m_hullDatas[n]->hazeSets;
+}
+
+// --------------------------------------------------------------------------------
+const std::vector<EveSOFDataMgr::HullBannerSetData>& EveSOFDNA::GetHullBannerSets( size_t n ) const
+{
+	return m_hullDatas[n]->bannerSets;
 }
 
 // --------------------------------------------------------------------------------

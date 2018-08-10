@@ -16,6 +16,17 @@ Tr2LodResource::Tr2LodResource( IRoot* lockobj ) :
 {
 }
 
+bool Tr2LodResource::OnModified( Be::Var* value )
+{
+	if( IsMatch( value, m_resPath[m_currentLod] ) )
+	{
+		m_requested = nullptr;
+		auto& respath = m_resPath[m_currentLod];
+		BeResMan->GetResource( respath, "", m_requested );
+	}
+	return true;
+}
+
 // --------------------------------------------------------------------------------
 // Description:
 //   Set the individual lod's resource path.

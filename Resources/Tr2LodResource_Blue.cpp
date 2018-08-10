@@ -53,6 +53,8 @@ BLUE_REGISTER_ENUM_EX(
 const Be::ClassInfo* Tr2LodResource::ExposeToBlue()
 {
 	EXPOSURE_BEGIN( Tr2LodResource, "Wrapper for resources with multiple levels of detail" )
+		MAP_INTERFACE( INotify )
+
 		MAP_ATTRIBUTE
 		(
 			"name",
@@ -66,7 +68,7 @@ const Be::ClassInfo* Tr2LodResource::ExposeToBlue()
 			"ultraDetailResPath",
 			m_resPath[TR2_LOD_ULTRA],
 			"Resource path for high detail resource",
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::PERSIST | Be::NOTIFY
 		)
 
 		MAP_ATTRIBUTE
@@ -74,7 +76,7 @@ const Be::ClassInfo* Tr2LodResource::ExposeToBlue()
 			"highDetailResPath",
 			m_resPath[TR2_LOD_HIGH],
 			"Resource path for high detail resource",
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::PERSIST | Be::NOTIFY
 		)
 		
 		MAP_ATTRIBUTE
@@ -82,7 +84,7 @@ const Be::ClassInfo* Tr2LodResource::ExposeToBlue()
 			"mediumDetailResPath",
 			m_resPath[TR2_LOD_MEDIUM],
 			"Resource path for medium detail resource",
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::PERSIST | Be::NOTIFY
 		)
 		
 		MAP_ATTRIBUTE
@@ -90,7 +92,7 @@ const Be::ClassInfo* Tr2LodResource::ExposeToBlue()
 			"lowDetailResPath",
 			m_resPath[TR2_LOD_LOW],
 			"Resource path for low detail resource",
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::PERSIST | Be::NOTIFY
 		)
 
 		MAP_METHOD_AND_WRAP

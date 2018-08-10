@@ -21,12 +21,15 @@ enum Tr2Lod {
 
 extern bool g_lodLevelUltraEnabled;
 
-BLUE_CLASS( Tr2LodResource ) : public IRoot
+BLUE_CLASS( Tr2LodResource ) : 
+	public INotify
 {
 public:
 	EXPOSE_TO_BLUE();
 
 	Tr2LodResource( IRoot* lockobj = nullptr );
+
+	virtual bool OnModified( Be::Var* value );
 
 	const char* GetName() const;
 	void SetName( const BlueSharedString& val );

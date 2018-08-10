@@ -165,7 +165,8 @@ EveSOFDataGeneric::EveSOFDataGeneric( IRoot* lockobj ) :
 	PARENTLOCK( m_patternMaterialPrefixes ),
 	PARENTLOCK( m_areaShaders ),
 	PARENTLOCK( m_decalShaders ),
-	PARENTLOCK( m_variants )
+	PARENTLOCK( m_variants ),
+	PARENTLOCK( m_bannerShader )
 	{}
 
 
@@ -258,6 +259,7 @@ EveSOFDataHull::EveSOFDataHull( IRoot* lockobj ) :
 	PARENTLOCK( m_planeSets ),
 	PARENTLOCK( m_spriteLineSets ),
 	PARENTLOCK( m_hazeSets ),
+	PARENTLOCK( m_banners ),
 	PARENTLOCK( m_decalSets ),
 	PARENTLOCK( m_hullDecals ),
 	PARENTLOCK( m_opaqueAreas ),
@@ -491,6 +493,18 @@ EveSOFDataHullHazeSetItem::EveSOFDataHullHazeSetItem( IRoot* lockobj ) :
 	m_hazeBrightness( 1.f ), m_hazeFalloff( 6.f ), m_sourceSize( 0.2f ), m_sourceBrightness( 2.f ),
 	m_boosterGainInfluence( false )
 {}
+
+EveSOFDataHullBanner::EveSOFDataHullBanner( IRoot* )
+	:m_usage( VERTICAL_BANNER ),
+	m_visibilityGroup( "primary" ),
+	m_position( 0, 0, 0 ),
+	m_scaling( 1, 1, 1 ),
+	m_rotation( 0, 0, 0, 1 ),
+	m_angleX( 0 ),
+	m_angleY( 0 ),
+	m_boneIndex( -1 )
+{
+}
 
 EveSOFDataHullDecalSet::EveSOFDataHullDecalSet( IRoot* lockobj ):
 	PARENTLOCK( m_items ),

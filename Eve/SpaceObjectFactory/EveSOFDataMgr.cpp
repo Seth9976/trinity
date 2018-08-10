@@ -657,6 +657,41 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 		hd.hazeSets.push_back( hhsd );
 	}
 
+	hd.bannerSets.clear();
+	std::map<EveSOFDataHullBanner::Usage, size_t> setIndices;
+	int32_t bannerIndex = 0;
+	for( auto hsit = srcData->m_banners.begin(); hsit != srcData->m_banners.end(); ++hsit )
+	{
+		auto sourceBanner = *hsit;
+
+		HullBannerSetData* set = nullptr;
+		auto found = setIndices.find( sourceBanner->m_usage );
+		if( found == end( setIndices ) )
+		{
+			setIndices[sourceBanner->m_usage] = hd.bannerSets.size();
+			hd.bannerSets.push_back( HullBannerSetData() );
+			set = &hd.bannerSets.back();
+			set->usage = sourceBanner->m_usage;
+		}
+		else
+		{
+			set = &hd.bannerSets[found->second];
+		}
+
+		std::string visGroupName( sourceBanner->m_visibilityGroup.c_str() );
+
+		HullBannerSetItemData hbsid;
+		hbsid.item.position = sourceBanner->m_position;
+		hbsid.item.scaling = sourceBanner->m_scaling;
+		hbsid.item.rotation = sourceBanner->m_rotation;
+		hbsid.item.angleX = sourceBanner->m_angleX;
+		hbsid.item.angleY = sourceBanner->m_angleY;
+		hbsid.item.bone = sourceBanner->m_boneIndex;
+		hbsid.item.reference = bannerIndex++;
+		hbsid.visibilityGroup = CcpHashFNV1( visGroupName.c_str(), visGroupName.size() );
+		set->items.push_back( hbsid );
+	}
+
 	// default hull pattern
 	EveSOFDataPatternPerHullPtr defaultPattern = srcData->m_defaultPattern;
 	// only one layer for the default hull one (yet...)
@@ -1414,6 +1449,27 @@ void EveSOFDataMgr::GenerateGenericData( GenericData& gd, EveSOFDataGenericPtr s
 	if( srcData->m_swarm )
 	{
 		gd.swarmBehavior = srcData->m_swarm->m_behavior;
+	}
+
+	{
+		EveSOFDataGenericShader* shaderData = &srcData->m_bannerShader;
+
+		GenericBannerShaderData gsd;
+		for( auto tdit = shaderData->m_defaultTextures.begin(); tdit != shaderData->m_defaultTextures.end(); ++tdit )
+		{
+			EveSOFDataTexturePtr textureData = ( *tdit );
+			gsd.defaultTextures[textureData->m_name].resFilePath = textureData->m_resFilePath;
+		}
+
+		for( auto pdit = shaderData->m_defaultParameters.begin(); pdit != shaderData->m_defaultParameters.end(); ++pdit )
+		{
+			EveSOFDataParameterPtr paramData = ( *pdit );
+			gsd.defaultParameters[paramData->m_name] = paramData->m_value;
+		}
+
+		gsd.shader = shaderData->m_shader.c_str();
+
+		gd.bannerShader = gsd;
 	}
 
 	// shader material name prefixes

@@ -445,6 +445,36 @@ const Be::ClassInfo* EveSOFDataHullHazeSet::ExposeToBlue()
 		EXPOSURE_END()
 }
 
+Be::VarChooser EveSOFDataHullBannerUsageChooser[] =
+{
+	{ "AllianceLogo", BeCast( EveSOFDataHullBanner::ALLIANCE_LOGO ), "Alliance logo" },
+	{ "CorpLogo", BeCast( EveSOFDataHullBanner::CORP_LOGO ), "Corporation logo" },
+	{ "CeoPortrait", BeCast( EveSOFDataHullBanner::CEO_PORTRAIT ), "Ceo portrait" },
+	{ "VerticalBanner", BeCast( EveSOFDataHullBanner::VERTICAL_BANNER ), "Vertical banner" },
+	{ "HorizontalBanner", BeCast( EveSOFDataHullBanner::HORIZONTAL_BANNER ), "Vertical banner" },
+	{ 0 }
+};
+BLUE_REGISTER_ENUM_EX( "HullBannerUsage", EveSOFDataHullBanner::Usage, EveSOFDataHullBannerUsageChooser, ENUM_REG_ENUM_OBJECT_ON_MODULE );
+
+
+BLUE_DEFINE( EveSOFDataHullBanner );
+const Be::ClassInfo* EveSOFDataHullBanner::ExposeToBlue()
+{
+	EXPOSURE_BEGIN( EveSOFDataHullBanner, "" )
+		MAP_INTERFACE( EveSOFDataHullBanner )
+
+		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE_WITH_CHOOSER( "usage", m_usage, "Banner usage", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFDataHullBannerUsageChooser )
+		MAP_ATTRIBUTE( "visibilityGroup", m_visibilityGroup, "Name for visibility group to toggle visibility", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "position", m_position, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "scaling", m_scaling, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "rotation", m_rotation, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "angleX", m_angleX, "Horizontal curve angle", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "angleY", m_angleY, "Vertical curve angle", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "boneIndex", m_boneIndex, ":jessica-widget: boneindex", Be::READWRITE | Be::PERSIST )
+	EXPOSURE_END()
+}
+
 
 
 BLUE_DEFINE( EveSOFDataHullBooster );
@@ -683,6 +713,7 @@ const Be::ClassInfo* EveSOFDataHull::ExposeToBlue()
 		MAP_ATTRIBUTE( "planeSets", m_planeSets, "The planesets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "spriteLineSets", m_spriteLineSets, "The spritelinesets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "hazeSets", m_hazeSets, "The hazesets", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "banners", m_banners, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "decalSets", m_decalSets, "The decalsets", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE_WITH_CHOOSER( "impactEffectType", m_impactEffectType, "Type of impact effect on this hull", Be::READWRITE | Be::PERSIST | Be::ENUM, EveSOFImpactEffectTypeChooser )
 
@@ -1182,6 +1213,7 @@ const Be::ClassInfo* EveSOFDataGeneric::ExposeToBlue()
 		MAP_ATTRIBUTE( "damage", m_damage, "Global visual damage data", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "hullDamage", m_hullDamage, "Global visual hull damage data", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "swarm", m_swarm, "Global swarm behavior preset data", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "bannerShader", m_bannerShader, "Banner shader", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "genericWreckMaterial", m_genericWreckMaterial, "Global wreck area shader data", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "variants", m_variants, "All the hull  variants", Be::READWRITE | Be::PERSIST )
 		EXPOSURE_END()

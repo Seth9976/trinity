@@ -8,6 +8,7 @@
 #define EveSOFDataMgr_H
 
 #include "EveSOFData.h"
+#include "Eve/SpaceObject/Attachments/Sets/EveBannerSet.h"
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -182,6 +183,18 @@ public:
 		std::vector<HullHazeSetItemData> items;
 	};
 
+	struct HullBannerSetItemData
+	{
+		EveBannerItem item;
+		uint32_t visibilityGroup;
+	};
+
+	struct HullBannerSetData
+	{
+		std::vector<HullBannerSetItemData> items;
+		EveSOFDataHullBanner::Usage usage;
+	};
+
 	struct HullAreas
 	{
 		unsigned int index;
@@ -297,6 +310,7 @@ public:
 		std::vector<HullPlaneSetData> planeSets;
 		std::vector<HullSpriteLineSetData> spriteLineSets;
 		std::vector<HullHazeSetData> hazeSets;
+		std::vector<HullBannerSetData> bannerSets;
 		std::vector<HullDecalSetData> hullDecalSets;
 		PatternProjectionData defaultPattern;
 		EveSOFDataHull::ImpactEffectType impactEffectType;
@@ -543,6 +557,13 @@ public:
 		HullAreas hullAreaData;
 	};
 
+	struct GenericBannerShaderData
+	{
+		std::string shader;
+		std::map<BlueSharedString, TextureData> defaultTextures;
+		std::map<BlueSharedString, Vector4> defaultParameters;
+	};
+
 	struct GenericData
 	{
 		// default textures
@@ -568,6 +589,7 @@ public:
 		std::map<BlueSharedString, VariantData> variants;
 		// swarm behavior
 		EveSwarm::BehaviorProperties swarmBehavior;
+		GenericBannerShaderData bannerShader;
 	};
 
 

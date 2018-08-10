@@ -563,6 +563,40 @@ TYPEDEF_BLUECLASS( EveSOFDataHullHazeSet );
 BLUE_DECLARE_VECTOR( EveSOFDataHullHazeSet );
 
 
+BLUE_CLASS( EveSOFDataHullBanner ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+
+	enum Usage
+	{
+		ALLIANCE_LOGO,
+		CORP_LOGO,
+		CEO_PORTRAIT,
+		VERTICAL_BANNER,
+		HORIZONTAL_BANNER,
+		_USAGE_COUNT,
+	};
+
+	EveSOFDataHullBanner( IRoot* lockobj = nullptr );
+
+	std::string m_name;
+	BlueSharedString m_visibilityGroup;
+
+	Usage m_usage;
+
+	Vector3 m_position, m_scaling;
+	Quaternion m_rotation;
+
+	float m_angleX;
+	float m_angleY;
+	int32_t m_boneIndex;
+};
+TYPEDEF_BLUECLASS( EveSOFDataHullBanner );
+BLUE_DECLARE_VECTOR( EveSOFDataHullBanner );
+
+
 BLUE_CLASS( EveSOFDataHullBoosterItem ) :
 	public IRoot
 {
@@ -875,6 +909,7 @@ public:
 	PEveSOFDataHullPlaneSetVector m_planeSets;
 	PEveSOFDataHullSpriteLineSetVector m_spriteLineSets;
 	PEveSOFDataHullHazeSetVector m_hazeSets;
+	PEveSOFDataHullBannerVector m_banners;
 	PEveSOFDataHullDecalSetVector m_decalSets;
 	ImpactEffectType m_impactEffectType;
 
@@ -1384,6 +1419,8 @@ public:
 
 	// generic wreck data
 	EveSOFDataAreaMaterialPtr m_genericWreckMaterial;
+
+	PEveSOFDataGenericShader m_bannerShader;
 
 	// effect data
 	PEveSOFDataGenericVariantVector m_variants;
