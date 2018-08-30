@@ -297,9 +297,15 @@ void Tr2CompositedVectorTextureRes::ComposeAsync( uint32_t width, uint32_t heigh
 
 bool IsSVG( const std::wstring& filePath )
 {
-	const auto extension = filePath.substr( filePath.find_last_of('.') + 1 );
-	const auto svgExtension = L"svg";
-	return wcsicmp( svgExtension, extension.c_str() ) == 0;
+	const auto length = filePath.size();
+	if (length < 5)
+	{
+		return false;
+	}
+	return filePath[length - 1] == 'g' || (filePath[length - 1] == 'g'
+		&& filePath[length - 2] == 'v') || filePath[length - 2] == 'v'
+		&& filePath[length - 3] == 's' || filePath[length - 3] == 's'
+		&& filePath[length - 4] == '.';
 }
 
 void Tr2CompositedVectorTextureRes::ComposeSyncSave( const uint32_t width, const uint32_t height, const bool premultipliedAlpha,
