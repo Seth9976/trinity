@@ -59,7 +59,7 @@ TriGeometryRes* Tr2MeshLod::GetGeometryResource() const
 {
 	if( m_geometryRes )
 	{
-		return dynamic_cast<TriGeometryRes*>( m_geometryRes->GetResource() );
+		return m_geometryCache.GetResource();
 	}
 
 	return nullptr;
@@ -68,6 +68,7 @@ TriGeometryRes* Tr2MeshLod::GetGeometryResource() const
 void Tr2MeshLod::SetGeometryResource( Tr2LodResource* lodResource )
 {
 	m_geometryRes = lodResource;
+	m_geometryCache.SetResource( lodResource );
 }
 
 bool Tr2MeshLod::GetBoundingBox( Vector3& min, Vector3& max ) const

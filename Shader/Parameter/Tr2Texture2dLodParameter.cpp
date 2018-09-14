@@ -18,13 +18,14 @@ Tr2Texture2dLodParameter::Tr2Texture2dLodParameter( IRoot* lockobj /*= nullptr *
 void Tr2Texture2dLodParameter::SetLodResource( Tr2LodResource* newLodResource )
 {
 	m_lodResource = newLodResource;
+	m_lodCache.SetResource( newLodResource );
 }
 
 ITr2TextureProvider* Tr2Texture2dLodParameter::GetResource() const
 {
 	if( m_lodResource )
 	{
-		return dynamic_cast<ITr2TextureProvider*>( m_lodResource->GetResource() );
+		return m_lodCache.GetResource();
 	}
 
 	return nullptr;

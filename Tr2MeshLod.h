@@ -10,6 +10,7 @@
 
 #include "Tr2MeshBase.h"
 #include "Resources/Tr2LodResource.h"
+#include "Resources/Tr2LodResourceCache.h"
 
 BLUE_DECLARE_VECTOR( Tr2LodResource );
 
@@ -46,6 +47,7 @@ public:
 
 protected:
 	Tr2LodResourcePtr m_geometryRes;
+	Tr2LodResourceCache<TriGeometryRes> m_geometryCache;
 
 	PTr2LodResourceVector m_associatedResources;
 	Tr2Lod m_selectedLod;

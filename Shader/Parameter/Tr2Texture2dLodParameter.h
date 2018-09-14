@@ -9,6 +9,7 @@
 #define Tr2Texture2dLodParameter_h
 
 #include "TriTextureParameter.h"
+#include "Resources/Tr2LodResourceCache.h"
 
 BLUE_DECLARE( Tr2LodResource );
 
@@ -25,6 +26,7 @@ public:
 
 protected:
 	Tr2LodResourcePtr m_lodResource;
+	Tr2LodResourceCache<ITr2TextureProvider> m_lodCache;
 };
 
 TYPEDEF_BLUECLASS( Tr2Texture2dLodParameter );
