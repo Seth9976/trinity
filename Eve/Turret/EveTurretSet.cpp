@@ -649,9 +649,9 @@ void EveTurretSet::RebuildCachedData( BlueAsyncRes* p )
 							}							 
 
 							// create animations for all turrets
-							for( auto it = m_singleTurrets.begin(); m_singleTurrets.end() != it; ++it )
+							for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 							{
-								if( nullptr == it->grnModelInstance )
+								if( it->grnModelInstance == NULL )
 								{
 									it->grnModelInstance = GrannyInstantiateModel( m_grnModel );
 									it->grnSkeleton = GrannyGetSourceSkeleton( it->grnModelInstance );
@@ -663,15 +663,17 @@ void EveTurretSet::RebuildCachedData( BlueAsyncRes* p )
 							// remove the turrets that are not able to be displayed
 							if( m_possibleTurretDisplayAmount > 0 && m_singleTurrets.size() > m_possibleTurretDisplayAmount )
 							{
-								CCP_LOGWARN( "Turretset '%s' has more turrets (%d) than the shader can handle (%d) due to the amount of bones for the model (%d)",
+								CCP_LOGWARN( "Turretset '%s' has more turrets (%d) than the shader can handle (%d) due to the amount of bones for the model (%d)", 
 									grannyFileInfo->FromFileName,
-									m_singleTurrets.size(),
-									m_possibleTurretDisplayAmount,
-									EVE_MAX_TURRET_SET_BONES / m_possibleTurretDisplayAmount
+									m_singleTurrets.size(), 
+									m_possibleTurretDisplayAmount,  
+									EVE_MAX_TURRET_SET_BONES/m_possibleTurretDisplayAmount
 								);
+
 								m_singleTurrets.resize( m_possibleTurretDisplayAmount );
 							}
-							if( !m_singleTurrets.empty() )
+
+							if( m_singleTurrets.size() > 0 )
 							{
 								InitializeDynamicBounds( grannyFileInfo, m_singleTurrets[0].grnSkeleton );
 							}
@@ -815,10 +817,10 @@ void EveTurretSet::UpdateSyncronous( float deltaT, Be::Time time, const Matrix* 
 		}
 	}
 
-	for( auto it = m_singleTurrets.begin(); m_singleTurrets.end() != it; ++it )
+	for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		// mesh animation
-		if( nullptr != it->grnModelInstance )
+		if( it->grnModelInstance )
 		{
 			GrannySetModelClock( it->grnModelInstance, Tr2Renderer::GetAnimationTime() );
 			GrannyFreeCompletedModelControls( it->grnModelInstance );
@@ -930,7 +932,7 @@ void EveTurretSet::UpdateAsyncronous( EveUpdateContext& updateContext, const Par
 	}
 
 	// update animation of each singel turret
-	for( auto it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
+	for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		// mesh animation
 		if( it->grnModelInstance )
@@ -965,7 +967,7 @@ void EveTurretSet::UpdateAsyncronous( EveUpdateContext& updateContext, const Par
 							granny_transform* boneTransform = GrannyGetLocalPoseTransform( it->grnLocalPose, m_systemBoneID[bone] );
 							if( boneTransform )
 							{
-								ModifySystemBoneTransform( static_cast<SystemBones>( bone ), &targetPosOS, boneTransform, localTransformPtr );
+								ModifySystemBoneTransform( (SystemBones)bone, &targetPosOS, boneTransform, localTransformPtr );
 							}
 						}
 					}
@@ -1029,7 +1031,7 @@ void EveTurretSet::UpdateAsyncronous( EveUpdateContext& updateContext, const Par
 // --------------------------------------------------------------------------------
 void EveTurretSet::UpdateTurretTransforms(const Matrix* turretTransformMatrix)
 {
-	for( auto it = m_singleTurrets.begin(); m_singleTurrets.end() != it ; ++it )
+	for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		Matrix localMatrix;		
 		Vector3 localPos = Vector3(it->localPosition.x, it->localPosition.y, it->localPosition.z);
@@ -1160,7 +1162,7 @@ void EveTurretSet::ModifySystemBoneTransform( SystemBones bone, const Vector3* t
 			// 2nd: apply this quat after the original one
 			quat = *reinterpret_cast<Quaternion*>( transform->Orientation ) * quat;
 			// 3rd: make granny_transform from quat
-			GrannySetTransform( transform, transform->Position, reinterpret_cast<float*>( &quat ), reinterpret_cast<float*>( transform->ScaleShear ) );
+			GrannySetTransform( transform, transform->Position, (float*)&quat, (float*)transform->ScaleShear );
 		}
 		break;
 	case SYSBONE_COUNTER_ROTATION:
@@ -1175,7 +1177,7 @@ void EveTurretSet::ModifySystemBoneTransform( SystemBones bone, const Vector3* t
 			// 2nd: apply this quat after the original one
 			quat = *reinterpret_cast<Quaternion*>( transform->Orientation ) * quat;
 			// 3rd: make granny_transform from quat
-			GrannySetTransform( transform, transform->Position, reinterpret_cast<float*>( &quat ), reinterpret_cast<float*>( transform->ScaleShear ) );
+			GrannySetTransform( transform, transform->Position, (float*)&quat, (float*)transform->ScaleShear );
 		}
 		break;
 	case SYSBONE_PITCH:
@@ -1196,7 +1198,7 @@ void EveTurretSet::ModifySystemBoneTransform( SystemBones bone, const Vector3* t
 			height *= m_trackingInfluence;
 			// it's a pos extension with a scale
 			Vector3 pos = Vector3( 0.f, height * m_sysBoneHeight, 0.f ) + Vector3( transform->Position[0], transform->Position[1], transform->Position[2] );
-			GrannySetTransform( transform, &pos.x, transform->Orientation, reinterpret_cast<float*>( transform->ScaleShear ) );
+			GrannySetTransform( transform, &pos.x, transform->Orientation, (float*)transform->ScaleShear );
 		}
 		break;
 	case SYSBONE_SCALED_PITCH01:
@@ -1238,7 +1240,7 @@ void EveTurretSet::SetLocalTransform( unsigned int turretIndex, const Matrix* lo
 	if( m_singleTurrets.size() <= turretIndex )
 	{
 		// fill up list with new entries for turrets to meet requirement
-		for( auto i = static_cast<unsigned int>( m_singleTurrets.size() ); i <= turretIndex; ++i )
+		for( unsigned int i = (unsigned int)m_singleTurrets.size(); i <= turretIndex; ++i )
 		{
 			SingleTurretData data;
 			if( m_grnModel )
@@ -1250,10 +1252,10 @@ void EveTurretSet::SetLocalTransform( unsigned int turretIndex, const Matrix* lo
 			}
 			else
 			{
-				data.grnModelInstance = nullptr;
-				data.grnSkeleton = nullptr;
-				data.grnLocalPose = nullptr;
-				data.grnWorldPose = nullptr;
+				data.grnModelInstance = NULL;
+				data.grnSkeleton = NULL;
+				data.grnLocalPose = NULL;
+				data.grnWorldPose = NULL;
 			}
 			data.worldMatrix = IdentityMatrix();
 			data.invWorldMatrix = IdentityMatrix();
@@ -1368,7 +1370,7 @@ void EveTurretSet::GetRenderablesCastingShadow( const TriFrustumOrtho& frustum, 
 
 	// check visibility for each turret
 	bool renderForShadow = false;
-	for( auto it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
+	for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		// transform bounding sphere into world space to check against frustum
 		Vector4 transformedBoundingSphere = m_boundingSphere;
@@ -1404,7 +1406,7 @@ void EveTurretSet::UpdateVisibility( const TriFrustum& frustum )
 		return;
 	}
 
-	for( auto it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
+	for( std::vector<SingleTurretData>::iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		// transform bounding sphere into world space to check against frustum
 		Vector4 transformedBoundingSphere = m_boundingSphere;
@@ -1496,7 +1498,7 @@ void EveTurretSet::GetBatches( ITriRenderBatchAccumulator* batches,
 		return;
 	}
 
-	auto batch = batches->Allocate<TriForwardingBatch>();
+	TriForwardingBatch* batch = batches->Allocate<TriForwardingBatch>();
 	if( batch )
 	{
 		batch->SetPerObjectData( perObjectData );
@@ -1521,8 +1523,8 @@ void EveTurretSet::GetShadowBatches( ITriRenderBatchAccumulator* batches, const 
 		return;
 	}
 
-	auto batch = batches->Allocate<TriForwardingBatch>();
-	if( nullptr != batch )
+	TriForwardingBatch* batch = batches->Allocate<TriForwardingBatch>();
+	if( batch )
 	{
 		batch->SetPerObjectData( perObjectData );
 		batch->SetShaderMaterial( m_shadowEffect );
@@ -1554,24 +1556,24 @@ Tr2PerObjectData* EveTurretSet::GetPerObjectData( ITriRenderBatchAccumulator* ac
 {
 	if( !m_geometryResource )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	if( !m_geometryResource->IsGood() )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	if( m_geometryResource->GetMeshCount() < 1 )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	// allocate only once
 	auto perObjectData = accumulator->Allocate<EveTurretSetPerObjectData>();
-	if( perObjectData != nullptr )
+	if( !perObjectData )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	Vector3 scale, translation;
@@ -2260,7 +2262,7 @@ void EveTurretSet::ForceStateTargeting()
 // --------------------------------------------------------------------------------
 void EveTurretSet::ForceIdleAnimation()
 {
-	std::string idleAnimName;
+	std::string idleAnimName = "";
 	// what state?
 	switch( m_state )
 	{
@@ -2555,7 +2557,7 @@ void EveTurretSet::CalcTransformForPitchBone( const Vector3* target, granny_tran
 	// 2nd: apply this quat after the original one
 	quat = *reinterpret_cast<Quaternion*>( transform->Orientation ) * quat;
 	// 2nd: make granny_transform from quat
-	GrannySetTransform( transform, transform->Position, reinterpret_cast<float*>( &quat ), reinterpret_cast<float*>( transform->ScaleShear ) );
+	GrannySetTransform( transform, transform->Position, (float*)&quat, (float*)transform->ScaleShear );
 }
 
 
@@ -2635,11 +2637,11 @@ void EveTurretSet::GetLights( Tr2LightManager& lightManager ) const
 
 void EveTurretSet::SetShaderOption( const BlueSharedString& name, const BlueSharedString& value )
 {
-	if ( nullptr != m_turretEffect )
+	if (nullptr != m_turretEffect)
 	{
 		m_turretEffect->SetOption( name, value );
 	}
-	if ( nullptr != m_shadowEffect )
+	if (nullptr != m_shadowEffect)
 	{
 		m_shadowEffect->SetOption( name, value );
 	}
