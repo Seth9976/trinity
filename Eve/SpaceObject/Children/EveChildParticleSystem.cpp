@@ -79,7 +79,7 @@ void EveChildParticleSystem::UpdateVisibility( const TriFrustum& frustum, const 
 	m_isVisible = m_display && frustum.IsSphereVisible( &m_boundingSphere );
 	if( m_isVisible )
 	{
-		m_currentScreenSize = frustum.GetPixelSizeAccross( &m_lodSphere );
+		m_currentScreenSize = frustum.GetPixelSizeAccrossEst( &m_lodSphere );
 		m_isVisible &= m_currentScreenSize >= m_minScreenSize * g_eveSpaceSceneLODFactor;
 	}
 	else
@@ -232,7 +232,7 @@ void EveChildParticleSystem::UpdateAsyncronous( EveUpdateContext& updateContext,
 			{
 				TriFrustum frustum;
 				frustum.DeriveFrustum( &Tr2Renderer::GetViewTransform(), &Tr2Renderer::GetViewPosition(), &Tr2Renderer::GetProjectionRawTransform(), Tr2Renderer::GetViewport() );
-				if( frustum.GetPixelSizeAccross( &m_lodSphere ) < m_minScreenSize * g_eveSpaceSceneLODFactor )
+				if( frustum.GetPixelSizeAccrossEst( &m_lodSphere ) < m_minScreenSize * g_eveSpaceSceneLODFactor )
 				{
 					emitCountFactor = 0.f;
 				}
