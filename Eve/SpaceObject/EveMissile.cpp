@@ -264,6 +264,7 @@ void EveMissile::GetRenderables( std::vector<ITr2Renderable*>& renderables, Tr2I
 void EveMissile::GetDebugOptions( Tr2DebugRendererOptions& options )
 {
 	EveSpaceObject2::GetDebugOptions( options );
+	options.insert( "Missiles" );
 	for( auto it = begin( m_warheads ); it != end( m_warheads ); ++it )
 	{
 		( *it )->GetDebugOptions( options );
@@ -280,6 +281,14 @@ void EveMissile::RenderDebugInfo( Tr2DebugRenderer& renderer )
 {
 	EveSpaceObject2::RenderDebugInfo( renderer );
 
+	if( renderer.HasOption( GetRawRoot(), "Missiles" ) )
+	{
+		renderer.DrawSphere( this, m_worldTransform, 50, 10, Tr2DebugRenderer::Wireframe, 0xff4444ff );
+		for( auto it = begin( m_warheads ); it != end( m_warheads ); ++it )
+		{
+			renderer.DrawLine( this, m_worldTransform.GetTranslation(), *( *it )->GetWorldPosition(), 0xff4444ff );
+		}
+	}
 	if( renderer.HasOption( GetRawRoot(), "Children" ) )
 	{
 		for( EveMissileWarheadVector::const_iterator it = m_warheads.begin(); it != m_warheads.end(); ++it )
