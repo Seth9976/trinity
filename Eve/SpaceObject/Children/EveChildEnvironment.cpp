@@ -404,14 +404,14 @@ void EveChildEnvironment::GetDebugOptions( Tr2DebugRendererOptions& options )
 
 void EveChildEnvironment::RenderDebugInfo( Tr2DebugRenderer& renderer )
 {
-	//if (renderer.HasOption( this, "Volumes" ))
+	if (renderer.HasOption( this, "Volumes" ))
 	{
 		for( auto volume = m_volumes.begin(); volume != m_volumes.end(); ++volume )
 		{
 			(*volume)->RenderDebugInfo( renderer, m_worldTransform );
 		}
 	}
-	//if( renderer.HasOption( this, "Bounding Sphere" ) )
+	if( renderer.HasOption( this, "Bounding Sphere" ) )
 	{
 		renderer.DrawSphere( this, TranslationMatrix( m_boundingSphere.GetXYZ() ) * m_worldTransform, m_boundingSphere.w, 10, Tr2DebugRenderer::Wireframe, 0xff333333 );
 	}
