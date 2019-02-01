@@ -128,16 +128,23 @@ const Be::ClassInfo* Tr2CurveScalar::ExposeToBlue()
 			m_timeOffset, 
 			"Curve internal time offset", 
 			Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( 
+		MAP_ATTRIBUTE(
 			"timeScale", 
 			m_timeScale, 
 			"Curve internal time scale", 
 			Be::READWRITE | Be::PERSIST )
 
-		MAP_METHOD_AND_WRAP( 
-			"GetValueAt", 
-			GetValue, 
+		MAP_METHOD_AND_WRAP(
+			"GetValueAt",
+			GetValue,
 			"Returns curve value at specified time\n"
+			":param time: input time"
+		)
+
+		MAP_METHOD_AND_WRAP(
+			"GetTangentAt",
+			GetTangent,
+			"Returns the tangent to the curve at specified time\n"
 			":param time: input time"
 		)
 

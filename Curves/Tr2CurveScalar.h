@@ -88,6 +88,8 @@ public:
 	virtual float Update( double time );
 	virtual float GetValueAt( Be::Time time );
 	virtual float GetValueAt( double time );
+	virtual float GetTangentAt( Be::Time time );
+	virtual float GetTangentAt( double time );
 	virtual void ScaleTime( float s );
 
 	virtual float Length();
@@ -96,6 +98,7 @@ public:
 	void SetName( const char* name );
 
 	float GetValue( double time ) const;
+	float GetTangent( double time ) const;
 	float GetCurrentValue() const;
 
 	float GetTimeOffset() const;
@@ -121,6 +124,7 @@ public:
 private:
 	float GetLocalTime( double time ) const;
 	float GetSegmentValue( float time, const Tr2CurveScalarKey& k0, const Tr2CurveScalarKey& k1 ) const;
+	float GetSegmentTangent( float time, const Tr2CurveScalarKey& k0, const Tr2CurveScalarKey& k1 ) const;
 
 	PTr2CurveScalarKeyStructureList m_keys;
 	std::string m_name;

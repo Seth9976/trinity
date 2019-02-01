@@ -230,6 +230,72 @@ float Tr2CurveScalar::GetValue( double time ) const
 }
 
 // --------------------------------------------------------------------------------
+float Tr2CurveScalar::GetTangentAt( Be::Time time )
+{
+	return GetTangent( TimeAsDouble( time ) );
+}
+
+// --------------------------------------------------------------------------------
+float Tr2CurveScalar::GetTangentAt( double time )
+{
+	return GetTangent( time );
+}
+
+// --------------------------------------------------------------------------------
+float Tr2CurveScalar::GetTangent( double time ) const
+{
+	if ( m_keys.empty() )
+	{
+		return 0;
+	}
+
+	auto count = m_keys.size();
+
+	if ( m_extrapolationBefore == Tr2CurveExtrapolation::LINEAR || m_extrapolationAfter == Tr2CurveExtrapolation::LINEAR )
+	{
+		float t = float( time / (double)m_timeScale - (double)m_timeOffset );
+
+		if ( m_extrapolationBefore == Tr2CurveExtrapolation::LINEAR && t < m_keys[0].m_time )
+		{
+			return m_keys[0].m_leftTangent;
+		}
+		else if ( m_extrapolationAfter == Tr2CurveExtrapolation::LINEAR && t > m_keys[count - 1].m_time )
+		{
+			return m_keys[count - 1].m_rightTangent;
+		}
+	}
+
+	if ( count == 1 )
+	{
+		return m_keys[0].m_rightTangent;
+	}
+
+	if ( m_extrapolationBefore == Tr2CurveExtrapolation::CLAMP && float( time / (double)m_timeScale - (double)m_timeOffset ) <= m_keys[0].m_time )
+	{
+		return 0;
+	}
+
+	if ( m_extrapolationAfter == Tr2CurveExtrapolation::CLAMP && float( time / (double)m_timeScale - (double)m_timeOffset ) >= m_keys[m_keys.size() - 1].m_time )
+	{
+		return 0;
+	}
+
+	float t = GetLocalTime( time );
+
+	for ( size_t i = 0; i + 1 < count; ++i )
+	{
+		auto& k0 = m_keys[i];
+		auto& k1 = m_keys[i + 1];
+
+		if ( t >= k0.m_time && t < k1.m_time )
+		{
+			return GetSegmentTangent( t, k0, k1 );
+		}
+	}
+	return GetSegmentTangent( t, m_keys[count - 2], m_keys[count - 1] );
+}
+
+// --------------------------------------------------------------------------------
 void Tr2CurveScalar::OnKeysChanged()
 {
 	std::stable_sort( 
@@ -335,7 +401,7 @@ float Tr2CurveScalar::GetLocalTime( double time ) const
 		}
 		return float( fracPart * length + first );
 	}
-	if( time < last )
+	if( time <= last )
 	{
 		return float( time );
 	}
@@ -386,6 +452,42 @@ float Tr2CurveScalar::GetSegmentValue( float time, const Tr2CurveScalarKey& k0, 
 		float c3 = s + c4 - s2;
 
 		return k0.m_value * c1 + k1.m_value * c2 + inTangent * c3 + outTangent * c4;
+	}
+	default:
+		return 0;
+	}
+}
+
+// --------------------------------------------------------------------------------
+float Tr2CurveScalar::GetSegmentTangent( float time, const Tr2CurveScalarKey& k0, const Tr2CurveScalarKey& k1 ) const
+{
+	switch ( k0.m_interpolation )
+	{
+	case Tr2CurveInterpolation::CONSTANT:
+		return 0;
+	case Tr2CurveInterpolation::LINEAR:
+		return ( k1.m_value - k0.m_value ) / ( k1.m_time - k0.m_time );
+	case Tr2CurveInterpolation::HERMITE:
+	{
+		float length = k1.m_time - k0.m_time;
+		if ( length == 0 )
+		{
+			return k1.m_rightTangent;
+		}
+		float inTangent = k0.m_rightTangent * length;
+		float outTangent = k1.m_leftTangent * length;
+
+		float s = ( time - k0.m_time ) / length;
+		float s2 = s * s;
+
+		float m2s = 2.0f * s;
+
+		float c1 = 6.0f * s2 - 6.0f * s;
+		float c2 = -c1;
+		float c4 = 3.0f * s2 - m2s;
+		float c3 = c4 - m2s + 1;
+
+		return ( k0.m_value * c1 + k1.m_value * c2 + inTangent * c3 + outTangent * c4 ) / length;
 	}
 	default:
 		return 0;
