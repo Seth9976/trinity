@@ -314,10 +314,10 @@
 			fileRef = 000003BA000044b827000cae;
 			};
 		000008FE000044b827000cae = {
-			name = TriStepRenderCubeMap.h;
+			name = TriStepRenderDebug.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderCubeMap.h";
+			path = "RenderJob/TriStepRenderDebug.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -370,10 +370,10 @@
 			sourceTree = "<group>";
 			};
 		0000047E000044b827000cae = {
-			name = TriStepRemoteSync_Blue.cpp;
+			name = TriStepRemoteUpdate_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRemoteSync_Blue.cpp";
+			path = "RenderJob/TriStepRemoteUpdate_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -386,18 +386,18 @@
 			fileRef = 000009EE000044b827000cae;
 			};
 		000008C4000044b827000cae = {
-			name = Tr2PPBloomEffect.h;
+			name = Tr2PPEffect.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "PostProcess/Effects/Tr2PPBloomEffect.h";
+			path = "PostProcess/Effects/Tr2PPEffect.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
 		000008D4000044b827000cae = {
-			name = TriStepClear.h;
+			name = TriStepClearUav.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepClear.h";
+			path = "RenderJob/TriStepClearUav.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -426,10 +426,10 @@
 			sourceTree = "<group>";
 			};
 		0000045C000044b827000cae = {
-			name = TriStepPopViewTransform.cpp;
+			name = TriStepPresentSwapChain.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopViewTransform.cpp";
+			path = "RenderJob/TriStepPresentSwapChain.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -454,10 +454,10 @@
 			sourceTree = "<group>";
 			};
 		00000420000044b827000cae = {
-			name = Tr2PPGodRaysEffect.cpp;
+			name = Tr2PPSignalLossEffect.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPGodRaysEffect.cpp";
+			path = "PostProcess/Effects/Tr2PPSignalLossEffect.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -810,10 +810,10 @@
 			fileRef = 000007B4000044b827000cae;
 			};
 		00000466000044b827000cae = {
-			name = TriStepPushDepthStencil_Blue.cpp;
+			name = TriStepPushProjection_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushDepthStencil_Blue.cpp";
+			path = "RenderJob/TriStepPushProjection_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -822,10 +822,10 @@
 			fileRef = 0000047E000044b827000cae;
 			};
 		00000454000044b827000cae = {
-			name = TriStepPopRenderTarget.cpp;
+			name = TriStepPopViewport.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopRenderTarget.cpp";
+			path = "RenderJob/TriStepPopViewport.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -854,10 +854,10 @@
 			sourceTree = "<group>";
 			};
 		000008F4000044b827000cae = {
-			name = TriStepPushViewTransform.h;
+			name = TriStepPythonCB.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPushViewTransform.h";
+			path = "RenderJob/TriStepPythonCB.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -962,10 +962,10 @@
 			sourceTree = "<group>";
 			};
 		00000900000044b827000cae = {
-			name = TriStepRenderDebug.h;
+			name = TriStepRenderEffect.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderDebug.h";
+			path = "RenderJob/TriStepRenderEffect.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -1203,10 +1203,10 @@
 			sourceTree = "<group>";
 			};
 		00000908000044b827000cae = {
-			name = TriStepRenderLineGraph.h;
+			name = TriStepRenderObject.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderLineGraph.h";
+			path = "RenderJob/TriStepRenderObject.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -1349,10 +1349,10 @@
 			fileRef = 00000240000044b827000cae;
 			};
 		0000044E000044b827000cae = {
-			name = TriStepPopDepthStencil_Blue.cpp;
+			name = TriStepPopProjection_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopDepthStencil_Blue.cpp";
+			path = "RenderJob/TriStepPopProjection_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -1369,10 +1369,10 @@
 			fileRef = 0000037E000044b827000cae;
 			};
 		0000045A000044b827000cae = {
-			name = TriStepPopViewport_Blue.cpp;
+			name = TriStepPopViewTransform_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopViewport_Blue.cpp";
+			path = "RenderJob/TriStepPopViewTransform_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -1405,10 +1405,10 @@
 			fileRef = 00000822000044b827000cae;
 			};
 		0000045E000044b827000cae = {
-			name = TriStepPopViewTransform_Blue.cpp;
+			name = TriStepPresentSwapChain_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopViewTransform_Blue.cpp";
+			path = "RenderJob/TriStepPresentSwapChain_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -1497,10 +1497,10 @@
 			sourceTree = "<group>";
 			};
 		00000462000044b827000cae = {
-			name = TriStepPresentSwapChain_Blue.cpp;
+			name = TriStepPushDepthStencil_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPresentSwapChain_Blue.cpp";
+			path = "RenderJob/TriStepPushDepthStencil_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -1581,10 +1581,10 @@
 			sourceTree = "<group>";
 			};
 		000008CC000044b827000cae = {
-			name = ITriRenderStep.h;
+			name = Tr2RenderJobs.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/ITriRenderStep.h";
+			path = "RenderJob/Tr2RenderJobs.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -2213,6 +2213,9 @@
 			isa = PBXGroup;
 			sourceTree = "<group>";
 			children = (
+				00000414000044b827000cae,
+				000008C2000044b827000cae,
+				00000416000044b827000cae,
 				00000418000044b827000cae,
 				000008C4000044b827000cae,
 				0000041A000044b827000cae,
@@ -2222,17 +2225,14 @@
 				00000420000044b827000cae,
 				000008C8000044b827000cae,
 				00000422000044b827000cae,
-				00000424000044b827000cae,
-				000008CA000044b827000cae,
-				00000426000044b827000cae,
 				);
 			name = Effects;
 			};
 		00000476000044b827000cae = {
-			name = TriStepPushViewTransform_Blue.cpp;
+			name = TriStepPythonCB_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushViewTransform_Blue.cpp";
+			path = "RenderJob/TriStepPythonCB_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -2311,9 +2311,6 @@
 				00000410000044b827000cae,
 				000008C0000044b827000cae,
 				00000412000044b827000cae,
-				00000414000044b827000cae,
-				000008C2000044b827000cae,
-				00000416000044b827000cae,
 				);
 			name = PostProcess;
 			};
@@ -2546,10 +2543,10 @@
 			fileRef = 0000065C000044b827000cae;
 			};
 		000008CE000044b827000cae = {
-			name = Tr2RenderJobs.h;
+			name = TriRenderJob.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/Tr2RenderJobs.h";
+			path = "RenderJob/TriRenderJob.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -2606,10 +2603,10 @@
 			sourceTree = "<group>";
 			};
 		000008DC000044b827000cae = {
-			name = TriStepFilterVisibilityResults.h;
+			name = TriStepGenerateMipMaps.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepFilterVisibilityResults.h";
+			path = "RenderJob/TriStepGenerateMipMaps.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -2702,10 +2699,10 @@
 			sourceTree = "<group>";
 			};
 		000008DA000044b827000cae = {
-			name = TriStepEnableWireframeMode.h;
+			name = TriStepFilterVisibilityResults.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepEnableWireframeMode.h";
+			path = "RenderJob/TriStepFilterVisibilityResults.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -2799,10 +2796,10 @@
 			sourceTree = "<group>";
 			};
 		0000041C000044b827000cae = {
-			name = Tr2PPEffect.cpp;
+			name = Tr2PPGodRaysEffect.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPEffect.cpp";
+			path = "PostProcess/Effects/Tr2PPGodRaysEffect.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -2862,7 +2859,10 @@
 			isa = PBXGroup;
 			sourceTree = "<group>";
 			children = (
+				000008CA000044b827000cae,
+				00000424000044b827000cae,
 				000008CC000044b827000cae,
+				00000426000044b827000cae,
 				00000428000044b827000cae,
 				000008CE000044b827000cae,
 				0000042A000044b827000cae,
@@ -2871,13 +2871,13 @@
 				0000042E000044b827000cae,
 				00000430000044b827000cae,
 				000008D2000044b827000cae,
-				00000432000044b827000cae,
 				00000434000044b827000cae,
 				000008D4000044b827000cae,
+				00000436000044b827000cae,
+				00000432000044b827000cae,
 				00000438000044b827000cae,
 				000008D6000044b827000cae,
 				0000043A000044b827000cae,
-				00000436000044b827000cae,
 				0000043C000044b827000cae,
 				000008D8000044b827000cae,
 				0000043E000044b827000cae,
@@ -2896,15 +2896,15 @@
 				00000450000044b827000cae,
 				000008E2000044b827000cae,
 				00000452000044b827000cae,
+				00000458000044b827000cae,
+				000008E6000044b827000cae,
+				0000045A000044b827000cae,
 				00000454000044b827000cae,
 				000008E4000044b827000cae,
 				00000456000044b827000cae,
 				0000045C000044b827000cae,
 				000008E8000044b827000cae,
 				0000045E000044b827000cae,
-				00000458000044b827000cae,
-				000008E6000044b827000cae,
-				0000045A000044b827000cae,
 				00000460000044b827000cae,
 				000008EA000044b827000cae,
 				00000462000044b827000cae,
@@ -2914,15 +2914,15 @@
 				00000468000044b827000cae,
 				000008EE000044b827000cae,
 				0000046A000044b827000cae,
+				00000470000044b827000cae,
+				000008F2000044b827000cae,
+				00000472000044b827000cae,
 				0000046C000044b827000cae,
 				000008F0000044b827000cae,
 				0000046E000044b827000cae,
 				00000474000044b827000cae,
 				000008F4000044b827000cae,
 				00000476000044b827000cae,
-				00000470000044b827000cae,
-				000008F2000044b827000cae,
-				00000472000044b827000cae,
 				00000478000044b827000cae,
 				000008F6000044b827000cae,
 				0000047A000044b827000cae,
@@ -3238,10 +3238,10 @@
 			sourceTree = "<group>";
 			};
 		00000442000044b827000cae = {
-			name = TriStepEnableWireframeMode_Blue.cpp;
+			name = TriStepFilterVisibilityResults_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepEnableWireframeMode_Blue.cpp";
+			path = "RenderJob/TriStepFilterVisibilityResults_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -3266,10 +3266,10 @@
 			sourceTree = "<group>";
 			};
 		000008C2000044b827000cae = {
-			name = Tr2PostProcessRenderInfo.h;
+			name = Tr2PPBloomEffect.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "PostProcess/Tr2PostProcessRenderInfo.h";
+			path = "PostProcess/Effects/Tr2PPBloomEffect.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -3378,10 +3378,10 @@
 			sourceTree = "<group>";
 			};
 		000008E8000044b827000cae = {
-			name = TriStepPopViewTransform.h;
+			name = TriStepPresentSwapChain.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPopViewTransform.h";
+			path = "RenderJob/TriStepPresentSwapChain.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -3707,10 +3707,10 @@
 			sourceTree = "<group>";
 			};
 		00000470000044b827000cae = {
-			name = TriStepPushViewport.cpp;
+			name = TriStepPushViewTransform.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushViewport.cpp";
+			path = "RenderJob/TriStepPushViewTransform.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -3751,10 +3751,10 @@
 			sourceTree = "<group>";
 			};
 		00000902000044b827000cae = {
-			name = TriStepRenderEffect.h;
+			name = TriStepRenderFps.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderEffect.h";
+			path = "RenderJob/TriStepRenderFps.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -3891,10 +3891,10 @@
 			fileRef = 00000214000044b827000cae;
 			};
 		00000474000044b827000cae = {
-			name = TriStepPushViewTransform.cpp;
+			name = TriStepPythonCB.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushViewTransform.cpp";
+			path = "RenderJob/TriStepPythonCB.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -3911,10 +3911,10 @@
 			sourceTree = "<group>";
 			};
 		0000046C000044b827000cae = {
-			name = TriStepPushRenderTarget.cpp;
+			name = TriStepPushViewport.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushRenderTarget.cpp";
+			path = "RenderJob/TriStepPushViewport.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -4112,10 +4112,10 @@
 			sourceTree = "<group>";
 			};
 		000008EE000044b827000cae = {
-			name = TriStepPushProjection.h;
+			name = TriStepPushRenderTarget.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPushProjection.h";
+			path = "RenderJob/TriStepPushRenderTarget.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -4455,10 +4455,10 @@
 			sourceTree = "<group>";
 			};
 		0000090C000044b827000cae = {
-			name = TriStepRenderPass.h;
+			name = TriStepRenderPostProcess.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderPass.h";
+			path = "RenderJob/TriStepRenderPostProcess.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -4675,10 +4675,10 @@
 			fileRef = 0000026C000044b827000cae;
 			};
 		000008D0000044b827000cae = {
-			name = TriRenderJob.h;
+			name = TriRenderStep.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriRenderJob.h";
+			path = "RenderJob/TriRenderStep.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -4816,10 +4816,10 @@
 			fileRef = 000002A6000044b827000cae;
 			};
 		00000410000044b827000cae = {
-			name = Tr2PostProcessManager.cpp;
+			name = Tr2PostProcessRenderInfo.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Tr2PostProcessManager.cpp";
+			path = "PostProcess/Tr2PostProcessRenderInfo.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5024,10 +5024,10 @@
 			sourceTree = "<group>";
 			};
 		000008EC000044b827000cae = {
-			name = TriStepPushDepthStencil.h;
+			name = TriStepPushProjection.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPushDepthStencil.h";
+			path = "RenderJob/TriStepPushProjection.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5060,10 +5060,10 @@
 			sourceTree = "<group>";
 			};
 		0000047A000044b827000cae = {
-			name = TriStepPythonCB_Blue.cpp;
+			name = TriStepRemoteSync_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPythonCB_Blue.cpp";
+			path = "RenderJob/TriStepRemoteSync_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5124,10 +5124,10 @@
 			sourceTree = "<group>";
 			};
 		000008E6000044b827000cae = {
-			name = TriStepPopViewport.h;
+			name = TriStepPopViewTransform.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPopViewport.h";
+			path = "RenderJob/TriStepPopViewTransform.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5467,10 +5467,10 @@
 			sourceTree = "<group>";
 			};
 		000008F0000044b827000cae = {
-			name = TriStepPushRenderTarget.h;
+			name = TriStepPushViewport.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPushRenderTarget.h";
+			path = "RenderJob/TriStepPushViewport.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5503,10 +5503,10 @@
 			sourceTree = "<group>";
 			};
 		00000464000044b827000cae = {
-			name = TriStepPushDepthStencil.cpp;
+			name = TriStepPushProjection.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushDepthStencil.cpp";
+			path = "RenderJob/TriStepPushProjection.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5515,10 +5515,10 @@
 			fileRef = 0000052A000044b827000cae;
 			};
 		000008E4000044b827000cae = {
-			name = TriStepPopRenderTarget.h;
+			name = TriStepPopViewport.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPopRenderTarget.h";
+			path = "RenderJob/TriStepPopViewport.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5902,10 +5902,10 @@
 			sourceTree = "<group>";
 			};
 		0000046A000044b827000cae = {
-			name = TriStepPushProjection_Blue.cpp;
+			name = TriStepPushRenderTarget_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushProjection_Blue.cpp";
+			path = "RenderJob/TriStepPushRenderTarget_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -5986,10 +5986,10 @@
 			fileRef = 000009C0000044b827000cae;
 			};
 		00000416000044b827000cae = {
-			name = Tr2PostProcessRenderInfo_Blue.cpp;
+			name = Tr2PPBloomEffect_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Tr2PostProcessRenderInfo_Blue.cpp";
+			path = "PostProcess/Effects/Tr2PPBloomEffect_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -6155,10 +6155,10 @@
 			fileRef = 00000404000044b827000cae;
 			};
 		00000412000044b827000cae = {
-			name = Tr2PostProcessManager_Blue.cpp;
+			name = Tr2PostProcessRenderInfo_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Tr2PostProcessManager_Blue.cpp";
+			path = "PostProcess/Tr2PostProcessRenderInfo_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -6755,10 +6755,10 @@
 			fileRef = 0000089A000044b827000cae;
 			};
 		00000480000044b827000cae = {
-			name = TriStepRemoteUpdate.cpp;
+			name = TriStepRenderAtlas.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRemoteUpdate.cpp";
+			path = "RenderJob/TriStepRenderAtlas.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -6795,10 +6795,10 @@
 			sourceTree = "<group>";
 			};
 		0000048C000044b827000cae = {
-			name = TriStepRenderDebug.cpp;
+			name = TriStepRenderEffect.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderDebug.cpp";
+			path = "RenderJob/TriStepRenderEffect.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -6935,10 +6935,10 @@
 			sourceTree = "<group>";
 			};
 		000008C6000044b827000cae = {
-			name = Tr2PPEffect.h;
+			name = Tr2PPGodRaysEffect.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "PostProcess/Effects/Tr2PPEffect.h";
+			path = "PostProcess/Effects/Tr2PPGodRaysEffect.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -7047,10 +7047,10 @@
 			sourceTree = "<group>";
 			};
 		00000484000044b827000cae = {
-			name = TriStepRenderAtlas.cpp;
+			name = TriStepRenderCubeMap.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderAtlas.cpp";
+			path = "RenderJob/TriStepRenderCubeMap.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -7075,10 +7075,10 @@
 			fileRef = 0000012A000044b827000cae;
 			};
 		0000042E000044b827000cae = {
-			name = TriRenderJob_Blue.cpp;
+			name = TriRenderStep_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriRenderJob_Blue.cpp";
+			path = "RenderJob/TriRenderStep_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -7227,10 +7227,10 @@
 			sourceTree = "<group>";
 			};
 		000008C8000044b827000cae = {
-			name = Tr2PPGodRaysEffect.h;
+			name = Tr2PPSignalLossEffect.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "PostProcess/Effects/Tr2PPGodRaysEffect.h";
+			path = "PostProcess/Effects/Tr2PPSignalLossEffect.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -7391,10 +7391,10 @@
 			sourceTree = "<group>";
 			};
 		0000049A000044b827000cae = {
-			name = TriStepRenderFullScreenShader_Blue.cpp;
+			name = TriStepRenderLineGraph_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderFullScreenShader_Blue.cpp";
+			path = "RenderJob/TriStepRenderLineGraph_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -8866,10 +8866,10 @@
 			sourceTree = "<group>";
 			};
 		00000904000044b827000cae = {
-			name = TriStepRenderFps.h;
+			name = TriStepRenderFullScreenShader.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderFps.h";
+			path = "RenderJob/TriStepRenderFullScreenShader.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -9006,10 +9006,10 @@
 			sourceTree = "<group>";
 			};
 		00000478000044b827000cae = {
-			name = TriStepPythonCB.cpp;
+			name = TriStepRemoteSync.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPythonCB.cpp";
+			path = "RenderJob/TriStepRemoteSync.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -9090,10 +9090,10 @@
 			fileRef = 000009E0000044b827000cae;
 			};
 		000008D8000044b827000cae = {
-			name = TriStepCopyRenderTarget.h;
+			name = TriStepEnableWireframeMode.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepCopyRenderTarget.h";
+			path = "RenderJob/TriStepEnableWireframeMode.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -9198,10 +9198,10 @@
 			sourceTree = "<group>";
 			};
 		000008EA000044b827000cae = {
-			name = TriStepPresentSwapChain.h;
+			name = TriStepPushDepthStencil.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPresentSwapChain.h";
+			path = "RenderJob/TriStepPushDepthStencil.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -9230,10 +9230,10 @@
 			fileRef = 00000872000044b827000cae;
 			};
 		00000418000044b827000cae = {
-			name = Tr2PPBloomEffect.cpp;
+			name = Tr2PPEffect.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPBloomEffect.cpp";
+			path = "PostProcess/Effects/Tr2PPEffect.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -9402,10 +9402,10 @@
 			sourceTree = "<group>";
 			};
 		00000430000044b827000cae = {
-			name = TriRenderStep.cpp;
+			name = TriStepClear.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriRenderStep.cpp";
+			path = "RenderJob/TriStepClear.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -9945,10 +9945,10 @@
 			sourceTree = "<group>";
 			};
 		00000496000044b827000cae = {
-			name = TriStepRenderFps_Blue.cpp;
+			name = TriStepRenderFullScreenShader_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderFps_Blue.cpp";
+			path = "RenderJob/TriStepRenderFullScreenShader_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10199,10 +10199,10 @@
 			sourceTree = "<group>";
 			};
 		000008E0000044b827000cae = {
-			name = TriStepPopDepthStencil.h;
+			name = TriStepPopProjection.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPopDepthStencil.h";
+			path = "RenderJob/TriStepPopProjection.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10376,10 +10376,10 @@
 			fileRef = 000009F6000044b827000cae;
 			};
 		000004A0000044b827000cae = {
-			name = TriStepRenderObject.cpp;
+			name = TriStepRenderPass.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderObject.cpp";
+			path = "RenderJob/TriStepRenderPass.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10416,10 +10416,10 @@
 			sourceTree = "<group>";
 			};
 		00000490000044b827000cae = {
-			name = TriStepRenderEffect.cpp;
+			name = TriStepRenderFps.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderEffect.cpp";
+			path = "RenderJob/TriStepRenderFps.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10505,10 +10505,10 @@
 			fileRef = 00000874000044b827000cae;
 			};
 		00000486000044b827000cae = {
-			name = TriStepRenderAtlas_Blue.cpp;
+			name = TriStepRenderCubeMap_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderAtlas_Blue.cpp";
+			path = "RenderJob/TriStepRenderCubeMap_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10629,10 +10629,10 @@
 			sourceTree = "<group>";
 			};
 		00000906000044b827000cae = {
-			name = TriStepRenderFullScreenShader.h;
+			name = TriStepRenderLineGraph.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderFullScreenShader.h";
+			path = "RenderJob/TriStepRenderLineGraph.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10649,10 +10649,10 @@
 			sourceTree = "<group>";
 			};
 		00000498000044b827000cae = {
-			name = TriStepRenderFullScreenShader.cpp;
+			name = TriStepRenderLineGraph.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderFullScreenShader.cpp";
+			path = "RenderJob/TriStepRenderLineGraph.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10841,10 +10841,10 @@
 			sourceTree = "<group>";
 			};
 		0000044A000044b827000cae = {
-			name = TriStepGenerateMipMaps_Blue.cpp;
+			name = TriStepPopDepthStencil_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepGenerateMipMaps_Blue.cpp";
+			path = "RenderJob/TriStepPopDepthStencil_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -10917,10 +10917,10 @@
 			sourceTree = "<group>";
 			};
 		00000422000044b827000cae = {
-			name = Tr2PPGodRaysEffect_Blue.cpp;
+			name = Tr2PPSignalLossEffect_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPGodRaysEffect_Blue.cpp";
+			path = "PostProcess/Effects/Tr2PPSignalLossEffect_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -11016,10 +11016,10 @@
 			sourceTree = "<group>";
 			};
 		000008CA000044b827000cae = {
-			name = Tr2PPSignalLossEffect.h;
+			name = ITriRenderStep.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "PostProcess/Effects/Tr2PPSignalLossEffect.h";
+			path = "RenderJob/ITriRenderStep.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -11048,10 +11048,10 @@
 			sourceTree = "<group>";
 			};
 		0000049C000044b827000cae = {
-			name = TriStepRenderLineGraph.cpp;
+			name = TriStepRenderObject.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderLineGraph.cpp";
+			path = "RenderJob/TriStepRenderObject.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -11308,10 +11308,10 @@
 			fileRef = 0000079C000044b827000cae;
 			};
 		000008F6000044b827000cae = {
-			name = TriStepPythonCB.h;
+			name = TriStepRemoteSync.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPythonCB.h";
+			path = "RenderJob/TriStepRemoteSync.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -11344,10 +11344,10 @@
 			fileRef = 0000011C000044b827000cae;
 			};
 		0000041A000044b827000cae = {
-			name = Tr2PPBloomEffect_Blue.cpp;
+			name = Tr2PPEffect_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPBloomEffect_Blue.cpp";
+			path = "PostProcess/Effects/Tr2PPEffect_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -11568,10 +11568,10 @@
 			sourceTree = "<group>";
 			};
 		0000043E000044b827000cae = {
-			name = TriStepCopyRenderTarget_Blue.cpp;
+			name = TriStepEnableWireframeMode_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepCopyRenderTarget_Blue.cpp";
+			path = "RenderJob/TriStepEnableWireframeMode_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -11644,10 +11644,10 @@
 			sourceTree = "<group>";
 			};
 		00000468000044b827000cae = {
-			name = TriStepPushProjection.cpp;
+			name = TriStepPushRenderTarget.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushProjection.cpp";
+			path = "RenderJob/TriStepPushRenderTarget.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -12000,10 +12000,10 @@
 			name = UI;
 			};
 		00000482000044b827000cae = {
-			name = TriStepRemoteUpdate_Blue.cpp;
+			name = TriStepRenderAtlas_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRemoteUpdate_Blue.cpp";
+			path = "RenderJob/TriStepRenderAtlas_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -12300,10 +12300,10 @@
 			fileRef = 00000366000044b827000cae;
 			};
 		00000494000044b827000cae = {
-			name = TriStepRenderFps.cpp;
+			name = TriStepRenderFullScreenShader.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderFps.cpp";
+			path = "RenderJob/TriStepRenderFullScreenShader.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -12352,10 +12352,10 @@
 			sourceTree = "<group>";
 			};
 		00000424000044b827000cae = {
-			name = Tr2PPSignalLossEffect.cpp;
+			name = Tr2RenderJobs.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPSignalLossEffect.cpp";
+			path = "RenderJob/Tr2RenderJobs.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -12410,10 +12410,10 @@
 			fileRef = 00000542000044b827000cae;
 			};
 		0000047C000044b827000cae = {
-			name = TriStepRemoteSync.cpp;
+			name = TriStepRemoteUpdate.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRemoteSync.cpp";
+			path = "RenderJob/TriStepRemoteUpdate.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -12691,10 +12691,10 @@
 			sourceTree = "<group>";
 			};
 		00000472000044b827000cae = {
-			name = TriStepPushViewport_Blue.cpp;
+			name = TriStepPushViewTransform_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushViewport_Blue.cpp";
+			path = "RenderJob/TriStepPushViewTransform_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13059,10 +13059,10 @@
 			fileRef = 000002AA000044b827000cae;
 			};
 		0000048E000044b827000cae = {
-			name = TriStepRenderDebug_Blue.cpp;
+			name = TriStepRenderEffect_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderDebug_Blue.cpp";
+			path = "RenderJob/TriStepRenderEffect_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13079,10 +13079,10 @@
 			sourceTree = "<group>";
 			};
 		00000436000044b827000cae = {
-			name = TriStepClear_Blue.cpp;
+			name = TriStepClearUav_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepClear_Blue.cpp";
+			path = "RenderJob/TriStepClearUav_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13147,10 +13147,10 @@
 			fileRef = 00000460000044b827000cae;
 			};
 		00000432000044b827000cae = {
-			name = TriRenderStep_Blue.cpp;
+			name = TriStepClear_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriRenderStep_Blue.cpp";
+			path = "RenderJob/TriStepClear_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13351,10 +13351,10 @@
 			fileRef = 00000124000044b827000cae;
 			};
 		000008FA000044b827000cae = {
-			name = TriStepRemoteUpdate.h;
+			name = TriStepRenderAtlas.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRemoteUpdate.h";
+			path = "RenderJob/TriStepRenderAtlas.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13499,10 +13499,10 @@
 			fileRef = 000004FC000044b827000cae;
 			};
 		00000434000044b827000cae = {
-			name = TriStepClear.cpp;
+			name = TriStepClearUav.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepClear.cpp";
+			path = "RenderJob/TriStepClearUav.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13583,10 +13583,10 @@
 			sourceTree = "<group>";
 			};
 		00000448000044b827000cae = {
-			name = TriStepGenerateMipMaps.cpp;
+			name = TriStepPopDepthStencil.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepGenerateMipMaps.cpp";
+			path = "RenderJob/TriStepPopDepthStencil.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13719,10 +13719,10 @@
 			fileRef = 0000084E000044b827000cae;
 			};
 		0000042A000044b827000cae = {
-			name = Tr2RenderJobs_Blue.cpp;
+			name = TriRenderJob_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/Tr2RenderJobs_Blue.cpp";
+			path = "RenderJob/TriRenderJob_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13803,10 +13803,10 @@
 			sourceTree = "<group>";
 			};
 		00000450000044b827000cae = {
-			name = TriStepPopProjection.cpp;
+			name = TriStepPopRenderTarget.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopProjection.cpp";
+			path = "RenderJob/TriStepPopRenderTarget.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13819,10 +13819,10 @@
 			sourceTree = "<group>";
 			};
 		000008FC000044b827000cae = {
-			name = TriStepRenderAtlas.h;
+			name = TriStepRenderCubeMap.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderAtlas.h";
+			path = "RenderJob/TriStepRenderCubeMap.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -13935,10 +13935,10 @@
 			sourceTree = "<group>";
 			};
 		0000043A000044b827000cae = {
-			name = TriStepClearUav_Blue.cpp;
+			name = TriStepCopyRenderTarget_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepClearUav_Blue.cpp";
+			path = "RenderJob/TriStepCopyRenderTarget_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -14115,10 +14115,10 @@
 			sourceTree = "<group>";
 			};
 		0000048A000044b827000cae = {
-			name = TriStepRenderCubeMap_Blue.cpp;
+			name = TriStepRenderDebug_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderCubeMap_Blue.cpp";
+			path = "RenderJob/TriStepRenderDebug_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -14231,10 +14231,10 @@
 			sourceTree = "<group>";
 			};
 		00000446000044b827000cae = {
-			name = TriStepFilterVisibilityResults_Blue.cpp;
+			name = TriStepGenerateMipMaps_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepFilterVisibilityResults_Blue.cpp";
+			path = "RenderJob/TriStepGenerateMipMaps_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -14403,10 +14403,10 @@
 			fileRef = 00000764000044b827000cae;
 			};
 		00000452000044b827000cae = {
-			name = TriStepPopProjection_Blue.cpp;
+			name = TriStepPopRenderTarget_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopProjection_Blue.cpp";
+			path = "RenderJob/TriStepPopRenderTarget_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -14631,10 +14631,10 @@
 			fileRef = 000000EE000044b827000cae;
 			};
 		000004A2000044b827000cae = {
-			name = TriStepRenderObject_Blue.cpp;
+			name = TriStepRenderPass_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderObject_Blue.cpp";
+			path = "RenderJob/TriStepRenderPass_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15178,10 +15178,10 @@
 			sourceTree = "<group>";
 			};
 		00000414000044b827000cae = {
-			name = Tr2PostProcessRenderInfo.cpp;
+			name = Tr2PPBloomEffect.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Tr2PostProcessRenderInfo.cpp";
+			path = "PostProcess/Effects/Tr2PPBloomEffect.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15222,10 +15222,10 @@
 			fileRef = 0000000C000044b827000cae;
 			};
 		0000041E000044b827000cae = {
-			name = Tr2PPEffect_Blue.cpp;
+			name = Tr2PPGodRaysEffect_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPEffect_Blue.cpp";
+			path = "PostProcess/Effects/Tr2PPGodRaysEffect_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15274,10 +15274,10 @@
 			sourceTree = "<group>";
 			};
 		000008DE000044b827000cae = {
-			name = TriStepGenerateMipMaps.h;
+			name = TriStepPopDepthStencil.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepGenerateMipMaps.h";
+			path = "RenderJob/TriStepPopDepthStencil.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15394,10 +15394,10 @@
 			fileRef = 00000842000044b827000cae;
 			};
 		0000090A000044b827000cae = {
-			name = TriStepRenderObject.h;
+			name = TriStepRenderPass.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRenderObject.h";
+			path = "RenderJob/TriStepRenderPass.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15422,10 +15422,10 @@
 			sourceTree = "<group>";
 			};
 		0000042C000044b827000cae = {
-			name = TriRenderJob.cpp;
+			name = TriRenderStep.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriRenderJob.cpp";
+			path = "RenderJob/TriRenderStep.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15450,10 +15450,10 @@
 			sourceTree = "<group>";
 			};
 		0000044C000044b827000cae = {
-			name = TriStepPopDepthStencil.cpp;
+			name = TriStepPopProjection.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopDepthStencil.cpp";
+			path = "RenderJob/TriStepPopProjection.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15522,10 +15522,10 @@
 			sourceTree = "<group>";
 			};
 		0000043C000044b827000cae = {
-			name = TriStepCopyRenderTarget.cpp;
+			name = TriStepEnableWireframeMode.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepCopyRenderTarget.cpp";
+			path = "RenderJob/TriStepEnableWireframeMode.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15574,10 +15574,10 @@
 			fileRef = 00000946000044b827000cae;
 			};
 		000008E2000044b827000cae = {
-			name = TriStepPopProjection.h;
+			name = TriStepPopRenderTarget.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPopProjection.h";
+			path = "RenderJob/TriStepPopRenderTarget.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15981,10 +15981,10 @@
 			fileRef = 00000986000044b827000cae;
 			};
 		000004A4000044b827000cae = {
-			name = TriStepRenderPass.cpp;
+			name = TriStepRenderPostProcess.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderPass.cpp";
+			path = "RenderJob/TriStepRenderPostProcess.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -15997,10 +15997,10 @@
 			sourceTree = "<group>";
 			};
 		000008D2000044b827000cae = {
-			name = TriRenderStep.h;
+			name = TriStepClear.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriRenderStep.h";
+			path = "RenderJob/TriStepClear.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -16261,10 +16261,10 @@
 			fileRef = 00000002000044b827000cae;
 			};
 		00000440000044b827000cae = {
-			name = TriStepEnableWireframeMode.cpp;
+			name = TriStepFilterVisibilityResults.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepEnableWireframeMode.cpp";
+			path = "RenderJob/TriStepFilterVisibilityResults.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -16361,10 +16361,10 @@
 			fileRef = 00000534000044b827000cae;
 			};
 		00000488000044b827000cae = {
-			name = TriStepRenderCubeMap.cpp;
+			name = TriStepRenderDebug.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderCubeMap.cpp";
+			path = "RenderJob/TriStepRenderDebug.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -16481,10 +16481,10 @@
 			fileRef = 0000083E000044b827000cae;
 			};
 		0000049E000044b827000cae = {
-			name = TriStepRenderLineGraph_Blue.cpp;
+			name = TriStepRenderObject_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderLineGraph_Blue.cpp";
+			path = "RenderJob/TriStepRenderObject_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -16593,18 +16593,18 @@
 			fileRef = 0000001A000044b827000cae;
 			};
 		00000460000044b827000cae = {
-			name = TriStepPresentSwapChain.cpp;
+			name = TriStepPushDepthStencil.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPresentSwapChain.cpp";
+			path = "RenderJob/TriStepPushDepthStencil.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
 		000008C0000044b827000cae = {
-			name = Tr2PostProcessManager.h;
+			name = Tr2PostProcessRenderInfo.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "PostProcess/Tr2PostProcessManager.h";
+			path = "PostProcess/Tr2PostProcessRenderInfo.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -16705,10 +16705,10 @@
 			sourceTree = "<group>";
 			};
 		000008D6000044b827000cae = {
-			name = TriStepClearUav.h;
+			name = TriStepCopyRenderTarget.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepClearUav.h";
+			path = "RenderJob/TriStepCopyRenderTarget.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -16893,10 +16893,10 @@
 			sourceTree = "<group>";
 			};
 		00000444000044b827000cae = {
-			name = TriStepFilterVisibilityResults.cpp;
+			name = TriStepGenerateMipMaps.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepFilterVisibilityResults.cpp";
+			path = "RenderJob/TriStepGenerateMipMaps.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17097,10 +17097,10 @@
 			fileRef = 000000E2000044b827000cae;
 			};
 		00000458000044b827000cae = {
-			name = TriStepPopViewport.cpp;
+			name = TriStepPopViewTransform.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopViewport.cpp";
+			path = "RenderJob/TriStepPopViewTransform.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17113,10 +17113,10 @@
 			sourceTree = "<group>";
 			};
 		000004A6000044b827000cae = {
-			name = TriStepRenderPass_Blue.cpp;
+			name = TriStepRenderPostProcess_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderPass_Blue.cpp";
+			path = "RenderJob/TriStepRenderPostProcess_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17257,10 +17257,10 @@
 			fileRef = 000000D6000044b827000cae;
 			};
 		000008F8000044b827000cae = {
-			name = TriStepRemoteSync.h;
+			name = TriStepRemoteUpdate.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepRemoteSync.h";
+			path = "RenderJob/TriStepRemoteUpdate.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17381,10 +17381,10 @@
 			fileRef = 00000114000044b827000cae;
 			};
 		00000426000044b827000cae = {
-			name = Tr2PPSignalLossEffect_Blue.cpp;
+			name = Tr2RenderJobs_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "PostProcess/Effects/Tr2PPSignalLossEffect_Blue.cpp";
+			path = "RenderJob/Tr2RenderJobs_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17541,10 +17541,10 @@
 			fileRef = 000002E2000044b827000cae;
 			};
 		00000438000044b827000cae = {
-			name = TriStepClearUav.cpp;
+			name = TriStepCopyRenderTarget.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepClearUav.cpp";
+			path = "RenderJob/TriStepCopyRenderTarget.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17737,18 +17737,18 @@
 			sourceTree = "<group>";
 			};
 		000008F2000044b827000cae = {
-			name = TriStepPushViewport.h;
+			name = TriStepPushViewTransform.h;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.h;
-			path = "RenderJob/TriStepPushViewport.h";
+			path = "RenderJob/TriStepPushViewTransform.h";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
 		00000492000044b827000cae = {
-			name = TriStepRenderEffect_Blue.cpp;
+			name = TriStepRenderFps_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepRenderEffect_Blue.cpp";
+			path = "RenderJob/TriStepRenderFps_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17777,10 +17777,10 @@
 			fileRef = 000008EE000044b827000cae;
 			};
 		00000456000044b827000cae = {
-			name = TriStepPopRenderTarget_Blue.cpp;
+			name = TriStepPopViewport_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPopRenderTarget_Blue.cpp";
+			path = "RenderJob/TriStepPopViewport_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17921,10 +17921,10 @@
 			sourceTree = "<group>";
 			};
 		0000046E000044b827000cae = {
-			name = TriStepPushRenderTarget_Blue.cpp;
+			name = TriStepPushViewport_Blue.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/TriStepPushRenderTarget_Blue.cpp";
+			path = "RenderJob/TriStepPushViewport_Blue.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
@@ -17997,10 +17997,10 @@
 			fileRef = 000003D8000044b827000cae;
 			};
 		00000428000044b827000cae = {
-			name = Tr2RenderJobs.cpp;
+			name = TriRenderJob.cpp;
 			fileEncoding = 4;
 			lastKnownFileType = sourcecode.cpp.cpp;
-			path = "RenderJob/Tr2RenderJobs.cpp";
+			path = "RenderJob/TriRenderJob.cpp";
 			isa = PBXFileReference;
 			sourceTree = "<group>";
 			};
