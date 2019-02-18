@@ -782,7 +782,7 @@ bool TriStepRenderPostProcess::ProcessFog( Tr2PPFogEffect* fog )
 			m_fogCompositeEffect->StartUpdate();
 			m_fogCompositeEffect->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/EnvironmentFogComposit.fx" );
 			m_fogCompositeEffect->SetParameter( BlueSharedString( "BlitCurrent" ), m_renderInfo->GetRt1Buffer() );
-			m_fogCompositeEffect->SetParameter( BlueSharedString( "BlitOriginal" ), m_renderInfo->GetSourceBufferCopy() ); // this used _fogsource in eve.yaml, but I'm trying _source here
+			m_fogCompositeEffect->SetParameter( BlueSharedString( "BlitOriginal" ), m_renderInfo->GetSourceBufferCopy(true) ); // this used _fogsource in eve.yaml, but I'm trying _source here
 			m_fogCompositeEffect->SetParameter( BlueSharedString( "FogParameters" ), Vector4( fog->m_totalAmount, fog->m_totalPower, fog->m_backgroundOcclusion, fog->m_intensity ) );
 			m_fogCompositeEffect->SetParameter( BlueSharedString( "BrightnessAdjustment" ), Vector4( fog->m_brightnessThreshold0, fog->m_brightnessThreshold1, fog->m_brightnessAdjustmentAmount, 0.0f ) );
 			m_fogCompositeEffect->SetParameter( BlueSharedString( "BlendFunction0" ), Vector4( fog->m_blendDistance0, fog->m_blendBias0, fog->m_blendAmount0, fog->m_blendPower0 ) );
@@ -830,9 +830,12 @@ void TriStepRenderPostProcess::RenderFog( Tr2RenderContext& renderContext, Tr2PP
 	if( sourceBuffer->GetMsaaType() > 1 )
 	{
 		sourceBuffer->GetRenderTarget().Resolve( *m_renderInfo->GetSourceBufferCopy(), renderContext );
-		Tr2Renderer::PushRenderTarget( *m_renderInfo->GetSourceBufferCopy(), renderContext );
+	}
+	else
+	{
+		Tr2Renderer::PushRenderTarget( *m_renderInfo->GetSourceBufferCopy(true), renderContext );
 		Tr2Renderer::DrawTexture( *sourceBuffer );
-		renderContext.PopRenderTarget( );
+		renderContext.PopRenderTarget();
 	}
 
 	// render fog color
@@ -924,10 +927,10 @@ void TriStepRenderPostProcess::RenderTaa( Tr2RenderContext& renderContext, Tr2PP
 	Tr2Renderer::DrawScreenQuad( m_taaEffect );
 	Tr2Renderer::PopRenderTarget( renderContext );
 
-	if( source->GetMsaaType() > 1 )
+	/*if( source->GetMsaaType() > 1 )
 	{
 		source->GetRenderTarget().Resolve( *m_renderInfo->GetSourceBufferCopy(), renderContext );
-	}
+	}*/
 
 	m_renderInfo->GetSourceBufferCopy()->GetRenderTarget().Resolve( *m_accumulationBuffer, renderContext );
 

@@ -34,9 +34,9 @@ public:
 
 	void SetSourceBuffer( Tr2RenderTarget* sourceBuffer );
 	Tr2RenderTarget* GetSourceBuffer() { return m_sourceBuffer; };
-	Tr2RenderTarget* GetSourceBufferCopy() 
+	Tr2RenderTarget* GetSourceBufferCopy( bool force = false ) 
 	{ 
-		if( m_sourceBuffer && m_sourceBuffer->GetMsaaType() > 1 )
+		if( force || m_sourceBuffer && m_sourceBuffer->GetMsaaType() > 1 )
 		{
 			return m_sourceBufferCopy;
 		}
