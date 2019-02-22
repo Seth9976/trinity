@@ -23,7 +23,7 @@ protected:
 	void UpdateLight() override;
 private:
 	std::wstring m_texturePath;
-	TriTextureResPtr m_texture;
+TriTextureResPtr m_texture;
 };
 
 TYPEDEF_BLUECLASS( Tr2TexturedPointLight );
