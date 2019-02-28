@@ -85,8 +85,6 @@ private:
 	int CalcRequiredTextureSize( float maxDiameter );
 	void SetLod( Tr2Lod lod );
 
-	void SetLod( Tr2Lod lod );
-
 	std::string m_name;
 
 	bool m_display;
