@@ -23,7 +23,7 @@
 #include "Shader/Tr2Effect.h"
 #include "Utils/EveCustomMask.h"
 #include "TriSettingsRegistrar.h"
-#include "Tr2PointLight.h"
+#include "Lights/Tr2PointLight.h"
 #include "Shader/Utils/Tr2DataTextureManager.h"
 #include "Utilities/StringUtils.h"
 #include "Tr2ExternalParameter.h"
