@@ -7,7 +7,11 @@
 #include "include/ITr2DebugRenderer.h"
 #include "Utilities/BoundingBox.h"
 #include "Utilities/BoundingSphere.h"
+#include "gstate_character_instance.h"
+#include "gstate_transition.h"
 #include <algorithm>
+
+using namespace gstate;
 
 static const int MAX_JOINT_COUNT = 58;
 
@@ -19,6 +23,7 @@ Tr2GStateAnimation::Tr2GStateAnimation(IRoot* lockobj) :
 	m_meshBinding( nullptr ),
 	m_localPose( nullptr ),
 	m_gStateCharacterInstance( nullptr ),
+	m_state_machine( nullptr ),
 	m_compositePose( nullptr ),
 	m_gstate_pose_cache( nullptr ),
 	m_meshBoneMatrixList( nullptr ),
@@ -217,6 +222,7 @@ void Tr2GStateAnimation::RebuildCachedData( BlueAsyncRes* p )
 			}
 
 			m_gStateCharacterInstance = GStateInstantiateCharacter(character_info, GetAnimationTime(), 0, GetGrannyModel());
+			m_state_machine = GStateGetStateMachine(m_gStateCharacterInstance);
 
 			if ( !m_gstate_pose_cache )
 			{
@@ -398,6 +404,95 @@ bool Tr2GStateAnimation::InitializeBoundingInfo()
 	}
 	return true;
 }
+
+tokenized* Tr2GStateAnimation::GetActiveMachineElement()
+{
+	tokenized *element = m_state_machine->GetActiveElement();
+
+	return element;
+}
+
+const std::string Tr2GStateAnimation::GetActiveMachineElementName()
+{
+	tokenized *active = GetActiveMachineElement();
+	assert(active);
+
+	node *curr_node = GSTATE_DYNCAST(active, node);
+	if (curr_node)
+	{
+		char const* curr_name = curr_node->GetName();
+		return std::string(curr_name);
+	}
+	else
+	{
+		assert(GSTATE_DYNCAST(active, transition));
+		transition *curr_transition = GSTATE_DYNCAST(active, transition);
+		if (curr_transition)
+		{
+			char const* curr_transition_name = curr_transition->GetName();
+			return std::string(curr_transition_name);
+		}
+	}
+
+	return "";
+}
+
+bool Tr2GStateAnimation::RequestChangeToState( const std::string& name )
+{
+	return m_state_machine->RequestChangeToState(GStateInstanceTime(m_gStateCharacterInstance), 
+												 GStateInstanceLastDeltaT(m_gStateCharacterInstance), name.c_str());
+}
+
+bool Tr2GStateAnimation::StartTransitionByName( const std::string& name )
+{
+	return m_state_machine->StartTransitionByName(GStateInstanceTime(m_gStateCharacterInstance), name.c_str());
+}
+
+float Tr2GStateAnimation::GetParameter( const std::string& param_node_name, granny_int32x param_idx )
+{
+	node *curr_param = m_state_machine->FindChildByName(param_node_name.c_str());
+	parameters* param_set = GSTATE_DYNCAST(curr_param, parameters);
+	assert(param_set);
+
+	return param_set->GetRequestedParam( param_idx );
+}
+
+void Tr2GStateAnimation::SetParameter( const std::string& param_node_name, granny_int32x param_idx, float value )
+{
+	node *curr_param = m_state_machine->FindChildByName(param_node_name.c_str());
+	parameters* param_set = GSTATE_DYNCAST(curr_param, parameters);
+	assert(param_set);
+
+	param_set->SetParameter( param_idx, value );
+}
+
+void Tr2GStateAnimation::RequestParameter( const std::string& param_node_name, granny_int32x param_idx, float value )
+{
+	node *curr_param = m_state_machine->FindChildByName(param_node_name.c_str());
+	parameters* param_set = GSTATE_DYNCAST(curr_param, parameters);
+	assert(param_set);
+
+	param_set->RequestParameter( param_idx, value );
+}
+
+
+granny_int32x Tr2GStateAnimation::GetParameterIndexByName( const std::string& param_node_name, const std::string& param_name )
+{
+	node *curr_param = m_state_machine->FindChildByName(param_node_name.c_str());
+	parameters* param_set = GSTATE_DYNCAST(curr_param, parameters);
+	assert(param_set);
+
+	int num_params = param_set->GetNumOutputs();
+	for ( auto count = 0; count < num_params; count++ )
+	{
+		if ( !param_name.compare( param_set->GetOutputName( count )) )
+		{
+			return count;
+		}
+	}
+	return -1;
+}
+
 
 bool Tr2GStateAnimation::GetDynamicBounds( Vector4& boundingSphere, Vector3 &aabbMin, Vector3 &aabbMax )
 {
@@ -704,23 +799,6 @@ void Tr2GStateAnimation::SetModel( const std::string& val )
 	Initialize();
 }
 
-bool Tr2GStateAnimation::PlayAnimation( const char* animName, bool replace, int loopCount, float delay, float speed, bool clearWhenDone )
-{
-	assert(0);
-	return (false);
-}
-
-
-void Tr2GStateAnimation::EndAnimation()
-{
-	assert(0);
-}
-
-
-void Tr2GStateAnimation::ClearAnimations()
-{
-	assert(0);
-}
 
 void Tr2GStateAnimation::ApplyBoneOffsets(unsigned i)
 {
@@ -875,7 +953,8 @@ void Tr2GStateAnimation::Cleanup()
 	if ( m_gStateCharacterInstance )
 	{
 		GStateFreeCharacterInstance(m_gStateCharacterInstance);
-		m_gStateCharacterInstance = 0;
+		m_gStateCharacterInstance = nullptr;
+		m_state_machine = nullptr;
 	}
 
 
@@ -970,17 +1049,6 @@ bool Tr2GStateAnimation::IsInitialized() const
 	return ( m_modelInstance != nullptr ) && ( m_gStateRes != nullptr ) && m_gStateRes->IsGood();
 }
 
-
-std::vector<std::string> Tr2GStateAnimation::GetAnimationNames() const
-{
-
-	std::vector<std::string> names;
-	auto name = static_cast<std::string>("blank");
-
-	names.push_back(name);
-	assert(0);
-	return names;
-}
 
 
 void Tr2GStateAnimation::TogglePauseAnimations(bool pause)

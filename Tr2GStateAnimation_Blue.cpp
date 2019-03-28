@@ -44,21 +44,6 @@ const Be::ClassInfo* Tr2GStateAnimation::ExposeToBlue()
 			Be::READWRITE
 		)
 
-		MAP_METHOD_AND_WRAP
-		(
-			"EndAnimation",
-			EndAnimation,
-			"EndAnimation()\n\n"
-			"Stops currently playing animation at the end of the current loop iteration."
-		)
-		MAP_METHOD_AND_WRAP
-		(
-			"ClearAnimations",
-			ClearAnimations,
-			"ClearAnimations()\n\n"
-			"Abruptly ends all animations."
-		)
-
 		MAP_ATTRIBUTE( "boneOffset", m_boneOffset, "Per-bone post animation offsets.", Be::READ )
 
 		MAP_ATTRIBUTE
@@ -68,6 +53,8 @@ const Be::ClassInfo* Tr2GStateAnimation::ExposeToBlue()
 			"An event listener that's triggered by granny text track events.",
 			Be::READWRITE
 		)
+
+		
 
 		MAP_METHOD_AND_WRAP
 		(
@@ -87,6 +74,73 @@ const Be::ClassInfo* Tr2GStateAnimation::ExposeToBlue()
 			":param string: resource path for animation file"
 		)
 
-		MAP_METHOD_AND_WRAP( "GetAnimationNames", GetAnimationNames, "Returns all animation names" )
+		MAP_METHOD_AND_WRAP
+		(
+			"GetActiveMachineElementName",
+			GetActiveMachineElementName,
+			"GetActiveMachineElementName()\n\n"
+			"Returns the name of the active state or transition object."
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"RequestChangeToState",
+			RequestChangeToState,
+			"RequestChangeToState( state_name )\n\n"
+			"Requests a change to a particular state, through any intermediate transitions. Returns boolean that indicates whether the change will take place."
+			":param string: name for destination state"
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"StartTransitionByName",
+			StartTransitionByName,
+			"StartTransitionByName( transition_name )\n\n"
+			"Requests taking a particular transition. Returns boolean that indicates whether the change will take place."
+			":param string: name for transition to start"
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"GetParameter",
+			GetParameter,
+			"GetParameter( parameter_node_name, param_index )\n\n"
+			"Queries the value of a given parameter in a parameter node.  Returns float."
+			":param string: name for parameter node to query"
+			":param int: index for parameter to query."
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"SetParameter",
+			SetParameter,
+			"SetParameter( parameter_node_name, param_index, value )\n\n"
+			"Instantly sets a parameter by index on a named parameter node, to a float value."
+			":param string: name for parameter node to query"
+			":param int: index for parameter to query."
+			":param float: value to set."
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"RequestParameter",
+			RequestParameter,
+			"RequestParameter( parameter_node_name, param_index, value )\n\n"
+			"Sets a parameter by index on a named parameter node, to a float value, allowing a smooth transition."
+			":param string: name for parameter node to query"
+			":param int: index for parameter to query."
+			":param float: value to set."
+		)
+
+		MAP_METHOD_AND_WRAP
+		(
+			"GetParameterIndexByName",
+			GetParameterIndexByName,
+			"GetParameterIndexByName( parameter_node_name, param_name )\n\n"
+			"Returns the integer index of a parameter name on a param node"
+			":param string: name for parameter node"
+			":param string: name for parameter"
+		)
+
 	EXPOSURE_END()
 }

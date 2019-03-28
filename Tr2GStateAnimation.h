@@ -5,6 +5,10 @@
 #include "Include/ITr2AnimationUpdater.h"
 #include "GrannyBoneOffset.h"
 #include "Resources/Tr2GrannyStateRes.h"
+#include "gstate.h"
+#include "gstate_parameters.h"
+#include "gstate_tokenized.h"
+#include "gstate_state_machine.h"
 
 BLUE_DECLARE( TriGrannyRes );
 BLUE_DECLARE( Tr2GrannyStateRes );
@@ -53,11 +57,14 @@ public:
 	
 	bool IsInitialized() const;
 
-	bool	PlayAnimation( const char* animName, bool replace, int loopCount, float delay, float speed, bool clearWhenDone=true );
-	bool	PlayLayerAnimationByName( const char* layer, const char* animName, bool replace, int loopCount, float delay, float speed, bool clearWhenDone );
-	void	EndAnimation();
-	void	ClearAnimations();
-	float	GetAnimationChainCompleteTime();
+	gstate::tokenized* GetActiveMachineElement();
+	const std::string GetActiveMachineElementName();
+	bool RequestChangeToState( const std::string& name );
+	bool StartTransitionByName( const std::string& name );
+	float GetParameter( const std::string& param_node_name, granny_int32x param_idx );
+	void SetParameter( const std::string& param_node_name, granny_int32x param_idx, float value );
+	void RequestParameter( const std::string& param_node_name, granny_int32x param_idx, float value );
+	granny_int32x GetParameterIndexByName( const std::string& param_node_name, const std::string& param_name );
 
 	bool GetDynamicBounds( Vector4& boundingSphere, Vector3 &aabbMin, Vector3 &aabbMax );
 	void RenderDynamicBounds( const Matrix& modelTransform );
@@ -68,8 +75,6 @@ public:
 
 	int GetMeshBoneCount() const;
 	const granny_matrix_3x4* GetMeshBoneMatrixList() const;
-
-	std::vector<std::string> GetAnimationNames() const;
 
 	void TogglePauseAnimations( bool pause );
 
@@ -116,6 +121,7 @@ private:
 	bool InitializeBoundingInfo();
 
 	gstate_character_instance *m_gStateCharacterInstance;
+	state_machine *m_state_machine;
 	PGrannyBoneOffset m_boneOffset;
 	granny_local_pose *m_localPose;
 	granny_local_pose *m_compositePose;
