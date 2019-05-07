@@ -15,11 +15,11 @@ BLUE_CLASS( Tr2ActionChildEffect ) : public ITr2ControllerAction
 {
 public:
 	Tr2ActionChildEffect( IRoot* lockobj = nullptr );
-
 	EXPOSE_TO_BLUE();
 
 	virtual void Start( Tr2Controller& controller );
 	virtual void Stop( Tr2Controller& controller );
+	virtual void Link( Tr2Controller& controller );
 private:
 	std::string m_path;
 	std::string m_childName;
