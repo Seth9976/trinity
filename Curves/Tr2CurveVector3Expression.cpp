@@ -33,7 +33,10 @@ namespace
 
 	float RandomHash( float a, float b, float x )
 	{
-		std::seed_seq::result_type seeds[] = { *reinterpret_cast<std::seed_seq::result_type*>( &x ), reinterpret_cast<std::seed_seq::result_type>( s_currentCurve.back() ) };
+		std::seed_seq::result_type seeds[] = {
+			*reinterpret_cast<std::seed_seq::result_type*>( &x ),
+			std::seed_seq::result_type( reinterpret_cast<uint64_t>( s_currentCurve.back() ) )
+		};
 		std::seed_seq seq( std::begin( seeds ), std::end( seeds ) );
 		std::default_random_engine e1( seq );
 		std::uniform_real_distribution<float> d( a, b );
