@@ -16,6 +16,7 @@
     <Filter Include="Source Files\Eve\SpaceObject\Attachments" />
     <Filter Include="Source Files\Eve\SpaceObject\Attachments\Sets" />
     <Filter Include="Source Files\Eve\SpaceObject\Children" />
+    <Filter Include="Source Files\Eve\SpaceObject\Children\Behaviors" />
     <Filter Include="Source Files\Eve\SpaceObject\Children\TransformModifiers" />
     <Filter Include="Source Files\Eve\SpaceObject\Utils" />
     <Filter Include="Source Files\Eve\Turret" />
@@ -742,6 +743,9 @@
     <ClInclude Include="Eve\SpaceObject\Attachments\Sets\IEveSpaceObjectAttachment.h">
       <Filter>Source Files\Eve\SpaceObject\Attachments\Sets</Filter>
     </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\Children\EveChildBehaviorSystem.h">
+      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\EveChildBulletStorm.h">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
     </ClInclude>
@@ -789,6 +793,9 @@
     </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\IEveSpaceObjectChild.h">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\IBehavior.h">
+      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierAttachToBone.h">
       <Filter>Source Files\Eve\SpaceObject\Children\TransformModifiers</Filter>
@@ -2697,6 +2704,12 @@
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Attachments\Sets\EveSpriteSet_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Attachments\Sets</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildBehaviorSystem.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildBehaviorSystem_Blue.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\EveChildBulletStorm.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children</Filter>

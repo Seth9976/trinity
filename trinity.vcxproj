@@ -2715,6 +2715,7 @@
     <ClInclude Include="Eve\SpaceObject\Attachments\Sets\EveSpriteSet.h" />
     <ClInclude Include="Eve\SpaceObject\Attachments\Sets\EveSpriteSetItem.h" />
     <ClInclude Include="Eve\SpaceObject\Attachments\Sets\IEveSpaceObjectAttachment.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\EveChildBehaviorSystem.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildBulletStorm.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildCloud.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildContainer.h" />
@@ -2731,6 +2732,7 @@
     <ClInclude Include="Eve\SpaceObject\Children\EveCloudEditableVolume.h" />
     <ClInclude Include="Eve\SpaceObject\Children\IEveEffectChildrenOwner.h" />
     <ClInclude Include="Eve\SpaceObject\Children\IEveSpaceObjectChild.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\IBehavior.h" />
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierAttachToBone.h" />
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierBillboard2D.h" />
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierBillboard3D.h" />
@@ -3371,6 +3373,8 @@
     <ClCompile Include="Eve\SpaceObject\Attachments\Sets\EveSpriteSetItem.cpp" />
     <ClCompile Include="Eve\SpaceObject\Attachments\Sets\EveSpriteSetItem_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Attachments\Sets\EveSpriteSet_Blue.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildBehaviorSystem.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildBehaviorSystem_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildBulletStorm.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildBulletStorm_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildCloud.cpp" />
