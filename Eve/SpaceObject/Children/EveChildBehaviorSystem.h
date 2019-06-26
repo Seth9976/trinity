@@ -3,13 +3,11 @@
 #define EveChildBehaviorSystem_H
 
 #include "EveChildMesh.h"
-#include "Eve\Volume\IEveVolume.h"
-#include "Include\ITr2InstanceData.h"
+#include "Include/ITr2InstanceData.h"
 #include "Tr2DeviceResource.h"
 
 BLUE_DECLARE( EveChildMesh ); //In future this will not be needed
 BLUE_DECLARE( EveChildBehaviorSystem );
-BLUE_DECLARE_VECTOR( IEveVolume );
 BLUE_DECLARE_INTERFACE( IBehavior );
 BLUE_DECLARE_IVECTOR( IBehavior );
 
