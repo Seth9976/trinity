@@ -36,6 +36,7 @@ public:
 	Matrix m_decalMatrix;
 	Matrix m_invDecalMatrix;
 	Matrix m_parentBoneMatrix;
+	Matrix m_invParentBoneMatrix;
 	// pixel shader per object data
 	Vector4 m_displayData;
 	Vector4 m_shipData;
@@ -164,6 +165,7 @@ private:
 	// decals can be parented to bones
 	int m_parentBoneIndex;
 	Matrix m_parentBoneMatrix;
+	Matrix m_invParentBoneMatrix;
 
 	// matrices representing the "volume" of the decal projection
 	Matrix m_decalMatrix;

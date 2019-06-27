@@ -269,6 +269,7 @@ Tr2PerObjectData* EveSpaceObjectDecal::GetPerObjectData( ITriRenderBatchAccumula
 
 	// matrix from possible bone animation of parent
 	perObjectData->m_parentBoneMatrix = Transpose( m_parentBoneMatrix );
+	perObjectData->m_invParentBoneMatrix = Inverse( Transpose( m_parentBoneMatrix ) );
 
 	// clip sphere data from parent
 	perObjectData->m_shipData = m_parentData.shipData;
