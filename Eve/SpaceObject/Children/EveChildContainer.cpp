@@ -294,11 +294,6 @@ void EveChildContainer::GetLocalToWorldTransform( Matrix& transform ) const
 
 void EveChildContainer::ChangeLOD( Tr2Lod lod )
 {
-	if( ( m_hideOnLowQuality && Tr2Renderer::IsLowQuality() ) || !IsRendering() )
-	{
-		return;
-	}
-
 	for( auto it = m_objects.begin(); it != m_objects.end(); it++ )
 	{
 		(*it)->ChangeLOD( lod );
