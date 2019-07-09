@@ -11,6 +11,10 @@
 
 #include "Blue/Include/IBlueCallbackMan.h"
 
+#ifdef _WIN32
+#include "winuser.h"
+#endif
+
 using namespace Tr2RenderContextEnum;
 
 #ifdef _WIN32
@@ -150,6 +154,10 @@ TriDevice::TriDevice(IRoot* lockobj) :
 	mPresentParam.presentInterval = PRESENT_INTERVAL_ONE;
 
 	BeOS->RegisterForSimTimeRebase( this );
+
+#ifdef _WIN32
+	SetProcessDPIAware();
+#endif
 
 	BeClasses->CreateInstanceFromName("BlueCallbackMan", BlueInterfaceIID<IBlueCallbackMan>(), (void**)&m_postUpdateCallbacks );
 }
