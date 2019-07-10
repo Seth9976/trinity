@@ -92,7 +92,8 @@ namespace
 
 	// ShaderOptions, only GEOMETRY_SHADER_SUPPORT at the moment
 	const size_t s_shaderOptionCount = 1;
-	Tr2ShaderOption s_shaderOptions[ s_shaderOptionCount ];
+	Tr2ShaderOption s_shaderOptions[s_shaderOptionCount];
+	bool s_shaderOptionsInitialized = false;
 
 	PROJECTION_TYPE s_currentProjectionType = PT_PERSPECTIVE;
 
@@ -365,11 +366,6 @@ bool Tr2Renderer::Initialize()
 	renderContext.m_esm.Initialize();
 
 	s_viewport2projectionAdjustment = IdentityMatrix();
-
-	Tr2ShaderOption option;
-	option.name = BlueSharedString( "GEOMETRY_SHADER_SUPPORT" );
-	option.value = BlueSharedString( GetGeometryShaderSupport() ? "SUPPORTED" : "UNSUPPORTED" );
-	s_shaderOptions[0] = option;
 
 	return true;
 }
@@ -1756,15 +1752,39 @@ const Tr2TextureAL& Tr2Renderer::GetFallbackTexture( Tr2EffectResource::Type tex
 
 bool Tr2Renderer::GetSystemShaderOptions( Tr2ShaderOption** options, size_t* count )
 {
+	if( !s_shaderOptionsInitialized )
+	{
+		Tr2ShaderOption option;
+		option.name = BlueSharedString( "GEOMETRY_SHADER_SUPPORT" );
+		option.value = BlueSharedString( GetGeometryShaderSupport() ? "SUPPORTED" : "UNSUPPORTED" );
+		s_shaderOptions[0] = option;
+		s_shaderOptionsInitialized = true;
+	}
+
 	*options = &s_shaderOptions[0];
 	*count = s_shaderOptionCount;
+
 	return true;
 }
 
 bool Tr2Renderer::GetGeometryShaderSupport()
 {
 #if defined( TRINITY_DIRECTX11 ) || defined( TRINITY_DIRECTX12 ) || defined( TRINITY_VULKAN )
-	return true; // TODO: Implement probing through shader creation or API
+	USE_MAIN_THREAD_RENDER_CONTEXT();
+
+	// Trivial empty geometry shader
+	const uint32_t bytecode[] =
+	{
+		0x43425844, 0x5b1f31ef, 0xd1efb39f, 0xbd11db87, 0xa78bee3f, 0x00000001, 0x000000a8, 0x00000003,
+		0x0000002c, 0x00000060, 0x00000070, 0x4e475349, 0x0000002c, 0x00000001, 0x00000008, 0x00000020,
+		0x00000000, 0x00000001, 0x00000003, 0x00000000, 0x0000000f, 0x505f5653, 0x5449534f, 0x004e4f49,
+		0x3547534f, 0x00000008, 0x00000000, 0x00000008, 0x58454853, 0x00000030, 0x00020050, 0x0000000c,
+		0x0100086a, 0x05000061, 0x002010f2, 0x00000003, 0x00000000, 0x00000001, 0x0100185d, 0x0200005e,
+		0x00000001, 0x0100003e
+	};
+
+	Tr2ShaderAL shader;
+	return SUCCEEDED( shader.Create( GEOMETRY_SHADER, bytecode, Tr2ShaderSignatureAL(), renderContext ) );
 #else
 	return false;
 #endif
