@@ -2,38 +2,29 @@
 #ifndef EveChildBehaviorSystem_H
 #define EveChildBehaviorSystem_H
 
-#include "EveChildMesh.h"
 #include "Include/ITr2InstanceData.h"
+#include "Behaviors/BehaviorGroup.h"
 #include "Tr2DeviceResource.h"
+#include "IEveSpaceObjectChild.h"
+#include "EveChildTransform.h"
+#include "TriRenderBatch.h"
+#include "ITr2Renderable.h"
+#include "Eve/SpaceObject/EveSpaceObject2.h"
 
-BLUE_DECLARE( EveChildMesh ); //In future this will not be needed
 BLUE_DECLARE( EveChildBehaviorSystem );
-BLUE_DECLARE_INTERFACE( IBehavior );
-BLUE_DECLARE_IVECTOR( IBehavior );
+BLUE_DECLARE(BehaviorGroup);
+BLUE_DECLARE_VECTOR( BehaviorGroup );
 
-struct DroneAgent
-{
-	DroneAgent() :
-		mass( 1.f ),
-		position( 0, 0, 0 ),
-		rotation( 0, 0, 0, 1 ),
-		acceleration( 0, 0, 0 ),
-		velocity( 0, 0, 0 ),
-		target( 0, 0, 0 )
-	{}
-
-	float mass;
-	Vector3 position;
-	Quaternion rotation;
-	Vector3 acceleration;
-	Vector3 velocity;
-	Vector3 target;
-};
+class TriBehaviorSystemInstancingBatch;
 
 BLUE_CLASS( EveChildBehaviorSystem ) :
-	public EveChildMesh, //In future it will not be needed
+	public IEveSpaceObjectChild,
 	public Tr2DeviceResource,
-	public ITr2InstanceData
+	public ITr2Renderable,
+	public IInitialize,
+	public IListNotify,
+	public EveChildTransform,
+	public ITr2DebugRenderable
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -45,17 +36,37 @@ public:
 	// EveChildMesh
 	void UpdateSyncronous( EveUpdateContext& updateContext, const EveChildUpdateParams& params );
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// EveChildBehaviorSystem
-	void AddAgent();
-	void SetCount( int count );
+	virtual void GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData );
+
+	// IInitialize
+	bool Initialize();
+
+	void OnListModified(
+		long event,		// BLUELISTEVENT values
+		ssize_t key,
+		ssize_t key2,
+		IRoot* value,
+		const struct IList* theList
+	);
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Tr2DeviceResource
 	void ReleaseResources( TriStorage s ) {}
-private:
-	bool OnPrepareResources();
-public:
+
+	const char* GetName() const;
+	void SetName( const char* name );
+
+	void UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform, Tr2Lod parentLod );
+	void GetRenderables( std::vector<ITr2Renderable*>& renderables );
+	bool GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query = EVE_BOUNDS_NORMAL ) const;
+	void UpdateAsyncronous( EveUpdateContext& updateContext, const EveChildUpdateParams& params );
+	void GetLocalToWorldTransform( Matrix& transform ) const;
+	void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
+	void ChangeLOD( Tr2Lod lod );
+	void GetLights( Tr2LightManager& lightManager ) const;
+
+	void ChangeBufferVertexCount();
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2InstanceData
 	bool IsInstanceDataReady() const;
@@ -64,8 +75,22 @@ public:
 	unsigned int GetInstanceBufferVertexCount( unsigned int bufferIndex ) const;
 	void GetVertexBuffer( unsigned int bufferIndex, Tr2BufferAL& buffer, unsigned& stride );
 	bool GetInstanceBufferBoundingBox( unsigned int bufferIndex, Vector3& minBounds, Vector3& maxBounds ) const;
+	bool HasTransparentBatches();
+	float GetSortValue();
+	void GetShadowBatches( ITriRenderBatchAccumulator* batches, const Tr2PerObjectData* perObjectData );
+	Tr2PerObjectData* GetPerObjectData( ITriRenderBatchAccumulator* accumulator );
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	// ITr2GeometryProvider
+	void Draw( TriBehaviorSystemInstancingBatch*, Tr2RenderContext& renderContext, int count, unsigned int vertexDecl, int groupIndex );
 
 private:
+
+	bool OnPrepareResources();
+	void PassInVertexesToBehaviorGroups();
+	char* m_name;
+	bool m_needToPassInVertexFunction;
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ITr2DebugRenderable
 	virtual void GetDebugOptions( Tr2DebugRendererOptions& options );
@@ -75,26 +100,28 @@ private:
 	// EveChildBehaviorSystem
 	void UpdateAgents( const float deltaTime );
 	void UpdateBuffer( Tr2RenderContext& renderContext );
+
 	std::vector<DroneAgent> m_agents;
-	//Number of agents
-	int m_count;
+	std::vector<uint32_t> m_offsets;
+
+	EveSpaceObjectPSData m_psData;
+	EveSpaceObjectVSData m_vsData;
 
 	//Steering behavior characteristics, this could actually go under the vehicle struct
 	float m_maxVelocity;
 	float m_maxForce;
 
+	bool m_display;
+	bool m_isVisible;
+
 	// Instance data as vertex buffer
 	Tr2BufferAL m_vertexBuffer;
-	// Vertex declaration handle for instance data
-	uint32_t m_vertexDeclaration;
-	//number of locations in memory between beginnings of successive array elements, measured in bytes or in units of the size of the array's elements.
-	unsigned m_stride;
+	//number of locations in memory between beginnings of successive array elements
+	unsigned const m_stride;
 	// Number of instances
 	unsigned m_vertexCount;
 
-	//TODO: Instead of this class owning behaviors it should contain a BehaviorGroup which owns the behaviors. One BehaviorGroup for one "kind" of drone.
-	//See modular traffic behavior for more info on behavior groups
-	PIBehaviorVector m_behaviors;
+	PBehaviorGroupVector m_behaviorGroups;
 };
 
 TYPEDEF_BLUECLASS( EveChildBehaviorSystem );

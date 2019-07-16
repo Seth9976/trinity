@@ -1,23 +1,26 @@
 #include "StdAfx.h"
 #include "EveChildBehaviorSystem.h"
-#include "Behaviors/IBehavior.h"
+#include "Behaviors/BehaviorGroup.h"
 
 BLUE_DEFINE( EveChildBehaviorSystem );
-BLUE_DEFINE_INTERFACE( IBehavior );
 const Be::ClassInfo* EveChildBehaviorSystem::ExposeToBlue()
 {
 	EXPOSURE_BEGIN( EveChildBehaviorSystem, "" )
 		MAP_INTERFACE( EveChildBehaviorSystem )
-		MAP_INTERFACE( EveChildMesh )
-		MAP_INTERFACE( ITr2InstanceData )
+		MAP_INTERFACE( IEveSpaceObjectChild )
+		MAP_INTERFACE( ITr2Renderable )
 
-		MAP_ATTRIBUTE( "count", m_count, ":jessica-group: Agent", Be::READ | Be::PERSIST )
-		MAP_ATTRIBUTE( "maxVelocity", m_maxVelocity, ":jessica-group: Agent", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "maxForce", m_maxForce, ":jessica-group: Agent", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "behaviors", m_behaviors, ":jessica-group: Agent", Be::READ | Be::PERSIST )
+		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "rotation", m_rotation, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "translation", m_translation, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "scaling", m_scaling, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "localTransform", m_localTransform, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "worldTransform", m_worldTransform, "", Be::READ )
+		MAP_ATTRIBUTE( "vertexCount", m_vertexCount, "", Be::READ | Be::PERSIST )
+		MAP_ATTRIBUTE( "useSRT", m_useSRT, "Should local transform be built from scaling, rotation and translation attributes.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "staticTransform", m_staticTransform, "Does local transform need to be rebuilt every frame.", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "behaviorGroups", m_behaviorGroups, "", Be::READ | Be::PERSIST )
 
-		MAP_METHOD_AND_WRAP( "AddAgent", AddAgent, "" )
-		MAP_METHOD_AND_WRAP( "SetCount", SetCount, "" )
 
-	EXPOSURE_CHAINTO( EveChildMesh )
+	EXPOSURE_END()
 }
