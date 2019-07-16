@@ -3101,7 +3101,9 @@
     <ClInclude Include="Eve\SpaceObject\Children\EveCloudEditableVolume.h" />
     <ClInclude Include="Eve\SpaceObject\Children\IEveEffectChildrenOwner.h" />
     <ClInclude Include="Eve\SpaceObject\Children\IEveSpaceObjectChild.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\IBehavior.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\Wander.h" />
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierAttachToBone.h" />
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierBillboard2D.h" />
     <ClInclude Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierBillboard3D.h" />
@@ -3775,6 +3777,10 @@
     <ClCompile Include="Eve\SpaceObject\Children\EveChildTransform.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveCloudEditableVolume.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveCloudEditableVolume_Blue.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup_Blue.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\Wander.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\Wander_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierAttachToBone.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierAttachToBone_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\TransformModifiers\EveChildModifierBillboard2D.cpp" />
