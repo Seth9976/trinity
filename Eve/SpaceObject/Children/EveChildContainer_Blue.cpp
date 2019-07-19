@@ -48,7 +48,6 @@ const Be::ClassInfo* EveChildContainer::ExposeToBlue()
 		MAP_ATTRIBUTE( "objects", m_objects, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "transformModifiers", m_transformModifiers, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "curveSets", m_curveSets, "", Be::READ | Be::PERSIST )
-		MAP_ATTRIBUTE( "hideOnLowQuality", m_hideOnLowQuality, "Disables all childs in this container on low quality mode.", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "alwaysOn", m_isAlwaysOn, "If false this will be hidden if a spaceobjects activation strength < 0.5. If True then it is always on.", Be::READWRITE | Be::PERSIST )
 
 		MAP_ATTRIBUTE_WITH_CHOOSER("displayFilter", m_displayFilter, "Choose the shader quality settings for users you'd like to display childs to", Be::READWRITE | Be::PERSIST | Be::ENUM, EveChildContainerDataSetShaderChooser )

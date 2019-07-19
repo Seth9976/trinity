@@ -125,13 +125,10 @@ protected:
 	PTr2LightVector m_lights;
 	PITr2ControllerVector m_controllers;
 	TrackableStdUnorderedMap<std::string, float> m_controllerVariables;
-
 	PIEveChildTransformModifierVector m_transformModifiers;
 	Vector3 m_worldVelocity;
 	bool m_display;
-	bool m_hideOnLowQuality;
 	DisplayQualityModifier m_displayFilter;
-
 	bool m_isAlwaysOn;
 	EveChildInheritPropertiesPtr m_inheritProperties;
 	Origin m_origin;
