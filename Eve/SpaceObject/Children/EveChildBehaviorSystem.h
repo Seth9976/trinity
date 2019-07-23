@@ -82,7 +82,8 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2GeometryProvider
-	void Draw( TriBehaviorSystemInstancingBatch*, Tr2RenderContext& renderContext, int count, unsigned int vertexDecl, int groupIndex );
+	void Draw(TriBehaviorSystemInstancingBatch*, Tr2RenderContext& renderContext, int count, unsigned int vertexDecl,
+	          int groupIndex, bool isSpriteBatch);
 
 private:
 
@@ -100,6 +101,9 @@ private:
 	// EveChildBehaviorSystem
 	void UpdateAgents( const float deltaTime );
 	void UpdateBuffer( Tr2RenderContext& renderContext );
+	void GetGroupBatches(ITriRenderBatchAccumulator* batches, TriBatchType batchType,
+	                     const Tr2PerObjectData* perObjectData,
+	                     Tr2MeshPtr mesh, BehaviorGroup* group, bool isSpriteBatch );
 
 	std::vector<DroneAgent> m_agents;
 	std::vector<uint32_t> m_offsets;

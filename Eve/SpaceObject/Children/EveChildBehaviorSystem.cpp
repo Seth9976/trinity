@@ -56,15 +56,37 @@ public:
 		m_geom = val;
 	}
 
+	void SetIsSpriteBatch( bool val )
+	{
+		m_isSpriteBatch = val;
+	}
+
 	// Forward the SubmitGeometry call to the geometry provider
 	void SubmitGeometry( Tr2RenderContext& renderContext )
 	{
-		if (m_geom)
+		if ( m_geom )
 		{
 			auto r = GetGeometryResource();
-			if (m_ground->m_display)
-				m_geom->Draw( this, renderContext, static_cast<unsigned int>(m_ground->GetSize()),
-					m_ground->GetVertexDeclarationHandle(), m_ground->GetGroupIndexIndicator() );
+			bool displ = m_ground->m_display;
+
+			if ( m_isSpriteBatch )
+			{
+				if ( displ && m_ground->GetSpriteMesh()->GetDisplay() )
+				{
+					m_geom->Draw( this, renderContext, static_cast<unsigned int>(m_ground->GetSize()),
+						m_ground->GetSpriteVertexDeclarationHandle(), m_ground->GetGroupIndexIndicator(),
+						true );
+				}
+			}
+			else
+			{
+				if ( displ && m_ground->GetMesh()->GetDisplay() )
+				{
+					m_geom->Draw( this, renderContext, static_cast<unsigned int>(m_ground->GetSize()),
+						m_ground->GetVertexDeclarationHandle(), m_ground->GetGroupIndexIndicator(),
+						false );
+				}
+			}
 		}
 	}
 
@@ -78,6 +100,7 @@ public:
 private:
 	EveChildBehaviorSystemPtr m_geom;
 	BehaviorGroupPtr m_ground;
+	bool m_isSpriteBatch;
 };
 
 
@@ -114,7 +137,7 @@ void EveChildBehaviorSystem::OnListModified( long event, ssize_t key, ssize_t ke
 {
 	if (theList == &m_behaviorGroups)
 	{
-		switch (event & BELIST_EVENTMASK)
+		switch ( event & BELIST_EVENTMASK )
 		{
 		case BELIST_INSERTED:
 			if (BehaviorGroupPtr handler = BlueCastPtr( value ))
@@ -190,7 +213,7 @@ unsigned int EveChildBehaviorSystem::GetInstanceBufferCount() const
 unsigned int EveChildBehaviorSystem::GetInstanceBufferVertexCount( unsigned int bufferIndex ) const
 {
 	size_t size = 0;
-	for (auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it)
+	for ( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it)
 	{
 		size += (*it)->GetSize();
 	}
@@ -239,6 +262,7 @@ void EveChildBehaviorSystem::UpdateSyncronous( EveUpdateContext& updateContext, 
 	for (auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it)
 	{
 		(*it)->CreateVertexDeclaration();
+		(*it)->CreateSpriteVertexDeclaration();
 	}
 }
 
@@ -265,15 +289,63 @@ void EveChildBehaviorSystem::UpdateBuffer( Tr2RenderContext& renderContext )
 	{
 		(*it)->GetInfoForBuffer( data, WT );
 		(*it)->SetGroupIndexIndicator( I ); 
-		data += (*it)->GetCount() * m_stride;
+		data += (*it)->GetCount() * m_stride * 2;
 		I++;
 		totalShipsSoFar += (*it)->GetCount();
-		m_offsets.push_back( totalShipsSoFar * m_stride );
+		m_offsets.push_back( totalShipsSoFar * 2 * m_stride );
 	}
 	m_vertexBuffer.UnmapForWriting( renderContext );
 }
 
-void EveChildBehaviorSystem::GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, const Tr2PerObjectData* perObjectData )
+void EveChildBehaviorSystem::GetGroupBatches(ITriRenderBatchAccumulator* batches, TriBatchType batchType,
+                                             const Tr2PerObjectData* perObjectData, Tr2MeshPtr mesh,
+                                             BehaviorGroup* group, bool isSpriteBatch )
+{
+	if ( mesh == nullptr )
+	{
+		return;
+	}
+
+	if ( mesh->GetGeometryResource() == nullptr )
+	{
+		return;
+	}
+
+	if ( !( mesh->GetGeometryResource()->IsGood() ) )
+	{
+		return;
+	}
+
+	if ( mesh->GetGeometryResource()->GetMeshCount() < 1 )
+	{
+		return;
+	}
+
+	auto areaList = mesh->GetAreas( batchType );
+	for (auto srcMeshArea = areaList->begin(); srcMeshArea != areaList->end(); ++srcMeshArea)
+	{
+		auto a = *srcMeshArea;
+
+		TriBehaviorSystemInstancingBatch* batch = batches->Allocate<TriBehaviorSystemInstancingBatch>();
+
+		if (nullptr == batch)
+		{
+			continue;
+		}
+
+		batch->SetPerObjectData( perObjectData );
+		batch->SetShaderMaterial( a->GetMaterialInterface() );
+		batch->SetMeshParameters( mesh->GetMeshIndex(), a->GetIndex(), a->GetCount(), a->IsReversed() );
+		batch->SetGeometryResource( mesh->GetGeometryResource() );
+		batch->SetBehaviorSystemReference( this );
+		batch->SetIsSpriteBatch( isSpriteBatch );
+		batch->SetGround( group );
+		batches->Commit( batch );
+	}
+}
+
+void EveChildBehaviorSystem::GetBatches(ITriRenderBatchAccumulator* batches, TriBatchType batchType,
+                                        const Tr2PerObjectData* perObjectData)
 {
 	if (!m_display)
 	{
@@ -289,46 +361,20 @@ void EveChildBehaviorSystem::GetBatches( ITriRenderBatchAccumulator* batches, Tr
 	{
 		auto group = *it;
 		auto mesh = group->GetMesh();
-		
-		if (mesh == nullptr)
+
+		//same is 1 if you are far away and should only see sprites and 0 for only ships ( ]0-1[ -> both ) 
+		const float same = group->AllTheSame();
+
+		if ( same != 1 )
 		{
-			continue;
-		}
-		
-		if (mesh->GetGeometryResource() == nullptr)
-		{
-			continue;
+			GetGroupBatches( batches, batchType, perObjectData, mesh, group, false );
 		}
 
-		if (!(mesh->GetGeometryResource()->IsGood()))
-		{
-			continue;
-		}
-		
-		if (mesh->GetGeometryResource()->GetMeshCount() < 1)
-		{
-			continue;
-		}
+		mesh = group->GetSpriteMesh();
 
-		auto areaList = mesh->GetAreas( batchType );
-		for (auto srcMeshArea = areaList->begin(); srcMeshArea != areaList->end(); ++srcMeshArea)
-		{
-			auto a = *srcMeshArea;
-
-			TriBehaviorSystemInstancingBatch* batch = batches->Allocate<TriBehaviorSystemInstancingBatch>();
-
-			if (nullptr == batch)
-			{
-				continue;
-			}
-				
-			batch->SetPerObjectData( perObjectData );
-			batch->SetShaderMaterial( a->GetMaterialInterface());
-			batch->SetMeshParameters( mesh->GetMeshIndex(), a->GetIndex(), a->GetCount(), a->IsReversed() );
-			batch->SetGeometryResource( mesh->GetGeometryResource() );
-			batch->SetBehaviorSystemReference( this );
-			batch->SetGround( group );
-			batches->Commit( batch );
+		if ( same != 0 )
+		{ 
+			GetGroupBatches( batches, batchType, perObjectData, mesh, group, true);
 		}
 	}
 }
@@ -337,12 +383,23 @@ void EveChildBehaviorSystem::GetBatches( ITriRenderBatchAccumulator* batches, Tr
 bool EveChildBehaviorSystem::HasTransparentBatches()
 {
 	bool isTrue = false;
-	for (auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it)
+	for ( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
 	{
 		auto mesh = (*it)->GetMesh();
+		if ( m_display && mesh )
+		{
+			if ( !( mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT )->empty() ) )
+			{
+				isTrue = true;
+			}
+		}
+		mesh = (*it)->GetSpriteMesh();
 		if (m_display && mesh)
 		{
-			if(!(mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT )->empty())) isTrue = true;
+			if ( !( mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT )->empty() ) )
+			{
+				isTrue = true;
+			}
 		}
 	}
 
@@ -353,7 +410,8 @@ bool EveChildBehaviorSystem::HasTransparentBatches()
 // Description:
 //   No shadows here
 // --------------------------------------------------------------------------------
-void EveChildBehaviorSystem::GetShadowBatches( ITriRenderBatchAccumulator* batches, const Tr2PerObjectData* perObjectData )
+void EveChildBehaviorSystem::GetShadowBatches(ITriRenderBatchAccumulator* batches,
+                                              const Tr2PerObjectData* perObjectData)
 {
 }
 
@@ -386,12 +444,13 @@ Tr2PerObjectData* EveChildBehaviorSystem::GetPerObjectData( ITriRenderBatchAccum
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Setup instanced reandering and call DIP
+//   Setup instanced rendering and call DIP
 // --------------------------------------------------------------------------------
-void EveChildBehaviorSystem::Draw( TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count, unsigned int vertexDecl, int groupIndex )
+void EveChildBehaviorSystem::Draw(TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count,
+                                  unsigned int vertexDecl, int groupIndex, bool isSpriteBatch)
 {
 	auto geometry = batch->GetGeometryResource();
-	
+
 	if (geometry == nullptr) { return; }
 	if (!(geometry->IsGood())) { return; }
 	if (geometry->GetMeshCount() < 1) { return; }
@@ -420,12 +479,18 @@ void EveChildBehaviorSystem::Draw( TriBehaviorSystemInstancingBatch* batch, Tr2R
 		primCount += curArea.m_primitiveCount;
 	}
 
+	int spriteAdder = 0;
+	if (isSpriteBatch)
+	{
+		spriteAdder += m_stride;
+	}
+
 	renderContext.m_esm.ApplyVertexDeclaration( vertexDecl );
 	renderContext.m_esm.ApplyIndexBuffer( meshData->m_indexBuffer );
 	// Stream 0: "geometry": here: our ship geometry
 	renderContext.m_esm.ApplyStreamSource( 0, meshData->m_vertexBuffer, 0, meshData->m_bytesPerVertex );
 	// Stream 1: instance", here: instance index
-	renderContext.m_esm.ApplyStreamSource( 1, m_vertexBuffer, m_offsets[groupIndex], m_stride );
+	renderContext.m_esm.ApplyStreamSource( 1, m_vertexBuffer, m_offsets[groupIndex] + spriteAdder, m_stride * 2 );
 
 	renderContext.SetTopology( Tr2RenderContextEnum::TOP_TRIANGLES );
 	renderContext.DrawIndexedInstanced( meshData->m_vertexCount, area.m_firstIndex, primCount, count );
@@ -462,7 +527,7 @@ void EveChildBehaviorSystem::ChangeBufferVertexCount( )
 	unsigned int numAgents = static_cast<unsigned int>(temp);
 	m_vertexCount = numAgents;
 	auto b = m_vertexBuffer.Create(
-		m_stride,				// 12 * sizeof( float )
+		m_stride*2,				// 12 * sizeof( float )
 		m_vertexCount,			// Number of instances
 		Tr2GpuUsage::VERTEX_BUFFER, // VERTEX_BUFFER
 		Tr2CpuUsage::WRITE_OFTEN,	// WRITE_OFTEN

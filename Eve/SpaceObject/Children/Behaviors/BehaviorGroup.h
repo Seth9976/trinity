@@ -14,6 +14,7 @@ struct DroneAgent
 		velocity(0, 0, 0),
 		target(0, 0, 0),
 		lifetime( 0.f ),
+		cameraDistance( 0 ),
 		id( 0 )
 	{}
 
@@ -24,6 +25,7 @@ struct DroneAgent
 	Vector3 velocity;
 	Vector3 target;
 	float lifetime;
+	float cameraDistance;
 	int id;
 };
 
@@ -53,45 +55,63 @@ public:
 	
 	// geom res
 	void InitializeGeometryResource();
-	Tr2MeshPtr GetMesh();
+	Tr2MeshPtr GetMesh() const;
+	Tr2MeshPtr GetSpriteMesh() const;
 
 	void AddAgent();
 	size_t GetSize();
 	unsigned int GetCount();
+	void SetMeshToggle( bool toggle );
 	void RemoveAgent();
 	void SetCount( int count );
-	int GetGroupIndexIndicator();
+	float AllTheSame();
+	int GetGroupIndexIndicator() const;
 	void CreateVertexDeclaration();
 	void ReleaseCachedData( BlueAsyncRes* );
 	void RebuildCachedData( BlueAsyncRes* );
 	void SetGroupIndexIndicator( int index );
 	void UpdateAgents( const float deltaTime );
+	void ProcessLOD(DroneAgent& agent);
+	void SetBlendRange( float min, float max );
 	unsigned int GetVertexDeclarationHandle() const;
+	unsigned GetSpriteVertexDeclarationHandle() const;
 	void SetVertexFunctionReferance( const std::function<void( void )>& F );
 	void GetInfoForBuffer( uint8_t* data, Matrix& parentWorldLocation );
-	
+	void CreateSpriteVertexDeclaration();
+
 	bool m_display;
 	float m_estimatedPixelDiameter;
 	
 private:
+	void ToggleMesh();
 	void AddAgentPrivate();
 	Vector3 RemoveAgentPrivate();
 
 	int m_count;
 	Vector3 m_scale;
+	Vector3 m_spriteScale;
 	int m_groupIndex;
+	bool m_meshToggle;
 	Tr2MeshPtr m_mesh;
+	Tr2MeshPtr m_spriteMesh;
 	unsigned int m_cachedVD;
+	unsigned int m_cachedSVD;
 	BlueSharedString m_name;
 	PIEveVolumeVector m_volumes;
 	PIBehaviorVector m_behaviors;
 	std::vector<DroneAgent> m_agents;
 	PIEveVolumeVector m_exclusionVolumes;
+	unsigned int m_spriteVertexDeclarationHandle;
 	unsigned int m_vertexDeclarationHandle;
 	std::function<void()> m_changeBufferVertexCount;
 	
 	//Steering behavior characteristics, this could actually go under the vehicle struct
 	float m_maxVelocity;
+
+	// Blend range
+	float m_blendRangeMax; // Effectively the distance threshold
+	float m_blendRangeMin; // The distance where a drone should stop having a mesh and be fully rendered as a light.
+	float m_blendRangeValue; // Normalized 0.0 - 1.0 from blendRangeMin to blendRangeMax;
 };
 
 TYPEDEF_BLUECLASS( BehaviorGroup );
