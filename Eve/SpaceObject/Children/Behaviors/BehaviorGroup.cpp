@@ -5,11 +5,8 @@
 #include "include/TriMath.h"
 #include "IBehavior.h"
 #include "Tr2InstancedMesh.h"
-
-//@Leó ->camera. | might need refactor 
 #include "Eve/SpaceObject/Children/TransformModifiers/EveChildModifierTransformCommon.h" 
 #include "Resources/TriGeometryRes.h"
-
 
 
 BehaviorGroup::BehaviorGroup( IRoot* lockobj ) :
@@ -158,6 +155,9 @@ void BehaviorGroup::SetCount( int count )
 
 float BehaviorGroup::AllTheSame()
 {
+	// Returns 1 if all agents are sprites
+	// Returns 0 if all agents are meshes
+	// Returns -1 if they are not the same or neither (no agents)
 	float same = -1;
 	// if none of the agents need either of the meshes we let the system know
 	for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent)
@@ -223,28 +223,22 @@ void BehaviorGroup::UpdateAgents(const float dt)
 
 void BehaviorGroup::ProcessLOD( DroneAgent& agent )
 {
-	// Calculate agent distance from camera.
-	// Get camera distance
-	Vector3 camPos;
-	camPos = TransformCoord( camPos, Tr2Renderer::GetViewTransform() );
+	// Calculate agent distance from camera and normalize it within the blend range
+	// so that dist <= m_blendRangeMin = 0.0 and dist >= m_blendRangeMax = 1.0
+	Vector3 camPos = Tr2Renderer::GetViewPosition();
 
 	Vector3 aPos = agent.position;
 	Vector3 diff = Vector3( (camPos.x - aPos.x), (camPos.y - aPos.y), (camPos.z - aPos.z) );
 	float dist = std::sqrt( std::pow( diff.x, 2 ) + std::pow( diff.y, 2 ) + std::pow( diff.z, 2 ) );
 
-	// Normalize the distance so that dist <= m_blendRangeMin = 0.0 and dist >= m_blendRangeMax = 1.0
 	if (dist >= m_blendRangeMax) {
 		agent.cameraDistance = 1.0;
-		return;
 	}
 	else if (dist <= m_blendRangeMin) {
 		agent.cameraDistance = 0.0;
-		return;
 	}
 	else {
-		float range = m_blendRangeMax - m_blendRangeMin;
-		float normDist = (dist - range) / range;
-		agent.cameraDistance = max(0.0f,min( normDist, 1.0f));
+		agent.cameraDistance = (dist - m_blendRangeMin) / (m_blendRangeMax - m_blendRangeMin);
 	}
 }
 
