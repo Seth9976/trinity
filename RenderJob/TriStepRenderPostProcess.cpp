@@ -131,17 +131,14 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 #if TRINITY_PLATFORM_SUPPORTS_COMPUTE
 			dynamicExposure = postProcess->GetDynamicExposure();
 #endif
-			break;
 		case MEDIUM:
 			bloom = postProcess->GetBloom();
 			desaturate = postProcess->GetDesaturate();
 			lut = postProcess->GetLut();
 			vignette = postProcess->GetVignette();
-			break;
 		case LOW:
 			signalLoss = postProcess->GetSignalLoss();
 			fade = postProcess->GetFade();
-			break;
 		default:
 			break;
 		}
