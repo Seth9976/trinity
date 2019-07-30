@@ -8,16 +8,17 @@
 struct DroneAgent
 {
 	DroneAgent() :
-		mass(1.f),
-		position(0, 0, 0),
-		rotation(0, 0, 0, 1),
-		acceleration(0, 0, 0),
-		velocity(0, 0, 0),
-		target(0, 0, 0),
+		mass( 1.f ),
+		position( 0, 0, 0 ),
+		rotation( 0, 0, 0, 1 ),
+		acceleration( 0, 0, 0 ),
+		velocity( 0, 0, 0 ),
+		target( 0, 0, 0 ),
 		lifetime( 0.f ),
-		xfade( 0.0 ),
+		xfade( 0.f ),
 		id( 0 ),
-		isVisible( false )
+		isVisible( false ),
+		screenSize( 0.f )
 	{}
 
 	float mass;
@@ -30,6 +31,7 @@ struct DroneAgent
 	float xfade; // Crossfade between mesh and sprite. 1.0 = mesh, 0.0 = sprite
 	int id;
 	bool isVisible; // Don't render agents off-screen
+	float screenSize;
 };
 
 struct ITr2Renderable;
@@ -55,8 +57,8 @@ public:
 	// ITr2DebugRenderable
 	virtual void GetDebugOptions( Tr2DebugRendererOptions& options );
 	virtual void RenderDebugInfo( Tr2DebugRenderer& renderer, Matrix& parentWorldLocation );
-	
-	void UpdateVisibility(const TriFrustum& frustum, const Matrix& parentTransform);
+
+	void UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform );
 
 	// geom res
 	void InitializeGeometryResource();
@@ -76,7 +78,7 @@ public:
 	void RebuildCachedData( BlueAsyncRes* );
 	void SetGroupIndexIndicator( int index );
 	void UpdateAgents( const float deltaTime );
-	void ProcessLOD(DroneAgent& agent);
+	void ProcessLOD( DroneAgent& agent );
 	void SetBlendRange( float min, float max );
 	unsigned int GetVertexDeclarationHandle() const;
 	unsigned GetSpriteVertexDeclarationHandle() const;
@@ -85,7 +87,8 @@ public:
 	void CreateSpriteVertexDeclaration();
 
 	bool m_display;
-	
+	bool IsGroupVisible();
+
 private:
 	void ToggleMesh();
 	void AddAgentPrivate();
@@ -108,14 +111,19 @@ private:
 	unsigned int m_spriteVertexDeclarationHandle;
 	unsigned int m_vertexDeclarationHandle;
 	std::function<void()> m_changeBufferVertexCount;
-	
+
 	//Steering behavior characteristics, this could actually go under the vehicle struct
 	float m_maxVelocity;
 
 	// Crossfade blend range
-	float m_screenSizeMin; // If mesh screen size (in pixels) is smaller than this, it will be drawn as a sprite
-	float m_screenSizeMax; // If mesh screen size exceeds this, it will be drawn as mesh
-	float m_xfadeValue; // Normalized 0.0 - 1.0 from m_pixelSizeMin to m_pixelSizeMax;
+	float m_currentScreenSize;  // READONLY attribute to show artist what the current agent screen size
+	float m_renderThreshold;	// Do not render group if all agents have a screen size below this threshold.
+	float m_blendScreenSizeMin; // If mesh screen size (in pixels) is smaller than this, it will be drawn as a sprite
+	float m_blendScreenSizeMax; // If mesh screen size exceeds this, it will be drawn as mesh
+	float m_xfadeValue;			// Normalized 0.0 - 1.0 from m_pixelSizeMin to m_pixelSizeMax;
+
+	void UpdateCurrentScreenSize();
+
 
 	// Bounding sphere
 	Vector3 m_boundingSphereCenter;

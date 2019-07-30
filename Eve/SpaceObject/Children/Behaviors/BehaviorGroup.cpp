@@ -16,15 +16,17 @@ BehaviorGroup::BehaviorGroup( IRoot* lockobj ) :
 	m_maxVelocity( 100 ),
 	m_changeBufferVertexCount( nullptr ),
 	m_scale( Vector3( 1, 1, 1 ) ),
-	m_spriteScale( Vector3( 10, 10, 10 ) ),
+	m_spriteScale( Vector3( 7.0, 7.0, 7.0 ) ),
 	PARENTLOCK( m_behaviors ),
 	PARENTLOCK( m_volumes ),
 	PARENTLOCK( m_exclusionVolumes ),
-	m_screenSizeMin( 15 ),
-	m_screenSizeMax(50),
+	m_currentScreenSize( 0.0 ),
+	m_renderThreshold( 1.0 ),
+	m_blendScreenSizeMin( 5.0 ),
+	m_blendScreenSizeMax( 15.0 ),
 	m_xfadeValue( 1.0 ),
-	m_boundingSphereCenter(0.f, 0.f, 0.f),
-	m_boundingSphereRadius(5.f)
+	m_boundingSphereCenter( 0.f, 0.f, 0.f ),
+	m_boundingSphereRadius( 5.f )
 {
 }
 
@@ -40,10 +42,10 @@ void BehaviorGroup::InitializeGeometryResource()
 	m_agents.clear();
 	const int t = m_count;
 	m_count = 0;
-	SetCount(t);
+	SetCount( t );
 }
 
-void BehaviorGroup::SetVertexFunctionReferance( const std::function<void(void)> &F)
+void BehaviorGroup::SetVertexFunctionReferance( const std::function<void( void )> &F )
 {
 	m_changeBufferVertexCount = F;
 }
@@ -59,7 +61,7 @@ size_t BehaviorGroup::GetSize()
 
 unsigned int BehaviorGroup::GetCount()
 {
-	return unsigned(m_count);
+	return unsigned( m_count );
 }
 
 // For Artists when they are creating the sprite to easily swap between mesh's
@@ -103,12 +105,12 @@ void BehaviorGroup::AddAgent()
 {
 	// The function without arguments to be called from the UI
 	AddAgentPrivate();
-	if (m_changeBufferVertexCount)
+	if ( m_changeBufferVertexCount )
 	{
 		(m_changeBufferVertexCount)();
 	}
 }
-	
+
 
 void BehaviorGroup::AddAgentPrivate()
 {
@@ -117,7 +119,7 @@ void BehaviorGroup::AddAgentPrivate()
 	agent.id = TriRandInt( 500 ); //TODO: look better into parameter, could the same ID be generate more than once?
 	m_agents.push_back( agent );
 	m_count++;
-	if (m_changeBufferVertexCount == nullptr)
+	if ( m_changeBufferVertexCount == nullptr )
 	{
 		return;
 	}
@@ -125,7 +127,7 @@ void BehaviorGroup::AddAgentPrivate()
 
 void BehaviorGroup::SetCount( int count )
 {
-	if (count == m_count || count < 0)
+	if ( count == m_count || count < 0 )
 	{
 		return;
 	}
@@ -138,16 +140,16 @@ void BehaviorGroup::SetCount( int count )
 			AddAgentPrivate();
 		}
 	}
-	else 
+	else
 	{
-		int difference =  m_count - count;
+		int difference = m_count - count;
 		for ( int i = 0; i < difference; i++ )
 		{
 			RemoveAgentPrivate();
 		}
 	}
 
-	if (m_changeBufferVertexCount == nullptr)
+	if ( m_changeBufferVertexCount == nullptr )
 	{
 		return;
 	}
@@ -161,10 +163,10 @@ float BehaviorGroup::AllTheSame()
 	// Returns -1 if they are not the same or neither (no agents)
 	float same = -1;
 	// if none of the agents need either of the meshes we let the system know
-	for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent)
+	for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
-		if (same == -1) same = (agent->xfade);
-		if (same != (agent->xfade)) return -1;
+		if ( same == -1 ) same = (agent->xfade);
+		if ( same != (agent->xfade) ) return -1;
 	}
 	return same;
 }
@@ -174,7 +176,7 @@ void BehaviorGroup::RemoveAgent()
 	// The function without arguments to be called from the UI
 	RemoveAgentPrivate();
 
-	if (m_changeBufferVertexCount)
+	if ( m_changeBufferVertexCount )
 	{
 		(m_changeBufferVertexCount)();
 	}
@@ -197,12 +199,12 @@ Vector3 BehaviorGroup::RemoveAgentPrivate()
 	return v.position;
 }
 
-void BehaviorGroup::UpdateAgents(const float dt)
+void BehaviorGroup::UpdateAgents( const float dt )
 {
 	//Calculate the behaviors
-	for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent)
+	for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
-		for (auto behavior = m_behaviors.begin(); behavior != m_behaviors.end(); ++behavior)
+		for ( auto behavior = m_behaviors.begin(); behavior != m_behaviors.end(); ++behavior )
 		{
 			//Rather send a list of all agents and in each behavior loop over them and apply the behavior
 			(*behavior)->CalculateBehavior( *agent, dt, *this );
@@ -216,28 +218,29 @@ void BehaviorGroup::UpdateAgents(const float dt)
 		//agent->acceleration = Vector3( 0, 0, 0 );
 		agent->position += agent->velocity * dt;
 
-		static const Vector3 zAxis(0.f, 0.f, 1.f);
+		static const Vector3 zAxis( 0.f, 0.f, 1.f );
 		TriQuaternionRotationArc( &agent->rotation, &zAxis, &agent->velocity );
 	}
 }
 
-void BehaviorGroup::UpdateVisibility(const TriFrustum & frustum, const Matrix & parentTransform)
+void BehaviorGroup::UpdateVisibility( const TriFrustum & frustum, const Matrix & parentTransform )
 {
 	// Check if an agent is visible and calculate the xfade value
-	for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent)
+	for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
-		if (frustum.IsSphereVisible(agent->position, m_boundingSphereRadius)) {
-			float pixelSize = frustum.GetPixelSizeAccross(agent->position, m_boundingSphereRadius);
+		if ( frustum.IsSphereVisible( agent->position, m_boundingSphereRadius ) ) {
+			float pixelSize = frustum.GetPixelSizeAccross( agent->position, m_boundingSphereRadius );
+			agent->screenSize = pixelSize; // Store the screen size for each agent
 
-			if (pixelSize >= m_screenSizeMax) {
+			if ( pixelSize >= m_blendScreenSizeMax ) {
 				agent->xfade = 0.0; // Render as mesh
 			}
-			else if (pixelSize <= m_screenSizeMin) {
+			else if ( pixelSize <= m_blendScreenSizeMin ) {
 				agent->xfade = 1.0; // Render as sprite
 			}
 			else {
 				float s = 1.0;
-				agent->xfade = s - (pixelSize - m_screenSizeMin) / (m_screenSizeMax - m_screenSizeMin);
+				agent->xfade = s - (pixelSize - m_blendScreenSizeMin) / (m_blendScreenSizeMax - m_blendScreenSizeMin);
 			}
 			agent->isVisible = true;
 		}
@@ -245,17 +248,42 @@ void BehaviorGroup::UpdateVisibility(const TriFrustum & frustum, const Matrix & 
 			agent->isVisible = false;
 		}
 	}
+
+	this->UpdateCurrentScreenSize();
 }
 
-void BehaviorGroup::GetInfoForBuffer(uint8_t* data, Matrix& parentWorldLocation )
+void BehaviorGroup::UpdateCurrentScreenSize()
+{
+	// Update the current screensize read-only attribute in Jessica using the first agent.
+	if ( !m_agents.empty() )
+	{
+		m_currentScreenSize = m_agents.begin()->screenSize;
+	}
+}
+
+bool BehaviorGroup::IsGroupVisible()
+{
+	bool isAnyAgentVisible = false;
+
+	for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
+	{
+		if ( agent->screenSize >= m_renderThreshold ) {
+			isAnyAgentVisible = true;
+			break;
+		}
+	}
+	return isAnyAgentVisible;
+}
+
+void BehaviorGroup::GetInfoForBuffer( uint8_t* data, Matrix& parentWorldLocation )
 {
 	for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
 		float LOD = (*agent).xfade;
 		float LODmod;
-		if (LOD != 1 && agent->isVisible)
+		if ( LOD != 1 && agent->isVisible )
 		{
-			LODmod = (1 - LOD) *( 0.5f + (1 - LOD) * 0.5f);
+			LODmod = (1 - LOD) *(0.5f + (1 - LOD) * 0.5f);
 			Vector3 meshScale = m_scale * Vector3( LODmod, LODmod, LODmod );
 
 			if ( m_meshToggle )
@@ -265,19 +293,19 @@ void BehaviorGroup::GetInfoForBuffer(uint8_t* data, Matrix& parentWorldLocation 
 
 			Matrix m = Transpose( TransformationMatrix( meshScale, agent->rotation, agent->position ) );
 			memcpy( data, &m, 12 * sizeof( float ) );
-		} 
+		}
 		else
 		{
-			Matrix m = Transpose( TransformationMatrix( Vector3( 0, 0, 0 ), Quaternion(0, 0, 0, 0), Vector3( 0, 0, 0 ) ) );
+			Matrix m = Transpose( TransformationMatrix( Vector3( 0, 0, 0 ), Quaternion( 0, 0, 0, 0 ), Vector3( 0, 0, 0 ) ) );
 			memcpy( data, &m, 12 * sizeof( float ) );
 		}
 
 		data += 12 * sizeof( float );
 
 		// sprite
-		if (LOD != 0 && agent->isVisible)
+		if ( LOD != 0 && agent->isVisible )
 		{
-			LODmod = ( 1.0f - LOD) * (LOD * 0.3f) +  (LOD * 1.0f);
+			LODmod = (1.0f - LOD) * (LOD * 0.3f) + (LOD * 1.0f);
 			Matrix agentMatrix = TransformationMatrix( m_scale * m_spriteScale * Vector3( LODmod, LODmod, LODmod ),
 				agent->rotation, agent->position );
 			agentMatrix = Billboard2D( agentMatrix );
@@ -294,15 +322,15 @@ void BehaviorGroup::CreateSpriteVertexDeclaration()
 
 	if ( meshPtr )
 	{
-		if (nullptr == meshPtr->GetGeometryResource())
+		if ( nullptr == meshPtr->GetGeometryResource() )
 		{
 			return;
 		}
 
-		if ((meshPtr->GetGeometryResource())->IsGood())
+		if ( (meshPtr->GetGeometryResource())->IsGood() )
 		{
 			TriGeometryResMeshData* meshData = meshPtr->GetGeometryResource()->GetMeshData( meshPtr->GetMeshIndex() );
-			if (meshData->m_vertexDeclaration != m_cachedSVD)
+			if ( meshData->m_vertexDeclaration != m_cachedSVD )
 			{
 				Tr2VertexDefinition s_agentInstancedVertex;
 				Tr2EffectStateManager::GetVertexDeclarationElements( meshData->m_vertexDeclaration, s_agentInstancedVertex );
@@ -328,17 +356,17 @@ void BehaviorGroup::CreateVertexDeclaration()
 {
 	Tr2MeshPtr meshPtr = GetMesh();
 
-	if (meshPtr)
+	if ( meshPtr )
 	{
-		if (nullptr == meshPtr->GetGeometryResource())
+		if ( nullptr == meshPtr->GetGeometryResource() )
 		{
 			return;
 		}
 
-		if ((meshPtr->GetGeometryResource())->IsGood())
+		if ( (meshPtr->GetGeometryResource())->IsGood() )
 		{
 			TriGeometryResMeshData* meshData = meshPtr->GetGeometryResource()->GetMeshData( meshPtr->GetMeshIndex() );
-			if (meshData->m_vertexDeclaration != m_cachedVD)
+			if ( meshData->m_vertexDeclaration != m_cachedVD )
 			{
 				Tr2VertexDefinition s_agentInstancedVertex;
 				Tr2EffectStateManager::GetVertexDeclarationElements( meshData->m_vertexDeclaration, s_agentInstancedVertex );
@@ -362,7 +390,7 @@ void BehaviorGroup::CreateVertexDeclaration()
 
 /////////////////////////////////////////////////////////////////////////////////////
 // ITr2DebugRenderable
-void BehaviorGroup::GetDebugOptions( Tr2DebugRendererOptions& options)
+void BehaviorGroup::GetDebugOptions( Tr2DebugRendererOptions& options )
 {
 	options.insert( "Agents" );
 	options.insert( "Volumes" );
@@ -372,34 +400,34 @@ void BehaviorGroup::GetDebugOptions( Tr2DebugRendererOptions& options)
 
 void BehaviorGroup::RenderDebugInfo( Tr2DebugRenderer& renderer, Matrix& parentWorldLocation )
 {
-	if ( renderer.HasOption(this, "Agents") )
+	if ( renderer.HasOption( this, "Agents" ) )
 	{
-		for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent)
+		for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 		{
-			renderer.DrawSphere(this, TranslationMatrix(agent->position) * parentWorldLocation, m_scale.z * 5, 6, Tr2DebugRenderer::Wireframe, 0xff555555);
+			renderer.DrawSphere( this, TranslationMatrix( agent->position ) * parentWorldLocation, m_scale.z * 5, 6, Tr2DebugRenderer::Wireframe, 0xff555555 );
 		}
 	}
 
-	if (renderer.HasOption( this, "Volumes" ))
+	if ( renderer.HasOption( this, "Volumes" ) )
 	{
-		for (auto volume = m_volumes.begin(); volume != m_volumes.end(); ++volume)
+		for ( auto volume = m_volumes.begin(); volume != m_volumes.end(); ++volume )
 		{
 			(*volume)->RenderDebugInfo( renderer, parentWorldLocation );
 		}
 	}
 
-	if (renderer.HasOption( this, "ExclusionVolumes" ))
+	if ( renderer.HasOption( this, "ExclusionVolumes" ) )
 	{
-		for (auto volume = m_exclusionVolumes.begin(); volume != m_exclusionVolumes.end(); ++volume)
+		for ( auto volume = m_exclusionVolumes.begin(); volume != m_exclusionVolumes.end(); ++volume )
 		{
 			(*volume)->RenderDebugInfo( renderer, parentWorldLocation );
 		}
 	}
-	
-	if (renderer.HasOption(this, "Bounding Sphere"))
+
+	if ( renderer.HasOption( this, "Bounding Sphere" ) )
 	{
-		for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent) {
-			renderer.DrawSphere(this, TranslationMatrix(agent->position) * parentWorldLocation, m_boundingSphereRadius, 8, Tr2DebugRenderer::Wireframe, 0xffff00ff);
+		for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent ) {
+			renderer.DrawSphere( this, TranslationMatrix( agent->position ) * parentWorldLocation, m_boundingSphereRadius, 8, Tr2DebugRenderer::Wireframe, 0xffff00ff );
 		}
 	}
 
