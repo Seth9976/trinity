@@ -3109,6 +3109,8 @@
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\FollowASpline.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\IBehavior.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\Inertia.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\KDdroneManagementTree.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\ProcessLifetime.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\SplineTunnelGroup.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\Wander.h" />
     <ClInclude Include="Eve\SpaceObject\Children\SocketParameters\EveSocketParameter.h" />
@@ -3801,6 +3803,10 @@
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\FollowASpline_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\Inertia.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\Inertia_Blue.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\KDdroneManagementTree.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\KDdroneManagementTree_Blue.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\ProcessLifetime.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\ProcessLifetime_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\SplineTunnelGroup.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\SplineTunnelGroup_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\Wander.cpp" />
