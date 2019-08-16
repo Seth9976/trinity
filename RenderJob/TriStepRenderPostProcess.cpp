@@ -672,16 +672,6 @@ void TriStepRenderPostProcess::ProcessFade(Tr2PPFadeEffect* fade)
 	}
 }
 
-int StringToWString(std::wstring &ws, const std::string &s)
-{
-	std::wstring wsTmp(s.begin(), s.end());
-
-	ws = wsTmp;
-
-	return 0;
-}
-
-
 void TriStepRenderPostProcess::ProcessLut(Tr2PPLutEffect* lut)
 {
 	if (lut && lut->IsActive())
@@ -700,7 +690,7 @@ void TriStepRenderPostProcess::ProcessLut(Tr2PPLutEffect* lut)
 			{
 				const auto param = dynamic_cast<TriTextureParameter*>(resource);
 				const auto currPath = param->GetResourcePath();
-				const std::string possibleNewPathStr = lut->m_path.c_str() ;
+				const std::string possibleNewPathStr = lut->m_path.c_str();
 
 				const std::wstring possibleNewPathWstr(possibleNewPathStr.begin(), possibleNewPathStr.end());
 
