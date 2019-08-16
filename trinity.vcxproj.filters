@@ -501,6 +501,9 @@
     <ClInclude Include="Controllers\Actions\Tr2ActionResetClipSphereCenter.h">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="Controllers\Actions\Tr2ActionSetAudioSwitch.h">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClInclude>
     <ClInclude Include="Controllers\Actions\Tr2ActionSetShaderOption.h">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClInclude>
@@ -2320,6 +2323,12 @@
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Controllers\Actions\Tr2ActionResetClipSphereCenter_Blue.cpp">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Actions\Tr2ActionSetAudioSwitch.cpp">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Actions\Tr2ActionSetAudioSwitch_Blue.cpp">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Controllers\Actions\Tr2ActionSetShaderOption.cpp">
