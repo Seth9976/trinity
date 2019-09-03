@@ -1731,7 +1731,7 @@ const Tr2TextureAL& Tr2Renderer::GetFallbackTexture( Tr2EffectResource::Type tex
 	if( s_debugFallbackTexture )
 	{
 		CCP_LOGWARN( "Using fallback texture for %s", debugContext );
-		textureSet = ( uint32_t( GetAnimationTime() * 20 ) % 2 ) * 3;
+		textureSet = uint32_t( GetAnimationTime() * 20 ) % 2;
 	}
 	switch( textureType )
 	{
