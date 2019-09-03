@@ -1769,7 +1769,29 @@ bool Tr2Renderer::GetSystemShaderOptions( Tr2ShaderOption** options, size_t* cou
 
 bool Tr2Renderer::GetGeometryShaderSupport()
 {
-#if TRINITY_PLATFORM == TRINITY_DIRECTX11 || TRINITY_PLATFORM == TRINITY_DIRECTX12 || TRINITY_PLATFORM == TRINITY_VULKAN
+#if TRINITY_PLATFORM == TRINITY_DIRECTX11
+	USE_MAIN_THREAD_RENDER_CONTEXT();
+
+	const uint32_t bytecode[] =
+	{
+		/* Most trivial geometry shader which does not crash intel drivers
+		/T gs_5_0 /O3 /WX /Qstrip_reflect /Qstrip_debug /Qstrip_priv /Qstrip_rootsignature /Lx
+
+		struct Vtx { float4 p : SV_POSITION; };
+		[maxvertexcount(3)]
+		void main(triangle Vtx pos[3], inout TriangleStream<Vtx> triStream) {}
+		*/
+		0x43425844, 0xd929b0ce, 0x9fb2e2b1, 0xfa578a84, 0x9714125e, 0x00000001, 0x000000a8, 0x00000003,
+		0x0000002c, 0x00000060, 0x00000070, 0x4e475349, 0x0000002c, 0x00000001, 0x00000008, 0x00000020,
+		0x00000000, 0x00000001, 0x00000003, 0x00000000, 0x0000000f, 0x505f5653, 0x5449534f, 0x004e4f49,
+		0x3547534f, 0x00000008, 0x00000000, 0x00000008, 0x58454853, 0x00000030, 0x00020050, 0x0000000c,
+		0x0100086a, 0x05000061, 0x002010f2, 0x00000003, 0x00000000, 0x00000001, 0x0100185d, 0x0200005e,
+		0x00000003, 0x0100003e
+	};
+
+	Tr2ShaderAL shader;
+	return SUCCEEDED( shader.Create( GEOMETRY_SHADER, bytecode, Tr2ShaderSignatureAL(), renderContext ) );
+#elif TRINITY_PLATFORM == TRINITY_DIRECTX12 || TRINITY_PLATFORM == TRINITY_VULKAN
 	return true;
 #else
 	return false;
