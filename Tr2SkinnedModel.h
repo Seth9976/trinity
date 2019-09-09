@@ -73,6 +73,8 @@ public:
 	const char* GetGeometryResPath() { return m_geometryResPath.c_str(); }
 	void SetSkeletonName( const char* name ) { m_skeletonName = name; }
 
+	bool GetDynamicBoundingBox( const Matrix* boneTransforms, Vector3& minBounds, Vector3& maxBounds ) const;
+
 protected:
     const std::string *m_pBoneList;
     int m_numBones;

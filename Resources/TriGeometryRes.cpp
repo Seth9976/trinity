@@ -642,7 +642,11 @@ bool TriGeometryRes::SetupMeshes( granny_file_info* gi )
 
 		for( int jointIx = 0; jointIx < myMesh->BoneBindingCount; ++jointIx )
 		{
-			pMesh->m_jointBindings.push_back( myMesh->BoneBindings[jointIx].BoneName );
+			TriJointBinding binding;
+			binding.m_name = myMesh->BoneBindings[jointIx].BoneName;
+			binding.m_obbMin = *reinterpret_cast<const Vector3*>( myMesh->BoneBindings[jointIx].OBBMin );
+			binding.m_obbMax = *reinterpret_cast<const Vector3*>( myMesh->BoneBindings[jointIx].OBBMax );
+			pMesh->m_jointBindings.push_back( binding );
 		}
 
 
@@ -1876,7 +1880,13 @@ bool TriGeometryRes::SaveMeshToGrannyFile( TriGeometryResMeshData* pMesh, const 
 		memset( myMesh.BoneBindings, 0, sizeof( granny_bone_binding ) * myMesh.BoneBindingCount );
 		for( int i = 0; i < myMesh.BoneBindingCount; ++i )
 		{
-			myMesh.BoneBindings[i].BoneName = pMesh->m_jointBindings[i].c_str();
+			myMesh.BoneBindings[i].BoneName = pMesh->m_jointBindings[i].m_name.c_str();
+			myMesh.BoneBindings[i].OBBMin[0] = pMesh->m_jointBindings[i].m_obbMin.x;
+			myMesh.BoneBindings[i].OBBMin[1] = pMesh->m_jointBindings[i].m_obbMin.y;
+			myMesh.BoneBindings[i].OBBMin[2] = pMesh->m_jointBindings[i].m_obbMin.z;
+			myMesh.BoneBindings[i].OBBMax[0] = pMesh->m_jointBindings[i].m_obbMax.x;
+			myMesh.BoneBindings[i].OBBMax[1] = pMesh->m_jointBindings[i].m_obbMax.y;
+			myMesh.BoneBindings[i].OBBMax[2] = pMesh->m_jointBindings[i].m_obbMax.z;
 		}
 	}
 

@@ -3,6 +3,8 @@
 #include "Tr2Mesh.h"
 #include "Resources/TriGeometryRes.h"
 #include "Tr2PerObjectData.h"
+#include "Utilities/BoundingBox.h"
+
 
 static const unsigned int NO_SKELETON = 0xffffffff;
 
@@ -301,4 +303,25 @@ void Tr2SkinnedModel::OnListModified( long event, ssize_t key, ssize_t key2, IRo
 		// Trigger rebinding of meshes
 		m_areAllMeshesBound = false;
 	}
+}
+
+bool Tr2SkinnedModel::GetDynamicBoundingBox( const Matrix* boneTransforms, Vector3& minBounds, Vector3& maxBounds ) const
+{
+	if( m_meshes.empty() )
+	{
+		return false;
+	}
+
+	BoundingBoxInitialize( minBounds, maxBounds );
+
+	for( auto it = begin( m_meshes ); it != end( m_meshes ); ++it )
+	{
+		Vector3 min, max;
+		if( !( *it )->GetDynamicBoundingBox( boneTransforms, min, max ) )
+		{
+			return false;
+		}
+		BoundingBoxUpdate( minBounds, maxBounds, min, max );
+	}
+	return true;
 }

@@ -67,6 +67,14 @@ struct TriGeometryResVertexData
 	unsigned int m_dstBinormalOffset;
 };
 
+
+struct TriJointBinding
+{
+	std::string m_name;
+	Vector3 m_obbMin;
+	Vector3 m_obbMax;
+};
+
 struct TriGeometryResMeshData
 {
 	TriGeometryResMeshData();
@@ -86,7 +94,7 @@ struct TriGeometryResMeshData
 	Vector3 m_maxBounds;
 	Vector4 m_boundingSphere;
 	bool m_hasPerMeshAreaBoneBindings;
-	TrackableStdVector<std::string> m_jointBindings;
+	TrackableStdVector<TriJointBinding> m_jointBindings;
 	TriGeometryResVertexData* m_pVertexData;
 };
 

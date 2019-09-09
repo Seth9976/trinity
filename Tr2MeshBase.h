@@ -73,6 +73,7 @@ public:
 	virtual bool GetBoundingSphere( Vector4& sphere );
 
 	bool BindToRig( const std::string* boneList, const int numBones, TriGeometryResSkeletonData* renderRig, bool forceRebind = false );
+	bool GetDynamicBoundingBox( const Matrix* boneTransforms, Vector3& min, Vector3& max ) const;
 
 	virtual bool IsLoading() const = 0;
 

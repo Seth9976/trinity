@@ -8,6 +8,7 @@
 #include "Tr2MeshBase.h"
 #include "Resources/TriGeometryRes.h"
 #include "Tr2Renderer.h"
+#include "Utilities/BoundingBox.h"
 
 
 CCP_STATS_DECLARE( tr2MeshBindToRig, "Trinity/BindToRig", true, CST_COUNTER_LOW, "Number of times a mesh executed bind to a new rig" );
@@ -132,7 +133,7 @@ bool Tr2MeshBase::BindToRig( const std::string* boneList, const int numBones, Tr
 
 	for( unsigned int j = 0; j < m_jointMappingAnimRig.size(); ++j )
 	{
-		const char* name = meshData->m_jointBindings[j].c_str();
+		const char* name = meshData->m_jointBindings[j].m_name.c_str();
 
 		m_jointMappingAnimRig[j] = FindJoint( boneList, numBones, name );
 
@@ -174,6 +175,50 @@ bool Tr2MeshBase::BindToRig( const std::string* boneList, const int numBones, Tr
 	m_pBoneList = boneList;
 	m_renderRig = renderRig;
 	m_numBones = numBones;
+
+	return true;
+}
+
+bool Tr2MeshBase::GetDynamicBoundingBox( const Matrix* boneTransforms, Vector3& min, Vector3& max ) const
+{
+	if( !GetBoundingBox( min, max ) )
+	{
+		return false;
+	}
+
+	if( !GetGeometryResource() )
+	{
+		return false;
+	}
+
+	TriGeometryResMeshData* meshData = GetGeometryResource()->GetMeshData( m_meshIndex );
+	if( !meshData )
+	{
+		return false;
+	}
+
+	if( m_jointMappingAnimRig.empty() )
+	{
+		return false;
+	}
+
+	BoundingBoxInitialize( min, max );
+
+	for( int i = 0; i < m_jointMappingAnimRig.size(); ++i )
+	{
+		auto& joint = meshData->m_jointBindings[i];
+		const Matrix& m = boneTransforms[m_jointMappingAnimRig[i]];
+
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMin.x, joint.m_obbMin.y, joint.m_obbMin.z ), m ) );
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMin.x, joint.m_obbMin.y, joint.m_obbMax.z ), m ) );
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMin.x, joint.m_obbMax.y, joint.m_obbMin.z ), m ) );
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMin.x, joint.m_obbMax.y, joint.m_obbMax.z ), m ) );
+
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMax.x, joint.m_obbMin.y, joint.m_obbMin.z ), m ) );
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMax.x, joint.m_obbMin.y, joint.m_obbMax.z ), m ) );
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMax.x, joint.m_obbMax.y, joint.m_obbMin.z ), m ) );
+		BoundingBoxUpdate( min, max, TransformCoord( Vector3( joint.m_obbMax.x, joint.m_obbMax.y, joint.m_obbMax.z ), m ) );
+	}
 
 	return true;
 }
