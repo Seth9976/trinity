@@ -846,9 +846,6 @@
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\Inertia.h">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
-    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\KDdroneManagementTree.h">
-      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
-    </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\ProcessLifetime.h">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
@@ -2956,12 +2953,6 @@
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\Inertia_Blue.cpp">
-      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
-    </ClCompile>
-    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\KDdroneManagementTree.cpp">
-      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
-    </ClCompile>
-    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\KDdroneManagementTree_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\ProcessLifetime.cpp">
