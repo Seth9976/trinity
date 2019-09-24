@@ -10,7 +10,6 @@
 #include "Tr2ExpressionTermInfo.h"
 #include "Controllers/Tr2Controller.h"
 #include "Controllers/Tr2ControllerFloatVariable.h"
-#include "Include/ITr2SoundEmitter.h"
 
 
 Tr2ActionBindRTPC::Tr2ActionBindRTPC( IRoot* ):
