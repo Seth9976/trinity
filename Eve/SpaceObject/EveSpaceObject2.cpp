@@ -150,6 +150,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_enableShadow( true ),
 	m_allowLodSelection( false ),
 	m_isPickable( true ),
+	m_activationStrength( 1.0f ),
 	m_estimatedPixelDiameter( 0.f ),
 	m_estimatedPixelDiameterWithChildren( 0.f ),
 	m_boundingSphereCenter( 0.f, 0.f, 0.f ),
@@ -2942,6 +2943,8 @@ void EveSpaceObject2::GetLights( Tr2LightManager& lightManager ) const
 	for( auto it = std::begin( m_lights ); it != std::end( m_lights ); ++it )
 	{
 		( *it )->AddLight( lightManager, worldTransform, 1.0f );
+		( *it )->SetBrightnessMultiplier( m_activationStrength );
+
 	}
 	auto displayChildren = DisplayChildren();
 	for( auto it = m_effectChildren.begin(); it != m_effectChildren.end(); ++it )

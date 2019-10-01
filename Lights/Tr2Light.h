@@ -58,6 +58,7 @@ public:
 	virtual void Update();
 	virtual void RenderDebugInfo( Tr2DebugRenderer& renderer, const Matrix& worldMatrix );
 	virtual void SetLightData( LightData& baseData );
+	void SetBrightnessMultiplier( float multi );
 
 	// INotify
 	virtual bool OnModified( Be::Var* value );
@@ -69,6 +70,7 @@ protected:
 	std::string m_name;
 	Be::Time m_startTime;
 	bool m_isDynamic;
+	float m_brightnessMultiplier;
 };
 
 TYPEDEF_BLUECLASS( Tr2Light );

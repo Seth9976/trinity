@@ -393,6 +393,9 @@ public:
 
 	Matrix GetEveLocatorTransform( const char* name ) const;
 protected:
+	// Activation-Strength
+	float m_activationStrength;
+
 	// LODing
 	void UnloadLodIfNeeded( Be::Time time );
 	void FreezeHighDetailMesh();

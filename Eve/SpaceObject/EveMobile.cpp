@@ -19,8 +19,7 @@
 //   Initialize data members
 // --------------------------------------------------------------------------------
 EveMobile::EveMobile( IRoot* lockobj ) :
-	PARENTLOCK( m_turretSets ),
-	m_activationStrenght( 1.f )
+	PARENTLOCK( m_turretSets )
 {
 	// ship class needs to know if turrets get added or removed
 	m_turretSets.SetNotify( this );
@@ -141,7 +140,7 @@ void EveMobile::PrepareShaderData( EveUpdateContext& updateContext )
 {
 	EveSpaceObject2::PrepareShaderData( updateContext );
 
-	m_spaceObjectShipData.y *= m_activationStrenght;
+	m_spaceObjectShipData.y *= m_activationStrength;
 }
 
 void EveMobile::UpdateTurretsAsyncronous( EveUpdateContext& updateContext )
@@ -258,7 +257,7 @@ void EveMobile::RenderDebugInfo( Tr2DebugRenderer& renderer )
 // --------------------------------------------------------------------------------
 void EveMobile::GetLights(Tr2LightManager& lightManager) const
 {
-	EveSpaceObject2::GetLights(lightManager);
+	EveSpaceObject2::GetLights( lightManager );
 	for (auto it = m_turretSets.begin(); it != m_turretSets.end(); ++it )
 	{
 		(*it)->GetLights(lightManager);
@@ -602,5 +601,5 @@ void EveMobile::ResetTurretLocatorCounter( bool updateTotal )
 bool EveMobile::DisplayChildren() const
 {
 	// if it is more than .5 -> render the children!
-	return ( m_activationStrenght > 0.5f );
+	return ( m_activationStrength > 0.5f );
 }

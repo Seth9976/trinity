@@ -16,8 +16,6 @@ const Be::ClassInfo* EveMobile::ExposeToBlue()
 		MAP_INTERFACE( ITr2Renderable )
 		MAP_INTERFACE( IListNotify )
 
-		MAP_ATTRIBUTE( "activationStrength", m_activationStrenght, "Ship's activation strength", Be::READWRITE )
-
 		MAP_ATTRIBUTE( "turretSets", m_turretSets, "a list of all the turret sets on this ship", Be::READ | Be::PERSIST | Be::NOTIFY )
 
 		MAP_METHOD_AND_WRAP(

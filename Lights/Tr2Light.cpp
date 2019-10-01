@@ -25,10 +25,11 @@ LightData::LightData() :
 }
 
 
-Tr2Light::Tr2Light( IRoot* lockobj ) : 
+Tr2Light::Tr2Light( IRoot* lockobj ) :
 	m_isDynamic( false ),
 	m_type( UNDEFINED_LIGHT ),
-	m_name( "" )
+	m_name( "" ),
+	m_brightnessMultiplier( 1.f )
 {
 	m_startTime = BeOS->GetCurrentFrameTime();
 	m_lightData = LightData();
@@ -37,6 +38,11 @@ Tr2Light::Tr2Light( IRoot* lockobj ) :
 void Tr2Light::SetLightData( LightData& baseData )
 {
 	m_lightData = baseData;
+}
+
+void Tr2Light::SetBrightnessMultiplier( float multi )
+{
+	m_brightnessMultiplier = multi;
 }
 
 void Tr2Light::ChangeLightColor( Color c )
@@ -53,7 +59,7 @@ void Tr2Light::AddLight( Tr2LightManager& lightManager, CXMMATRIX transform, flo
 	
 	Tr2LightManager::PerLightData data;
 
-	float brightness = m_lightData.brightness;
+	float brightness = m_lightData.brightness * m_brightnessMultiplier;
 	if( m_lightData.noiseAmplitude != 0.f )
 	{
 		float noise = float( PerlinNoise1D( TimeAsDouble( BeOS->GetCurrentFrameTime() - m_startTime ) * m_lightData.noiseFrequency, 2.f, 2.f, m_lightData.noiseOctaves ) );
