@@ -101,28 +101,41 @@ TriStepResult TriStepRenderFps::Execute( Be::Time realTime, Be::Time simTime, Tr
 		textColor = 0xffff0000;
 	}
 
+	auto type =
+#ifdef _DEBUG
+	"debug"
+#elif defined( TRINITYDEV )
+	"dev"
+#elif defined( CCP_DEPLOY )
+	"deploy"
+#else
+	"internal"
+#endif
+	;
+
 	auto bitcount = CCP_STRINGIZE( CCP_CONCATENATE( x, PROCESS_BIT_COUNT ) );
 	auto toolset = GetPlatformToolset();
 	uint64_t counter = Tr2Renderer::GetCurrentFrameCounter();
 	int dpCount = m_dpCount ? int( m_dpCount->GetValue() ) : 0;
-	std::string str = 
-		"trinity: %10s\n"
-		"bitness: %10s\n"
-		"toolset: %10s\n"
-		"frame:   %10.0lld\n"
-		"fps:     %10.2f\n"
-		"ms:      %10.2f\n"
-		"dp:      %10.0d";
+	std::string str =
+		"platform: %10s\n"
+		"type:     %10s\n"
+		"bitness:  %10s\n"
+		"toolset:  %10s\n"
+		"frame:    %10.0lld\n"
+		"fps:      %10.2f\n"
+		"ms:       %10.2f\n"
+		"dp:       %10.0d";
 
 	if( Wine::IsWine() )
 	{
-		str += "\nwine:    %10s";
+		str += "\nwine:     %10s";
 	}
 
 	const int bufferSize = 256; // Make sure to increase this as necessary
 	char fpsBuffer[bufferSize];
 
-	sprintf_s( fpsBuffer, str.c_str(), TRINITY_PLATFORM_NAME, bitcount, toolset, counter, m_averageFPS, m_averageMSPerFrame, dpCount, Wine::GetWineVersion() );
+	sprintf_s( fpsBuffer, str.c_str(), TRINITY_PLATFORM_NAME, type, bitcount, toolset, counter, m_averageFPS, m_averageMSPerFrame, dpCount, Wine::GetWineVersion() );
 
 	uint32_t flags = 0;
 	if( m_alignRight )
