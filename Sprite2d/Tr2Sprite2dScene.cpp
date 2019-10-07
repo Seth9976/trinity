@@ -2081,6 +2081,11 @@ void Tr2Sprite2dScene::RunJobHelper( TriRenderJob* job )
 
 	renderContext.m_esm.EndManagedRendering();
 
+	if( m_useLinearColorSpace )
+	{
+		renderContext.SetRenderState( Tr2RenderContextEnum::RS_SRGBWRITEENABLE, 0 );
+	}
+
 	// When rendering of this scene started, a NULL value was pushed
 	// for depth/stencil buffer. Pop it here, to get whatever was
 	// in use before back. The null value is pushed again after
@@ -2095,6 +2100,11 @@ void Tr2Sprite2dScene::RunJobHelper( TriRenderJob* job )
 
 	renderContext.m_esm.BeginManagedRendering();
 	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_SPRITE2D );
+
+	if( m_useLinearColorSpace )
+	{
+		renderContext.SetRenderState( Tr2RenderContextEnum::RS_SRGBWRITEENABLE, 1 );
+	}
 
 	renderContext.m_esm.ApplyVertexDeclaration( m_vertexDecl );
 }
