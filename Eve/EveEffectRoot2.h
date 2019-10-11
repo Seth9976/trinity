@@ -16,6 +16,7 @@
 #include "ITr2CurveSetOwner.h"
 #include "Shader/IShaderConfigurer.h"
 #include "ITr2SoundEmitterOwner.h"
+#include "Controllers/ITr2ControllerOwner.h"
 
 BLUE_DECLARE( Tr2Light );
 BLUE_DECLARE_VECTOR( Tr2Light );
@@ -39,7 +40,8 @@ BLUE_CLASS( EveEffectRoot2 ):
 	public IListNotify,
 	public IEveEffectChildrenOwner,
 	public IShaderConfigurer,
-	public ITr2SoundEmitterOwner
+	public ITr2SoundEmitterOwner,
+	public ITr2ControllerOwner
 
 {
 public:
@@ -117,6 +119,12 @@ public:
 	virtual void GetDebugOptions( Tr2DebugRendererOptions& options );
 	virtual void RenderDebugInfo( Tr2DebugRenderer& renderer );
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ITr2ControllerOwner
+	void SetControllerVariable( const char* name, float value );
+	void HandleControllerEvent( const char* name ) override;
+	void StartControllers();
+
 	ITr2SoundEmitter* FindSoundEmitter( const char* name ) override;
 
 	void Start();
@@ -126,9 +134,7 @@ public:
 
 	void SetTransform( const Matrix& transform );
 
-	void SetControllerVariable( const char* name, float value );
-	void HandleControllerEvent( const char* name );
-	void StartControllers();
+
 
 	void FreezeHighDetailMesh();
 
@@ -148,7 +154,7 @@ private:
 	// Lods
 	bool m_dynamicLODSelection;
 	bool m_changeLOD;
-
+	
 	PTr2LightVector m_lights;
 	PITr2ControllerVector m_controllers;
 	TrackableStdUnorderedMap<std::string, float> m_controllerVariables;
@@ -156,9 +162,9 @@ private:
 
 	float m_estimatedSize;
 	float m_effectDuration;
-
-	IBlueEventListenerPtr m_loadedEventListener;
 	
+	IBlueEventListenerPtr m_loadedEventListener;
+
 protected:
 	// general
 	std::string m_name;

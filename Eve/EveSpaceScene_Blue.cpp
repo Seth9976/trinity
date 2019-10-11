@@ -129,6 +129,13 @@ const Be::ClassInfo* EveSpaceScene::ExposeToBlue()
 		MAP_INTERFACE( INotify )
 		MAP_INTERFACE( ITr2NamedPredicate )
 
+		MAP_ATTRIBUTE(
+			"name",
+			m_name,
+			"The name of the scene",
+			Be::READWRITE | Be::PERSIST
+		)
+
 		MAP_ATTRIBUTE
 		( 
 			"display", 

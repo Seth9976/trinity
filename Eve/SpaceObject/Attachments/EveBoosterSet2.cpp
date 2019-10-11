@@ -14,6 +14,8 @@
 #include "Tr2LightManager.h"
 #include "Tr2DebugRenderer.h"
 
+BLUE_DECLARE_VECTOR( EveSpriteSet );
+
 using namespace Tr2RenderContextEnum;
 
 CCP_STATS_DECLARED_ELSEWHERE( primitiveCount );
@@ -607,6 +609,7 @@ EveBoosterSet2::EveBoosterSet2( IRoot* lockobj ) :
 	m_destinyUpdate( true ),
 	m_alwaysOn( false ),
 	m_alwaysOnIntensity( 1.f ),
+	m_staticTrailLength( 0.f ),
 	m_vertexDeclHandle( Tr2EffectStateManager::UNINITIALIZED_DECLARATION ),
 	m_maxVel( 250.f ),
 	m_warpIntensity( 0.f ),
@@ -738,6 +741,34 @@ bool EveBoosterSet2::Initialize()
 	return true;
 }
 
+bool EveBoosterSet2::OnModified( Be::Var* value )
+{
+
+	if( m_glows )
+	{
+		if( IsMatch( value, m_glowScale ) || IsMatch( value, m_haloScaleX ) || IsMatch( value, m_haloScaleY ) || IsMatch( value, m_symHaloScale ) ||
+			IsMatch( value, m_glowColor ) || IsMatch( value, m_warpGlowColor ) || IsMatch( value, m_haloColor ) || IsMatch( value, m_warpHaloColor ) )
+		{
+			m_glows->Clear();
+			for( auto it = m_singleBoosters.begin(); it != m_singleBoosters.end(); ++it )
+			{
+				CreateFlares( *it );
+			}
+			m_glows->Rebuild();
+		}
+		else if( IsMatch( value, m_staticTrailLength ) )
+		{
+			float step = m_staticTrailLength / ( EVE_MAX_CONTROL_POINT_COUNT - 1 );
+			
+			for( unsigned int i = 0; i <EVE_MAX_CONTROL_POINT_COUNT; ++i )
+			{
+				m_trailsStaticOffsets[i] = Vector3( 0.f, 0.f, -step * i );
+			}
+		}
+	}
+	return true;
+}
+
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -829,32 +860,12 @@ void EveBoosterSet2::Add( const Matrix* localMatrix, const Vector4* functionalit
 	sbd.atlasIndex1 = atlasIndex1;
 	m_singleBoosters.push_back( sbd );
 
-	// grab pos/dir/scale from the local transform matrix
 	Vector3 pos( localMatrix->_41, localMatrix->_42, localMatrix->_43 );
-	Vector3 dir( localMatrix->_31, localMatrix->_32, localMatrix->_33 );
 	float scale = std::max( Length( localMatrix->GetX() ), Length( localMatrix->GetY() ) );
-	dir = Normalize( dir );
-	if( scale < 3.f )
-	{
-		dir *= scale / 3.f;
-	}
 
-	float seed = float( rand() ) / float( RAND_MAX ) * 0.7f;
-
-	// also add it to all the lensflares
 	if( m_glows )
 	{
-		Vector3 spritePos = pos - 2.5f * dir;
-		m_glows->Add( spritePos, seed, seed, scale * m_glowScale, scale * m_glowScale, 0.0f, 
-			m_glowColor, m_warpGlowColor );
-
-		spritePos = pos - 3.0f * dir;
-		m_glows->Add( spritePos, seed, 1.0f + seed, scale * m_symHaloScale, scale * m_symHaloScale, 0.0f, 
-			m_haloColor, m_warpHaloColor );
-
-		spritePos = pos - 3.01f * dir;
-		m_glows->Add( spritePos, seed, 1.0f + seed, scale * m_haloScaleX, scale * m_haloScaleY, 0.0f, 
-			m_haloColor, m_warpHaloColor );
+		CreateFlares( sbd );
 	}
 
 	// also add it to the trails
@@ -862,6 +873,7 @@ void EveBoosterSet2::Add( const Matrix* localMatrix, const Vector4* functionalit
 	{
 		if( hasTrail )
 		{
+
 			Matrix offset = *localMatrix;
 			offset.GetTranslation() -= offset.GetZ() * 0.5f;
 			m_trails->Add( &offset, scale );
@@ -879,6 +891,35 @@ void EveBoosterSet2::Add( const Matrix* localMatrix, const Vector4* functionalit
 	{
 		m_maxSize = scale;
 	}
+}
+
+void EveBoosterSet2::CreateFlares( SingleBoosterData& boosterData )
+{
+	auto localMatrix = boosterData.transform;
+	// grab pos/dir/scale from the local transform matrix
+	Vector3 pos( localMatrix._41, localMatrix._42, localMatrix._43 );
+	Vector3 dir( localMatrix._31, localMatrix._32, localMatrix._33 );
+	float scale = std::max( Length( localMatrix.GetX() ), Length( localMatrix.GetY() ) );
+
+	dir = Normalize( dir );
+	if( scale < 3.f )
+	{
+		dir *= scale / 3.f;
+	}
+
+	float seed = float( rand() ) / float( RAND_MAX ) * 0.7f;
+
+	Vector3 spritePos = pos - 2.5f * dir;
+	m_glows->Add( spritePos, seed, seed, scale * m_glowScale, scale * m_glowScale, 0.0f,
+		m_glowColor, m_warpGlowColor );
+
+	spritePos = pos - 3.0f * dir;
+	m_glows->Add( spritePos, seed, 1.0f + seed, scale * m_symHaloScale, scale * m_symHaloScale, 0.0f,
+		m_haloColor, m_warpHaloColor );
+
+	spritePos = pos - 3.01f * dir;
+	m_glows->Add( spritePos, seed, 1.0f + seed, scale * m_haloScaleX, scale * m_haloScaleY, 0.0f,
+		m_haloColor, m_warpHaloColor );
 }
 
 // --------------------------------------------------------------------------------

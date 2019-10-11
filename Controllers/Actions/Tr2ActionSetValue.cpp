@@ -50,7 +50,7 @@ void Tr2ActionSetValue::Start( Tr2Controller& controller )
 	{
 		return;
 	}
-	m_destination.SetValue( value.second );
+	m_destination.SetValue( value.second );	
 }
 
 bool Tr2ActionSetValue::OnModified( Be::Var* value )

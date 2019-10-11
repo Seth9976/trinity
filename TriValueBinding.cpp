@@ -799,3 +799,8 @@ bool TriValueBinding::IsValid() const
 {
 	return m_isValid;
 }
+
+void TriValueBinding::SetScale( float scale )
+{
+	m_scale = scale;
+}

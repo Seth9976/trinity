@@ -16,7 +16,6 @@ BLUE_DECLARE( Tr2ControllerEventHandler );
 BLUE_DECLARE_VECTOR( Tr2ControllerEventHandler );
 BLUE_DECLARE_INTERFACE( ITr2Updateable );
 
-
 BLUE_CLASS( Tr2Controller ):
 	public ITr2Controller,
 	public IListNotify
@@ -47,13 +46,20 @@ public:
 
 	void RegisterUpdateable( ITr2Updateable& updateable );
 	void UnRegisterUpdateable( ITr2Updateable& updateable );
+
+	void Callback( BlueSharedString callbackName);
+	void RegisterCallback( BlueSharedString callbackName, BlueScriptCallback callback );
+	void ClearCallbacks();
 private:
+	size_t GetCallbackCount() { return m_callbacks.size(); };
+
 	std::string m_name;
 	PTr2StateMachineVector m_stateMachines;
 	PTr2ControllerFloatVariableVector m_variables;
 	PTr2ControllerEventHandlerVector m_eventHandlers;
 	
 	TrackableStdSet<ITr2UpdateablePtr> m_updateables;
+	std::vector<std::pair<BlueSharedString, BlueScriptCallback>>  m_callbacks;
 
 	IRoot* m_owner;
 	bool m_isActive;

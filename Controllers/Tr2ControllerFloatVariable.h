@@ -26,6 +26,7 @@ public:
 
 	const std::string& GetName() const;
 	float* GetPointerForParser();
+	float GetValue() const;
 private:
 	std::string m_name;
 	std::string m_enumValues;

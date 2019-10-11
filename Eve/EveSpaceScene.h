@@ -567,6 +567,8 @@ private:
 
 	Tr2PostProcess2Ptr m_postProcess;
 	Tr2ReflectionProbePtr m_reflectionProbe;
+
+	BlueSharedString m_name;
 };
 
 TYPEDEF_BLUECLASS( EveSpaceScene );

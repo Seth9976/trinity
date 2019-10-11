@@ -15,6 +15,7 @@
 #include "ITr2CurveSetOwner.h"
 #include "EveChildInheritProperties.h"
 #include "ITr2SoundEmitterOwner.h"
+#include "Controllers/ITr2ControllerOwner.h"
 
 
 BLUE_DECLARE( TriCurveSet );
@@ -36,7 +37,8 @@ BLUE_CLASS( EveChildContainer ) :
 	public IEveEffectChildrenOwner,
 	public ITr2DebugRenderable,
 	public IShaderConfigurer,
-	public ITr2SoundEmitterOwner
+	public ITr2SoundEmitterOwner,
+	public ITr2ControllerOwner
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -62,6 +64,12 @@ public:
 	IEveSpaceObjectChildPtr GetEffectChildByName( const char* name ) const;
 	void AddToEffectChildrenList( IEveSpaceObjectChild* child );
 	void RemoveFromEffectChildrenList( IEveSpaceObjectChild* child );
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ITr2ControllerOwner
+	void SetControllerVariable( const char* name, float value );
+	void HandleControllerEvent( const char* name ) override;
+	void StartControllers();
 
 	const char* GetName() const;
 	void SetName( const char* name );
@@ -95,9 +103,6 @@ public:
 	void GetDebugOptions( Tr2DebugRendererOptions& options );
 	void RenderDebugInfo( Tr2DebugRenderer& renderer );
 
-	void SetControllerVariable( const char* name, float value );
-	void HandleControllerEvent( const char* name ) override;
-	void StartControllers();
 	void GetWorldVelocity( Vector3& velocity ) const;
 	void SetInheritProperties( const Color* colorSet );
 

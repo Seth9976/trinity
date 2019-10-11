@@ -39,6 +39,7 @@ public:
 
 	void SetSource( const std::string& sourceAttribute, IRootPtr sourceObject );
 	void SetDestination( const std::string& destAttribute, IRootPtr destination );
+	void SetScale( float scale );
 
 	bool IsValid() const;
 

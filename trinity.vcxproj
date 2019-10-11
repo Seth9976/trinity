@@ -2857,6 +2857,7 @@
     <ClInclude Include="IRenderCallback.h" />
     <ClInclude Include="ITr2AttributeGenerator.h" />
     <ClInclude Include="ITr2CurveSetOwner.h" />
+    <ClInclude Include="ITr2DynamicBindingOwner.h" />
     <ClInclude Include="ITr2EffectValue.h" />
     <ClInclude Include="ITr2GeometryProvider.h" />
     <ClInclude Include="ITr2PhysicsUpdater.h" />
@@ -2883,6 +2884,7 @@
     <ClInclude Include="Tr2DepthStencil.h" />
     <ClInclude Include="Tr2DeviceResource.h" />
     <ClInclude Include="Tr2DxtCompressor.h" />
+    <ClInclude Include="Tr2DynamicBinding.h" />
     <ClInclude Include="Tr2DynamicRingBuffer.h" />
     <ClInclude Include="Tr2ExpressionTermInfo.h" />
     <ClInclude Include="Tr2ExternalParameter.h" />
@@ -2983,6 +2985,7 @@
     <ClInclude Include="TriViewport.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="Controllers\ITr2Controller.h" />
+    <ClInclude Include="Controllers\ITr2ControllerOwner.h" />
     <ClInclude Include="Controllers\Tr2BindingPoint.h" />
     <ClInclude Include="Controllers\Tr2Controller.h" />
     <ClInclude Include="Controllers\Tr2ControllerEventHandler.h" />
@@ -2996,6 +2999,7 @@
     <ClInclude Include="Controllers\Actions\Tr2ActionAnimateCurveSet.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionAnimateValue.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionBindRTPC.h" />
+    <ClInclude Include="Controllers\Actions\Tr2ActionCallback.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionChildEffect.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionOverlay.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionPlayCurveSet.h" />
@@ -3003,6 +3007,7 @@
     <ClInclude Include="Controllers\Actions\Tr2ActionPlaySound.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionResetClipSphereCenter.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionSetAudioSwitch.h" />
+    <ClInclude Include="Controllers\Actions\Tr2ActionSetExternalControllerVariable.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionSetShaderOption.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionSetValue.h" />
     <ClInclude Include="Controllers\Actions\Tr2ActionSpawnParticles.h" />
@@ -3020,7 +3025,10 @@
     <ClInclude Include="Curves\Tr2CurveVector2.h" />
     <ClInclude Include="Curves\Tr2CurveVector3.h" />
     <ClInclude Include="Curves\Tr2CurveVector3Expression.h" />
+    <ClInclude Include="Curves\Tr2CurveVector3Lerp.h" />
     <ClInclude Include="Curves\Tr2DistanceTracker.h" />
+    <ClInclude Include="Curves\Tr2FollowCurve.h" />
+    <ClInclude Include="Curves\Tr2FollowCurveKey.h" />
     <ClInclude Include="Curves\Tr2GrannyEventTrack.h" />
     <ClInclude Include="Curves\Tr2GrannyTrack.h" />
     <ClInclude Include="Curves\Tr2GrannyTransformTrack.h" />
@@ -3040,6 +3048,8 @@
     <ClInclude Include="Eve\EveEffectRoot2.h" />
     <ClInclude Include="Eve\EveLensflare.h" />
     <ClInclude Include="Eve\EveLODHelper.h" />
+    <ClInclude Include="Eve\EveMultiEffect.h" />
+    <ClInclude Include="Eve\EveMultiEffectParameter.h" />
     <ClInclude Include="Eve\EveOccluder.h" />
     <ClInclude Include="Eve\EveParticleDirectForce.h" />
     <ClInclude Include="Eve\EveParticleDragForce.h" />
@@ -3414,6 +3424,8 @@
     <ClCompile Include="Tr2DeviceResource.cpp" />
     <ClCompile Include="Tr2DxtCompressor.cpp" />
     <ClCompile Include="Tr2DxtCompressor_Blue.cpp" />
+    <ClCompile Include="Tr2DynamicBinding.cpp" />
+    <ClCompile Include="Tr2DynamicBinding_Blue.cpp" />
     <ClCompile Include="Tr2DynamicRingBuffer.cpp" />
     <ClCompile Include="Tr2ExpressionTermInfo.cpp" />
     <ClCompile Include="Tr2ExpressionTermInfo_Blue.cpp" />
@@ -3606,6 +3618,8 @@
     <ClCompile Include="Controllers\Actions\Tr2ActionAnimateValue_Blue.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionBindRTPC.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionBindRTPC_Blue.cpp" />
+    <ClCompile Include="Controllers\Actions\Tr2ActionCallback.cpp" />
+    <ClCompile Include="Controllers\Actions\Tr2ActionCallback_Blue.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionChildEffect.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionChildEffect_Blue.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionOverlay.cpp" />
@@ -3620,6 +3634,8 @@
     <ClCompile Include="Controllers\Actions\Tr2ActionResetClipSphereCenter_Blue.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionSetAudioSwitch.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionSetAudioSwitch_Blue.cpp" />
+    <ClCompile Include="Controllers\Actions\Tr2ActionSetExternalControllerVariable.cpp" />
+    <ClCompile Include="Controllers\Actions\Tr2ActionSetExternalControllerVariable_Blue.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionSetShaderOption.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionSetShaderOption_Blue.cpp" />
     <ClCompile Include="Controllers\Actions\Tr2ActionSetValue.cpp" />
@@ -3651,9 +3667,15 @@
     <ClCompile Include="Curves\Tr2CurveVector3.cpp" />
     <ClCompile Include="Curves\Tr2CurveVector3Expression.cpp" />
     <ClCompile Include="Curves\Tr2CurveVector3Expression_Blue.cpp" />
+    <ClCompile Include="Curves\Tr2CurveVector3Lerp.cpp" />
+    <ClCompile Include="Curves\Tr2CurveVector3Lerp_Blue.cpp" />
     <ClCompile Include="Curves\Tr2CurveVector3_Blue.cpp" />
     <ClCompile Include="Curves\Tr2DistanceTracker.cpp" />
     <ClCompile Include="Curves\Tr2DistanceTracker_Blue.cpp" />
+    <ClCompile Include="Curves\Tr2FollowCurve.cpp" />
+    <ClCompile Include="Curves\Tr2FollowCurveKey.cpp" />
+    <ClCompile Include="Curves\Tr2FollowCurveKey_Blue.cpp" />
+    <ClCompile Include="Curves\Tr2FollowCurve_Blue.cpp" />
     <ClCompile Include="Curves\Tr2GrannyEventTrack.cpp" />
     <ClCompile Include="Curves\Tr2GrannyEventTrack_Blue.cpp" />
     <ClCompile Include="Curves\Tr2GrannyTrack.cpp" />
@@ -3689,6 +3711,10 @@
     <ClCompile Include="Eve\EveLensflare.cpp" />
     <ClCompile Include="Eve\EveLensflare_Blue.cpp" />
     <ClCompile Include="Eve\EveLODHelper.cpp" />
+    <ClCompile Include="Eve\EveMultiEffect.cpp" />
+    <ClCompile Include="Eve\EveMultiEffectParameter.cpp" />
+    <ClCompile Include="Eve\EveMultiEffectParameter_Blue.cpp" />
+    <ClCompile Include="Eve\EveMultiEffect_Blue.cpp" />
     <ClCompile Include="Eve\EveOccluder.cpp" />
     <ClCompile Include="Eve\EveOccluder_Blue.cpp" />
     <ClCompile Include="Eve\EveParticleDirectForce.cpp" />

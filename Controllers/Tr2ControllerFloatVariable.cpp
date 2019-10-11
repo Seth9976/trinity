@@ -30,3 +30,8 @@ float* Tr2ControllerFloatVariable::GetPointerForParser()
 {
 	return &m_value;
 }
+
+float Tr2ControllerFloatVariable::GetValue() const
+{
+	return m_value;
+}

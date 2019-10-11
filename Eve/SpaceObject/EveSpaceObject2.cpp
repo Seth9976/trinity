@@ -2099,6 +2099,11 @@ const Vector3* EveSpaceObject2::GetWorldPosition()
 	return &m_worldPosition;
 }
 
+const Quaternion* EveSpaceObject2::GetWorldRotation()
+{
+	return &m_worldRotation;
+}
+
 void EveSpaceObject2::SelectMeshLevelOfDetail()
 {
 	if( m_meshLod )

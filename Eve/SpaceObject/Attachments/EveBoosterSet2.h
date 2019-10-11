@@ -170,6 +170,7 @@ BLUE_DECLARE_VECTOR( EveBoosterSet2Renderable );
 // --------------------------------------------------------------------------------
 BLUE_CLASS( EveBoosterSet2 ):
 	public IInitialize,
+	public INotify,
 	public Tr2DeviceResource
 {
 public:
@@ -191,6 +192,10 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
 	bool Initialize();
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// INotify
+	virtual bool OnModified( Be::Var* value );
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// ITriDeviceResource
@@ -258,8 +263,24 @@ public:
 	void GetLights( Tr2LightManager& lightManager, const Matrix& parentTransform ) const;
 
 private:
+	// indivual data of each booster (position, etc.)
+	struct SingleBoosterData
+	{
+		Matrix transform;
+		Vector4 functionality;
+		Vector3 lightPosition;
+		float lightRadius;
+		float lightPhase;
+		uint32_t atlasIndex0;
+		uint32_t atlasIndex1;
+	};
+	std::vector<SingleBoosterData> m_singleBoosters;
+
 	// re-alloc and init the instance vertex buffers
 	void RebuildInstanceData( Tr2RenderContext& renderContext );
+
+	// function to create the flares from boosterdata
+	void CreateFlares( SingleBoosterData& boosterData );
 
 	// toggle display
 	bool m_display;
@@ -287,18 +308,6 @@ private:
 	// holds all the trails of this booster
 	EveTrailsSetPtr m_trails;
 
-	// indivual data of each booster (position, etc.)
-	struct SingleBoosterData
-	{
-		Matrix transform;
-		Vector4 functionality;
-		Vector3 lightPosition;
-		float lightRadius;
-		float lightPhase;
-		uint32_t atlasIndex0;
-		uint32_t atlasIndex1;
-	};
-	std::vector<SingleBoosterData> m_singleBoosters;
 
 	// booster gain
 	float m_maxVel;
@@ -323,6 +332,7 @@ private:
 	bool m_destinyUpdate;
 	// trail static positions
 	Vector3 m_trailsStaticOffsets[EVE_MAX_CONTROL_POINT_COUNT];
+	float m_staticTrailLength;
 
 	float m_lightOffset;
 	float m_lightRadius;

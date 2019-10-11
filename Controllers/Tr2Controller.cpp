@@ -244,3 +244,30 @@ void Tr2Controller::UnRegisterUpdateable( ITr2Updateable& updateable )
 {
 	m_updateables.erase( &updateable );
 }
+
+void Tr2Controller::Callback( BlueSharedString callbackName )
+{
+	if( !m_isActive || m_callbacks.empty() )
+	{
+		return;
+	}
+
+	for( auto callbackpair = begin( m_callbacks ); callbackpair != end( m_callbacks ); ++callbackpair )
+	{
+		auto pair = *callbackpair;
+		if( pair.first == callbackName )
+		{
+			pair.second.CallVoid();
+		}
+	}
+}
+
+void Tr2Controller::RegisterCallback( BlueSharedString callbackName, BlueScriptCallback callback )
+{
+	m_callbacks.push_back(std::pair<BlueSharedString, BlueScriptCallback>( callbackName, callback) );
+}
+
+void Tr2Controller::ClearCallbacks()
+{
+	m_callbacks.clear();
+}

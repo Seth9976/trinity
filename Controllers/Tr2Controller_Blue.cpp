@@ -26,6 +26,7 @@ const Be::ClassInfo* Tr2Controller::ExposeToBlue()
 		MAP_ATTRIBUTE( "variables", m_variables, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "eventHandlers", m_eventHandlers, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "isPlaying", m_isActive, "", Be::READ )
+		MAP_PROPERTY_READONLY( "callbackCount", GetCallbackCount, "Returns the number of callbacks that are attached to this controller" )
 
 		MAP_METHOD_AND_WRAP( 
 			"Start", 
@@ -51,6 +52,19 @@ const Be::ClassInfo* Tr2Controller::ExposeToBlue()
 			"GetOwner",
 			GetOwner,
 			"Returns controller owner"
+		)		
+		MAP_METHOD_AND_WRAP(
+			"RegisterCallback",
+			RegisterCallback,
+			"Registers a callback under a specific name\n"
+			":param callbackName: the name of the callback\n"
+			":param callback: A python function that accepts no arguments"
 		)
+		MAP_METHOD_AND_WRAP(
+			"ClearCallbacks",
+			ClearCallbacks,
+			"Clears all callbacks"
+		)
+
 	EXPOSURE_END()
 }

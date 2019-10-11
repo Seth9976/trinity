@@ -28,6 +28,7 @@
 #include "ITr2CurveSetOwner.h"
 #include "Shader/IShaderConfigurer.h"
 #include "ITr2SoundEmitterOwner.h"
+#include "Controllers/ITr2ControllerOwner.h"
 
 // consts
 #define EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT (0.f)
@@ -153,7 +154,8 @@ BLUE_CLASS( EveSpaceObject2 ):
 	public ITr2CurveSetOwner,
 	public IEveEffectChildrenOwner,
 	public IShaderConfigurer,
-	public ITr2SoundEmitterOwner
+	public ITr2SoundEmitterOwner,
+	public ITr2ControllerOwner
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -297,11 +299,19 @@ public:
 	void AddToEffectChildrenList( IEveSpaceObjectChild* child );
 	void RemoveFromEffectChildrenList( IEveSpaceObjectChild* child );
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ITr2ControllerOwner
+	void SetControllerVariable( const char* name, float value );
+	void HandleControllerEvent( const char* name ) override;
+	void StartControllers();
+
 	// For stateful GPU particles
 	ITriVectorFunctionPtr GetPositionFunction();
 
 	Vector3 GetModelWorldPosition() const;
 	void GetWorldVelocity( Vector3& velocity ) const;
+	const Quaternion* GetWorldRotation();
+
 	Tr2GrannyAnimationPtr GetAnimationController() { return m_animationUpdater; }
 	bool IsAnimated() const; 
 
@@ -377,9 +387,6 @@ public:
 	// external parameters
 	void AddExternalParameter( Tr2ExternalParameter* externalParameter );
 
-	void SetControllerVariable( const char* name, float value );
-	void HandleControllerEvent( const char* name );
-	void StartControllers();
 	std::map<std::string, float> GetControllerVariables() const;
 
 	void SetShaderOption( const BlueSharedString& name, const BlueSharedString& value ) override;

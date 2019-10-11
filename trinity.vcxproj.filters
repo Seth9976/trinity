@@ -66,6 +66,9 @@
     <ClInclude Include="ITr2CurveSetOwner.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ITr2DynamicBindingOwner.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="ITr2EffectValue.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -142,6 +145,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Tr2DxtCompressor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tr2DynamicBinding.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Tr2DynamicRingBuffer.h">
@@ -444,6 +450,9 @@
     <ClInclude Include="Controllers\ITr2Controller.h">
       <Filter>Source Files\Controllers</Filter>
     </ClInclude>
+    <ClInclude Include="Controllers\ITr2ControllerOwner.h">
+      <Filter>Source Files\Controllers</Filter>
+    </ClInclude>
     <ClInclude Include="Controllers\Tr2BindingPoint.h">
       <Filter>Source Files\Controllers</Filter>
     </ClInclude>
@@ -483,6 +492,9 @@
     <ClInclude Include="Controllers\Actions\Tr2ActionBindRTPC.h">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="Controllers\Actions\Tr2ActionCallback.h">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClInclude>
     <ClInclude Include="Controllers\Actions\Tr2ActionChildEffect.h">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClInclude>
@@ -502,6 +514,9 @@
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClInclude>
     <ClInclude Include="Controllers\Actions\Tr2ActionSetAudioSwitch.h">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllers\Actions\Tr2ActionSetExternalControllerVariable.h">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClInclude>
     <ClInclude Include="Controllers\Actions\Tr2ActionSetShaderOption.h">
@@ -555,7 +570,16 @@
     <ClInclude Include="Curves\Tr2CurveVector3Expression.h">
       <Filter>Source Files\Curves</Filter>
     </ClInclude>
+    <ClInclude Include="Curves\Tr2CurveVector3Lerp.h">
+      <Filter>Source Files\Curves</Filter>
+    </ClInclude>
     <ClInclude Include="Curves\Tr2DistanceTracker.h">
+      <Filter>Source Files\Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\Tr2FollowCurve.h">
+      <Filter>Source Files\Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\Tr2FollowCurveKey.h">
       <Filter>Source Files\Curves</Filter>
     </ClInclude>
     <ClInclude Include="Curves\Tr2GrannyEventTrack.h">
@@ -613,6 +637,12 @@
       <Filter>Source Files\Eve</Filter>
     </ClInclude>
     <ClInclude Include="Eve\EveLODHelper.h">
+      <Filter>Source Files\Eve</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\EveMultiEffect.h">
+      <Filter>Source Files\Eve</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\EveMultiEffectParameter.h">
       <Filter>Source Files\Eve</Filter>
     </ClInclude>
     <ClInclude Include="Eve\EveOccluder.h">
@@ -1725,6 +1755,12 @@
     <ClCompile Include="Tr2DxtCompressor_Blue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Tr2DynamicBinding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tr2DynamicBinding_Blue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Tr2DynamicRingBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2301,6 +2337,12 @@
     <ClCompile Include="Controllers\Actions\Tr2ActionBindRTPC_Blue.cpp">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="Controllers\Actions\Tr2ActionCallback.cpp">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Actions\Tr2ActionCallback_Blue.cpp">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClCompile>
     <ClCompile Include="Controllers\Actions\Tr2ActionChildEffect.cpp">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClCompile>
@@ -2341,6 +2383,12 @@
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Controllers\Actions\Tr2ActionSetAudioSwitch_Blue.cpp">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Actions\Tr2ActionSetExternalControllerVariable.cpp">
+      <Filter>Source Files\Controllers\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Actions\Tr2ActionSetExternalControllerVariable_Blue.cpp">
       <Filter>Source Files\Controllers\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Controllers\Actions\Tr2ActionSetShaderOption.cpp">
@@ -2436,6 +2484,12 @@
     <ClCompile Include="Curves\Tr2CurveVector3Expression_Blue.cpp">
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
+    <ClCompile Include="Curves\Tr2CurveVector3Lerp.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2CurveVector3Lerp_Blue.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
     <ClCompile Include="Curves\Tr2CurveVector3_Blue.cpp">
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
@@ -2443,6 +2497,18 @@
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
     <ClCompile Include="Curves\Tr2DistanceTracker_Blue.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2FollowCurve.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2FollowCurveKey.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2FollowCurveKey_Blue.cpp">
+      <Filter>Source Files\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Tr2FollowCurve_Blue.cpp">
       <Filter>Source Files\Curves</Filter>
     </ClCompile>
     <ClCompile Include="Curves\Tr2GrannyEventTrack.cpp">
@@ -2548,6 +2614,18 @@
       <Filter>Source Files\Eve</Filter>
     </ClCompile>
     <ClCompile Include="Eve\EveLODHelper.cpp">
+      <Filter>Source Files\Eve</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\EveMultiEffect.cpp">
+      <Filter>Source Files\Eve</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\EveMultiEffectParameter.cpp">
+      <Filter>Source Files\Eve</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\EveMultiEffectParameter_Blue.cpp">
+      <Filter>Source Files\Eve</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\EveMultiEffect_Blue.cpp">
       <Filter>Source Files\Eve</Filter>
     </ClCompile>
     <ClCompile Include="Eve\EveOccluder.cpp">
