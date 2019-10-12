@@ -6,8 +6,8 @@
 
 #include "StdAfx.h"
 #include "Tr2FollowCurveKey.h"
-#include "Eve\SpaceObject\EveSpaceObject2.h"
-#include "include\TriMath.h"
+#include "Eve/SpaceObject/EveSpaceObject2.h"
+#include "include/TriMath.h"
 
 
 Tr2ObjectFollowCurveKey::Tr2ObjectFollowCurveKey( IRoot* lockobj ) : 
