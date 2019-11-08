@@ -23,7 +23,9 @@ Tr2Sprite2dStretchVertical::Tr2Sprite2dStretchVertical( IRoot* lockobj ) :
 	m_topEdgeSize( 0 ),
 	m_bottomEdgeSize( 0 ),
 	m_fillCenter( true ),
-	m_offset( 0 )
+	m_offset( 0 ),
+	m_saturation( 1.0f ),
+	m_effectOpacity( 1.0f )
 {
 	std::fill( std::begin( m_vertices ), std::end( m_vertices ), Tr2Sprite2dD3DVertex() );
 }
@@ -37,143 +39,76 @@ void Tr2Sprite2dStretchVertical::GatherSprites( Tr2Sprite2dScene* renderer )
 
 	if( m_isDirty )
 	{
-		if( !m_texture )
+		if( !ValidateAndSetTextures( renderer ) )
 		{
 			return;
 		}
 
-		if( !m_texture->IsGood() )
+		if( m_spriteEffect == TR2_SFX_BLUR || m_spriteEffect == TR2_SFX_GLOW )
 		{
+			// don't support these atm
 			return;
 		}
-
-		m_texture->Apply( renderer, 0 );
 
 		renderer->SetSpriteEffect( m_spriteEffect );
 		renderer->SetTileMode( 0 );
 
-		float srcHeight = m_texture->GetSrcHeight();
-
-		unsigned int textureHeight = m_texture->GetHeight();
-
+		float srcHeight = m_texturePrimary->GetSrcHeight();
 		if( srcHeight == 0.0f )
 		{
-			srcHeight = (float)textureHeight;
+			srcHeight = float( m_texturePrimary->GetHeight() );
 		}
 
-		float topEdgeSize = (float)m_topEdgeSize;
-		float bottomEdgeSize = (float)m_bottomEdgeSize;
+		Tr2Sprite2dVertexBase vertices[8 * 3];
+
+		if( m_shadowOffset.x != 0.0f || m_shadowOffset.y != 0.0f )
+		{
+			SetShadowRenderState( renderer );
+			PrepareVertices( &vertices[0], srcHeight, m_shadowOffset, Vector2( 1, 1 ) );
+			renderer->PrepareTriangleVerts( &m_vertices[0], &vertices[0], sizeof( Tr2Sprite2dVertexBase ), 8 );
+		}
 
 		SetRegularRenderState( renderer );
-		renderer->SetDepth( m_depth );
+		PrepareVertices( &vertices[8], srcHeight, Vector2( 0, 0 ), Vector2( 1, 1 ) );
+		renderer->PrepareTriangleVerts( &m_vertices[8], &vertices[8], sizeof( Tr2Sprite2dVertexBase ), 8 );
 
-		const Color white( WHITE );
+		if( ( m_glowFactor != 0.0f ) || ( m_glowExpand != 0.0f ) )
+		{
+			float offset2 = m_glowExpand + m_glowExpand;
 
-		float offset = (float)m_offset;
-		float offset_2 = offset * 2.0f;
+			SetGlowRenderState( renderer );
+			PrepareVertices( &vertices[16], srcHeight, Vector2( -m_glowExpand, -m_glowExpand ), Vector2( 1 + offset2 / m_displayWidth, 1 + offset2 / m_displayHeight ) );
+			renderer->PrepareTriangleVerts( &m_vertices[16], &vertices[16], sizeof( Tr2Sprite2dVertexBase ), 8 );
+		}
 
-		float scaledWidth = m_displayWidth - offset;
-		float scaledHeight = m_displayHeight - offset_2;
-		float offsetY = offset;
+		if( m_spriteEffect < TR2_SFX_TWO_TEXTURES && ( m_spriteEffect != TR2_SFX_BLUR ) && ( m_spriteEffect != TR2_SFX_GLOW ) )
+		{
+			for( int i = 0; i < 8 * 3; ++i )
+			{
+				m_vertices[i].texCoord[1].x = m_saturation;
+				m_vertices[i].texCoord[1].y = m_effectOpacity;
+			}
+		}
 
-		Tr2Sprite2dVertexBase vertices[8];
-		Tr2Sprite2dVertexBase* v = &vertices[0];
-		//
-		// First line
-		//
-		// Vertex 0
-		v->position.x = 0.0f;
-		v->position.y = offsetY;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 0.0f;
-		v->texCoord[0].y = 0.0f;
-		v->color = white;
-		++v;
-
-		// Vertex 1
-		v->position.x = scaledWidth;
-		v->position.y = 0.0f;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 1.0f;
-		v->texCoord[0].y = 0.0f;
-		v->color = white;
-		++v;
-
-		//
-		// Second line
-		//
-		// Vertex 2
-		v->position.x = 0.0f;
-		v->position.y = offsetY + topEdgeSize;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 0.0f;
-		v->texCoord[0].y = topEdgeSize / srcHeight;
-		v->color = white;
-		++v;
-
-		// Vertex 3
-		v->position.x = scaledWidth;
-		v->position.y = offsetY + topEdgeSize;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 1.0f;
-		v->texCoord[0].y = topEdgeSize / srcHeight;
-		v->color = white;
-		++v;
-
-		//
-		// Third line
-		//
-		// Vertex 4
-		v->position.x = 0.0f;
-		v->position.y = offsetY + scaledHeight - bottomEdgeSize;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 0.0f;
-		v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
-		v->color = white;
-		++v;
-
-		// Vertex 5
-		v->position.x = scaledWidth;
-		v->position.y = offsetY + scaledHeight - bottomEdgeSize;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 1.0f;
-		v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
-		v->color = white;
-		++v;
-
-		//
-		// Fourth line
-		// 
-		// Vertex 6
-		v->position.x = 0.0f;
-		v->position.y = scaledHeight;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 0.0f;
-		v->texCoord[0].y = 1.0f;
-		v->color = white;
-		++v;
-
-		// Vertex 7
-		v->position.x = scaledWidth;
-		v->position.y = scaledHeight;
-		v->position.z = 0.0f;
-		v->texCoord[0].x = 1.0f;
-		v->texCoord[0].y = 1.0f;
-		v->color = white;
-		++v;
-
-		renderer->PrepareTriangleVerts( &m_vertices[0], &vertices[0], sizeof( Tr2Sprite2dVertexBase ), 8 );
-
+		m_isDirty = false;
 	}
 
-	m_texture->Apply( renderer, 0 );
-	
+	SetValidatedTextures( renderer );
+
 	renderer->PushTranslation( m_translation );
 	
 	unsigned int triangleCount = m_fillCenter ? 6 : 4;
 	unsigned int indexCount = triangleCount * 3;
-	renderer->RenderTriangleVerts( &m_vertices[0], 8, &s_frameIndices[0], indexCount );
-	
+	if( m_shadowOffset.x != 0.0f || m_shadowOffset.y != 0.0f )
+	{
+		renderer->RenderTriangleVerts( &m_vertices[0], 8, &s_frameIndices[0], indexCount );
+	}
+	renderer->RenderTriangleVerts( &m_vertices[8], 8, &s_frameIndices[0], indexCount );
+	if( ( m_glowFactor != 0.0f ) || ( m_glowExpand != 0.0f ) )
+	{
+		renderer->RenderTriangleVerts( &m_vertices[16], 8, &s_frameIndices[0], indexCount );
+	}
+
 	renderer->PopTranslation();
 }
 
@@ -202,5 +137,117 @@ unsigned int Tr2Sprite2dStretchVertical::GetVertexCount()
 		return 0;
 	}
 
-	return 8;
+	return 8 * 3;
+}
+
+void Tr2Sprite2dStretchVertical::PrepareVertices( Tr2Sprite2dVertexBase* v, float srcHeight, const Vector2& vertOffset, const Vector2& scale ) const
+{
+	float topEdgeSize = (float)m_topEdgeSize;
+	float bottomEdgeSize = (float)m_bottomEdgeSize;
+
+	float offset = float( m_offset );
+
+	float scaledWidth = m_displayWidth * scale.x - offset * scale.x;
+	float scaledHeight = m_displayHeight * scale.y - offset * 2.0f * scale.y;
+	float offsetY = offset * scale.y;
+
+	const Color white( 1, 1, 1, 1 );
+	//
+	// First line
+	//
+	// Vertex 0
+	v->position.x = 0.0f + vertOffset.x;
+	v->position.y = offsetY + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 0.0f;
+	v->texCoord[0].y = 0.0f;
+	v->texCoord[1].x = 0.0f;
+	v->texCoord[1].y = 0.0f;
+	v->color = white;
+	++v;
+
+	// Vertex 1
+	v->position.x = scaledWidth + vertOffset.x;
+	v->position.y = 0.0f + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 1.0f;
+	v->texCoord[0].y = 0.0f;
+	v->texCoord[1].x = 1.0f;
+	v->texCoord[1].y = 0.0f;
+	v->color = white;
+	++v;
+
+	//
+	// Second line
+	//
+	// Vertex 2
+	v->position.x = 0.0f + vertOffset.x;
+	v->position.y = offsetY + topEdgeSize * scale.y + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 0.0f;
+	v->texCoord[0].y = topEdgeSize / srcHeight;
+	v->texCoord[1].x = 0.0f;
+	v->texCoord[1].y = topEdgeSize / srcHeight;
+	v->color = white;
+	++v;
+
+	// Vertex 3
+	v->position.x = scaledWidth + vertOffset.x;
+	v->position.y = offsetY + topEdgeSize * scale.y + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 1.0f;
+	v->texCoord[0].y = topEdgeSize / srcHeight;
+	v->texCoord[1].x = 1.0f;
+	v->texCoord[1].y = topEdgeSize / srcHeight;
+	v->color = white;
+	++v;
+
+	//
+	// Third line
+	//
+	// Vertex 4
+	v->position.x = 0.0f + vertOffset.x;
+	v->position.y = offsetY + scaledHeight - bottomEdgeSize * scale.y + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 0.0f;
+	v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
+	v->texCoord[1].x = 0.0f;
+	v->texCoord[1].y = 1.0f - topEdgeSize / srcHeight;
+	v->color = white;
+	++v;
+
+	// Vertex 5
+	v->position.x = scaledWidth + vertOffset.x;
+	v->position.y = offsetY + scaledHeight - bottomEdgeSize * scale.y + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 1.0f;
+	v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
+	v->texCoord[1].x = 1.0f;
+	v->texCoord[1].y = 1.0f - topEdgeSize / srcHeight;
+	v->color = white;
+	++v;
+
+	//
+	// Fourth line
+	// 
+	// Vertex 6
+	v->position.x = 0.0f + vertOffset.x;
+	v->position.y = scaledHeight + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 0.0f;
+	v->texCoord[0].y = 1.0f;
+	v->texCoord[1].x = 0.0f;
+	v->texCoord[1].y = 1.0f;
+	v->color = white;
+	++v;
+
+	// Vertex 7
+	v->position.x = scaledWidth + vertOffset.x;
+	v->position.y = scaledHeight + vertOffset.y;
+	v->position.z = 0.0f;
+	v->texCoord[0].x = 1.0f;
+	v->texCoord[0].y = 1.0f;
+	v->texCoord[1].x = 1.0f;
+	v->texCoord[1].y = 1.0f;
+	v->color = white;
 }

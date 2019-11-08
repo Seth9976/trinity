@@ -13,7 +13,7 @@ const Be::ClassInfo* Tr2Sprite2dStretchVertical::ExposeToBlue()
 			"topEdgeSize", 
 			m_topEdgeSize, 
 			"Number of fixed pixels on the top edge of the texture", 
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::NOTIFY
 		)
 
 		MAP_ATTRIBUTE
@@ -21,15 +21,7 @@ const Be::ClassInfo* Tr2Sprite2dStretchVertical::ExposeToBlue()
 			"bottomEdgeSize", 
 			m_bottomEdgeSize, 
 			"Number of fixed pixels on the bottom edge of the texture", 
-			Be::READWRITE | Be::PERSIST
-		)
-
-		MAP_ATTRIBUTE
-		(
-			"texturePrimary",
-			m_texture,
-			"Texture for this frame",
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::NOTIFY
 		)
 
 		MAP_ATTRIBUTE
@@ -37,8 +29,24 @@ const Be::ClassInfo* Tr2Sprite2dStretchVertical::ExposeToBlue()
 			"fillCenter",
 			m_fillCenter,
 			"If set, the center of the sprite is filled (this is the default).",
-			Be::READWRITE | Be::PERSIST
+			Be::READWRITE | Be::NOTIFY
 		)
 
-	EXPOSURE_CHAINTO( Tr2SpriteObject )
+		MAP_ATTRIBUTE
+		(
+			"saturation",
+			m_saturation,
+			"Saturation factor, used when TR2_SFX_COLOROVERLAY or TR2_SFX_SOFTLIGHT is used.",
+			Be::READWRITE | Be::NOTIFY
+		)
+
+		MAP_ATTRIBUTE
+		(
+			"effectOpacity",
+			m_effectOpacity,
+			"Effect opacity, used when TR2_SFX_COLOROVERLAY or TR2_SFX_SOFTLIGHT is used.",
+			Be::READWRITE | Be::NOTIFY
+		)
+
+	EXPOSURE_CHAINTO( Tr2TexturedSpriteObject )
 }

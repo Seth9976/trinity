@@ -17,7 +17,7 @@ BLUE_DECLARE( Tr2Sprite2dTexture );
 // center piece appropriately according to the dimensions of the sprite.
 //////////////////////////////////////////////////////////////////////////
 class Tr2Sprite2dStretchVertical:
-	public Tr2SpriteObject
+	public Tr2TexturedSpriteObject
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -30,6 +30,8 @@ public:
 	ITr2SpriteObject* PickPoint( float x, float y, Tr2Sprite2dScene* renderer );
 
 private:
+	void PrepareVertices( Tr2Sprite2dVertexBase* v, float sourceHeight, const Vector2& vertOffset, const Vector2& scale ) const;
+
 	// Resource path used to load a Tr2Sprite2dTexture stored in m_texture
 	std::string m_resPath;
 
@@ -39,6 +41,12 @@ private:
 	// Number of pixels on the bottom edge of the texture
 	unsigned int m_bottomEdgeSize;
 
+	// Saturation factor, used when TR2_SFX_COLOROVERLAY or TR2_SFX_SOFTLIGHT is used
+	float m_saturation;
+
+	// Opacity of effect - used when TR2_SFX_COLOROVERLAY or TR2_SFX_SOFTLIGHT is used
+	float m_effectOpacity;
+
 	// Offset the sprite. Positive values will make it smaller vertically,
 	// and negative bigger. The sprite is shifted horizontally by this offset.
 	int m_offset;
@@ -47,11 +55,8 @@ private:
 	// the display width of the stretch sprite.
 	bool m_fillCenter;
 
-	// The texture object, loaded from the resource pointed to with m_resPath
-	Tr2Sprite2dTexturePtr m_texture;
-
 	// The buffer of vertices used to render the sprite
-	Tr2Sprite2dD3DVertex m_vertices[8];
+	Tr2Sprite2dD3DVertex m_vertices[8 * 3];
 };
 
 TYPEDEF_BLUECLASS( Tr2Sprite2dStretchVertical );
