@@ -1314,6 +1314,9 @@
     <ClInclude Include="PostProcess\Effects\Tr2PPFadeEffect.h">
       <Filter>Source Files\PostProcess\Effects</Filter>
     </ClInclude>
+    <ClInclude Include="PostProcess\Effects\Tr2PPFidelityFXEffect.h">
+      <Filter>Source Files\PostProcess\Effects</Filter>
+    </ClInclude>
     <ClInclude Include="PostProcess\Effects\Tr2PPFilmGrainEffect.h">
       <Filter>Source Files\PostProcess\Effects</Filter>
     </ClInclude>
@@ -3493,6 +3496,12 @@
       <Filter>Source Files\PostProcess\Effects</Filter>
     </ClCompile>
     <ClCompile Include="PostProcess\Effects\Tr2PPFadeEffect_Blue.cpp">
+      <Filter>Source Files\PostProcess\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\Effects\Tr2PPFidelityFXEffect.cpp">
+      <Filter>Source Files\PostProcess\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\Effects\Tr2PPFidelityFXEffect_Blue.cpp">
       <Filter>Source Files\PostProcess\Effects</Filter>
     </ClCompile>
     <ClCompile Include="PostProcess\Effects\Tr2PPFilmGrainEffect.cpp">
