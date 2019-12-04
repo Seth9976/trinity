@@ -84,10 +84,14 @@ EveSOFDataInstancedMesh::EveSOFDataInstancedMesh( IRoot* lockobj ) :
 	m_lowestLodVisible( TR2_LOD_LOW ),
 	PARENTLOCK( m_textures ),
 	PARENTLOCK( m_instances )
+	
 {
 	m_instances.SetStructureDefinition( s_eveSOFMeshInstanceDef );
 }
-
+void EveSOFDataInstancedMesh::SetInstances( PEveSofDataMeshInstanceStructureList instances )
+{
+	m_instances = instances;
+}
 
 EveSOFDataGenericString::EveSOFDataGenericString( IRoot* lockobj )
 {}
