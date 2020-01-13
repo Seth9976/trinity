@@ -31,9 +31,7 @@ EveChildMesh::EveChildMesh( IRoot* lockobj ):
 	m_vsData.shipData.w = 1.f;
 	m_psData.shipData.y = 1.f;
 	m_psData.shipData.w = 1.f;
-	m_psData.screenSize.x = 0.5f;
-	m_psData.screenSize.y = 0.5f;
-	m_psData.screenSize.z = 0.5f;
+	m_psData.screenSize = Vector4( 0.5f, 0.5f, 0.5f, 1.f );
 }
 
 EveChildMesh::~EveChildMesh()
@@ -82,7 +80,7 @@ void EveChildMesh::UpdateVisibility( const TriFrustum& frustum, const Matrix& pa
 // Description:
 //   Only used by planets because they use a custom frustum and UpdateVisibility fails at calculating m_currentScreenSize
 // --------------------------------------------------------------------------------
-void EveChildMesh::SetCurrentScreenSize( float screenSize )
+void EveChildMesh::ForceCurrentScreenSize( float screenSize )
 {
 	m_currentScreenSize = screenSize;
 	m_isVisible = m_currentScreenSize >= m_minScreenSize * g_eveSpaceSceneLODFactor;

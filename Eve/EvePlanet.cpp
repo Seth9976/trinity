@@ -126,7 +126,8 @@ void EvePlanet::UpdatePlanetVisibility( const TriFrustum& frustum, float renderS
 
 	for ( auto it = m_effectChildren.begin(); it != m_effectChildren.end(); ++it )
 	{
-		(*it)->SetCurrentScreenSize( m_estimatedPixelDiameter );
+		// EveChildMesh::UpdateVisibility does the wrong pixel diameter estimation so we call this instead.
+		(*it)->ForceCurrentScreenSize( m_estimatedPixelDiameter );
 	}
 }
 
