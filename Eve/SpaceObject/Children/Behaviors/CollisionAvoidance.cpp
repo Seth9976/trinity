@@ -2,6 +2,7 @@
 #include "CollisionAvoidance.h"
 
 CollisionAvoidance::CollisionAvoidance( IRoot* lockobj ) :
+	PARENTLOCK( m_exclusionVolumes ),
 	m_collisionAvoidanceScalar( 10.f ),
 	m_collisionStrength( 0.f ) 
 {
@@ -11,6 +12,11 @@ CollisionAvoidance::~CollisionAvoidance()
 {
 }
 
+int CollisionAvoidance::GetProcessPriority()
+{
+	return PROCESS_FIRST;
+}
+
 std::vector<Vector3> CollisionAvoidance::CalculateBehavior( std::vector<DroneAgent>& agents, void* scratchData, const float deltaTime,
 	BehaviorGroup& group, EveChildBehaviorSystem& system, const std::vector < std::vector<DroneAgent*>>& dronesInSearchRadius)
 {
@@ -18,7 +24,7 @@ std::vector<Vector3> CollisionAvoidance::CalculateBehavior( std::vector<DroneAge
 	for( auto agent = agents.begin(); agent != agents.end(); ++agent )
 	{
 		Vector3 avoidanceForce( 0, 0, 0 );
-		for( auto exclusionVolume = group.m_exclusionVolumes.begin(); exclusionVolume != group.m_exclusionVolumes.end(); ++exclusionVolume )
+		for( auto exclusionVolume = m_exclusionVolumes.begin(); exclusionVolume != m_exclusionVolumes.end(); ++exclusionVolume )
 		{
 			float intensity = ( *exclusionVolume )->GetIntensity( agent->position );
 			Vector3 pos = ( *exclusionVolume )->GetBoundingSphere().GetXYZ();
@@ -41,7 +47,7 @@ std::vector<Vector3> CollisionAvoidance::CalculateBehavior( std::vector<DroneAge
 			Vector3 forceOffset = Normalize( avoidanceForce ) * group.GetBoundingSphereRadius();
 			forceVectors.push_back( agent->position + forceOffset );
 
-			avoidanceForce = Normalize( avoidanceForce )  * ( m_collisionStrength );
+			avoidanceForce = Normalize( avoidanceForce ) * ( m_collisionStrength );
 			agent->acceleration += avoidanceForce;
 
 			forceVectors.push_back( avoidanceForce );
@@ -52,4 +58,11 @@ std::vector<Vector3> CollisionAvoidance::CalculateBehavior( std::vector<DroneAge
 
 void CollisionAvoidance::RenderDebugInfo( ITr2DebugRenderer2& renderer, std::vector<DroneAgent>& agents, Matrix& parentWorldLocation )
 {
+	if( renderer.HasOption( this, "ExclusionVolumes" ) )
+	{
+		for( auto volume = m_exclusionVolumes.begin(); volume != m_exclusionVolumes.end(); ++volume )
+		{
+			( *volume )->RenderDebugInfo( renderer, parentWorldLocation );
+		}
+	}
 }
