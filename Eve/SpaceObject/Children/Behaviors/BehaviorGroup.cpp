@@ -276,7 +276,7 @@ void BehaviorGroup::SetCount( int count )
 		int difference = m_count - count;
 		for ( int i = 0; i < difference; i++ )
 		{
-			RemoveSpecificAgent( TriRandInt( m_count ) );
+			RemoveSpecificAgent( m_count - 1 );
 		}
 	}
 
@@ -308,7 +308,8 @@ float BehaviorGroup::AllTheSame()
 // The function without arguments to be called from the UI
 void BehaviorGroup::RemoveAgent()
 {
-	RemoveSpecificAgent( TriRandInt( m_count ) );
+	// Removes the last agent
+	RemoveSpecificAgent( m_count - 1 );
 
 	if ( m_changeBufferVertexCount )
 	{
