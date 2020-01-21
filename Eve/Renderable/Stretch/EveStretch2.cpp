@@ -160,6 +160,11 @@ void EveStretch2::DisplayEndPoints( bool displaySource, bool displayDest )
 	m_currentDestinationScale = displayDest ? m_destinationScale : 0;
 }
 
+void EveStretch2::SetDisplay( bool display )
+{
+	m_visible = display;
+}
+
 void EveStretch2::SetIntensity( float intensity )
 {
 	m_intensity = intensity;

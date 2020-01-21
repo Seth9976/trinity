@@ -59,6 +59,7 @@ public:
 	void UpdateCurves( EveUpdateContext& updateContext );
 	void Start();
 
+	virtual void SetDisplay( bool display );
 
 	virtual void SetDestObjectScale( float scale ) { m_destObjectScale = scale; };
 	virtual void StartMoving();

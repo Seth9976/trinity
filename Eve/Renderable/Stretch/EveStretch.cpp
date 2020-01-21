@@ -314,6 +314,11 @@ void EveStretch::Start()
 	}
 }
 
+void EveStretch::SetDisplay( bool display )
+{
+	m_display = display;
+}
+
 bool EveStretch::GetBoundingSphere( Vector4& sphere, BoundingSphereQuery query ) const
 {
 	bool valid = false;

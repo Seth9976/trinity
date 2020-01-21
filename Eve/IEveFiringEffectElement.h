@@ -25,6 +25,7 @@ BLUE_INTERFACE( IEveFiringEffectElement ): public IRoot
 
 	virtual void GetLights( Tr2LightManager& lightManager ) const = 0;
 	virtual void SetIntensity( float intensity ) {}
+	virtual void SetDisplay( bool display ) {}
 };
 
 BLUE_DECLARE_IVECTOR( IEveFiringEffectElement );

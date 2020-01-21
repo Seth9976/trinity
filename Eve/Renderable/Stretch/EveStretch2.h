@@ -46,6 +46,7 @@ public:
 	virtual void StartFiring( float delay );
 	virtual void StopFiring();
 
+	virtual void SetDisplay( bool display );
 	virtual void SetFiringTransform( const Matrix& source, const Vector3& dest );
 	virtual void SetFiringTransform( const Vector3& source, const Vector3& dest );
 	virtual void DisplayEndPoints( bool displaySource, bool displayDest );
