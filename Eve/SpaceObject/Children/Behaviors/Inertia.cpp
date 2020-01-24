@@ -47,7 +47,7 @@ std::vector<Vector3> Inertia::CalculateBehavior(std::vector<DroneAgent>& agents,
 			if ( m_maxRotationSpeed > 0 )
 			{
 				auto c = Normalize( Cross( lastVelocityNormalized, velocityNormalized ) );
-				if ( Length( c ) != 0 )
+				if ( LengthSq( c ) != 0 )
 				{
 					auto angle = acos( TriClamp( Dot( velocityNormalized, lastVelocityNormalized ), -1, 1 ) );
 					angle = min( abs( angle ), m_maxRotationSpeed ) * deltaTime * ( angle >= 0 ? 1 : -1 );
