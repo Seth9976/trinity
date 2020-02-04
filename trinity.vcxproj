@@ -3103,6 +3103,7 @@
     <ClInclude Include="Eve\SpaceObject\Children\EveChildEnvironment.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildExplosion.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildInheritProperties.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\EveChildLineSet.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildLink.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildMesh.h" />
     <ClInclude Include="Eve\SpaceObject\Children\EveChildParticleSphere.h" />
@@ -3814,6 +3815,8 @@
     <ClCompile Include="Eve\SpaceObject\Children\EveChildExplosion_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildInheritProperties.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildInheritProperties_Blue.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildLineSet.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\EveChildLineSet_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildLink.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildLink_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\EveChildMesh.cpp" />

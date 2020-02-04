@@ -11,7 +11,7 @@ BLUE_DECLARE( EveCurveLineSet );
 class Tr2PerObjectData;
 class Tr2PerObjectDataStandard;
 
-class EveCurveLineSet : 
+BLUE_CLASS( EveCurveLineSet ):
 	public Tr2CurveLineSet,
 	public IEveTransform,
 	public IEveSpaceObject2

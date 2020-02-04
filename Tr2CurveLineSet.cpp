@@ -31,6 +31,7 @@ Tr2CurveLineSet::Tr2CurveLineSet( IRoot* lockobj ):
 	m_vertexBufferSize( 0 ),
 	m_display( true ),
 	m_boundsDirty( false ),
+	m_boundingSphere( 0.f, 0.f, 0.f, 0.f ),
 	m_depthOffset( 0.f )
 {
 	m_lines.reserve( 100 );
@@ -639,7 +640,6 @@ void Tr2CurveLineSet::GetBatches( ITriRenderBatchAccumulator* accumulator,
 	{
 		GetBatchImpl( accumulator, perObjectData, m_pickEffect );
 	}
-
 }
 
 // --------------------------------------------------------------------------------------
