@@ -44,8 +44,6 @@ public:
 	void SetExit( bool value );
 
 private:
-	Vector3 GetRandomPosition( int rand );
-	Vector3 GetLocatorDirection( int rand );
 	void SetArrivedRadius();
 	void SetSlowDownRadius();
 

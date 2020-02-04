@@ -10,13 +10,11 @@ struct PlayFXData
 {
 	PlayFXData() :
 		effectPlayed( false ),
-		display( false ),
 		seconds( 10 )
 	{
 	}
 
 	bool effectPlayed;
-	bool display;
 	int seconds;
 };
 

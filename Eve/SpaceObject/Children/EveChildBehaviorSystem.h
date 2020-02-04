@@ -68,6 +68,8 @@ public:
 	void ChangeLOD( Tr2Lod lod );
 	void GetLights( Tr2LightManager& lightManager ) const;
 
+	Matrix GetWorldTransform();
+
 	void ChangeBufferVertexCount();
 	const std::vector<SplineTunnel>* GetTunnels() const;
 

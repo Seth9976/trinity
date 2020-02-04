@@ -23,5 +23,11 @@ const Be::ClassInfo* SeekTarget::ExposeToBlue()
 			"Assigns target.\n"
 			":param transforms: target" )
 
+		MAP_METHOD_AND_WRAP(
+			"SetExit",
+			SetExit,
+			"Set exit value.\n"
+			":param transforms: target" )
+
 		EXPOSURE_END()
 }

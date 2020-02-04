@@ -720,4 +720,10 @@ void EveChildBehaviorSystem::GetLights( Tr2LightManager& lightManager ) const
 {
 }
 
+Matrix EveChildBehaviorSystem::GetWorldTransform()
+{
+	return m_worldTransform;
+}
+
+
 

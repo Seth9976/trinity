@@ -74,16 +74,18 @@ std::vector<Vector3> PlayFX::CalculateBehavior( std::vector<DroneAgent>& agents,
 	// This behavior will be activated when the drone has arrived near the damage locator
 	for( auto agent = agents.begin(); agent != agents.end(); ++agent, ++i, ++data )
 	{
-		m_firingEffects[i]->SetFiringTransform( agent->position, agent->target );
+		// Set the agent's position to world space because if the parent object had an offset the effect would also offset
+		Matrix worldTransform = system.GetWorldTransform();
+		Vector3 agentPositionWS = XMVector3TransformCoord( agent->position, worldTransform );
+
+		m_firingEffects[i]->SetFiringTransform( agentPositionWS, agent->target );
 
 		// Drone has arrived to target so play effect
 		if( agent->playFX && !data->effectPlayed )
 		{
 			data->seconds = TriRandInt( m_low, m_high );
-			data->display = true;
-			data->effectPlayed = data->display;
+			data->effectPlayed = true;
 
-			m_firingEffects[i]->SetDisplay( data->display );
 			m_firingEffects[i]->StartFiring( m_delay );
 		}
 
@@ -95,12 +97,9 @@ std::vector<Vector3> PlayFX::CalculateBehavior( std::vector<DroneAgent>& agents,
 
 			if( diff > duration )
 			{
-				data->display = false;
-
 				m_firingEffects[i]->StopFiring();
 
-				data->effectPlayed = data->display;
-				agent->playFX = data->display;
+				data->effectPlayed = agent->playFX = false;
 				agent->target = Vector3( 0, 0, 0 );
 			}
 		}

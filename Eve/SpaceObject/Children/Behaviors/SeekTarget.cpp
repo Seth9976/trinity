@@ -73,8 +73,8 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 			m_takenLocatorIndices.push_back( rand );
 
 			data->index = rand;
-			data->position = GetRandomPosition( rand );
-			data->direction = GetLocatorDirection( rand );
+			m_target->GetDamageLocatorPosition( &data->position, rand, true );
+			m_target->GetDamageLocatorDirection( &data->direction, rand, true );
 			agent->target = data->position;
 
 			// For debugging
@@ -89,7 +89,10 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 
 		m_arrivalPoint = fakePoint;
 
-		Vector3 desiredVelocity = fakePoint - agent->position;
+		Matrix worldTransform = system.GetWorldTransform();
+		Vector3 agentPositionWS = XMVector3TransformCoord( agent->position, worldTransform );
+
+		Vector3 desiredVelocity = fakePoint - agentPositionWS;
 		float distance = Length( desiredVelocity );
 		desiredVelocity = Normalize( desiredVelocity );
 		static const Vector3 zAxis( 0.f, 0.f, 1.f );
@@ -101,7 +104,7 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 			
 			// Set the rotation of the drone
 			Quaternion newRotation;
-			auto invDir = Normalize(data->position - agent->position);
+			auto invDir = Normalize(data->position - agentPositionWS );
 			TriQuaternionRotationArc( &newRotation, &zAxis, &invDir );
 			agent->rotation = newRotation;
 			data->timePassed = 0.f;
@@ -162,29 +165,12 @@ void SeekTarget::SetExit( bool value )
 
 void SeekTarget::SetArrivedRadius()
 {
-	m_arrivedRadius = m_target->GetRadius() / 3;
+	m_arrivedRadius = m_target->GetRadius() / 4;
 }
 
 void SeekTarget::SetSlowDownRadius()
 {
 	m_slowDownRadius = m_target->GetRadius() / 2;
-}
-
-Vector3 SeekTarget::GetRandomPosition( int rand )
-{
-	Vector3 targetPositionWS;
-	// Get a damage locator in world position
-	m_target->GetDamageLocatorPosition( &targetPositionWS, rand, true );
-
-	return targetPositionWS;
-}
-
-Vector3 SeekTarget::GetLocatorDirection( int rand )
-{
-	Vector3 directionWS;
-	m_target->GetDamageLocatorDirection( &directionWS, rand, true );
-
-	return directionWS;
 }
 
 void SeekTarget::RenderDebugInfo( ITr2DebugRenderer2& renderer, std::vector<DroneAgent>& agents, Matrix& parentWorldLocation )
