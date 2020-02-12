@@ -42,6 +42,7 @@ public:
 
 private:
 	bool m_exit;
+	bool m_droneArrived;
 	float m_behaviorWeight;
 	float m_arrivedRadius;
 	float m_slowDownRadius;
@@ -55,6 +56,8 @@ private:
 	IBehavior* m_fxBehavior;
 
 	std::vector<Vector3> m_todo;
+
+	BlueScriptCallback m_onFirstDroneArrivedCallback;
 };
 
 TYPEDEF_BLUECLASS( SeekTarget );

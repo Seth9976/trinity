@@ -9,6 +9,7 @@ SeekTarget::SeekTarget( IRoot* lockobj ) :
 	m_distanceFromShip( 50.f ),
 	m_seconds( 0.25f ),
 	m_exit( false ),
+	m_droneArrived( false ),
 	m_target( nullptr ),
 	m_tunnelBehavior( nullptr ),
 	m_fxBehavior( nullptr )
@@ -89,6 +90,12 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 		if( distance < m_slowDownRadius )
 		{
 			desiredVelocity = desiredVelocity * m_behaviorWeight * ( distance / m_slowDownRadius );
+
+			if( !m_droneArrived && m_onFirstDroneArrivedCallback )
+			{
+				m_onFirstDroneArrivedCallback.CallVoid().ReportException();				
+			}
+			m_droneArrived = true;
 			
 			// Set the rotation of the drone
 			Quaternion newRotation;
