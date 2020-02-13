@@ -290,15 +290,15 @@ void EveChildLineSet::InitializeLineSet()
 		lines--;
 	}
 
-	Vector4 bv = Vector4( 1.f, 1.f, 1.f, m_brightness );
+	float b = m_brightness;
 	
 	for( int i = 0; i < lines; i++ )
 	{
 		int nextPoint = ( i + 1 ) % m_numSegments;
 		
-		int id = m_lineSet->AddStraightLine(m_managedPoints[i], m_baseColor *bv,m_managedPoints[nextPoint], m_baseColor *bv, m_lineWidth );
+		int id = m_lineSet->AddStraightLine(m_managedPoints[i], m_baseColor * b,m_managedPoints[nextPoint], m_baseColor * b, m_lineWidth );
 		
-		m_lineSet->ChangeLineAnimation( id, (Vector4) m_animColor * bv, m_scrollSpeed, m_scrollSegmenting );
+		m_lineSet->ChangeLineAnimation( id, (Vector4) m_animColor * b, m_scrollSpeed, m_scrollSegmenting );
 	}
 	
 	m_lineSet->SubmitChanges();
@@ -314,8 +314,7 @@ void EveChildLineSet::InitializeLineSetForCurves()
 
 	m_lineSet->ClearLines();
 
-	Vector4 bv = Vector4( 1.f, 1.f, 1.f, m_brightness );
-
+	float b = m_brightness;
 	
 	for( int i = 0; i < m_curveSegments; i++ )
 	{
@@ -325,16 +324,16 @@ void EveChildLineSet::InitializeLineSetForCurves()
 		
 		if (nextPoint == 0)
 		{
-			id = m_lineSet->AddStraightLine( m_managedPoints[i], m_baseColor * bv, m_point2, m_baseColor * bv, m_lineWidth );
+			id = m_lineSet->AddStraightLine( m_managedPoints[i], m_baseColor * b, m_point2, m_baseColor * b, m_lineWidth );
 		}
 		else
 		{
-			id = m_lineSet->AddStraightLine( m_managedPoints[i], m_baseColor * bv, m_managedPoints[nextPoint], m_baseColor * bv, m_lineWidth );
+			id = m_lineSet->AddStraightLine( m_managedPoints[i], m_baseColor * b, m_managedPoints[nextPoint], m_baseColor * b, m_lineWidth );
 		}
 
 		if( m_scrollSpeed != 0 )
 		{
-			m_lineSet->ChangeLineAnimation( id, (Vector4) m_animColor * bv, m_scrollSpeed, m_scrollSegmenting );
+			m_lineSet->ChangeLineAnimation( id, (Vector4) m_animColor * b, m_scrollSpeed, m_scrollSegmenting );
 		}
 	}
 
