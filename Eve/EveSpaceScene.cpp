@@ -1685,6 +1685,10 @@ void EveSpaceScene::RenderBackgroundPass( Tr2RenderContext& renderContext )
 	{
 		GPU_REGION( renderContext, "Background" );
 		RenderBackgroundPassObjects( renderContext, BACKGROUND_RENDER_COLOR );
+		if( !m_planets.empty() )
+		{
+			renderContext.Clear( CLEARFLAGS_ZBUFFER, 0, 0, 0 );
+		}
 	}
 
 	// Render background reflection cubemap
