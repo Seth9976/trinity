@@ -391,3 +391,22 @@ IRoot* Tr2BindingPoint::GetBoundObject() const
 	}
 	return m_object;
 }
+
+
+IRootPtr ResolveObjectPath( const std::string& reference, const std::map<std::string, IRoot*>& roots )
+{
+	std::unordered_map<std::string, IRoot*> unorderedRoots;
+	for( auto it = begin( roots ); it != end( roots ); ++it )
+	{
+		unorderedRoots.insert( *it );
+	}
+	return ResolveReference( reference, unorderedRoots );
+}
+
+MAP_FUNCTION_AND_WRAP( 
+	"ResolveObjectPath", 
+	ResolveObjectPath, 
+	"Resolve path to an objects (for controller actions, etc.).\n"
+	":param path: path from one of the roots to an object\n"
+	":param roots: named \"root\" objects - starting points for a path"
+);
