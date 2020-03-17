@@ -5,10 +5,11 @@
 #include "IWorldPosition.h"
 #include "Utilities/BoundingBox.h"
 
+Vector3 const EveBoxVolume::MAX_AABB = Vector3( 0.5, 0.5, 0.5 );
+Vector3 const EveBoxVolume::MIN_AABB = Vector3( -0.5, -0.5, -0.5 );
 
 EveBoxVolume::EveBoxVolume( IRoot* lockobj ) :
 	m_position( 0, 0, 0 ),
-	m_centerOffset( 0, 0, 0 ),
 	m_scaling( 0, 0, 0 ),
 	m_innerScaling( 0, 0, 0 ),
 	m_rotation( 0, 0, 0, 1 ),
@@ -16,8 +17,8 @@ EveBoxVolume::EveBoxVolume( IRoot* lockobj ) :
 	m_outerIntersection( 0, 0, 0 ),
 	m_boxTransform( IdentityMatrix() ),
 	m_innerBoxTransform( IdentityMatrix() ),
-	m_rotationMatrix( IdentityMatrix() ),
-	m_inverseRotation( IdentityMatrix() ),
+	m_inverseBoxTransform( IdentityMatrix() ),
+	m_inverseInnerBoxTransform( IdentityMatrix() ),
 	m_debugShowIntersection( false ),
 	m_notifyParent( false )
 {
@@ -35,23 +36,13 @@ bool EveBoxVolume::Initialize()
 
 void EveBoxVolume::RenderDebugInfo( ITr2DebugRenderer2& renderer, const Matrix& parentTransform )
 {
-	Vector3 min, max;
-	max = Vector3( 0.5f, 0.5f, 0.5f );
-	min = Vector3( -0.5f, -0.5f, -0.5f );
-
-	if( LengthSq( m_scaling ) != 0 )
-	{
-		renderer.DrawBox( this, m_boxTransform * parentTransform, min, max, Tr2DebugRenderer::Wireframe, 0xff555555 );
-	}
-	if( LengthSq( m_innerScaling ) != 0 )
-	{
-		renderer.DrawBox( this, m_innerBoxTransform * parentTransform, min, max, Tr2DebugRenderer::Wireframe, 0xff777777 );
-	}
+	renderer.DrawBox( this, m_boxTransform * parentTransform, MIN_AABB, MAX_AABB, Tr2DebugRenderer::Wireframe, 0xff555555 );
+	renderer.DrawBox( this, m_innerBoxTransform * parentTransform, MIN_AABB, MAX_AABB, Tr2DebugRenderer::Wireframe, 0xff777777 );
 
 	if( m_debugShowIntersection )
 	{
-		renderer.DrawSphere( this, m_rotationMatrix * parentTransform, m_innerIntersection, 1, 16, Tr2DebugRenderer::Solid, 0xffff0000 );
-		renderer.DrawSphere( this, m_rotationMatrix * parentTransform, m_outerIntersection, 1, 16, Tr2DebugRenderer::Solid, 0xffffff00 );
+		renderer.DrawSphere( this, parentTransform, TransformCoord( m_innerIntersection, m_boxTransform ), 1, 16, Tr2DebugRenderer::Solid, 0xffff0000 );
+		renderer.DrawSphere( this, parentTransform, TransformCoord( m_outerIntersection, m_boxTransform ), 1, 16, Tr2DebugRenderer::Solid, 0xffffff00 );
 	}
 }
 
@@ -63,34 +54,30 @@ Vector4 EveBoxVolume::GetBoundingSphere() const
 
 float EveBoxVolume::GetIntensity( Vector3 position )
 {
-
-	Vector3 axisAlignedPosition = TransformCoord( position, m_inverseRotation );
-	Vector3 rotatedOffset = TransformCoord( m_centerOffset, m_inverseRotation );
-
-	Vector3 outerMin = m_position - m_scaling * 0.5;
-	Vector3 outerMax = m_position + m_scaling * 0.5;
-
-	Vector3 innerMin = m_position + rotatedOffset - m_innerScaling * 0.5;
-	Vector3 innerMax = m_position + rotatedOffset + m_innerScaling * 0.5;
-
+	Vector3 axisAlignedPosition = TransformCoord( position, m_inverseBoxTransform );
 
 	// Are we outside the outer box?
-	if( !BoundingBoxIsInside( outerMin, outerMax, axisAlignedPosition ) )
+	if( !BoundingBoxIsInside( MIN_AABB, MAX_AABB, axisAlignedPosition ) )
 	{
 		return 0.0f;
 	}
 
+	Vector3 axisAlignedInnerPosition = TransformCoord( position, m_inverseInnerBoxTransform );
+
 	// Are we inside the inner box?
-	if( BoundingBoxIsInside( innerMin, innerMax, axisAlignedPosition ) )
+	if( BoundingBoxIsInside( MIN_AABB, MAX_AABB, axisAlignedInnerPosition ) )
 	{
 		return 1.0f;
 	}
-	
-	Vector3 rayDir = Normalize( m_position + rotatedOffset - axisAlignedPosition );
+	 
+	Vector3 rayDir = Normalize( -axisAlignedPosition );
 
 	// we are somewhere in between 
-	IntersectAxisAlignedBoxRay( outerMin, outerMax, axisAlignedPosition, rayDir, m_outerIntersection );
-	IntersectAxisAlignedBoxRay( innerMin, innerMax, axisAlignedPosition, rayDir, m_innerIntersection );
+	IntersectAxisAlignedBoxRay( MIN_AABB, MAX_AABB, axisAlignedPosition, rayDir, m_outerIntersection );
+	IntersectAxisAlignedBoxRay( MIN_AABB, MAX_AABB, axisAlignedInnerPosition, rayDir, m_innerIntersection );
+
+	// move the inner intersection to the outer box space
+	m_innerIntersection = TransformCoord( m_innerIntersection, m_innerBoxTransform * m_inverseBoxTransform );
 
 	return LengthSq( axisAlignedPosition - m_outerIntersection ) / LengthSq( m_innerIntersection - m_outerIntersection );
 }
@@ -108,10 +95,10 @@ void EveBoxVolume::Setup()
 	m_innerScaling = XMVectorMin( XMVectorMax(m_innerScaling, Vector3( 0, 0, 0 ) ), m_scaling );
 
 	m_boxTransform = TransformationMatrix( m_scaling, m_rotation, m_position );
-	m_innerBoxTransform = TransformationMatrix( m_innerScaling, m_rotation, m_position + m_centerOffset );
+	m_innerBoxTransform = TransformationMatrix( m_innerScaling, m_rotation, m_position );
 
-	m_rotationMatrix = RotationMatrix( m_rotation );
-	m_inverseRotation = Inverse( m_rotationMatrix );
+	m_inverseBoxTransform = Inverse( m_boxTransform );
+	m_inverseInnerBoxTransform = Inverse( m_innerBoxTransform );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -124,7 +111,7 @@ bool EveBoxVolume::OnModified( Be::Var* val )
 
 		m_notifyParentFunc();
 	}
-	if( IsMatch( val, m_rotation ) || IsMatch( val, m_innerScaling ) || IsMatch( val, m_centerOffset ) )
+	if( IsMatch( val, m_rotation ) || IsMatch( val, m_innerScaling ) )
 	{
 		Setup();
 	}
