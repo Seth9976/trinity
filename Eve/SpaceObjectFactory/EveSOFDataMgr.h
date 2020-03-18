@@ -122,6 +122,7 @@ public:
 		Color color;
 		Vector4 layer1Transform, layer2Transform, layer1Scroll, layer2Scroll;
 		int boneIndex, groupIndex, maskMapAtlasIndex;
+		Vector4 blinkData;
 	};
 
 	struct HullPlaneSetData

@@ -400,6 +400,7 @@ public:
 	Color m_color;
 	Vector4 m_layer1Transform, m_layer2Transform, m_layer1Scroll, m_layer2Scroll;
 	int m_boneIndex, m_groupIndex, m_maskMapAtlasIndex;
+	Vector4 m_blinkData;
 };
 TYPEDEF_BLUECLASS( EveSOFDataHullPlaneSetItem );
 BLUE_DECLARE_VECTOR( EveSOFDataHullPlaneSetItem );

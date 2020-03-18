@@ -583,6 +583,7 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 			pssid.color = planeSetItemData->m_color;
 			pssid.groupIndex = planeSetItemData->m_groupIndex;
 			pssid.maskMapAtlasIndex = planeSetItemData->m_maskMapAtlasIndex;
+			pssid.blinkData = planeSetItemData->m_blinkData;
 			hpsd.items.push_back( pssid );
 		}
 		hd.planeSets.push_back( hpsd );

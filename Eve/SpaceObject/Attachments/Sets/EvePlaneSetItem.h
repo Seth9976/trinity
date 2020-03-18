@@ -22,13 +22,14 @@ BLUE_DECLARE_VECTOR( EvePlaneSetItem );
 // --------------------------------------------------------------------------------
 BLUE_CLASS( EvePlaneSetItem ) :
 	public IRoot
+	
 {
 public:
 	EXPOSE_TO_BLUE();
 
 	EvePlaneSetItem( IRoot* lockobj = NULL );
 	~EvePlaneSetItem();
-
+	
 	// name
 	BlueSharedString m_name;
 	// positional attributes
@@ -46,6 +47,9 @@ public:
 	int m_boneIndex;
 	// supports atlasing
 	uint32_t m_maskAtlasID;
+	Vector4 m_blinkData;
+
+	
 };
 
 TYPEDEF_BLUECLASS( EvePlaneSetItem );

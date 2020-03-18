@@ -34,6 +34,7 @@ struct PlaneVertex
 	uint8_t boneIndex;
 	uint8_t maskMapAtlasIndex;
 	uint8_t pickBufferID;
+	Vector4 blinkData;
 };
 
 
@@ -159,6 +160,7 @@ bool EvePlaneSet::OnPrepareResources()
 		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 5 );
 		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 6 );
 		vd.Add( vd.UBYTE_4, vd.TEXCOORD, 7 );
+		vd.Add( vd.FLOAT32_4, vd.TEXCOORD, 8 );
 	}
 	m_vertexDeclHandle = Tr2EffectStateManager::GetVertexDeclarationHandle( s_spriteVertexDecl );
 	if( m_vertexDeclHandle == Tr2EffectStateManager::UNINITIALIZED_DECLARATION )
@@ -192,6 +194,7 @@ bool EvePlaneSet::OnPrepareResources()
 			vertex.boneIndex = m_planes[i]->m_boneIndex;
 			vertex.maskMapAtlasIndex = m_planes[i]->m_maskAtlasID;
 			vertex.pickBufferID = m_pickBufferID;
+			vertex.blinkData = m_planes[i]->m_blinkData;
 		}
 		// We cache this for updating view distance info
 		m_cachedTransforms.push_back( itemTransform );

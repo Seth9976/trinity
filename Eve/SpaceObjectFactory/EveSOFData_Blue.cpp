@@ -270,6 +270,7 @@ const Be::ClassInfo* EveSOFDataHullPlaneSetItem::ExposeToBlue()
 		MAP_ATTRIBUTE( "boneIndex", m_boneIndex, ":jessica-widget: boneindex", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "groupIndex", m_groupIndex, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "maskMapAtlasIndex", m_maskMapAtlasIndex, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "blinkData", m_blinkData, "rate (Hz), phase (0.-1.), duty cycle (0.-1), mode-> [0:blink - 1:fadeIn - 2:fadeOut - 3:Cycle]", Be::READWRITE | Be::PERSIST )
 	EXPOSURE_END()
 }
 

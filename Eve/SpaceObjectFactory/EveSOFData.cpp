@@ -419,7 +419,8 @@ EveSOFDataHullPlaneSetItem::EveSOFDataHullPlaneSetItem( IRoot* lockobj ) :
 	m_layer2Scroll( 0.f, 0.f, 0.f, 0.f ),
 	m_boneIndex( -1 ),
 	m_groupIndex( -1 ),
-	m_maskMapAtlasIndex( 0 )
+	m_maskMapAtlasIndex( 0 ),
+	m_blinkData( 1.f, 0.f, 1.f, 0.f )
 {
 }
 

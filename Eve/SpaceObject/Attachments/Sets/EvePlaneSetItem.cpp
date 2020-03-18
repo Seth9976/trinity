@@ -20,7 +20,8 @@ EvePlaneSetItem::EvePlaneSetItem( IRoot* lockobj ) :
 	m_layer1Scroll( 0.f, 0.f, 0.f, 0.f ),
 	m_layer2Scroll( 0.f, 0.f, 0.f, 0.f ),
 	m_boneIndex( 0 ),
-	m_maskAtlasID( 0 )
+	m_maskAtlasID( 0 ),
+	m_blinkData( 1.f, 0.f, 1.f, 0.f )
 {
 }
 
@@ -31,4 +32,3 @@ EvePlaneSetItem::EvePlaneSetItem( IRoot* lockobj ) :
 EvePlaneSetItem::~EvePlaneSetItem()
 {
 }
-
