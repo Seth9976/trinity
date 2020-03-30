@@ -19,6 +19,8 @@ const Be::ClassInfo* EveStretch3::ExposeToBlue()
 		MAP_INTERFACE( IInitialize )
 		MAP_INTERFACE( IEveSpaceObject2 )
 		MAP_INTERFACE( IEveFiringEffectElement )
+		MAP_INTERFACE( ITr2ControllerOwner )
+		MAP_INTERFACE( ITr2CurveSetOwner )
 
 		MAP_ATTRIBUTE
 		(
@@ -85,6 +87,14 @@ const Be::ClassInfo* EveStretch3::ExposeToBlue()
 			"",
 			Be::READWRITE
 		)
+
+		MAP_ATTRIBUTE
+		(
+			"destSpaceObject",
+			m_destSpaceObject,
+			"",
+			Be::READWRITE
+		)		
 
 		MAP_ATTRIBUTE
 		( 

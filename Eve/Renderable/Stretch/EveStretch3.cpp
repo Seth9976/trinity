@@ -180,7 +180,7 @@ void EveStretch3::UpdateSyncronous( EveUpdateContext& updateContext )
 	m_length->m_value = Length( directionVec );
 
 	EveChildUpdateParams params;
-	params.spaceObjectParent = m_sourceSpaceObject == nullptr ? m_sourceSpaceObject : this;
+	params.spaceObjectParent = m_sourceSpaceObject == nullptr ? this : m_sourceSpaceObject;
 	params.childParent = nullptr;
 	params.boneCount = 0;
 	params.bones = nullptr;
@@ -209,6 +209,7 @@ void EveStretch3::UpdateSyncronous( EveUpdateContext& updateContext )
 	if( m_destObject )
 	{
 		params.localToWorldTransform = TranslationMatrix( m_destinationPosition );
+		params.spaceObjectParent = m_destSpaceObject == nullptr ? this : m_destSpaceObject;
 		m_destObject->UpdateSyncronous( updateContext, params );
 	}
 }
@@ -444,6 +445,8 @@ void EveStretch3::GetBindingRoots( std::unordered_map<std::string, IRoot*>& vari
 	variables["Dest"] = m_destObject;
 	variables["Stretch"] = m_stretchObject;
 	variables["Move"] = m_moveObject;
+	variables["SourceSpaceObject"] = m_sourceSpaceObject;
+	variables["DestSpaceObject"] = m_destSpaceObject;
 }
 
 

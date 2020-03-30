@@ -120,6 +120,7 @@ private:
 	EveChildModifierStretchPtr m_stretchModifier;
 
 	IEveSpaceObject2Ptr m_sourceSpaceObject;
+	IEveSpaceObject2Ptr m_destSpaceObject;
 	
 	IEveSpaceObjectChildPtr m_sourceObject;
 	IEveSpaceObjectChildPtr m_destObject;
