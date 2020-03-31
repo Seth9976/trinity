@@ -12,6 +12,7 @@
 #include "Include/TriMath.h"
 #include "Utilities/BoundingSphere.h"
 #include "Curves/TriCurveSet.h"
+#include "Tr2DynamicBinding.h"
 
 #include "Lights/Tr2PointLight.h"
 #include "Controllers/ITr2Controller.h"
@@ -21,6 +22,7 @@
 EveStretch3::EveStretch3( IRoot* lockobj ) :
 	PARENTLOCK( m_curveSets ),
 	PARENTLOCK( m_controllers ),
+	PARENTLOCK( m_dynamicBindings ),
 	m_display( true ),
 	m_update( true ),
 	m_sourcePosition( 0.0f, 0.0f, 0.0f ),
@@ -32,6 +34,7 @@ EveStretch3::EveStretch3( IRoot* lockobj ) :
 	m_moveProgression.CreateInstance();
 
 	m_controllers.SetNotify( this );
+	m_dynamicBindings.SetNotify( this );
 }
 
 bool EveStretch3::Initialize()
@@ -48,6 +51,12 @@ bool EveStretch3::Initialize()
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
 	{
 		( *it )->Link( *GetRawRoot() );
+	}
+	
+	for( auto binding = m_dynamicBindings.begin(); binding != m_dynamicBindings.end(); ++binding )
+	{
+		( *binding )->SetOwner( this );
+		( *binding )->Link();
 	}
 
 	return true;
@@ -101,6 +110,46 @@ float EveStretch3::RunOnComponentsGetMax( std::function<float( IEveSpaceObjectCh
 	return ret;
 }
 
+std::unordered_map<std::string, IRoot*> EveStretch3::GetParameterMap() const
+{
+	std::unordered_map<std::string, IRoot*> parameterMap;
+	
+	for( auto curveset = m_curveSets.begin(); curveset != m_curveSets.end(); ++curveset )
+	{
+		auto c = ( *curveset );
+		parameterMap[c->GetName().c_str()] = c->GetRawRoot();
+	}
+
+	parameterMap["Owner"] = this->GetRawRoot();
+	if( m_sourceSpaceObject ) 
+	{
+		parameterMap["SourceSpaceObject"] = m_sourceSpaceObject->GetRootObject();
+	}
+	if( m_destSpaceObject )
+	{
+		parameterMap["DestSpaceObject"] = m_destSpaceObject->GetRootObject();
+	}
+
+	if( m_sourceObject )
+	{
+		parameterMap["SourceObject"] = m_sourceObject->GetRootObject();
+	}
+	if( m_destObject )
+	{
+		parameterMap["DestObject"] = m_destObject->GetRootObject();
+	}
+	if( m_moveObject )
+	{
+		parameterMap["MoveObject"] = m_moveObject->GetRootObject();
+	}
+	if( m_stretchObject )
+	{
+		parameterMap["StretchObject"] = m_stretchObject->GetRootObject();
+	}
+
+	return parameterMap;
+}
+
 bool EveStretch3::OnModified( Be::Var* value )
 {
 	if( IsMatch( value, m_stretchObject ) )
@@ -147,6 +196,27 @@ void EveStretch3::OnListModified( long event, ssize_t key, ssize_t key2, IRoot* 
 			break;
 		}
 	}
+	if( list == &m_dynamicBindings && ( event & BELIST_LOADING ) == 0 )
+	{
+		switch( event & BELIST_EVENTMASK )
+		{
+		case BELIST_INSERTED:
+			if( Tr2DynamicBindingPtr dynamicBinding = BlueCastPtr( value ) )
+			{
+				dynamicBinding->SetOwner( this );
+				dynamicBinding->Link();
+			}
+			break;
+		case BELIST_REMOVED:
+			if( Tr2DynamicBindingPtr dynamicBinding = BlueCastPtr( value ) )
+			{
+				dynamicBinding->SetOwner( nullptr );
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 
@@ -158,14 +228,19 @@ void EveStretch3::UpdateSyncronous( EveUpdateContext& updateContext )
 	{
 		return;
 	}
+	
+	Be::Time time = updateContext.GetTime();
+
+	for( auto binding = m_dynamicBindings.begin(); binding != m_dynamicBindings.end(); ++binding )
+	{
+		( *binding )->Update( time );
+	}
 
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
 	{
 		( *it )->Update();
 	}
 	
-	Be::Time time = updateContext.GetTime();
-
 	if( m_source )
 	{
 		m_source->Update( &m_sourcePosition, time );

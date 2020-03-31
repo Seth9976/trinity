@@ -21,6 +21,7 @@ const Be::ClassInfo* EveStretch3::ExposeToBlue()
 		MAP_INTERFACE( IEveFiringEffectElement )
 		MAP_INTERFACE( ITr2ControllerOwner )
 		MAP_INTERFACE( ITr2CurveSetOwner )
+		MAP_INTERFACE( ITr2DynamicBindingOwner )
 
 		MAP_ATTRIBUTE
 		(
@@ -158,6 +159,14 @@ const Be::ClassInfo* EveStretch3::ExposeToBlue()
 			"curveSets", 
 			m_curveSets, 
 			"Curvesets for animating things", 
+			Be::READ | Be::PERSIST
+		)
+		
+		MAP_ATTRIBUTE
+		(
+			"dynamicBindings",
+			m_dynamicBindings,
+			"Dynamic bindings",
 			Be::READ | Be::PERSIST
 		)
 

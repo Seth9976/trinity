@@ -9,6 +9,7 @@
 #include "Eve/IEveSpaceObject2.h"
 #include "Tr2DebugRenderer.h"
 #include "ITr2CurveSetOwner.h"
+#include "ITr2DynamicBindingOwner.h"
 #include "Controllers/ITr2ControllerOwner.h"
 
 BLUE_DECLARE( EveStretch3 );
@@ -17,16 +18,20 @@ BLUE_DECLARE( EveChildModifierStretch );
 
 BLUE_DECLARE_INTERFACE( IEveSpaceObjectChild );
 BLUE_DECLARE_INTERFACE( ITr2Controller );
+
 BLUE_DECLARE_INTERFACE( ITriVectorFunction );
 
 BLUE_DECLARE_IVECTOR( ITr2Controller );
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE_VECTOR( TriCurveSet );
+BLUE_DECLARE( Tr2DynamicBinding );
+BLUE_DECLARE_VECTOR( Tr2DynamicBinding );
 
 
 BLUE_CLASS( EveStretch3 ):
 	public IEveFiringEffectElement,
 	public ITr2DebugRenderable,
+	public ITr2DynamicBindingOwner,
 	public IEveSpaceObject2,
 	public ITr2ControllerOwner,
 	public INotify,
@@ -100,6 +105,10 @@ public:
 	void Update( EveUpdateContext& updateContext ) override;
 	void SetDisplay( bool display ) override;
 
+	//////////////////////////////////////////////////////////////////////////
+	// ITr2DynamicBindingOwner
+	std::unordered_map<std::string, IRoot*> GetParameterMap() const override;
+
 private:
 	void RunOnComponents( std::function<void( IEveSpaceObjectChild* )> func ) const;
 	float RunOnComponentsGetMax( std::function<float( IEveSpaceObjectChild* )> func ) const;
@@ -130,6 +139,7 @@ private:
 	
 	Be::Time m_startTime;
 	PITr2ControllerVector m_controllers;
+	PTr2DynamicBindingVector m_dynamicBindings;
 
 	// These can't be stored directly here as we must allow
 	// value bindings to the length and move progression
