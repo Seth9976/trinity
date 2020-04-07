@@ -118,6 +118,9 @@
     <Filter Include="Source Files\Wod">
       <UniqueIdentifier>{9b7dbf25-c064-5688-a6a7-29080b2817ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{22f13a40-ad60-43f6-b9cc-abde3c7cf0f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ALResultBlue.h">
@@ -4395,5 +4398,22 @@
     <ResourceCompile Include="Trinity.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+    <ClInclude Include="Audio\ITr2AudEmitter.h">
+      <Filter>Source Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\ITr2Audio.h">
+      <Filter>Source Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\Tr2AudioStretch.h">
+      <Filter>Source Files\Audio</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Audio\Tr2AudioStretch.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\Tr2AudioStretch_Blue.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

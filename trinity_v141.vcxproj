@@ -2851,6 +2851,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ALResultBlue.h" />
+    <ClInclude Include="Audio\ITr2AudEmitter.h" />
+    <ClInclude Include="Audio\ITr2Audio.h" />
+    <ClInclude Include="Audio\Tr2AudioStretch.h" />
     <ClInclude Include="autoversion.h" />
     <ClInclude Include="EveSprite2dBracket.h" />
     <ClInclude Include="EveSprite2dBracketRenderer.h" />
@@ -3411,6 +3414,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ALResultBlue.cpp" />
+    <ClCompile Include="Audio\Tr2AudioStretch.cpp" />
+    <ClCompile Include="Audio\Tr2AudioStretch_Blue.cpp" />
     <ClCompile Include="EveSprite2dBracket.cpp" />
     <ClCompile Include="EveSprite2dBracketRenderer.cpp" />
     <ClCompile Include="EveSprite2dBracketRenderer_Blue.cpp" />

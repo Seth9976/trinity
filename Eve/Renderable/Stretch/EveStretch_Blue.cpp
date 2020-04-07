@@ -11,6 +11,7 @@ const Be::ClassInfo* EveStretch::ExposeToBlue()
 		MAP_INTERFACE( IEveTransform )
 		MAP_INTERFACE( IEveSpaceObject2 )
 		MAP_INTERFACE( IEveFiringEffectElement )
+		MAP_INTERFACE( ITr2DebugRenderable )
 
 		MAP_ATTRIBUTE
 		(
@@ -46,38 +47,38 @@ const Be::ClassInfo* EveStretch::ExposeToBlue()
 		)
 
 		MAP_ATTRIBUTE
-		( 
-			"source",        
+		(
+			"source",
 			m_source,
-			"", 
+			"",
 			Be::READWRITE | Be::PERSIST
-		)		
+		)
 		MAP_ATTRIBUTE
-		( 
-			"dest",        
+		(
+			"dest",
 			m_dest,
-			"", 
+			"",
 			Be::READWRITE | Be::PERSIST
 		)
 		MAP_ATTRIBUTE
-		( 
-			"sourceObject",        
+		(
+			"sourceObject",
 			m_sourceObject,
-			"Object to be rendered at the source", 
+			"Object to be rendered at the source",
 			Be::READWRITE | Be::PERSIST
 		)
 		MAP_ATTRIBUTE
-		( 
-			"destObject",        
+		(
+			"destObject",
 			m_destObject,
-			"Object to be rendered at the destination", 
+			"Object to be rendered at the destination",
 			Be::READWRITE | Be::PERSIST
 		)
 		MAP_ATTRIBUTE
-		( 
-			"stretchObject",        
+		(
+			"stretchObject",
 			m_stretchObject,
-			"Object to be stretched from source to destination", 
+			"Object to be stretched from source to destination",
 			Be::READWRITE | Be::PERSIST
 		)
 
@@ -145,10 +146,10 @@ const Be::ClassInfo* EveStretch::ExposeToBlue()
 		)
 
 		MAP_ATTRIBUTE
-		( 
-			"curveSets", 
-			m_curveSets, 
-			"Curvesets for animating things", 
+		(
+			"curveSets",
+			m_curveSets,
+			"Curvesets for animating things",
 			Be::READ | Be::PERSIST
 		)
 		MAP_ATTRIBUTE
@@ -166,10 +167,17 @@ const Be::ClassInfo* EveStretch::ExposeToBlue()
 			Be::READ
 		)
 		MAP_ATTRIBUTE
-		( 
-			"useCurveLod", 
-			m_useCurveLod, 
-			"Should curves be LOD'd", 
+		(
+			"useCurveLod",
+			m_useCurveLod,
+			"Should curves be LOD'd",
+			Be::READWRITE | Be::PERSIST
+		)
+		MAP_ATTRIBUTE
+		(
+			"audio",
+			m_audio,
+			"The type of audio to be used for this asset",
 			Be::READWRITE | Be::PERSIST
 		)
 

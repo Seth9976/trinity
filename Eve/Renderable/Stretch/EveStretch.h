@@ -7,6 +7,8 @@
 #include "Eve/EveTransform.h"
 #include "Curves/TriCurveSet.h"
 #include "Eve/IEveFiringEffectElement.h"
+#include "Audio/ITr2Audio.h"
+#include "Tr2DebugRenderer.h"
 
 BLUE_DECLARE( EveStretch );
 BLUE_DECLARE( TriFloat );
@@ -14,7 +16,8 @@ BLUE_DECLARE( TriFloat );
 class EveStretch:
 	public IEveFiringEffectElement,
 	public IEveTransform,
-	public IEveSpaceObject2
+	public IEveSpaceObject2,
+	public ITr2DebugRenderable
 {
 public:
     EXPOSE_TO_BLUE();
@@ -72,6 +75,10 @@ public:
 	virtual void DisplayEndPoints( bool displaySource, bool displayDest );
 
 	void SetSourceObjectScale( float scale ) { m_sourceObjectScale = scale; };
+
+	// debug
+	void GetDebugOptions( Tr2DebugRendererOptions& options );
+	void RenderDebugInfo( ITr2DebugRenderer2& renderer );
 private:
 	Tr2Lod m_lodLevel;
 	Be::Time m_lastCurveUpdateTime;
@@ -124,6 +131,8 @@ private:
 	// This can't be stored directly here as we must allow
 	// value bindings to the length.
 	TriFloatPtr m_length;
+
+	ITr2AudioPtr m_audio;
 };
 
 TYPEDEF_BLUECLASS( EveStretch );

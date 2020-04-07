@@ -7,6 +7,7 @@
 #include "Eve/Turret/EveTurretSet.h"
 #include "Curves/Tr2CurveScalar.h"
 #include "Lights/Tr2PointLight.h"
+#include "Audio/Tr2AudioStretch.h"
 
 static const Vector3 Y_AXIS(0.0f, 1.0f, 0.0f);
 
@@ -78,7 +79,7 @@ void EveStretch::UpdateAsyncronous( EveUpdateContext& updateContext )
 	{
 		m_sourceObject->Update( updateContext );
 	}
-	
+
 	if( m_stretchObject )
 	{
 		m_stretchObject->Update( updateContext );
@@ -88,10 +89,15 @@ void EveStretch::UpdateAsyncronous( EveUpdateContext& updateContext )
 	{
 		m_moveObject->Update( updateContext );
 	}
-	
+
 	if( m_destObject && m_displayDestObject )
 	{
 		m_destObject->Update( updateContext );
+	}
+
+	if (auto tmp = dynamic_cast< Tr2AudioStretch* > ( m_audio.p ))
+	{
+		tmp->Update( m_sourcePosition, m_destinationPosition );
 	}
 }
 
@@ -115,7 +121,7 @@ void EveStretch::UpdateCurves( EveUpdateContext& updateContext )
 	}
 
 	float delta = (float)TimeAsDouble( time - m_lastCurveUpdateTime );
-	
+
 	if( !m_useCurveLod || EveLODHelper::ShouldUpdate( m_lodLevel, delta ) )
 	{
 		m_lastCurveUpdateTime = time;
@@ -129,7 +135,7 @@ void EveStretch::UpdateCurves( EveUpdateContext& updateContext )
 		{
 			m_moveCompletion->Update( TimeAsDouble( time ) );
 		}
-	
+
 		for( TriCurveSetVector::const_iterator it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
 		{
 			(*it)->Update( TimeAsDouble( time ) );
@@ -172,7 +178,7 @@ void EveStretch::UpdateVisibility( const TriFrustum& frustum, const Matrix& pare
 		// The object's LOD is the highest of it's move, stretch, dest and source object's LODs
 		m_lodLevel = EveLODHelper::MergeLOD( m_lodLevel, m_sourceObject->GetLODLevel() );
 	}
-	
+
 	if( m_destObject && m_displayDestObject )
 	{
 		Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -186,7 +192,7 @@ void EveStretch::UpdateVisibility( const TriFrustum& frustum, const Matrix& pare
 		// The object's LOD is a combination of it's move, stretch, dest and source object's LODs
 		m_lodLevel = EveLODHelper::MergeLOD( m_lodLevel, m_destObject->GetLODLevel() );
 	}
-	
+
 	if( m_stretchObject )
 	{
 		if( m_useTransformsForStretch )
@@ -230,11 +236,11 @@ void EveStretch::UpdateVisibility( const TriFrustum& frustum, const Matrix& pare
 
 		Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
 		TriQuaternionArcFromForward( &rotation, &directionVec );
-		
+
 		Vector3 movedPostition = m_sourcePosition;
 		// Calculate the current position of the move object
 		if( m_progressCurve && m_moveObject )
-		{ 
+		{
 			float progress = 0;
 			if( auto curve = dynamic_cast<Tr2CurveScalar*>( m_progressCurve.p ) )
 			{
@@ -297,13 +303,19 @@ void EveStretch::StartMoving()
 	m_startTime = -1;
 	m_moving = true;
 	m_moveCompleted = false;
-	
+
 	if( m_moveObject )
 	{
 		m_moveObject->SetDisplay( true );
 	}
+
+	if ( auto tmp = dynamic_cast< Tr2AudioStretch* > ( m_audio.p ) )
+	{
+		tmp->TriggerStretchEvent();
+	}
 }
 
+// For future developers, this is the method that is used in client, not StartFiring
 void EveStretch::Start()
 {
 	StartMoving();
@@ -311,6 +323,12 @@ void EveStretch::Start()
 	if ( !m_curveSets.empty() )
 	{
 		m_curveSets.front()->Play();
+
+		if ( auto tmp = dynamic_cast< Tr2AudioStretch* > ( m_audio.p ) )
+		{
+			tmp->TriggerOutburstEvent();
+			tmp->TriggerImpactEvent();
+		}
 	}
 }
 
@@ -408,6 +426,7 @@ void EveStretch::StartFiring( float delay )
 			{
 				curveSet->PlayFrom( -delay );
 				StartMoving();
+
 			}
 			else if( curveSet->GetName() == "play_loop" )
 			{
@@ -515,5 +534,21 @@ void EveStretch::GetLights( Tr2LightManager& lightManager ) const
 		{
 			( *it )->AddLight( lightManager, m, m_destObjectScale );
 		}
+	}
+}
+
+void EveStretch::GetDebugOptions( Tr2DebugRendererOptions& options )
+{
+	if (auto tmp = dynamic_cast< Tr2AudioStretch* > ( m_audio.p ))
+	{
+		tmp->GetDebugOptions( options );
+	}
+}
+
+void EveStretch::RenderDebugInfo( ITr2DebugRenderer2& renderer )
+{
+	if (auto tmp = dynamic_cast< Tr2AudioStretch* > ( m_audio.p ))
+	{
+		tmp->RenderDebugInfo( renderer );
 	}
 }
