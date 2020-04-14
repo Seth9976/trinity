@@ -34,6 +34,7 @@ public:
 	void AddQuadsToQuadRenderer(const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer) const override;
 	void GetRenderables(std::vector<ITr2Renderable*>& renderables) override;
 	void UpdateAsyncronous(EveUpdateContext& updateContext, const EveChildUpdateParams& params) override;
+	void GetLights(Tr2LightManager& lightManager) const override;
 	void UpdateSyncronous( EveUpdateContext& updateContext, const EveChildUpdateParams& params );
 	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
 	
@@ -64,7 +65,7 @@ private:
 		}
 	};
 	
-	void ProcessLocators();
+	void ProcessLocators( IEveSpaceObject2* parent );
 	void DistanceSortLocators();
 	void ManageTriggers();
 
@@ -79,6 +80,7 @@ private:
 	
 	Vector3 m_triggerSphereOffset;
 	Tr2CurveScalarPtr m_triggerSphereRadiusCurve;
+	float m_triggerSphereScalarMulti;
 
 	EveLocatorSetsPtr m_localLocators;
 
@@ -104,6 +106,7 @@ private:
 	
 	// Is the effect playing
 	bool m_isPlaying;
+	bool m_trigger;
 };
 
 TYPEDEF_BLUECLASS( EveChildEffectPropagator );

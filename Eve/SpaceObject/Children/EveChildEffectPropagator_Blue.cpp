@@ -38,7 +38,7 @@ const Be::ClassInfo* EveChildEffectPropagator::ExposeToBlue()
 			"localLocators",
 			m_localLocators,
 			"locators for a self-contained propagation",
-			Be::READWRITE | Be::PERSIST | Be::NOTIFY )
+			Be::READWRITE | Be::PERSIST )
 		
 
 		MAP_ATTRIBUTE_WITH_CHOOSER( "propagationType", m_type, "", Be::READWRITE | Be::PERSIST | Be::ENUM | Be::NOTIFY, PropagationChooser )
@@ -59,7 +59,8 @@ const Be::ClassInfo* EveChildEffectPropagator::ExposeToBlue()
 		MAP_ATTRIBUTE( "rotation", m_rotation, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "scaling", m_scaling, "", Be::READWRITE | Be::PERSIST )
 	
-		MAP_METHOD_AND_WRAP( "RebuildLocalTransform", RebuildLocalTransform, "Rebuilds local transform." )
+		MAP_ATTRIBUTE( "trigger", m_trigger, "reset and start", Be::READWRITE )
+		MAP_ATTRIBUTE( "triggerSphereScalarMulti", m_triggerSphereScalarMulti, "multiplied by the scalar curve\n:jessica-group: ExternalLocatorSet", Be::READ )
 		
 		MAP_ATTRIBUTE( "completeness", m_completeness, "range: [0:1] ~to use if you don't want 100% of a Locset. Doesn't work for randomSpread\n:jessica-group: SpawnSettings", Be::READWRITE | Be::PERSIST |Be::NOTIFY )
 		MAP_ATTRIBUTE( "triggerSphereOffset", m_triggerSphereOffset, "Centerpoint of the trigger sphere\n:jessica-group: SpawnSettings", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
@@ -78,6 +79,10 @@ const Be::ClassInfo* EveChildEffectPropagator::ExposeToBlue()
 		
 		MAP_ATTRIBUTE( "refObject", m_refObject, "target obj that has the locator set\n:jessica-group: ExternalLocatorSet", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "locatorSetName", m_locatorSetName, "name of the locator set\n:jessica-group: ExternalLocatorSet", Be::READWRITE | Be::PERSIST )
+		
+		
+
+		MAP_METHOD_AND_WRAP("RebuildLocalTransform", RebuildLocalTransform, "Rebuilds local transform.")
 
 		MAP_METHOD_AND_WRAP( 
 			"Play", 
