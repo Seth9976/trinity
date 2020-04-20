@@ -957,6 +957,9 @@
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup.h">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroupBooster.h">
+      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
+    </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\CollisionAvoidance.h">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
@@ -3142,6 +3145,12 @@
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroupBooster.cpp">
+      <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroupBooster_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup_Blue.cpp">

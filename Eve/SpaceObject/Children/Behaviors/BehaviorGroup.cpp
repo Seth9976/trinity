@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "BehaviorGroup.h"
+#include "BehaviorGroupBooster.h"
+#include "Tr2LightManager.h"
 #include "include/TriMath.h"
 #include "IBehavior.h"
 #include "Tr2InstancedMesh.h"
@@ -7,22 +9,24 @@
 #include "Resources/TriGeometryRes.h"
 #include "PlayFX.h"
 
+
 BehaviorGroup::BehaviorGroup( IRoot* lockobj ) :
 	PARENTLOCK( m_behaviors ),
 	m_vertexDeclarationHandle( Tr2EffectStateManager::UNINITIALIZED_DECLARATION ),
 	m_count( 0 ),
 	m_display( true ),
-	m_meshToggle( false ),
 	m_maxVelocity( 100 ),
 	m_changeBufferVertexCount( nullptr ),
 	m_scale( Vector3( 1, 1, 1 ) ),
-	m_spriteScale( Vector3( 7.0, 7.0, 7.0 ) ),
 	m_currentScreenSize( 0.0 ),
 	m_renderThreshold( 1.0 ),
 	m_blendScreenSizeMin( 5.0 ),
 	m_blendScreenSizeMax( 15.0 ),
 	m_boundingSphereRadius( 5.f ),
-	m_spawnPosition( 0.f, 0.f, 0.f )
+	m_spawnPosition( 0.f, 0.f, 0.f ),
+	m_debugMode( false ),
+	m_debugLodLevel( 0.f ),
+	m_debugIntensity( 0.f )
 {
 	m_behaviors.SetNotify( this );
 	m_tree = nullptr;
@@ -32,6 +36,22 @@ BehaviorGroup::BehaviorGroup( IRoot* lockobj ) :
 bool BehaviorGroup::Initialize()
 {
 	m_scratchData.resize( m_behaviors.size() );
+	CreateVertexDeclaration();
+	
+	if( m_booster )
+	{
+		m_booster->RebuildFlareBuffer( m_count );
+	}
+	return true;
+}
+
+bool BehaviorGroup::OnModified( Be::Var* value )
+{
+	if( IsMatch( value, m_mesh ) )
+	{
+		CreateVertexDeclaration();
+	}
+
 	return true;
 }
 
@@ -174,8 +194,7 @@ void BehaviorGroup::SortBehaviorIndexes()
 {
 	m_sortedBehaviorIndexes.clear();
 
-	// Hard-coded 5 because the enum ProcessPriority has 5 elements
-	for ( int i = 0; i < 5; ++i )
+	for ( int i = 0; i < IBehavior::ProcessPriority::COUNT; ++i )
 	{
 		int p = 0;
 		for ( auto behavior = m_behaviors.begin(); behavior != m_behaviors.end(); ++behavior, ++p )
@@ -190,30 +209,11 @@ void BehaviorGroup::SortBehaviorIndexes()
 
 // --------------------------------------------------------------------------------------
 // Description:
-//   For artists when they are creating the sprite to easily swap between meshes
-// --------------------------------------------------------------------------------------
-void BehaviorGroup::ToggleMesh()
-{
-	m_meshToggle = !m_meshToggle;
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Return either the instanced mesh or the lodded out mesh
+//   Returns the instanced mesh
 // --------------------------------------------------------------------------------------
 Tr2MeshPtr BehaviorGroup::GetMesh() const
 {
-	auto mesh = m_meshToggle ? m_spriteMesh : m_mesh;
-	return mesh;
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Return the lodded out mesh
-// --------------------------------------------------------------------------------------
-Tr2MeshPtr BehaviorGroup::GetSpriteMesh() const
-{
-	return m_spriteMesh;
+	return m_mesh;
 }
 
 // --------------------------------------------------------------------------------------
@@ -232,15 +232,6 @@ float BehaviorGroup::GetMaxVelocity() const
 unsigned int BehaviorGroup::GetVertexDeclarationHandle() const
 {
 	return m_vertexDeclarationHandle;
-}
-
-// --------------------------------------------------------------------------------------
-// Description:
-//   Return the vertex declaration handle for the BehaviorGroup sprite(lodded out) mesh 
-// --------------------------------------------------------------------------------------
-unsigned int BehaviorGroup::GetSpriteVertexDeclarationHandle() const
-{
-	return m_spriteVertexDeclarationHandle;
 }
 
 // --------------------------------------------------------------------------------------
@@ -269,12 +260,9 @@ void BehaviorGroup::AddAgent()
 {
 	// The function without arguments to be called from the UI
 	AddAgentPrivate();
-	if ( m_changeBufferVertexCount )
-	{
-		(m_changeBufferVertexCount)();
-	}
+	
 	m_count++;
-	CreateAgentTree();
+	OnAgentCountChanged();
 }
 
 // --------------------------------------------------------------------------------------
@@ -330,13 +318,21 @@ void BehaviorGroup::SetCount( int count )
 	}
 		
 	m_count = count;
-	CreateAgentTree();
+	OnAgentCountChanged();
+}
 
-	if ( m_changeBufferVertexCount == nullptr )
+void BehaviorGroup::OnAgentCountChanged()
+{
+	if( m_changeBufferVertexCount )
 	{
-		return;
+		( m_changeBufferVertexCount )( );
 	}
-	(m_changeBufferVertexCount)();
+	CreateAgentTree();
+	
+	if( m_booster )
+	{
+		m_booster->RebuildFlareBuffer( m_count );
+	}
 }
 
 // --------------------------------------------------------------------------------------
@@ -371,13 +367,9 @@ void BehaviorGroup::RemoveAgent()
 	// Removes the last agent
 	RemoveSpecificAgent( m_count - 1 );
 
-	if ( m_changeBufferVertexCount )
-	{
-		(m_changeBufferVertexCount)();
-	}
-
 	m_count--;
-	CreateAgentTree();
+
+	OnAgentCountChanged();
 }
 
 // --------------------------------------------------------------------------------------
@@ -462,6 +454,8 @@ void BehaviorGroup::RemoveAgentsByCount( int size )
 // --------------------------------------------------------------------------------------
 void BehaviorGroup::UpdateAgents(const float dt, EveChildBehaviorSystem& system )
 {
+	CCP_STATS_ZONE( __FUNCTION__ );
+
 	if ( m_agents.empty() )
 	{
 		return;
@@ -542,6 +536,8 @@ void BehaviorGroup::UpdateAgents(const float dt, EveChildBehaviorSystem& system 
 // --------------------------------------------------------------------------------------
 void BehaviorGroup::UpdateVisibility( const TriFrustum & frustum, const Matrix & parentTransform )
 {
+	CCP_STATS_ZONE( __FUNCTION__ );
+
 	// Check if an agent is visible and calculate the xfade value
 	for ( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
@@ -563,7 +559,7 @@ void BehaviorGroup::UpdateVisibility( const TriFrustum & frustum, const Matrix &
 				float s = 1.0;
 				agent->xfade = s - ( pixelSize - m_blendScreenSizeMin ) / ( m_blendScreenSizeMax - m_blendScreenSizeMin );
 			}
-			agent->isVisible = true;
+			agent->isVisible = agent->screenSize >= m_renderThreshold;
 		}
 		else
 		{
@@ -612,85 +608,84 @@ bool BehaviorGroup::IsGroupVisible()
 //   Get LOD info for buffer. Called from BehaviorSystem
 // --------------------------------------------------------------------------------------
 void BehaviorGroup::GetInfoForBuffer( uint8_t* data, Matrix& parentWorldLocation )
-{
+{	
+	CCP_STATS_ZONE( __FUNCTION__ );
+	m_lightInfo.clear();
+	auto agentScale = Vector3( 1.0, 1.0, 1.0 );
+	Matrix zeroMatrix = ScalingMatrix( Vector3( 0.0, 0.0, 0.0 ) );
+	unsigned int agentIndex = 0;
+
 	for( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
-		float LOD = ( *agent ).xfade;
+		float LOD = m_debugMode ? m_debugLodLevel : ( *agent ).xfade;
 		float LODmod;
-		if( LOD != 1 && agent->isVisible )
+		Matrix agentTransform = TransformationMatrix(agentScale, agent->rotation, agent->position );
+		if( agent->isVisible )
 		{
-			LODmod = ( 1 - LOD ) *( 0.5f + ( 1 - LOD ) * 0.5f );
-			Vector3 meshScale = m_scale * Vector3( LODmod, LODmod, LODmod );
-
-			if( m_meshToggle )
+			Matrix meshData = Matrix( zeroMatrix );
+			// agent mesh
+			if( LOD < 0.75f )
 			{
-				meshScale *= m_spriteScale;
+				LODmod = ( 1 - LOD ) * ( 0.5f + ( 1 - LOD ) * 0.5f );
+				Vector3 meshScale = m_scale * Vector3( LODmod, LODmod, LODmod );
+				meshData = Transpose( ScalingMatrix( meshScale ) * agentTransform );
+			}
+			memcpy( data, &meshData, 12 * sizeof( float ) );
+			data += 12 * sizeof( float );
+
+			// boosters
+			Vector4 boosterPos = Vector4();
+			Quaternion boosterQuaternion = Quaternion();
+			Vector4 boosterInfo = Vector4();
+			if( m_booster != nullptr )
+			{
+				boosterPos.GetXYZ() = TransformCoord( m_booster->GetOffset() * LODmod, agentTransform );
+				boosterPos.w = 1.0f;
+				boosterQuaternion = agent->rotation;
+				
+				float intensity = m_debugMode ? m_debugIntensity : Length( agent->velocity ) / max( 1.0f, m_maxVelocity );
+
+				if( LOD < 0.3 )
+				{
+					boosterPos.GetXYZ() = TransformCoord( m_booster->GetOffset(), agentTransform );
+					boosterPos.w = 1.0f;
+					boosterQuaternion = agent->rotation;
+					srand( agent->id );
+					boosterInfo.x = intensity;
+					boosterInfo.y = ( float )rand() / ( float )RAND_MAX; // random stuff
+					boosterInfo.z = float( m_booster->GetAtlasIndex0() );
+					boosterInfo.w = float( m_booster->GetAtlasIndex1() );
+
+					if( LOD < 0.25 )
+					{
+						float lightScale = intensity * ( 1.0f - 4.0f * LOD ) * ( 2.0f * LOD + 1.0f ); // early scale down for lights
+						m_lightInfo.push_back( Vector4( boosterPos.GetXYZ(), lightScale ) ) ;
+					}
+				}
+				auto m = agentTransform * m_parentTransform;
+				m_booster->AddFlare( m, LOD, intensity, agentIndex, m_boundingSphereRadius );
 			}
 
-			Matrix m = Transpose( TransformationMatrix( meshScale, agent->rotation, agent->position ) );
-			memcpy( data, &m, 12 * sizeof( float ) );
+			memcpy( data, &boosterPos, 4 * sizeof( float ) );
+			data += 4 * sizeof( float );
+			memcpy( data, &boosterQuaternion, 4 * sizeof( float ) );
+			data += 4 * sizeof( float );
+			memcpy( data, &boosterInfo, 4 * sizeof( float ) );
+			data += 4 * sizeof( float );
 		}
 		else
 		{
-			Matrix m = Transpose( TransformationMatrix( Vector3( 0, 0, 0 ), Quaternion( 0, 0, 0, 0 ), Vector3( 0, 0, 0 ) ) );
-			memcpy( data, &m, 12 * sizeof( float ) );
-		}
+			memcpy( data, &zeroMatrix, 12 * sizeof( float ) );
+			data += 12 * sizeof( float );	
 
-		data += 12 * sizeof( float );
-
-		// sprite
-		if( LOD != 0 && agent->isVisible )
-		{
-			LODmod = ( 1.0f - LOD ) * ( LOD * 0.3f ) + ( LOD * 1.0f );
-			Matrix agentMatrix = TransformationMatrix( m_scale * m_spriteScale * Vector3( LODmod, LODmod, LODmod ),
-				agent->rotation, agent->position );
-			agentMatrix = Billboard2D( agentMatrix );
-			Matrix m2 = Transpose( agentMatrix );
-			memcpy( data, &m2, 12 * sizeof( float ) );
+			// boosters
+			memcpy( data, &zeroMatrix, 12 * sizeof( float ) );
+			data += 12 * sizeof( float );
 		}
-		data += 12 * sizeof( float );
+		agentIndex++;
 	}
 }
 
-// --------------------------------------------------------------------------------------
-// Description:
-//   Create lodded out mesh vertex declaration.
-// --------------------------------------------------------------------------------------
-void BehaviorGroup::CreateSpriteVertexDeclaration()
-{
-	Tr2MeshPtr meshPtr = GetSpriteMesh();
-
-	if ( meshPtr )
-	{
-		if ( nullptr == meshPtr->GetGeometryResource() )
-		{
-			return;
-		}
-
-		if ( (meshPtr->GetGeometryResource())->IsGood() )
-		{
-			TriGeometryResMeshData* meshData = meshPtr->GetGeometryResource()->GetMeshData( meshPtr->GetMeshIndex() );
-			if ( meshData->m_vertexDeclaration != m_cachedSVD )
-			{
-				Tr2VertexDefinition s_agentInstancedVertex;
-				Tr2EffectStateManager::GetVertexDeclarationElements( meshData->m_vertexDeclaration, s_agentInstancedVertex );
-
-				Tr2VertexDefinition& def = s_agentInstancedVertex;
-				def.Add( Tr2VertexDefinition::FLOAT32_4, Tr2VertexDefinition::TEXCOORD, 8, 1, 1 );
-				def.Add( Tr2VertexDefinition::FLOAT32_4, Tr2VertexDefinition::TEXCOORD, 9, 1, 1 );
-				def.Add( Tr2VertexDefinition::FLOAT32_4, Tr2VertexDefinition::TEXCOORD, 10, 1, 1 );
-
-				// create vertex-declarartion
-				m_spriteVertexDeclarationHandle = Tr2EffectStateManager::GetVertexDeclarationHandle( s_agentInstancedVertex );
-
-				m_cachedSVD = meshData->m_vertexDeclaration;
-			}
-			return;
-		}
-	}
-	m_cachedSVD = -1;
-	m_spriteVertexDeclarationHandle = 0;
-}
 
 // --------------------------------------------------------------------------------------
 // Description:
@@ -775,6 +770,12 @@ void BehaviorGroup::GetDebugOptions( Tr2DebugRendererOptions& options )
 	options.insert( "AgentsKDTree" );
 	options.insert( "Bounding Sphere" );
 	options.insert( "DebugBehaviors" );
+	
+        if( m_booster != nullptr )
+	{
+		options.insert( "Boosters" );
+		options.insert( "Lights" );
+	}
 
 	for( auto group = m_behaviors.begin(); group != m_behaviors.end(); ++group )
 	{
@@ -792,11 +793,47 @@ EveKDdroneManagementTreePtr BehaviorGroup::GetKDTree()
 	return m_tree;
 }
 
+BehaviorGroupBoosterPtr BehaviorGroup::GetBooster() const
+{
+	return m_booster;
+}
+
+void BehaviorGroup::AddLights( Tr2LightManager& lightManager )
+{
+	if( m_booster && m_booster->GetDisplay() )
+	{
+		for( auto it = m_lightInfo.begin(); it != m_lightInfo.end(); ++it )
+		{
+			Vector4 info = *it;
+			m_booster->AddLight( lightManager, info.GetXYZ(), info.w, m_parentTransform );			
+		}
+	}
+}
+
+void BehaviorGroup::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	if( m_booster ) 
+	{
+		m_booster->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+
+void BehaviorGroup::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const
+{
+	CCP_STATS_ZONE( __FUNCTION__ );
+
+	if( m_booster && m_booster->GetDisplay() )
+	{
+		m_booster->AddQuadsToQuadRenderer( frustum, quadRenderer );
+	}
+}
+
 void BehaviorGroup::RenderDebugInfo( ITr2DebugRenderer2& renderer, Matrix& parentWorldLocation )
 {
-	for ( auto group = m_behaviors.begin(); group != m_behaviors.end(); ++group )
+	for ( auto behavior = m_behaviors.begin(); behavior != m_behaviors.end(); ++behavior )
 	{
-		( *group )->RenderDebugInfo( renderer, m_agents, parentWorldLocation );
+		( *behavior )->RenderDebugInfo( renderer, m_agents, parentWorldLocation );
 	}
 
 	if ( renderer.HasOption( this, "AgentsKDTree" ) )
@@ -811,11 +848,21 @@ void BehaviorGroup::RenderDebugInfo( ITr2DebugRenderer2& renderer, Matrix& paren
 		}
 	}
 
-	if (renderer.HasOption( this, "Bounding Sphere" ))
+	bool drawBS = renderer.HasOption( this, "Bounding Sphere" );
+	bool drawBoosters = renderer.HasOption( this, "Boosters" ) && m_booster != nullptr;
+
+	if( drawBoosters || drawBS )
 	{
 		for (auto agent = m_agents.begin(); agent != m_agents.end(); ++agent) 
 		{
-			renderer.DrawSphere( this, TranslationMatrix( agent->position ) * parentWorldLocation, m_boundingSphereRadius, 8, Tr2DebugRenderer::Wireframe, 0xffff00ff );
+			if( drawBS )
+			{
+				renderer.DrawSphere( this, TranslationMatrix( agent->position ) * parentWorldLocation, m_boundingSphereRadius, 8, Tr2DebugRenderer::Wireframe, 0xffff00ff );
+			}
+			if( drawBoosters )
+			{
+				m_booster->RenderBoosterDebug( renderer, this, TransformationMatrix(Vector3(1, 1, 1), agent->rotation, agent->position ) * parentWorldLocation );
+			}
 		}
 	}
 
@@ -850,6 +897,21 @@ void BehaviorGroup::RenderDebugInfo( ITr2DebugRenderer2& renderer, Matrix& paren
 	else
 	{
 		m_collectForces = false;
+	}
+
+
+	if( renderer.HasOption( this, "Lights" ) )
+	{
+		auto parentTranslation = m_parentTransform.GetTranslation();
+		
+		auto iq = IdentityQuaternion();
+		auto scale = Vector3( 1, 1, 1 );
+		
+		for( auto it = m_lightInfo.begin(); it != m_lightInfo.end(); ++it )
+		{
+			Vector4 info = *it;
+			m_booster->RenderLightDebug( renderer, this, TransformationMatrix( info.w * scale, iq, info.GetXYZ() ) );
+		}
 	}
 }
 

@@ -3,7 +3,9 @@
 #include "EveChildBehaviorSystem.h"
 #include "TriRenderBatch.h"
 #include "Tr2Mesh.h"
+#include "Tr2QuadRenderer.h"
 #include "Resources/TriGeometryRes.h"
+#include "Behaviors/BehaviorGroupBooster.h"
 
 namespace
 {
@@ -43,10 +45,10 @@ public:
 		m_geometryResource = val;
 	}
 
-	// Set the ground
-	void SetGround( BehaviorGroup* val )
+	// Set the group
+	void SetGroup( BehaviorGroup* val )
 	{
-		m_ground = val;
+		m_group = val;
 	}
 
 	// Set the geometry provider
@@ -55,9 +57,9 @@ public:
 		m_geom = val;
 	}
 
-	void SetIsSpriteBatch( bool val )
+	void SetRenderType( EveChildBehaviorSystem::RenderType renderType )
 	{
-		m_isSpriteBatch = val;
+		m_renderType = renderType;
 	}
 
 	// Forward the SubmitGeometry call to the geometry provider
@@ -65,25 +67,31 @@ public:
 	{
 		if ( m_geom )
 		{
-			bool displ = m_ground->m_display;
-
-			if ( m_isSpriteBatch )
+			if( !m_group->m_display )
 			{
-				if ( displ && m_ground->GetSpriteMesh()->GetDisplay() )
-				{
-					m_geom->Draw( this, renderContext, static_cast<unsigned int>(m_ground->GetSize()),
-						m_ground->GetSpriteVertexDeclarationHandle(), m_ground->GetGroupIndexIndicator(),
-						true );
-				}
+				return;
 			}
-			else
+			auto booster = m_group->GetBooster();
+			switch( m_renderType )
 			{
-				if ( displ && m_ground->GetMesh()->GetDisplay() )
+			case EveChildBehaviorSystem::RENDER_SHIP:
+				if( m_group->GetMesh()->GetDisplay() )
 				{
-					m_geom->Draw( this, renderContext, static_cast<unsigned int>(m_ground->GetSize()),
-						m_ground->GetVertexDeclarationHandle(), m_ground->GetGroupIndexIndicator(),
-						false );
+					m_geom->Draw( this, renderContext, static_cast< unsigned int >( m_group->GetSize() ),
+						m_group->GetVertexDeclarationHandle(), m_group->GetGroupIndexIndicator(), m_renderType );
+				}				
+				break;
+			case EveChildBehaviorSystem::RENDER_BOOSTER:
+				
+				if( booster != nullptr && booster->GetDisplay() )
+				{
+					m_geom->Draw( this, renderContext, static_cast< unsigned int >( m_group->GetSize() ),
+						booster->GetVertexDeclaration(), m_group->GetGroupIndexIndicator(),
+						m_renderType );
 				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -95,10 +103,17 @@ public:
 		return name;
 	}
 
+	BehaviorGroupBoosterPtr GetBooster() {
+		if( m_group ) {
+			return m_group->GetBooster();
+		}
+		return nullptr;
+	}
+
 private:
 	EveChildBehaviorSystemPtr m_geom;
-	BehaviorGroupPtr m_ground;
-	bool m_isSpriteBatch;
+	BehaviorGroupPtr m_group;
+	EveChildBehaviorSystem::RenderType m_renderType;
 };
 
 
@@ -201,19 +216,10 @@ void EveChildBehaviorSystem::OnListModified( long event, ssize_t key, ssize_t ke
 bool EveChildBehaviorSystem::OnPrepareResources()
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	auto hr = m_vertexBuffer.Create(
-		m_stride,					// 12 * sizeof( float )
-		m_vertexCount,				// Number of instances
-		Tr2GpuUsage::VERTEX_BUFFER, // VERTEX_BUFFER
-		Tr2CpuUsage::WRITE_OFTEN,	// WRITE_OFTEN
-		nullptr,					// initialData
-		renderContext );
-	if ( FAILED( hr ) )
-	{
-		return false;
-	}
-
+	
+	// Start with a fresh buffer
+	m_vertexBuffer = Tr2BufferAL();
+	ChangeBufferVertexCount();
 	return true;
 }
 
@@ -310,7 +316,6 @@ void EveChildBehaviorSystem::UpdateSyncronous( EveUpdateContext& updateContext, 
 	for ( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
 	{
 		(*it)->CreateVertexDeclaration();
-		(*it)->CreateSpriteVertexDeclaration();
 	}
 }
 
@@ -337,7 +342,7 @@ void EveChildBehaviorSystem::UpdateBuffer( Tr2RenderContext& renderContext )
 	{
 		(*it)->GetInfoForBuffer( data, WT );
 		(*it)->SetGroupIndexIndicator( I );
-		data += (*it)->GetCount() * m_stride * 2;
+		data += (*it)->GetCount() * 2 * m_stride;
 		I++;
 		totalShipsSoFar += (*it)->GetCount();
 		m_offsets.push_back( totalShipsSoFar * 2 * m_stride );
@@ -346,8 +351,7 @@ void EveChildBehaviorSystem::UpdateBuffer( Tr2RenderContext& renderContext )
 }
 
 void EveChildBehaviorSystem::GetGroupBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType,
-	const Tr2PerObjectData* perObjectData, Tr2MeshPtr mesh,
-	BehaviorGroup* group, bool isSpriteBatch )
+	const Tr2PerObjectData* perObjectData, Tr2MeshPtr mesh, BehaviorGroup* group )
 {
 	if ( mesh == nullptr )
 	{
@@ -386,10 +390,44 @@ void EveChildBehaviorSystem::GetGroupBatches( ITriRenderBatchAccumulator* batche
 		batch->SetMeshParameters( mesh->GetMeshIndex(), a->GetIndex(), a->GetCount(), a->IsReversed() );
 		batch->SetGeometryResource( mesh->GetGeometryResource() );
 		batch->SetBehaviorSystemReference( this );
-		batch->SetIsSpriteBatch( isSpriteBatch );
-		batch->SetGround( group );
+		batch->SetRenderType( RENDER_SHIP );
+		batch->SetGroup( group );
 		batches->Commit( batch );
 	}
+}
+
+void EveChildBehaviorSystem::GetGroupBoosterBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType, 
+	const Tr2PerObjectData* perObjectData, BehaviorGroup* group )
+{
+	if( batchType != TRIBATCHTYPE_ADDITIVE )
+	{
+		return;
+	}
+	
+	TriBehaviorSystemInstancingBatch* batch = batches->Allocate<TriBehaviorSystemInstancingBatch>();
+
+	if( batch == nullptr )
+	{
+		return;
+	}
+
+	auto booster = group->GetBooster();
+	if( booster == nullptr )
+	{
+		return;
+	}
+	auto effect = booster->GetEffect();
+	if( effect == nullptr )
+	{
+		return;
+	}
+
+	batch->SetPerObjectData( perObjectData );
+	batch->SetShaderMaterial( (Tr2Material*) effect.p );
+	batch->SetBehaviorSystemReference( this );
+	batch->SetRenderType( RENDER_BOOSTER );
+	batch->SetGroup( group );
+	batches->Commit( batch );
 }
 
 void EveChildBehaviorSystem::GetBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType,
@@ -418,21 +456,14 @@ void EveChildBehaviorSystem::GetBatches( ITriRenderBatchAccumulator* batches, Tr
 	for ( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
 	{
 		auto group = *it;
-		auto mesh = group->GetMesh();
 
 		//same is 1 if you are far away and should only see sprites and 0 for only ships ( ]0-1[ -> both ) 
 		const float same = group->AllTheSame();
 
 		if ( same != 1 )
 		{
-			GetGroupBatches( batches, batchType, perObjectData, mesh, group, false );
-		}
-
-		mesh = group->GetSpriteMesh();
-
-		if ( same != 0 )
-		{
-			GetGroupBatches( batches, batchType, perObjectData, mesh, group, true );
+			GetGroupBatches( batches, batchType, perObjectData, group->GetMesh(), group );
+			GetGroupBoosterBatches( batches, batchType, perObjectData, group );
 		}
 	}
 }
@@ -444,14 +475,6 @@ bool EveChildBehaviorSystem::HasTransparentBatches()
 	for ( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
 	{
 		auto mesh = (*it)->GetMesh();
-		if ( m_display && mesh )
-		{
-			if ( !(mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT )->empty()) )
-			{
-				isTrue = true;
-			}
-		}
-		mesh = (*it)->GetSpriteMesh();
 		if ( m_display && mesh )
 		{
 			if ( !(mesh->GetAreas( TRIBATCHTYPE_TRANSPARENT )->empty()) )
@@ -505,53 +528,75 @@ Tr2PerObjectData* EveChildBehaviorSystem::GetPerObjectData( ITriRenderBatchAccum
 //   Setup instanced rendering and call DIP
 // --------------------------------------------------------------------------------
 void EveChildBehaviorSystem::Draw( TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count,
-	unsigned int vertexDecl, int groupIndex, bool isSpriteBatch )
+	unsigned int vertexDecl, int groupIndex, RenderType renderType )
+{
+	switch( renderType )
+	{
+	case RENDER_SHIP:
+		DrawMeshes( batch, renderContext, count, vertexDecl, groupIndex );
+		break;
+	case RENDER_BOOSTER:
+		DrawBoosters( batch, renderContext, count, vertexDecl, groupIndex );
+		break;
+	default:
+		break;
+	}
+}
+
+void EveChildBehaviorSystem::DrawMeshes( TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count,
+	unsigned int vertexDecl, int groupIndex )
 {
 	auto geometry = batch->GetGeometryResource();
 
-	if ( geometry == nullptr ) { return; }
-	if ( !(geometry->IsGood()) ) { return; }
-	if ( geometry->GetMeshCount() < 1 ) { return; }
-	if ( !m_vertexBuffer.IsValid() ) { return; }
+	if( geometry == nullptr ) { return; }
+	if( !( geometry->IsGood() ) ) { return; }
+	if( geometry->GetMeshCount() < 1 ) { return; }
+	if( !m_vertexBuffer.IsValid() ) { return; }
 
 	const TriGeometryResMeshData* meshData = geometry->GetMeshData( 0 );
 	auto areaIx = batch->GetAreaIndex();
 	auto areaCount = batch->GetAreaCount();
 
-	if ( areaIx >= meshData->m_areas.size() )
+	if( areaIx >= meshData->m_areas.size() )
 	{
 		return;
 	}
 
-	if ( areaIx + areaCount > meshData->m_areas.size() )
+	if( areaIx + areaCount > meshData->m_areas.size() )
 	{
-		areaCount = static_cast<unsigned int>(meshData->m_areas.size()) - areaIx;
+		areaCount = static_cast< unsigned int >( meshData->m_areas.size() ) - areaIx;
 	}
 
 	const TriGeometryResAreaData& area = meshData->m_areas[areaIx];
 
 	unsigned int primCount = area.m_primitiveCount;
-	for ( unsigned int i = 1; i < areaCount; ++i )
+	for( unsigned int i = 1; i < areaCount; ++i )
 	{
 		const TriGeometryResAreaData& curArea = meshData->m_areas[areaIx + i];
 		primCount += curArea.m_primitiveCount;
 	}
-
-	int spriteAdder = 0;
-	if ( isSpriteBatch )
-	{
-		spriteAdder += m_stride;
-	}
-
+	
 	renderContext.m_esm.ApplyVertexDeclaration( vertexDecl );
 	renderContext.m_esm.ApplyIndexBuffer( meshData->m_indexBuffer );
 	// Stream 0: "geometry": here: our ship geometry
 	renderContext.m_esm.ApplyStreamSource( 0, meshData->m_vertexBuffer, 0, meshData->m_bytesPerVertex );
 	// Stream 1: instance", here: instance index
-	renderContext.m_esm.ApplyStreamSource( 1, m_vertexBuffer, m_offsets[groupIndex] + spriteAdder, m_stride * 2 );
+	renderContext.m_esm.ApplyStreamSource( 1, m_vertexBuffer, m_offsets[groupIndex], 2 * m_stride );
 
 	renderContext.SetTopology( Tr2RenderContextEnum::TOP_TRIANGLES );
 	renderContext.DrawIndexedInstanced( meshData->m_vertexCount, area.m_firstIndex, primCount, count );
+}
+
+void EveChildBehaviorSystem::DrawBoosters( TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count,
+	unsigned int vertexDecl, int groupIndex )
+{
+	auto boosters = batch->GetBooster();
+	
+	if( boosters == nullptr )
+	{
+		return;
+	}
+	boosters->Draw( renderContext, &m_vertexBuffer, m_offsets[groupIndex] + m_stride, 2 * m_stride, count );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -626,12 +671,13 @@ void EveChildBehaviorSystem::ChangeBufferVertexCount()
 	if ( m_vertexCount == 0 ) { m_vertexCount++; }
 
 	auto b = m_vertexBuffer.Create(
-		m_stride * 2,				// 12 * sizeof( float )
+		2 * m_stride,				// 12 * sizeof( float )
 		m_vertexCount,			// Number of instances
 		Tr2GpuUsage::VERTEX_BUFFER, // VERTEX_BUFFER
 		Tr2CpuUsage::WRITE_OFTEN,	// WRITE_OFTEN
 		nullptr,
 		renderContext );
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -718,12 +764,31 @@ void EveChildBehaviorSystem::ChangeLOD( Tr2Lod lod )
 
 void EveChildBehaviorSystem::GetLights( Tr2LightManager& lightManager ) const
 {
+	for( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
+	{
+		( *it )->AddLights( lightManager );
+	}
+}
+
+void EveChildBehaviorSystem::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer ) 
+{
+	for( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
+	{
+		( *it )->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+void EveChildBehaviorSystem::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const
+{
+	for( auto it = begin( m_behaviorGroups ); it != end( m_behaviorGroups ); ++it )
+	{
+		( *it )->AddQuadsToQuadRenderer( frustum, quadRenderer );
+	}
 }
 
 Matrix EveChildBehaviorSystem::GetWorldTransform()
 {
 	return m_worldTransform;
 }
-
 
 

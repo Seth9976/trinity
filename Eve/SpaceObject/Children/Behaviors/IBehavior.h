@@ -19,6 +19,8 @@ public:
 		PROCESS_INERTIA = 2, // Inertia
 		PROCESS_LATER = 3,	// This group is for behaviors that want to override the earlier categories and directly control movement (animations etc)
 		PROCESS_LAST = 4,	// things that should have more priority than direct control (ships pushing each other away, wind, or similar effects)
+
+		COUNT,
 	};
 
 	virtual size_t GetScratchMemorySize() const { return 0; }

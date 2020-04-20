@@ -3127,6 +3127,7 @@
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\ApproachGroup.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\BackAndForth.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup.h" />
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroupBooster.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\CollisionAvoidance.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\DroneAgent.h" />
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\DroneAvoidance.h" />
@@ -3860,6 +3861,8 @@
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BackAndForth.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BackAndForth_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroupBooster.cpp" />
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroupBooster_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\BehaviorGroup_Blue.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\CollisionAvoidance.cpp" />
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\CollisionAvoidance_Blue.cpp" />

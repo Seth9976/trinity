@@ -35,6 +35,13 @@ public:
 	EveChildBehaviorSystem( IRoot* lockobj = nullptr );
 	~EveChildBehaviorSystem();
 
+	enum RenderType {
+		RENDER_SHIP,
+		RENDER_BOOSTER,
+
+		COUNT
+	};
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// EveChildMesh
 	void UpdateSyncronous( EveUpdateContext& updateContext, const EveChildUpdateParams& params );
@@ -67,6 +74,8 @@ public:
 	void Setup( const Vector3* scale, const Quaternion* rotation, const Vector3* translation, Tr2Lod lowestLodVisible );
 	void ChangeLOD( Tr2Lod lod );
 	void GetLights( Tr2LightManager& lightManager ) const;
+	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer ) override;
+	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const override;
 
 	Matrix GetWorldTransform();
 
@@ -89,7 +98,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	// ITr2GeometryProvider
 	void Draw( TriBehaviorSystemInstancingBatch*, Tr2RenderContext& renderContext, int count, unsigned int vertexDecl,
-			  int groupIndex, bool isSpriteBatch );
+			  int groupIndex, RenderType renderType );
 
 private:
 
@@ -113,9 +122,15 @@ private:
 	void UpdateBuffer( Tr2RenderContext& renderContext );
 	void GetGroupBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType,
 						 const Tr2PerObjectData* perObjectData,
-						 Tr2MeshPtr mesh, BehaviorGroup* group, bool isSpriteBatch );
+						 Tr2MeshPtr mesh, BehaviorGroup* group );
+	void GetGroupBoosterBatches( ITriRenderBatchAccumulator* batches, TriBatchType batchType,
+								 const Tr2PerObjectData* perObjectData, BehaviorGroup* group );
 
-	//std::vector<DroneAgent> m_agents;
+	void DrawMeshes( TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count,
+		unsigned int vertexDecl, int groupIndex );
+	void DrawBoosters( TriBehaviorSystemInstancingBatch* batch, Tr2RenderContext& renderContext, int count,
+		unsigned int vertexDecl, int groupIndex );
+
 	std::vector<uint32_t> m_offsets;
 
 	EveSpaceObjectPSData m_psData;

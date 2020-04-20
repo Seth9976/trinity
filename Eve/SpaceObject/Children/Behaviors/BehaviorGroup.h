@@ -6,25 +6,34 @@
 
 struct ITr2Renderable;
 
-BLUE_DECLARE( BehaviorGroup );
+BLUE_DECLARE( BehaviorGroupBooster );
 BLUE_DECLARE( EveChildBehaviorSystem );
 BLUE_DECLARE( Tr2Mesh );
 BLUE_DECLARE_INTERFACE( IBehavior );
 BLUE_DECLARE_IVECTOR( IBehavior );
 BLUE_DECLARE( KDdroneManagementTree );
+BLUE_DECLARE( Tr2LightManager );
+BLUE_DECLARE( Tr2QuadRenderer );
+
 
 BLUE_CLASS( BehaviorGroup ) :
 	public IInitialize,
-	public IListNotify
+	public IListNotify,
+	public INotify
 {
 public:
 	EXPOSE_TO_BLUE();
 	BehaviorGroup( IRoot* lockobj = nullptr );
 	~BehaviorGroup();
 
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
 	bool Initialize();
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// INotify
+	bool OnModified( Be::Var* value );
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// IListNotify
@@ -51,7 +60,9 @@ public:
 	float AllTheSame();
 	bool IsGroupVisible();
 	void CreateVertexDeclaration();
-	void CreateSpriteVertexDeclaration();
+
+	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) const;
 
 	// Getters
 	size_t GetSize();
@@ -62,7 +73,6 @@ public:
 	IBehavior* GetBehaviorByName( std::string name );
 	int GetGroupIndexIndicator() const;
 	unsigned int GetVertexDeclarationHandle() const;
-	unsigned GetSpriteVertexDeclarationHandle() const;
 	void GetInfoForBuffer( uint8_t* data, Matrix& parentWorldLocation );
 	void GetRenderables( std::vector<ITr2Renderable*>& renderables );
 
@@ -82,9 +92,13 @@ public:
 	// Geometry Resource
 	void InitializeGeometryResource();
 	Tr2MeshPtr GetMesh() const;
-	Tr2MeshPtr GetSpriteMesh() const;
 
 	void UpdateVisibility( const TriFrustum& frustum, const Matrix& parentTransform );
+
+	void SetupRenderables();
+
+	BehaviorGroupBoosterPtr GetBooster() const;
+	void AddLights( Tr2LightManager& lightManger );
 
 private:
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +107,8 @@ private:
 	void AddAgentPrivate();
 	void AddAgentsByCount( int count );
 	void RemoveAgentsByCount( int count );
+	void OnAgentCountChanged();
 	void UpdateCurrentScreenSize();
-	void ToggleMesh();
 	void SortBehaviorIndexes();
 	void ReleaseCachedData( BlueAsyncRes* );
 	void RebuildCachedData( BlueAsyncRes* );
@@ -103,16 +117,12 @@ private:
 	BlueSharedString m_behaviorGroupName; 	// name to identify group
 	int m_count; // Number of agents
 	int m_groupIndex; // ID
-	bool m_meshToggle; // To configure sprite during development
 	Tr2MeshPtr m_mesh; // Instanced mesh
-	Tr2MeshPtr m_spriteMesh; // Lodded out mesh
 	unsigned int m_cachedVD; // A cached Vertex Declaration to detect change
-	unsigned int m_cachedSVD; // A cached Vertex Declaration for the sprite to detect change
 	PIBehaviorVector m_behaviors; // Autonomous systems for the AgentGroup
 	std::vector<int> m_sortedBehaviorIndexes; // A sorted list by processPriority
 	std::vector<DroneAgent> m_agents; // The agents
 	std::vector<CcpMallocBuffer> m_scratchData; // Additional data for each behavior
-	unsigned int m_spriteVertexDeclarationHandle; // VertexDeclHandle for the BehaviorGroup sprite mesh 
 	unsigned int m_vertexDeclarationHandle; // VertexDeclHandle for the BehaviorGroup agent mesh 
 	std::function<void()> m_changeBufferVertexCount; // A reference to a function on the parent class
 	float m_maxVelocity; // Steering behavior characteristics
@@ -121,7 +131,6 @@ private:
 
 	// Lod-ing
 	Vector3 m_scale; // Size Multiplier for the agent mesh
-	Vector3 m_spriteScale; // Size Multiplier for the sprite mesh
 
 	// Tr2Debug 
 	std::vector<Vector3> m_forces; // A debug vector that represents the forces applied to the agent 
@@ -135,6 +144,14 @@ private:
 	// Spatial partitioning manager/tree
 	EveKDdroneManagementTreePtr m_tree;
 
+	// boosters
+	BehaviorGroupBoosterPtr m_booster;
+	std::vector<Vector4> m_lightInfo;
+
+	// debug stuff
+	bool m_debugMode;
+	float m_debugLodLevel;
+	float m_debugIntensity;
 };
 
 TYPEDEF_BLUECLASS( BehaviorGroup );
