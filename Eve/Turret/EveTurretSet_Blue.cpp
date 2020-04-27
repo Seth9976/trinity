@@ -139,27 +139,27 @@ const Be::ClassInfo* EveTurretSet::ExposeToBlue()
 		MAP_METHOD_AND_WRAP(
 			"EnterStateDeactive",
 			EnterStateDeactive,
-			"Go into state deactive: play deactive anim and stay inside ship." )
+			"Go into state deactive: play deactive anim and stay inside ship. \n:jessica-placement: TOOLBAR\n:jessica-icon: fa-bed\n" )
 
 		MAP_METHOD_AND_WRAP(
 			"EnterStateIdle",
 			EnterStateIdle,
-			"Go into state idle: play idle anim and face cannons forward." )
+			"Go into state idle: play idle anim and face cannons forward. \n:jessica-placement: TOOLBAR\n:jessica-icon: fa-male\n" )
 
 		MAP_METHOD_AND_WRAP(
 			"EnterStateTargeting",
 			EnterStateTargeting,
-			"Go into state targeting: face cannons towards enemy." )
+			"Go into state targeting: face cannons towards enemy. \n:jessica-placement: TOOLBAR\n:jessica-icon: fa-crosshairs\n" )
 
 		MAP_METHOD_AND_WRAP(
 			"EnterStateFiring",
 			EnterStateFiring,
-			"Go into state fire: play fire anim and face cannons towards enemy." )
+			"Go into state fire: play fire anim and face cannons towards enemy.\n:jessica-placement: TOOLBAR\n:jessica-icon: fa-fire-alt\n" )
 
 		MAP_METHOD_AND_WRAP(
 			"EnterStateReloading",
 			EnterStateReloading,
-			"Go into state reloading: play reload anim and then idle." )
+			"Go into state reloading: play reload anim and then idle. \n:jessica-placement: TOOLBAR\n:jessica-icon: fa-sync\n" )
 
 		MAP_METHOD_AND_WRAP(
 			"ForceStateDeactive",

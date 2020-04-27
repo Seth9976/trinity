@@ -33,6 +33,7 @@ BLUE_DECLARE( TriGeometryRes );
 BLUE_DECLARE( EveTurretFiringFX );
 BLUE_DECLARE( EveTurretTarget );
 BLUE_DECLARE( Tr2DebugRenderer );
+BLUE_DECLARE( Tr2QuadRenderer );
 
 // constants
 // maximum number of single turrets per turret set
@@ -196,6 +197,9 @@ public:
 
 	void GetLights( Tr2LightManager& lightManager ) const;
 	void SetShaderOption( const BlueSharedString& name, const BlueSharedString& value ) override;
+	   
+	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 
 	// turret LOD
 	enum LOD

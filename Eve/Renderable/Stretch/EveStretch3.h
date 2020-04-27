@@ -145,6 +145,9 @@ private:
 	// value bindings to the length and move progression
 	TriFloatPtr m_length;
 	TriFloatPtr m_moveProgression;
+
+	Matrix m_sourceMatrix;
+	bool m_isMuzzleEffect;
 };
 
 TYPEDEF_BLUECLASS( EveStretch3 );

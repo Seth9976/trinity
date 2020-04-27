@@ -74,18 +74,25 @@ void EveTurretFiringFX::CleanUp()
 //   If loading from a .red file, everything is read now
 // --------------------------------------------------------------------------------
 bool EveTurretFiringFX::Initialize()
-{
-	// check for whole curve duration
-	float duration = GetCurveDuration();
-	// if we get zero here, something is wrong and we are sub-optimal
-	if( duration == 0.f )
+{	
+	if( m_firingDurationOverride >= 0.0f ) 
 	{
-		CCP_LOGWARN( "EveTurretFiringFX: could not determine curve duration, will use a very number then: %s", m_name.c_str() );
-		return true;
+		m_firingDuration = m_firingDurationOverride;
 	}
+	else
+	{
+		// check for whole curve duration
+		float duration = GetCurveDuration();
+		// if we get zero here, something is wrong and we are sub-optimal
+		if( duration == 0.f )
+		{
+			CCP_LOGWARN( "EveTurretFiringFX: could not determine curve duration, will use a very number then: %s", m_name.c_str() );
+			return true;
+		}
 
-	// remember it for later use
-	m_firingDuration = duration;
+		// remember it for later use
+		m_firingDuration = duration;
+	}
 	return true;
 }
 
@@ -165,6 +172,17 @@ void EveTurretFiringFX::SetScaleByRadius( float radius )
 // --------------------------------------------------------------------------------
 bool EveTurretFiringFX::OnModified( Be::Var* val )
 {
+	if( IsMatch( val, m_firingDurationOverride ) )
+	{
+		if( m_firingDurationOverride >= 0.0f )
+		{
+			m_firingDuration = m_firingDurationOverride;
+		}
+		else
+		{
+			m_firingDuration = GetCurveDuration();
+		}
+	}
 	return true;
 }
 
@@ -646,5 +664,23 @@ void EveTurretFiringFX::GetLights( Tr2LightManager& lightManager ) const
 	for( auto it = m_stretch.begin(); it != m_stretch.end(); ++it )
 	{
 		( *it )->GetLights( lightManager );
+	}
+}
+
+// --------------------------------------------------------------------------------
+void EveTurretFiringFX::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	for( auto it = m_stretch.begin(); it != m_stretch.end(); ++it )
+	{
+		( *it )->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+// --------------------------------------------------------------------------------
+void EveTurretFiringFX::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
+{
+	for( auto it = m_stretch.begin(); it != m_stretch.end(); ++it )
+	{
+		( *it )->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
 }

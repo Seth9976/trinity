@@ -15,6 +15,7 @@ BLUE_DECLARE_INTERFACE( IEveFiringEffectElement );
 BLUE_DECLARE_IVECTOR( IEveFiringEffectElement );
 BLUE_DECLARE( TriCurveSet );
 BLUE_DECLARE( TriObserverLocal );
+BLUE_DECLARE( Tr2QuadRenderer );
 class EveUpdateContext;
 class Tr2LightManager;
 
@@ -100,6 +101,9 @@ public:
 	bool GetDisplaySourceObject() const { return m_displaySourceObject; }
 
 	void GetLights( Tr2LightManager& lightManager ) const;
+
+	void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer );
+	void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer );
 private:
 	float GetCurveDuration();
 

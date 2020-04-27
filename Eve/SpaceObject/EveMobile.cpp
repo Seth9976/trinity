@@ -608,3 +608,21 @@ bool EveMobile::DisplayChildren() const
 	// if it is more than .5 -> render the children!
 	return ( m_activationStrength > 0.5f );
 }
+
+void EveMobile::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer ) 
+{
+	EveSpaceObject2::RegisterWithQuadRenderer( quadRenderer );
+	for( auto it = begin( m_turretSets ); it != end( m_turretSets ); ++it )
+	{
+		( *it )->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+void EveMobile::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
+{
+	EveSpaceObject2::AddQuadsToQuadRenderer( frustum, quadRenderer );
+	for( auto it = begin( m_turretSets ); it != end( m_turretSets ); ++it )
+	{
+		( *it )->AddQuadsToQuadRenderer( frustum, quadRenderer );
+	}
+}

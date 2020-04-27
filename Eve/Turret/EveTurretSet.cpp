@@ -18,6 +18,7 @@
 #include "Eve/Turret/EveTurretTarget.h"
 #include "EveTurretFiringFX.h"
 #include "include/TriMath.h"
+#include "Tr2QuadRenderer.h"
 
 CCP_STATS_DECLARED_ELSEWHERE( primitiveCount );
 
@@ -276,6 +277,7 @@ void EveTurretSet::InitializeFiringEffect()
 	{
 		return;
 	}
+	m_firingEffect->RegisterWithQuadRenderer( *Tr2QuadRenderer::Instance() );
 	// check for model geometry
 	if( m_geometryResource )
 	{
@@ -2626,6 +2628,24 @@ void EveTurretSet::GetLights( Tr2LightManager& lightManager ) const
 	if( m_firingEffect )
 	{
 		m_firingEffect->GetLights( lightManager );
+	}
+}
+
+// --------------------------------------------------------------------------------
+void EveTurretSet::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
+{
+	if( nullptr != m_firingEffect )
+	{
+		m_firingEffect->RegisterWithQuadRenderer( quadRenderer );
+	}
+}
+
+// --------------------------------------------------------------------------------
+void EveTurretSet::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
+{
+	if( nullptr != m_firingEffect )
+	{
+		m_firingEffect->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
 }
 

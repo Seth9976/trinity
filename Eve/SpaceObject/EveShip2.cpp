@@ -121,7 +121,7 @@ void EveShip2::GetRenderables( std::vector<ITr2Renderable*>& renderables, Tr2Imp
 
 void EveShip2::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 {
-	EveSpaceObject2::RegisterWithQuadRenderer( quadRenderer );
+	EveMobile::RegisterWithQuadRenderer( quadRenderer );
 	if( m_boosters )
 	{
 		m_boosters->RegisterWithQuadRenderer( quadRenderer );
@@ -134,7 +134,7 @@ void EveShip2::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRendere
 	{
 		return;
 	}
-	EveSpaceObject2::AddQuadsToQuadRenderer( frustum, quadRenderer );
+	EveMobile::AddQuadsToQuadRenderer( frustum, quadRenderer );
 	if( DisplayBoosters() )
 	{
 		m_boosters->AddToQuadRenderer( quadRenderer, m_worldTransform );

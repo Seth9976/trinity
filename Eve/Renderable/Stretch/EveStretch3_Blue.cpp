@@ -174,7 +174,7 @@ const Be::ClassInfo* EveStretch3::ExposeToBlue()
 			"length",
 			m_length,
 			"Distance between the source and the destination",
-			Be::READ
+			Be::READ | Be::PERSIST
 		)
 
 		MAP_METHOD_AND_WRAP(

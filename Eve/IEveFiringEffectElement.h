@@ -3,6 +3,7 @@
 class EveUpdateContext;
 class TriFrustum;
 class Tr2LightManager;
+class Tr2QuadRenderer;
 BLUE_DECLARE_INTERFACE( ITr2Renderable );
 
 BLUE_INTERFACE( IEveFiringEffectElement ): public IRoot
@@ -23,6 +24,9 @@ BLUE_INTERFACE( IEveFiringEffectElement ): public IRoot
 	virtual void GetRenderables( std::vector<ITr2Renderable*>& renderables ) = 0;
 
 	virtual void GetLights( Tr2LightManager& lightManager ) const = 0;
+	
+	virtual void RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer ) {}
+	virtual void AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer ) {}
 	virtual void SetIntensity( float intensity ) {}
 	virtual void SetDisplay( bool display ) {}
 };

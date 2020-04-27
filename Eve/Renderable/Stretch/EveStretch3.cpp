@@ -28,7 +28,9 @@ EveStretch3::EveStretch3( IRoot* lockobj ) :
 	m_sourcePosition( 0.0f, 0.0f, 0.0f ),
 	m_destinationPosition( 0.0f, 0.0f, 0.0f ),
 	m_startTime( 0 ),
-	m_destObjectScale( 1.0f )
+	m_destObjectScale( 1.0f ),
+	m_sourceMatrix( IdentityMatrix() ),
+	m_isMuzzleEffect( false )
 {
 	m_length.CreateInstance();
 	m_moveProgression.CreateInstance();
@@ -306,51 +308,50 @@ void EveStretch3::UpdateAsyncronous( EveUpdateContext& updateContext )
 	{
 		( *curve )->Update( TimeAsDouble( time - m_startTime ) );
 	}
-
-	Vector3 directionVec( m_sourcePosition - m_destinationPosition );
-	m_length->m_value = Length( directionVec );
-
 	EveChildUpdateParams params;
 	params.spaceObjectParent = nullptr;
 	params.childParent = nullptr;
-	params.boneCount = 0; 
+	params.boneCount = 0;
 	params.bones = nullptr;
 	params.isVisible = m_display;
 
+	Vector3 directionVec( m_sourcePosition - m_destinationPosition );
+	Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
+	Matrix rotationMatrix = IdentityMatrix();
+	TriQuaternionArcFromForward( &rotation, &directionVec );
+	rotationMatrix = RotationMatrix( rotation );
+
+	Matrix sourceMatrix = m_isMuzzleEffect ? m_sourceMatrix : rotationMatrix * TranslationMatrix( m_sourcePosition );
+
 	if( m_sourceObject )
 	{
-		auto m = TranslationMatrix( m_sourcePosition );
-
-		params.localToWorldTransform = m;
+		params.localToWorldTransform = sourceMatrix;
 		m_sourceObject->UpdateAsyncronous( updateContext, params );
 	}
-	
+
 	if( m_stretchObject )
 	{
-		auto m = TranslationMatrix( m_sourcePosition );
 		m_stretchModifier->SetDestPosition( m_destinationPosition );
-		m = m_stretchModifier->ApplyTransform( m, 0, nullptr );
-		params.localToWorldTransform = m;
+		params.localToWorldTransform = m_stretchModifier->ApplyTransform( TranslationMatrix( m_sourcePosition ), 0, nullptr );
+
 		m_stretchObject->UpdateAsyncronous( updateContext, params );
 	}
-	params.spaceObjectParent = nullptr;
-
 	if( m_moveObject )
 	{
-		Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
-		TriQuaternionArcFromForward( &rotation, &directionVec );
-
-		Vector3 movedPostition = Lerp( m_sourcePosition, m_destinationPosition, m_moveProgression->m_value );
-		
-		params.localToWorldTransform = TransformationMatrix( Vector3( 1, 1, 1 ), rotation, movedPostition );
+		Vector3 movedPosition = Lerp( m_sourcePosition, m_destinationPosition, m_moveProgression->m_value );
+		params.localToWorldTransform = rotationMatrix * TranslationMatrix( movedPosition );
 
 		m_moveObject->UpdateAsyncronous( updateContext, params );
 	}
-	
 	if( m_destObject )
 	{
-		params.localToWorldTransform = ScalingMatrix( Vector3(1, 1, 1) * m_destObjectScale ) * TranslationMatrix( m_destinationPosition );
-
+		// make the rotation matrix face source
+		auto oneEighty = Matrix(
+			-1.0, 0.0, 0.0, 0.0,
+			0.0, 1.0, 0.0, 0.0,
+			0.0, 0.0, -1.0, 0.0,
+			0.0, 0.0, 0.0, 1.0);
+		params.localToWorldTransform = ScalingMatrix( Vector3( 1, 1, 1 ) * m_destObjectScale ) * oneEighty * rotationMatrix * TranslationMatrix( m_destinationPosition );
 		m_destObject->UpdateAsyncronous( updateContext, params );
 	}
 }
@@ -360,7 +361,6 @@ void EveStretch3::Update( EveUpdateContext& updateContext )
 	UpdateSyncronous(updateContext);
 	UpdateAsyncronous(updateContext);
 }
-
 
 void EveStretch3::StartMoving()
 { 
@@ -373,17 +373,19 @@ void EveStretch3::UpdateVisibility( const TriFrustum& frustum, const Matrix& par
 		return;
 	}
 
+	auto sourceMatrix = TranslationMatrix( m_sourcePosition );
+	auto destMatrix = TranslationMatrix( m_destinationPosition );
 	Vector3 directionVec = Normalize( m_sourcePosition - m_destinationPosition );
 	float scalingLength = m_length->m_value;
 
 	if( m_sourceObject )
 	{
-		m_sourceObject->UpdateVisibility( frustum, parentTransform, TR2_LOD_HIGH );
+		m_sourceObject->UpdateVisibility( frustum, sourceMatrix, TR2_LOD_HIGH );
 	}
 	
 	if( m_destObject )
 	{
-		m_destObject->UpdateVisibility( frustum, parentTransform, TR2_LOD_HIGH );
+		m_destObject->UpdateVisibility( frustum, destMatrix, TR2_LOD_HIGH );
 	}
 	
 	if( m_stretchObject )
@@ -397,7 +399,12 @@ void EveStretch3::UpdateVisibility( const TriFrustum& frustum, const Matrix& par
 
 	if( m_moveObject )
 	{
-		m_moveObject->UpdateVisibility( frustum, parentTransform, TR2_LOD_HIGH );
+		Vector3 movedPostition = Lerp( m_sourcePosition, m_destinationPosition, m_moveProgression->m_value );
+		Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
+		TriQuaternionArcFromForward( &rotation, &directionVec );
+		auto moveMatrix = TransformationMatrix( Vector3( 1, 1, 1 ), rotation, movedPostition );
+
+		m_moveObject->UpdateVisibility( frustum, moveMatrix, TR2_LOD_HIGH );
 	}
 	
 }
@@ -476,25 +483,39 @@ float EveStretch3::GetCurveDuration()
 
 void EveStretch3::StartFiring( float delay )
 {
+	StartControllers();
 	SetControllerVariable( "firingDelay", delay );
 	SetControllerVariable( "isFiring", 1 );
 }
 
 void EveStretch3::StopFiring()
 {
-	SetControllerVariable( "isFiring", 0 );
 }
 
 void EveStretch3::SetFiringTransform( const Matrix& source, const Vector3& dest )
 {
-	m_destinationPosition = dest;
+	// this means the muzzle effect should not be rotated
+	m_isMuzzleEffect = true;
+
+	m_dest = nullptr;
+	m_source = nullptr;
+
 	m_sourcePosition = source.GetTranslation();
+	m_destinationPosition = dest;
+	m_sourceMatrix = source;
+
 }
 
 void EveStretch3::SetFiringTransform( const Vector3& source, const Vector3& dest )
 {
-	m_destinationPosition = dest;
+	// this means we need to calculate the direction to the destination
+	m_isMuzzleEffect = false;
+
+	m_dest = nullptr;
+	m_source = nullptr;
 	m_sourcePosition = source;
+	m_destinationPosition = dest;
+	m_sourceMatrix = TranslationMatrix( source );
 }
 
 void EveStretch3::DisplayEndPoints( bool displaySource, bool displayDest )
@@ -581,7 +602,7 @@ bool EveStretch3::GetLocalBoundingBox( Vector3& min, Vector3& max )
 }
 
 void EveStretch3::GetLocalToWorldTransform( Matrix& transform ) const
-{ 
+{
 }
 
 void EveStretch3::SetDestObjectScale( float scale ) 
