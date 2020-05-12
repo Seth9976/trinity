@@ -437,12 +437,12 @@ void BehaviorGroupBooster::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr
 	}
 }
 
-void BehaviorGroupBooster::AddLight( Tr2LightManager& lightManager, Vector3 position, float radiusModifier, Matrix parentTransform )
+void BehaviorGroupBooster::AddLight( Tr2LightManager& lightManager, Vector3 position, float radiusModifier, const Matrix& parentTransform )
 {
 	lightManager.AddPointLight( position, radiusModifier * m_lightRadius, m_lightColor, 0.1f * radiusModifier * m_lightRadius );
 }
 
-void BehaviorGroupBooster::AddFlare( Matrix& agentTransform, float lod, float intensity, unsigned int agentIndex, float shipBoundingSphereRadius )
+void BehaviorGroupBooster::AddFlare( const Matrix& agentTransform, float lod, float intensity, unsigned int agentIndex, float shipBoundingSphereRadius )
 {
     // This is unlikely, but can happen during editing (importing a booster before it has been told how many flares there are)	
     if( m_flareCount == 0 )
