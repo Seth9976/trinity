@@ -20,6 +20,7 @@ public:
 private:
 	std::string m_emitterName;
 	std::wstring m_soundEvent;
+	bool m_bypassPrefix;
 };
 
 TYPEDEF_BLUECLASS( Tr2ActionPlaySound );

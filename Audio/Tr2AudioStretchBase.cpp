@@ -40,7 +40,7 @@ bool Tr2AudioStretchBase::Initialize()
 
 void Tr2AudioStretchBase::Update( Vector3& sourcePosition, Vector3& destPosition )
 {
-	Vector3 front, top;
+	Vector3 front(0,1,0), top(0,0,1);
 	if ( nullptr != m_sourceEmitter )
 	{
 		m_sourceEmitter->SetPosition( front, top, sourcePosition );

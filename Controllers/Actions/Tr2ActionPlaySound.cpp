@@ -13,6 +13,7 @@
 
 Tr2ActionPlaySound::Tr2ActionPlaySound( IRoot* )
 {
+	m_bypassPrefix = false;
 }
 
 void Tr2ActionPlaySound::Start( Tr2Controller& controller )
@@ -21,7 +22,7 @@ void Tr2ActionPlaySound::Start( Tr2Controller& controller )
 	{
 		if( auto emitter = emitters->FindSoundEmitter( m_emitterName.c_str() ) )
 		{
-			emitter->SendEvent( m_soundEvent );
+			emitter->SendEvent( m_soundEvent, m_bypassPrefix );
 		}
 	}
 }
