@@ -112,7 +112,8 @@ EveTurretSet::EveTurretSet( IRoot* lockobj ) :
 	m_parentShLighting( nullptr ),
 	m_possibleTurretDisplayAmount( 0 ),
 	m_chooseRandomLocator( true ),
-	m_recreateAmbientEffect( false ),
+	m_ambientEffectEditingMode( false ),
+	m_ambientOffsetMatrix( IdentityMatrix() ),
 	m_impactBehaviour( ImpactBehaviour::DAMAGE_LOCATOR )
 {
 	// 0
@@ -186,7 +187,7 @@ bool EveTurretSet::OnModified( Be::Var* value )
 		// attached firing effect has changed -> relink!
 		InitializeFiringEffect();
 	}
-	else if( IsMatch( value, m_ambientEffect ) || IsMatch( value, m_recreateAmbientEffect ) )
+	else if( IsMatch( value, m_ambientEffect ) || IsMatch( value, m_ambientEffectEditingMode ) )
 	{
 		// redistribute the ambient effect across the turret locators
 		InitializeAmbientEffect();
@@ -329,30 +330,59 @@ void EveTurretSet::InitializeAmbientEffect()
 	{
 		return;
 	}
-	
+    
+	m_ambientOffsetMatrix = IdentityMatrix();
+	if( m_ambientEffectEditingMode && !m_singleTurrets.empty() )
+	{
+		auto firstTurret = m_singleTurrets[0];		
+		// calculate the offset to place the ambient effect, if we are in editing mode so we can see the effect on the first turret
+		m_ambientOffsetMatrix = firstTurret.localMatrix;
+	}	
+
 	m_generatedDistributedAmbientEffect.CreateInstance();
 	m_generatedDistributedAmbientEffect->SetSourceEffect( m_ambientEffect );
-
+	
 	for( auto it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
 		auto turret = *it;
 		// Add the instance to the generated effect
 		// Note that we don't want this to be attached to a bone
-		m_generatedDistributedAmbientEffect->AddInstanceTransform( Vector3( 1, 1, 1 ), turret.localQuaternion, turret.localPosition.GetXYZ() );
+		m_generatedDistributedAmbientEffect->AddInstanceTransform( Vector3(1, 1, 1), turret.localQuaternion, turret.localPosition.GetXYZ() );
 	}
 
-	// during debug we need to force the state of the controllers
+	// This will either return the source or the generated effect
+	auto ambientEffect = GetAmbientEffect();
+
 	switch( m_state ) 
 	{
 	case STATE_FIRING:
-		m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( STATE_TARGETING ) );
-		m_generatedDistributedAmbientEffect->SetControllerVariableForInstance( m_activeTurret, "TurretState", float( m_state ) );
+		ambientEffect->SetControllerVariable( "TurretState", float( STATE_TARGETING ) );
+		SetAmbientEffectControllerVariableOnInstance( m_activeTurret, "TurretState", float( m_state ) );
 		break;
 	default:
-		m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( m_state ) );
+		ambientEffect->SetControllerVariable( "TurretState", float( m_state ) );
 	}
 
-	m_generatedDistributedAmbientEffect->StartControllers();
+	ambientEffect->StartControllers();
+}
+
+IEveSpaceObjectChild* EveTurretSet::GetAmbientEffect() const
+{
+	if( m_ambientEffectEditingMode ) 
+	{
+		return m_ambientEffect;
+	}
+	return m_generatedDistributedAmbientEffect;
+}
+
+void EveTurretSet::SetAmbientEffectControllerVariableOnInstance( int index, const char* name, float value )
+{
+	if( m_ambientEffectEditingMode )
+	{
+		m_ambientEffect->SetControllerVariable(name, value);
+		return;
+	}
+	m_generatedDistributedAmbientEffect->SetControllerVariableForInstance(index, name, value);
 }
 
 // --------------------------------------------------------------------------------
@@ -921,18 +951,14 @@ void EveTurretSet::UpdateSyncronous( EveUpdateContext& updateContext, const Matr
 	{
 		m_firingEffect->GetStartPosition( p );
 	}
-	
-	if( m_recreateAmbientEffect && m_ambientEffect )
-	{
-		InitializeAmbientEffect();
-	}
 
-	if( m_generatedDistributedAmbientEffect )
+	auto ambientEffect = GetAmbientEffect();	
+	if( ambientEffect )
 	{
 		EveChildUpdateParams params;
 		params.isVisible = m_display;
-		params.localToWorldTransform = m_parentData.transform;
-		m_generatedDistributedAmbientEffect->UpdateSyncronous( updateContext, params );
+		params.localToWorldTransform = m_ambientOffsetMatrix * m_parentData.transform;
+		ambientEffect->UpdateSyncronous( updateContext, params );
 	}
 
 	m_target->Update( deltaT, &p );
@@ -1088,12 +1114,14 @@ void EveTurretSet::UpdateAsyncronous( EveUpdateContext& updateContext, const Par
 			m_firingEffect->SetDisplayDestObject( m_target->ShowDestObject() );
 		}
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
 		EveChildUpdateParams params;
 		params.isVisible = m_display;
-		params.localToWorldTransform = parentData->transform;
-		m_generatedDistributedAmbientEffect->UpdateAsyncronous( updateContext, params );
+		params.localToWorldTransform = m_ambientOffsetMatrix * m_parentData.transform;
+		ambientEffect->UpdateAsyncronous( updateContext, params );
 	}
 }
 
@@ -1409,26 +1437,48 @@ bool EveTurretSet::GetLocalBoundingBox( Vector3& aabbMin, Vector3& aabbMax )
 
 // --------------------------------------------------------------------------------
 // Description:
-//   Render debug info of this turret set: bounding sphere
+//   Render debug info of this turret set
 // --------------------------------------------------------------------------------
 void EveTurretSet::RenderDebugInfo( ITr2DebugRenderer2& renderer )
 {
-	// draw bounding sphere for every turret in this set
-	for( std::vector<SingleTurretData>::const_iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
+	if( renderer.HasOption(GetRawRoot(), "TurretBounds" ) )
 	{
-		if( it->valid )
+		// draw bounding sphere for every turret in this set
+		for( std::vector<SingleTurretData>::const_iterator it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 		{
-			Vector3 center = TransformCoord( m_boundingSphere.GetXYZ(), it->worldMatrix );
-			renderer.DrawSphere( this, center, m_boundingSphere.w, 10, Tr2DebugRenderer::Wireframe, 0xffffff00 );
+			if( it->valid )
+			{
+				Vector3 center = TransformCoord( m_boundingSphere.GetXYZ(), it->worldMatrix );
+				renderer.DrawSphere( this, center, m_boundingSphere.w, 10, Tr2DebugRenderer::Wireframe, 0xffffff00 );
+			}
 		}
+		RenderDynamicBounds();
 	}
 
-	if( m_generatedDistributedAmbientEffect )
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->RenderDebugInfo( renderer );
+		if( auto debuggable = dynamic_cast< ITr2DebugRenderable* >( ambientEffect ) )
+		{
+			debuggable->RenderDebugInfo( renderer );
+		}
 	}
-	RenderDynamicBounds();
 }
+
+void EveTurretSet::GetDebugOptions( Tr2DebugRendererOptions& options )
+{
+	options.insert( "TurretBounds" );
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
+	{
+		if( auto debuggable = dynamic_cast< ITr2DebugRenderable* >( ambientEffect ) )
+		{
+			debuggable->GetDebugOptions( options );
+		}
+	}
+}
+
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -1512,7 +1562,8 @@ void EveTurretSet::UpdateVisibility( const TriFrustum& frustum )
 		m_firingEffect->UpdateVisibility( frustum );
 	}
 
-	if( m_generatedDistributedAmbientEffect )
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect  )
 	{
 		Tr2Lod currentLod = Tr2Lod::TR2_LOD_HIGH;
 		if( m_lodLevel == LOD::LOD_EMPTY )
@@ -1524,7 +1575,7 @@ void EveTurretSet::UpdateVisibility( const TriFrustum& frustum )
 			currentLod = Tr2Lod::TR2_LOD_UNSPECIFIED;
 		}
 
-		m_generatedDistributedAmbientEffect->UpdateVisibility( frustum, m_parentData.transform, currentLod );
+		ambientEffect->UpdateVisibility( frustum, m_parentData.transform, currentLod );
 	}
 }
 
@@ -1560,13 +1611,11 @@ void EveTurretSet::GetRenderables( std::vector<ITr2Renderable*>& renderables, co
 	{
 		m_firingEffect->GetRenderables( renderables );
 	}
-	if( m_ambientEffect )
+	
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_ambientEffect->GetRenderables( renderables );
-	}
-	if( m_generatedDistributedAmbientEffect )
-	{
-		m_generatedDistributedAmbientEffect->GetRenderables( renderables );
+		ambientEffect->GetRenderables( renderables );
 	}
 }
 
@@ -2026,9 +2075,10 @@ void EveTurretSet::EnterStateDeactive()
 	// finally, we can set state
 	m_state = STATE_DEACTIVE;
 
-	if( m_generatedDistributedAmbientEffect ) 
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect ) 
 	{
-		m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( m_state ) );
+		ambientEffect->SetControllerVariable( "TurretState", float( m_state ) );
 	}
 }
 
@@ -2084,10 +2134,11 @@ void EveTurretSet::EnterStateIdle()
 	}
 	// finally, we can set state
 	m_state = STATE_IDLE;
-
-	if( m_generatedDistributedAmbientEffect ) 
+	
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( m_state ) );
+		ambientEffect->SetControllerVariable( "TurretState", float( m_state ) );
 	}
 }
 
@@ -2147,9 +2198,10 @@ void EveTurretSet::EnterStateTargeting()
 	// finally, we can set state
 	m_state = STATE_TARGETING;
 
-	if( m_generatedDistributedAmbientEffect ) 
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect ) 
 	{
-		m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( m_state ) );
+		ambientEffect->SetControllerVariable( "TurretState", float( m_state ) );
 	}
 }
 
@@ -2286,17 +2338,19 @@ bool EveTurretSet::SetupFiringState()
 		break;
 	}
 
-	if( m_generatedDistributedAmbientEffect != nullptr )
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
 		if( m_state == STATE_FIRING )
 		{
-			m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", STATE_TARGETING );
+			ambientEffect->SetControllerVariable( "TurretState", STATE_TARGETING );
 		}
 		else {
-			m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( m_state ) );
+			ambientEffect->SetControllerVariable( "TurretState", float( m_state ) );
 		}
-		m_generatedDistributedAmbientEffect->SetControllerVariableForInstance( m_activeTurret, "TurretState", STATE_FIRING );
-		m_generatedDistributedAmbientEffect->SetControllerVariableForInstance( m_activeTurret, "FiringDelay", m_randomFiringDelay );
+
+		SetAmbientEffectControllerVariableOnInstance( m_activeTurret, "TurretState", STATE_FIRING );
+		SetAmbientEffectControllerVariableOnInstance( m_activeTurret, "FiringDelay", m_randomFiringDelay );
 	}
 
 	return true;
@@ -2346,9 +2400,10 @@ void EveTurretSet::EnterStateReloading()
 	// finally, we can set state
 	m_state = STATE_RELOADING;
 
-	if( m_generatedDistributedAmbientEffect )
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->SetControllerVariable( "TurretState", float( m_state ) );
+		ambientEffect->SetControllerVariable( "TurretState", float( m_state ) );
 	}
 }
 
@@ -2773,9 +2828,11 @@ void EveTurretSet::GetLights( Tr2LightManager& lightManager ) const
 	{
 		m_firingEffect->GetLights( lightManager );
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->GetLights( lightManager );
+		ambientEffect->GetLights( lightManager );
 	}
 }
 
@@ -2786,9 +2843,11 @@ void EveTurretSet::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 	{
 		m_firingEffect->RegisterWithQuadRenderer( quadRenderer );
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->RegisterWithQuadRenderer( quadRenderer );
+		ambientEffect->RegisterWithQuadRenderer( quadRenderer );
 	}
 }
 
@@ -2799,9 +2858,11 @@ void EveTurretSet::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRen
 	{
 		m_firingEffect->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->AddQuadsToQuadRenderer( frustum, quadRenderer );
+		ambientEffect->AddQuadsToQuadRenderer( frustum, quadRenderer );
 	}
 }
 
@@ -2812,9 +2873,11 @@ void EveTurretSet::SetControllerVariable( const char* name, float value )
 	{
 		m_firingEffect->SetControllerVariable( name, value );
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->SetControllerVariable( name, value );
+		ambientEffect->SetControllerVariable( name, value );
 	}
 }
 
@@ -2824,9 +2887,11 @@ void EveTurretSet::HandleControllerEvent( const char* name )
 	{
 		m_firingEffect->HandleControllerEvent( name );
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->HandleControllerEvent( name );
+		ambientEffect->HandleControllerEvent( name );
 	}
 }
 
@@ -2836,9 +2901,11 @@ void EveTurretSet::StartControllers()
 	{
 		m_firingEffect->StartControllers();
 	}
-	if( m_generatedDistributedAmbientEffect )
+
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
 	{
-		m_generatedDistributedAmbientEffect->StartControllers( );
+		ambientEffect->StartControllers( );
 	}
 }
 
@@ -2851,6 +2918,12 @@ void EveTurretSet::SetShaderOption( const BlueSharedString& name, const BlueShar
 	if (nullptr != m_shadowEffect)
 	{
 		m_shadowEffect->SetOption( name, value );
+	}
+	
+	auto ambientEffect = GetAmbientEffect();
+	if( ambientEffect )
+	{
+		ambientEffect->SetShaderOption(name, value);
 	}
 }
 

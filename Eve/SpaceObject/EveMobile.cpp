@@ -244,13 +244,21 @@ void EveMobile::RenderDebugInfo( ITr2DebugRenderer2& renderer )
 {
 	EveSpaceObject2::RenderDebugInfo( renderer );
 
-	if( renderer.HasOption( this, "Children" ) )
+	// let the turrets render some debug info
+	for( auto it = m_turretSets.begin(); it != m_turretSets.end(); ++it )
 	{
-		// let the turrets render some debug info
-		for( auto it = m_turretSets.begin(); it != m_turretSets.end(); ++it )
-		{
-			(*it)->RenderDebugInfo( renderer );
-		}
+		(*it)->RenderDebugInfo( renderer );
+	}
+}
+
+void EveMobile::GetDebugOptions( Tr2DebugRendererOptions& options )
+{
+	EveSpaceObject2::GetDebugOptions( options );
+		
+	// Get the debug options from the turrets
+	for( auto it = m_turretSets.begin(); it != m_turretSets.end(); ++it )
+	{
+		( *it )->GetDebugOptions( options );
 	}
 }
 

@@ -95,7 +95,8 @@ BLUE_CLASS( EveTurretSet ):
 	public Tr2DeviceResource,
 	public ITr2Renderable,
 	public IShaderConfigurer,
-	public ITr2ControllerOwner
+	public ITr2ControllerOwner,
+	public ITr2DebugRenderable
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -150,7 +151,11 @@ public:
 	void SetControllerVariable( const char* name, float value );
 	void HandleControllerEvent( const char* name );
 	void StartControllers();
-
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ITr2DebugRenderable
+	void GetDebugOptions( Tr2DebugRendererOptions& options ) override;
+	void RenderDebugInfo( ITr2DebugRenderer2& renderer ) override;
 private:
 	bool OnPrepareResources() override;
 
@@ -167,8 +172,7 @@ public:
 	void UpdateVisibility( const TriFrustum& frustum );
 	void GetRenderables( std::vector<ITr2Renderable*>& renderables, const Vector4* shLighting );
 	void GetRenderablesCastingShadow( const TriFrustumOrtho& frustum, std::vector<ITr2Renderable*>& renderables );
-	// just debug info
-	void RenderDebugInfo( ITr2DebugRenderer2& renderer );
+
 	// rebuild the bounding sphere size
 	void RebuildBoundingSphere();
 	// disable LODing
@@ -262,6 +266,8 @@ private:
 	void InitializeFiringEffect();
 	// setup the attached ambient effect
 	void InitializeAmbientEffect();
+	IEveSpaceObjectChild* GetAmbientEffect() const;
+	void SetAmbientEffectControllerVariableOnInstance( int index, const char* name, float value );
 
 	// cleanup
 	void Cleanup();
@@ -435,7 +441,8 @@ private:
 	// ambient effects
 	IEveSpaceObjectChildPtr m_ambientEffect;
 	EveChildInstanceContainerPtr m_generatedDistributedAmbientEffect;
-	bool m_recreateAmbientEffect; // used for editing
+	Matrix m_ambientOffsetMatrix; // used while editing
+	bool m_ambientEffectEditingMode; // used for editing
 };
 
 TYPEDEF_BLUECLASS( EveTurretSet );
