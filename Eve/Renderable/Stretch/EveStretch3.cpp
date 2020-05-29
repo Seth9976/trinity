@@ -345,8 +345,15 @@ void EveStretch3::UpdateAsyncronous( EveUpdateContext& updateContext )
 
 	if( m_stretchObject )
 	{
-		m_stretchModifier->SetDestPosition( m_destinationPosition );
-		params.localToWorldTransform = m_stretchModifier->ApplyTransform( TranslationMatrix( m_sourcePosition ), 0, nullptr );
+		if( m_stretchModifier )
+		{
+			m_stretchModifier->SetDestPosition( m_destinationPosition );
+			params.localToWorldTransform = m_stretchModifier->ApplyTransform( TranslationMatrix( m_sourcePosition ), 0, nullptr );
+		}
+		else
+		{
+			params.localToWorldTransform = TranslationMatrix( m_sourcePosition );
+		}
 
 		m_stretchObject->UpdateAsyncronous( updateContext, params );
 	}
