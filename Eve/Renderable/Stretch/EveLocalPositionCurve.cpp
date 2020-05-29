@@ -157,8 +157,8 @@ Vector3* EveLocalPositionCurve::GetDamageLocator( Vector3* in, Be::Time t )
 {	
 	if( m_alignPositionCurve && m_parentObject )
 	{
-		ITriTargetablePtr target;
-		if( !m_parentObject->QueryInterface( BlueInterfaceIID<ITriTargetable>(), (void**)&target ) )
+		ITriTargetable* target = dynamic_cast< ITriTargetable* >( m_parentObject.p );
+		if( !target )
 		{
 			CCP_LOGERR( "Parent object is not targetable. Unable to get valid damage locators." );
 			return in;
@@ -185,12 +185,13 @@ Vector3* EveLocalPositionCurve::GetNearestFiringLocator( Vector3* in, Be::Time t
 {
 	if( m_parentObject && m_locatorIndex != -1 && !m_locatorSetName.empty())
 	{
-		if( EveSpaceObject2Ptr target = BlueCastPtr( m_parentObject ) )
+		if( EveSpaceObject2* target = dynamic_cast< EveSpaceObject2* >( m_parentObject.p ) )
 		{
 			Vector3 locatorPos( 0, 0, 0 );
 			target->GetLocatorPosition( &locatorPos, m_locatorIndex, true, m_locatorSetName );
 	
 			in->x = locatorPos.x;
+			in->y = locatorPos.y;
 			in->y = locatorPos.y;
 			in->z = locatorPos.z;
 		}
@@ -206,8 +207,9 @@ Vector3* EveLocalPositionCurve::GetDamageLocatorImpact( Vector3* in, Be::Time t 
 {	
 	if( m_alignPositionCurve && m_parentObject )
 	{
-		ITriTargetablePtr target;
-		if( !m_parentObject->QueryInterface( BlueInterfaceIID<ITriTargetable>(), (void**)&target ) )
+		ITriTargetable* target = dynamic_cast< ITriTargetable* >( m_parentObject.p );
+
+		if( !target )
 		{
 			CCP_LOGERR( "Parent object is not targetable. Unable to get valid damage locators." );
 			return in;
