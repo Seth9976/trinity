@@ -172,9 +172,20 @@ bool EveStretch3::OnModified( Be::Var* value )
 			m_stretchModifier = nullptr;
 		}
 	}
-	else if( IsMatch( value, m_dest ) && m_stretchModifier )
+	else if( IsMatch( value, m_dest ) )
 	{
-		m_stretchModifier->SetDest( m_dest );
+		if( m_dest == nullptr ) 
+		{
+			m_stretchModifier = nullptr;
+		}
+		else 
+		{
+			if( m_stretchModifier == nullptr )
+			{
+				m_stretchModifier.CreateInstance();
+			}
+			m_stretchModifier->SetDest( m_dest );
+		}
 	}
 	return true;
 }
