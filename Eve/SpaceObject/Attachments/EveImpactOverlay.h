@@ -111,7 +111,7 @@ public:
 	void Clear();
 
 	// control impacts
-	int CreateImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime, float size, float intensity );
+	int CreateImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime, float size, float intensity, Tr2Lod lod );
 	bool UpdateImpact( Vector3& out, const Vector3& direction, int impactIndex );
 
 	// helper for checking activity

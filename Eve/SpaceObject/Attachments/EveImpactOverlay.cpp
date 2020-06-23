@@ -593,23 +593,23 @@ void EveImpactOverlay::Clear()
 //   Use this method to add a new impact effect. Internal states determines
 //   what effect to use
 // --------------------------------------------------------------------------------
-int EveImpactOverlay::CreateImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime, float size, float intensity )
+int EveImpactOverlay::CreateImpact( int damageLocatorIndex, const Vector3& direction, float lifeTime, float size, float intensity, Tr2Lod lod )
 {
 	// settings
 	if( !g_eveSpaceObjectImpactEffectEnabled )
 	{
 		return -1;
 	}
-
+	
 	// what's the situation?
-	switch( m_configuration )
+	if( m_configuration == IMPACT_SHIELD && lod != TR2_LOD_LOW )
 	{
-	case IMPACT_SHIELD:
 		return CreateShieldImpact( damageLocatorIndex, direction, lifeTime, size, intensity );
-	case IMPACT_ARMOR:
-	case IMPACT_HULL:
-    default:
-		return CreateArmorImpact( damageLocatorIndex, size, true );
+	}
+	else if( m_configuration == IMPACT_ARMOR || m_configuration == IMPACT_HULL )
+	{
+		bool spawnEffects = lod != TR2_LOD_LOW;
+		return CreateArmorImpact( damageLocatorIndex, size, spawnEffects );
 	}
 
 	return -1;
