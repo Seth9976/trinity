@@ -6,7 +6,6 @@ SeekTarget::SeekTarget( IRoot* lockobj ) :
 	m_behaviorWeight( 20.f ),
 	m_arrivedRadius( 10.f ),
 	m_slowDownRadius( 33.f ),
-	m_distanceFromShip( 0.0f ),
 	m_seconds( 0.25f ),
 	m_exit( false ),
 	m_droneArrived( false ),
@@ -41,15 +40,14 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 		return m_todo;
 	}
 
-	if( m_tunnelBehavior == nullptr && m_fxBehavior == nullptr )
+	if( m_tunnelBehavior == nullptr )
 	{
 		m_tunnelBehavior = group.GetBehaviorByName( "ProcessLifetime" );
-		m_fxBehavior = group.GetBehaviorByName( "PlayFX" );
-	}
 
-	if( m_distanceFromShip == 0.0f )
+	}
+	if( m_fxBehavior == nullptr )
 	{
-		SetDistanceFromShip( m_target->GetRadius() );
+		m_fxBehavior = group.GetBehaviorByName( "PlayFX" );
 	}
 
 	auto data = static_cast<SeekTargetData*>( scratchData );
@@ -86,11 +84,14 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 		}
 
 		agent->target = data->position;
-		
+
+		Vector3 center;
+		Vector3 radius;
+		m_target->GetShapeEllipsoid( center, radius );
 		// Set the target point on the radius sphere
 		Vector3 fakePoint = data->direction;
 		fakePoint = Normalize( fakePoint );
-		fakePoint *= m_distanceFromShip;
+		fakePoint *= radius;
 		fakePoint += data->position;
 
 		// For debugging
@@ -161,11 +162,6 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 	}
 
 	return m_todo;
-}
-
-void SeekTarget::SetDistanceFromShip( float boundingRadius )
-{
-	m_distanceFromShip = boundingRadius / 3;
 }
 
 void SeekTarget::SetTarget( EveSpaceObject2* target )

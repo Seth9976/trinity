@@ -3,7 +3,7 @@
 
 CollisionAvoidance::CollisionAvoidance( IRoot* lockobj ) :
 	PARENTLOCK( m_exclusionVolumes ),
-	m_collisionAvoidanceScalar( 10.f ) 
+	m_collisionAvoidanceScalar( 20.f ) 
 {
 }
 
@@ -16,52 +16,49 @@ int CollisionAvoidance::GetProcessPriority()
 	return PROCESS_LAST;
 }
 
-size_t CollisionAvoidance::GetScratchMemorySize() const
-{
-	return sizeof( CollisionAvoidanceData );
-}
-
-void CollisionAvoidance::InitializeScratch( void* scratchMemory )
-{
-	*static_cast<CollisionAvoidanceData*>( scratchMemory ) = CollisionAvoidanceData();
-}
-
 std::vector<Vector3> CollisionAvoidance::CalculateBehavior( std::vector<DroneAgent>& agents, void* scratchData, const float deltaTime,
 	BehaviorGroup& group, EveChildBehaviorSystem& system, const std::vector < std::vector<DroneAgent*>>& dronesInSearchRadius)
 {
 	std::vector<Vector3> forceVectors;
-	auto data = static_cast<CollisionAvoidanceData*>( scratchData );
-	for( auto agent = agents.begin(); agent != agents.end(); ++agent, ++data )
+	for( auto agent = agents.begin(); agent != agents.end(); ++agent )
 	{
-		Vector3 avoidanceForce( 0, 0, 0 );
+		float force = 0.f;
+		Vector3 avoidanceForce( 0.0f, 0.0f, 0.0f );
 		for( auto exclusionVolume = m_exclusionVolumes.begin(); exclusionVolume != m_exclusionVolumes.end(); ++exclusionVolume )
 		{
-			float intensity = ( *exclusionVolume )->GetIntensity( agent->position );
-			Vector3 pos = ( *exclusionVolume )->GetBoundingSphere().GetXYZ();
+			Vector3 targetPos = ( *exclusionVolume )->GetBoundingSphere().GetXYZ();
+			float targetRadius = ( *exclusionVolume )->GetBoundingSphere().w;
+			Vector3 dronePos = agent->position;
+			float droneRadius = group.GetBoundingSphereRadius();
 
-			// This is when drones realize they're in the outer radius
-			if( intensity > 0.0f )
+			float dynamicLength = Length( agent->velocity ) / group.GetMaxVelocity();
+			Vector3 ahead = (dronePos + Normalize( agent->velocity ) ) * dynamicLength;
+
+			// 1. Get both radius and distance between drone and target
+			// 2. if rad1 + rad2 is >= distance then we have collision
+			// 3. if collision get direction of target to drone and move drone in that direction
+			float dist = sqrt( pow( dronePos.x - targetPos.x, 2 ) + pow( dronePos.y - targetPos.y, 2 ) + pow( dronePos.z - targetPos.z, 2 ) );
+
+			if( dist < targetRadius + droneRadius )
 			{
-				avoidanceForce = agent->position - pos;
-				Vector3 force = Normalize( avoidanceForce );
-				Vector3 velocity = agent->velocity;
-				velocity = Normalize( velocity );
-				float dotProduct = Dot( force, velocity );
-
-				if( dotProduct < 0.f )
-				{
-					data->collisionStrength = ( intensity * m_collisionAvoidanceScalar * -dotProduct);
-				}
+				avoidanceForce = ahead - targetPos;
+				float intensity = ( *exclusionVolume )->GetIntensity( dronePos );
+				force = dist * m_collisionAvoidanceScalar;
+				avoidanceForce = Normalize( avoidanceForce ) * intensity;
 			}
-
+			else
+			{
+				force = 0.0f;
+			}
+		}
+		agent->acceleration += avoidanceForce * force;
+		if( group.m_collectForces )
+		{
 			Vector3 forceOffset = Normalize( avoidanceForce ) * group.GetBoundingSphereRadius();
 			forceVectors.push_back( agent->position + forceOffset );
-
-			avoidanceForce = Normalize( avoidanceForce ) * ( data->collisionStrength );
-			agent->acceleration += avoidanceForce;
-
-			forceVectors.push_back( avoidanceForce );
+			forceVectors.push_back( avoidanceForce  * force );
 		}
+
 	}
 	return forceVectors;
 }

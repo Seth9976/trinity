@@ -16,7 +16,6 @@ const Be::ClassInfo* SeekTarget::ExposeToBlue()
 		MAP_ATTRIBUTE( "behaviorWeight", m_behaviorWeight, ":jessica-group: SeekTarget", Be::READWRITE )
 		MAP_ATTRIBUTE( "arrivedRadius", m_arrivedRadius, ":jessica-group: SeekTarget", Be::READWRITE )
 		MAP_ATTRIBUTE( "slowDownRadius", m_slowDownRadius, ":jessica-group: SeekTarget", Be::READWRITE )
-		MAP_ATTRIBUTE( "distanceFromShip", m_distanceFromShip, ":jessica-group: SeekTarget", Be::READWRITE )
 		MAP_ATTRIBUTE( "locatorSetName", m_locatorSetName, "The locatorSet name that repair drones seek to", Be::READWRITE )
 		MAP_ATTRIBUTE( "onFirstDroneArrivedCallback", m_onFirstDroneArrivedCallback, "A callback that is called when the first drone arrives", Be::READWRITE )
 
