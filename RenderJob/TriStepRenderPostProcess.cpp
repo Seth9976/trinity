@@ -671,7 +671,7 @@ bool TriStepRenderPostProcess::ProcessFidelityFX( Tr2RenderContext& renderContex
 {
 	if( fx && fx->IsActive() )
 	{
-		if( fx->IsDirty() )
+		if( fx->IsDirty() || !m_fidelityFXShader )
 		{
 			auto source = m_renderInfo->GetFidelityInputBuffer();
 			auto dest = m_renderInfo->GetFidelityOutputBuffer();
