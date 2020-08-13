@@ -58,6 +58,7 @@ public:
 	void SetupShipRepair();
 	void ResetBehavior();
 	void SplitBoundingBox();
+	void SetTotalRepairTime( float seconds );
 
 private:
 	void SortLocators();
@@ -66,8 +67,11 @@ private:
 	bool m_droneArrived;
 	bool m_sortedLocators;
 	bool m_repair;
+	bool m_startTimer;
 	bool m_doneRepairing;
 	int m_counter;
+	float m_totalRepairTime;
+	float m_repairTimePassed;
 	float m_behaviorWeight;
 	float m_arrivedRadius;
 	float m_slowDownRadius;

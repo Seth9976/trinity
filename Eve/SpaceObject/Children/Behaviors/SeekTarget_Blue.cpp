@@ -61,5 +61,11 @@ const Be::ClassInfo* SeekTarget::ExposeToBlue()
 			AddLocatorSet, 
 			"Adds a locatorSet to the behavior \n:jessica-placement: TOOLBAR\n:jessica-icon: fa-map-pin\n" )
 
+		MAP_METHOD_AND_WRAP(
+			"SetTotalRepairTime",
+			SetTotalRepairTime,
+			"Set the totalRepairTime \n:jessica-placement: TOOLBAR\n:jessica-icon: fa-map-pin\n" )
+
+
 		EXPOSURE_END()
 }

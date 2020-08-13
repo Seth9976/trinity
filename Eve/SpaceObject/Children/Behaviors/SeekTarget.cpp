@@ -10,6 +10,8 @@ SeekTarget::SeekTarget( IRoot* lockobj ) :
 	m_slowDownRadius( 33.f ),
 	m_seconds( 0.25f ),
 	m_counter( 0 ),
+	m_repairTimePassed( 0.f ),
+	m_totalRepairTime( -1.f ),
 	m_exit( false ),
 	m_repair( false ),
 	m_droneArrived( false ),
@@ -17,7 +19,8 @@ SeekTarget::SeekTarget( IRoot* lockobj ) :
 	m_doneRepairing( false ),
 	m_target( nullptr ),
 	m_fxBehavior( nullptr ),
-	m_locatorSetName( "damage" )
+	m_locatorSetName( "damage" ),
+	m_startTimer( false )
 {
 	m_locatorSet.CreateInstance();
 }
@@ -60,6 +63,13 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 
 	for( auto agent = agents.begin(); agent != agents.end(); ++agent, ++data )
 	{
+		if( m_totalRepairTime != -1.f && m_repairTimePassed >= m_totalRepairTime )
+		{
+			SetExit( true );
+			m_repair = false;
+			m_repairTimePassed = 0.f;
+		}
+
 		if( m_doneRepairing )
 		{
 			data->arrived = true;
@@ -154,6 +164,10 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 				m_onFirstDroneArrivedCallback.CallVoid().ReportException();
 				m_droneArrived = true;
 				m_doneRepairing = false;
+				if( m_repair )
+				{
+					m_startTimer = true;
+				}
 			}
 
 			// Set the rotation of the drone
@@ -191,12 +205,19 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 			data->locatorIndex = -1;
 			m_droneArrived = false;
 			m_counter++;
+			m_startTimer = false;
 		}
 
 		agent->acceleration += desiredVelocity - agent->velocity;
 	}
 
 	m_doneRepairing = false;
+
+	if( m_startTimer )
+	{
+		m_repairTimePassed += deltaTime;
+	}
+
 	return m_todo;
 }
 
@@ -216,6 +237,11 @@ const LocatorStructureList* SeekTarget::GetLocatorsForSet( const BlueSharedStrin
 void SeekTarget::SetTarget( EveSpaceObject2* target )
 {
 	m_target = target;
+}
+
+void SeekTarget::SetTotalRepairTime( float seconds )
+{
+	m_totalRepairTime = seconds;
 }
 
 void SeekTarget::SetExit( bool value )
