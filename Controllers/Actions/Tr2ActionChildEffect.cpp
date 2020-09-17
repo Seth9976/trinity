@@ -156,10 +156,7 @@ void Tr2ActionChildEffect::Stop( Tr2Controller& controller )
 				auto cast = dynamic_cast<IEveEffectChildrenOwner*>( obj );
 				if( cast )
 				{
-					if( IEveEffectChildrenOwnerPtr owner = BlueCastPtr( cast ) )
-					{
-						owner->RemoveFromEffectChildrenList( m_child );
-					}
+					cast->RemoveFromEffectChildrenList( m_child );
 				}
 			}
 		}
