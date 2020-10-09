@@ -4423,6 +4423,9 @@
     <ClInclude Include="Tr2GStateParameter.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sprite2d\Tr2Sprite2dPickingMask.h">
+      <Filter>Source Files\Sprite2d</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Audio\Tr2AudioStretchAuto.cpp">
@@ -4450,6 +4453,12 @@
     </ClCompile>
     <ClCompile Include="Tr2GStateParameter_Blue.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite2d\Tr2Sprite2dPickingMask.cpp">
+      <Filter>Source Files\Sprite2d</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite2d\Tr2Sprite2dPickingMask_Blue.cpp">
+      <Filter>Source Files\Sprite2d</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

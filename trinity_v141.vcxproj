@@ -2875,6 +2875,7 @@
     <ClInclude Include="ITriReroutable.h" />
     <ClInclude Include="IWorldPosition.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Sprite2d\Tr2Sprite2dPickingMask.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TbbStub.h" />
     <ClInclude Include="Tr2AddSafeGrowableBuffer.h" />
@@ -3431,6 +3432,8 @@
     <ClCompile Include="GrannyBoneOffset.cpp" />
     <ClCompile Include="GrannyBoneOffset_Blue.cpp" />
     <ClCompile Include="ITr2PickableScene.cpp" />
+    <ClCompile Include="Sprite2d\Tr2Sprite2dPickingMask.cpp" />
+    <ClCompile Include="Sprite2d\Tr2Sprite2dPickingMask_Blue.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
