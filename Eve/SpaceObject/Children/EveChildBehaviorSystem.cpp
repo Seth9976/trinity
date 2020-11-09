@@ -744,6 +744,11 @@ void EveChildBehaviorSystem::GetRenderables( std::vector<ITr2Renderable*>& rende
 {
 	renderables.push_back( this );
 
+	if( !m_behaviorGroupLoaded )
+	{
+		return;	
+	}
+
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 	UpdateBuffer( renderContext );
 
