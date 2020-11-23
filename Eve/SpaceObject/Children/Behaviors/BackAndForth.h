@@ -74,7 +74,7 @@ private:
 	BlueSharedString m_locatorSetName;
 	void AddLocatorSet();
 	LocatorType m_locatorType;
-	void BackAndForth::GetParentLocatorPosition( int locatorIndex, Vector3* locatorPosition, Vector3* locatorDirection );
+	void GetParentLocatorPosition( int locatorIndex, Vector3* locatorPosition, Vector3* locatorDirection );
 	void GetTargetLocatorPosition( int locatorIndex, Vector3* locatorPosition, Vector3* locatorDirection );
 };
 
