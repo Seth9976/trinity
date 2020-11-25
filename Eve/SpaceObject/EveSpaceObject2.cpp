@@ -186,8 +186,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_lastDamageLocatorHit( -1 ),
 	m_worldTransform( XMMatrixIdentity() ),
 	m_invWorldTransform( XMMatrixIdentity() ),
-	m_controllerVariables( "EveSpaceObject2::m_controllerVariables" ),
-	m_startControllersQueued( false )
+	m_controllerVariables( "EveSpaceObject2::m_controllerVariables" )
 {
 	m_positionDelta.CreateInstance();
 
@@ -319,20 +318,6 @@ void EveSpaceObject2::UpdateSyncronous( EveUpdateContext& updateContext )
 	if( m_allowLodSelection )
 	{
 		UnloadLodIfNeeded( time );
-	}
-
-	if( m_startControllersQueued )
-	{
-		for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
-		{
-			( *it )->Start();
-		}
-		for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
-		{
-			auto child = *it;
-			child->StartControllers();
-		}
-		m_startControllersQueued = false;
 	}
 
 	// Particle Systems
@@ -3194,7 +3179,15 @@ void EveSpaceObject2::HandleControllerEvent( const char* name )
 
 void EveSpaceObject2::StartControllers()
 {
-	m_startControllersQueued = true;
+	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+	{
+		( *it )->Start();
+	}
+	for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
+	{
+		auto child = *it;
+		child->StartControllers();
+	}
 }
 
 std::map<std::string, float> EveSpaceObject2::GetControllerVariables() const
