@@ -10,6 +10,7 @@
 #include "Tr2ControllerFloatVariable.h"
 #include "Tr2ControllerEventHandler.h"
 #include "Include/ITr2Updateable.h"
+#include "blue/Include/ScopedBlockTrap.h"
 
 
 Tr2Controller::Tr2Controller( IRoot* lockobj )
@@ -137,6 +138,8 @@ void Tr2Controller::Unlink()
 
 void Tr2Controller::Start()
 {
+	ScopedBlockTrap blockTrap;
+	
 	if( m_isActive )
 	{
 		Stop();
