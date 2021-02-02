@@ -47,6 +47,8 @@ void Tr2ActionOverlay::Start( Tr2Controller& controller )
 	}
 	
 	auto path = m_path;
+	std::transform( path.begin(), path.end(), path.begin(), ::tolower );
+
 	if( owner->IsAnimated() && !StringFind( path.c_str(), "_skinned" ) )
 	{
 		StringInsertStubBefore( path, ".red", "_skinned" );
