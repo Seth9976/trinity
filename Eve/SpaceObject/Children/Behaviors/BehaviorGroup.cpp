@@ -864,6 +864,17 @@ void BehaviorGroup::AddLights( Tr2LightManager& lightManager, const Matrix& pare
 			m_booster->AddLight( lightManager, info.GetXYZ(), info.w, it->first, parentTransform );
 		}
 	}
+
+	auto behavior = GetBehaviorByName( "PlayFX" );
+
+	if( behavior != nullptr )
+	{
+		auto tmp = dynamic_cast<PlayFX*>( behavior );
+		if( tmp )
+		{
+			tmp->GetLights( lightManager );
+		}
+	}
 }
 
 void BehaviorGroup::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )

@@ -41,6 +41,7 @@ public:
 	int GetProcessPriority();
 
 	void GetRenderables( std::vector<ITr2Renderable*>& renderables );
+	void GetLights( Tr2LightManager & lightManager ) const;
 	void UpdateAsyncronous( EveUpdateContext & updateContext, const TriFrustum& frustum, const Matrix& parentTransform );
 	void UpdateSyncronous( EveUpdateContext & updateContext );
 	void UpdateState( bool state ) { m_stop = state; }

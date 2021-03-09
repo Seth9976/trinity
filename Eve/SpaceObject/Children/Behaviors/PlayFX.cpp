@@ -150,6 +150,14 @@ void PlayFX::GetRenderables( std::vector<ITr2Renderable*>& renderables )
 	}
 }
 
+void PlayFX::GetLights( Tr2LightManager& lightManager ) const
+{
+	for( auto fx = m_firingEffects.begin(); fx != m_firingEffects.end(); ++fx )
+	{
+		( *fx )->GetLights( lightManager );
+	}
+}
+
 void PlayFX::CheckCount( size_t agentSize )
 {
 	if( m_count > agentSize )
