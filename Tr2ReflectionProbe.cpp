@@ -25,7 +25,8 @@ Tr2ReflectionProbe::Tr2ReflectionProbe( IRoot* lockobj )
 	m_position( 0, 0, 0 ),
 	m_intermediateSize( FILTER_SIZE * 4 ),
 	m_prevCullInversion( false ),
-	m_customSourceTexture()
+	m_customSourceTexture(),
+	m_hdrOutput( true )
 {
 	for( unsigned i = 0; i < 6; i++ )
 	{
@@ -164,7 +165,7 @@ bool Tr2ReflectionProbe::OnPrepareResources()
 	{
 		if( !m_renderTargets[i]->IsValid() )
 		{
-			CR_RETURN_VAL( m_renderTargets[i]->CreateManual( m_intermediateSize, m_intermediateSize, 1, PIXEL_FORMAT_R8G8B8A8_UNORM, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_2D, Tr2CpuUsage::NONE, Tr2GpuUsage::RENDER_TARGET ), false );
+			CR_RETURN_VAL( m_renderTargets[i]->CreateManual( m_intermediateSize, m_intermediateSize, 1, PIXEL_FORMAT_R11G11B10_FLOAT, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_2D, Tr2CpuUsage::NONE, Tr2GpuUsage::RENDER_TARGET ), false );
 		}
 
 		if( !m_stencilMaps[i].IsValid() )
@@ -176,17 +177,17 @@ bool Tr2ReflectionProbe::OnPrepareResources()
 
 	if( !m_renderTargetCube->IsValid() )
 	{
-		CR_RETURN_VAL( m_renderTargetCube->Create( m_intermediateSize, m_intermediateSize, 1, PIXEL_FORMAT_R8G8B8A8_UNORM, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_CUBE ), false );
+		CR_RETURN_VAL( m_renderTargetCube->Create( m_intermediateSize, m_intermediateSize, 1, PIXEL_FORMAT_R11G11B10_FLOAT, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_CUBE ), false );
 	}
 
 	if( !m_preFilterTarget->IsValid() )
 	{
-		CR_RETURN_VAL( m_preFilterTarget->Create( FILTER_SIZE, FILTER_SIZE, 8, PIXEL_FORMAT_R8G8B8A8_UNORM, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_CUBE ), false );
+		CR_RETURN_VAL( m_preFilterTarget->Create( FILTER_SIZE, FILTER_SIZE, 8, PIXEL_FORMAT_R11G11B10_FLOAT, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_CUBE ), false );
 	}
 
 	if( !m_postFilterTarget->IsValid() )
 	{
-		CR_RETURN_VAL( m_postFilterTarget->Create( FILTER_SIZE, FILTER_SIZE, MIP_COUNT, PIXEL_FORMAT_R8G8B8A8_UNORM, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_CUBE ), false );
+		CR_RETURN_VAL( m_postFilterTarget->Create( FILTER_SIZE, FILTER_SIZE, MIP_COUNT, m_hdrOutput ? PIXEL_FORMAT_R11G11B10_FLOAT : PIXEL_FORMAT_R8G8B8A8_UNORM, 0, 0, EX_BIND_UNORDERED_ACCESS, TEX_TYPE_CUBE ), false );
 	}
 
 	if( !m_initialized )
@@ -208,6 +209,8 @@ bool Tr2ReflectionProbe::OnPrepareResources()
 			m_filterEffect->AddResource( param );
 		}
 
+		m_filterEffect->SetParameter( BlueSharedString( "output_srgb" ), m_hdrOutput ? 0.f : 1.f );
+
 		m_initialized = true;
 	}
 
@@ -223,6 +226,8 @@ bool Tr2ReflectionProbe::OnModified( Be::Var* value )
 	}
 
 	m_renderTargetCube->Destroy();
+	m_preFilterTarget->Destroy();
+	m_postFilterTarget->Destroy();
 	m_initialized = false;
 
 	PrepareResources();

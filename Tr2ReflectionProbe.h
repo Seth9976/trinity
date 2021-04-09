@@ -57,6 +57,7 @@ private:
 	ITriTextureResPtr m_customSourceTexture;
 
 	bool m_prevCullInversion;
+	bool m_hdrOutput;
 };
 
 TYPEDEF_BLUECLASS( Tr2ReflectionProbe );
