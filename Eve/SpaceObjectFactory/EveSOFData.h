@@ -96,6 +96,18 @@ public:
 	// data
 	BlueSharedString m_name;
 	Tr2Lod m_lowestLodVisible;
+	
+	enum DisplayQualityModifier
+	{
+		SHADER_ALL = 5,
+		SHADER_HIGHMID = 3,
+		SHADER_LOWMID = 1,
+		SHADER_HIGH = 4,
+		SHADER_MED = 2,
+		SHADER_LOW = 0,
+	};
+
+	DisplayQualityModifier m_displayModifier;
 	std::string m_geometryResPath;
 	PEveSofDataMeshInstanceStructureList m_instances;
 	BlueSharedString m_shader;

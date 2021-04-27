@@ -94,6 +94,7 @@ static BlueStructureDefinition s_eveSOFMeshInstanceDef[] =
 
 EveSOFDataInstancedMesh::EveSOFDataInstancedMesh( IRoot* lockobj ) :
 	m_lowestLodVisible( TR2_LOD_LOW ),
+	m_displayModifier( SHADER_ALL ),
 	PARENTLOCK( m_textures ),
 	PARENTLOCK( m_instances )
 {

@@ -301,6 +301,7 @@ public:
 	{
 		BlueSharedString name;
 		Tr2Lod lowestLodVisible;
+		int displayModifier;
 		std::string geometryResPath;
 		BlueSharedString shader;
 		std::map<BlueSharedString, TextureData> textures;

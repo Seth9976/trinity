@@ -124,6 +124,7 @@ public:
 		SHADER_MED = 2,
 		SHADER_LOW = 0,
 	};
+	void SetDisplayQualityModifier( DisplayQualityModifier filter );
 
 	PIEveSpaceObjectChildVector m_objects;
 

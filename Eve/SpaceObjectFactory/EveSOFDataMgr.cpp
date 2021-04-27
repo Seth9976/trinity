@@ -947,6 +947,7 @@ void EveSOFDataMgr::GenerateHullData( HullData& hd, EveSOFDataHullPtr srcData ) 
 			td.resFilePath = textureData->m_resFilePath;
 			him.textures[textureData->m_name] = td;
 		}
+		him.displayModifier = instMesh->m_displayModifier;
 		hd.instancedMeshes.push_back( him );
 	}
 

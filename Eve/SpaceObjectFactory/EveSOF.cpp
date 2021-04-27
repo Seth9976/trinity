@@ -1816,7 +1816,24 @@ void EveSOF::SetupInstancedMeshes( EveSpaceObject2Ptr newObj, const EveSOFDNAPtr
 		childMesh.CreateInstance();
 		childMesh->SetMesh( mesh );
 		childMesh->Setup( nullptr, nullptr, nullptr, him->lowestLodVisible );
-		meshContainer->AddToEffectChildrenList( childMesh );
+
+		if( him->displayModifier != EveChildContainer::DisplayQualityModifier::SHADER_ALL )
+		{
+			// need to create an eveChildContainer with the display quality modifier
+			EveChildContainerPtr qualityControl;
+			qualityControl.CreateInstance();
+			qualityControl->SetName( "Shader Quality Controlled Instanced Mesh" );
+			qualityControl->Setup( nullptr, nullptr, nullptr, him->lowestLodVisible );
+			qualityControl->AddToEffectChildrenList( childMesh );
+			qualityControl->SetDisplayQualityModifier( (EveChildContainer::DisplayQualityModifier) him->displayModifier );
+
+			// and add it to the main mesh container
+			meshContainer->AddToEffectChildrenList( qualityControl );
+		}
+		else
+		{
+			meshContainer->AddToEffectChildrenList( childMesh );
+		}
 	}
 	newObj->AddToEffectChildrenList( static_cast<IEveSpaceObjectChild*>( meshContainer) );
 }

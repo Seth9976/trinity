@@ -661,6 +661,11 @@ float EveChildContainer::GetOwnerMaxSpeed() const
 	return m_ownerMaxSpeed;
 }
 
+void EveChildContainer::SetDisplayQualityModifier( DisplayQualityModifier filter )
+{
+	m_displayFilter = filter;
+}
+
 bool EveChildContainer::GetControllerValueByName( const char* name, float& out )
 {
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )

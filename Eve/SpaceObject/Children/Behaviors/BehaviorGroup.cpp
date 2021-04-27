@@ -530,15 +530,18 @@ void BehaviorGroup::UpdateAgents( const float dt, EveChildBehaviorSystem& system
 		}
 	}
 
+	// make sure the update isn't too big when e.g. a player resizes his window (in window mode)
+	float deltaTime = TriClamp( dt, 0.0, 0.1 );
+
 	// Move the agents based on the behaviors
 	for( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
 	{
 		// make sure the update isn't too big when e.g. a player resizes his window (in window mode)
-		agent->lifetime += TriClamp( dt, 0.0, 0.1 );
+		agent->lifetime += deltaTime;
 
 		static const Vector3 zAxis( 0.f, 0.f, 1.f );
 
-		agent->velocity += agent->acceleration * dt;
+		agent->velocity += agent->acceleration * deltaTime;
 		Vector3 facingDir = agent->velocity;
 		Vector3 interestPoint = Vector3();
 		TriVectorRotateQuaternion( &interestPoint, &zAxis, &agent->rotation );
@@ -548,14 +551,14 @@ void BehaviorGroup::UpdateAgents( const float dt, EveChildBehaviorSystem& system
 		agent->targetDirection = actualFacingDir;
 
 		agent->velocity = ClampLength( agent->velocity, m_maxVelocity );
-		agent->position = agent->position + agent->velocity * dt;
+		agent->position = agent->position + agent->velocity * deltaTime;
 		agent->acceleration = Vector3( 0, 0, 0 );
 	}
 
 	// later on we could have the updateTree input dynamically adjust based on dt
 	// one of my ideas was input = max( const - dt , minimumUpdateFreq )
 	// this would make it update less often on big dt-s
-	m_tree->UpdateTree( dt );
+	m_tree->UpdateTree( deltaTime );
 }
 
 float BehaviorGroup::GetBlendModifier() const

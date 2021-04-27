@@ -106,7 +106,7 @@ std::vector<Vector3> ProcessLifetime::CalculateBehavior( std::vector<DroneAgent>
 
 	for( auto drone = agents.begin(); drone != agents.end(); ++drone, ++data )
 	{
-		if( drone->lifetime <= deltaTime && data->hasSpawned )
+		if( drone->lifetime <= deltaTime && !m_intialSpawn )
 		{
 			FindASpawnPoint( *drone, data, group );
 		}
@@ -114,11 +114,12 @@ std::vector<Vector3> ProcessLifetime::CalculateBehavior( std::vector<DroneAgent>
 		// find an initial spawn position
 		if( !data->hasSpawned && m_intialSpawn )
 		{
-			Vector3 spawnPos;
+			Vector3 spawnPos = group.m_spawnPosition;
 			if( FindInitialSpawnPoint( *drone, data, spawnPos ) )
 			{
 				group.m_spawnPosition = spawnPos;
 			}
+			data->hasSpawned = true;
 		}
 
 		m_desiredVector = Vector3( 0, 0, 0 );
@@ -324,21 +325,27 @@ bool ProcessLifetime::FindInitialSpawnPoint( DroneAgent& drone, ProcessLifetimeD
 		return false;
 	}
 
-	size_t sizeIndex = m_splineTunnels.size() - 1;
-	// random nr from 0 to sizeIndex - 1
-	size_t randomNr = rand() % ( sizeIndex + 1 );
+	size_t sizeIndex = m_splineTunnels.size();
+	// random nr from 0 to sizeIndex
+	size_t randomNr = rand() % ( sizeIndex );
 
 	// pick a random splineTunnel
 	auto splineTunnel = m_splineTunnels[randomNr];
+
+	// return early if there are no curves or the curves aren't loaded
+	if( splineTunnel->GetCurveSets()->size() <= 0 )
+	{
+		return false;
+	}
 
 	if( splineTunnel->GetTunnelGroupType() == ENTRANCE_TUNNELS )
 	{
 		// get the curve sets for that tunnel
 		auto curveSets = splineTunnel->GetCurveSets();
 
-		size_t curveSize = ( *curveSets ).size() - 1;
+		size_t curveSize = ( *curveSets ).size();
 		// we can have more than 1 curve so pick a random curve
-		size_t randomCurve = rand() % ( curveSize + 1 );
+		size_t randomCurve = rand() % ( curveSize );
 
 		// get random time
 		size_t length = size_t( ( *curveSets )[randomCurve]->Length() );
@@ -350,11 +357,10 @@ bool ProcessLifetime::FindInitialSpawnPoint( DroneAgent& drone, ProcessLifetimeD
 		float stepSize = float( time ) / float( length );
 
 		// Get the next pointID
-		auto pointID =  floor(stepSize * ( splineTunnel->GetNumBreakPoints() ) + 1) + 0.5f;
+		auto pointID =  floor(stepSize * ( splineTunnel->GetNumBreakPoints() ) + 1 ) + 0.5f;
 
 		drone.position = pos;
 		drone.lifetime += stepSize * pointID;
-		data->hasSpawned = true;
 		data->tunnelPoint = static_cast<int>( pointID );
 
 		return true;
