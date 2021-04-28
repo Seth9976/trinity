@@ -390,16 +390,19 @@ void ProcessLifetime::FindASpawnPoint( DroneAgent& agent, ProcessLifetimeData* d
 	{
 		if( ( *tunnel )->tunnelGroupType == ENTRANCE_TUNNELS )
 		{
-			Vector3 point = ( *tunnel )->splinePoints[0].pos;
-			for( int i = 0; i < 3; i++ )
+			if( !( *tunnel )->splinePoints.empty() )
 			{
-				point[i] += -( *tunnel )->pointOfNoReturnSize + static_cast<float>( rand() ) / ( static_cast<float>( RAND_MAX / ( 2 * ( *tunnel )->pointOfNoReturnSize ) ) );
+				Vector3 point = ( *tunnel )->splinePoints[0].pos;
+				for( int i = 0; i < 3; i++ )
+				{
+					point[i] += -( *tunnel )->pointOfNoReturnSize + static_cast<float>( rand() ) / ( static_cast<float>( RAND_MAX / ( 2 * ( *tunnel )->pointOfNoReturnSize ) ) );
+				}
+				potentialPoints.push_back( point );
+				potentialRotations.push_back( ( *tunnel )->splinePoints[0].rot );
+				tunnelIndex.push_back( ( *tunnel )->tunnelID );
 			}
-			potentialPoints.push_back( point );
-			potentialRotations.push_back( ( *tunnel )->splinePoints[0].rot );
-			tunnelIndex.push_back( ( *tunnel )->tunnelID );
 		}
-	}
+	}	
 
 	if( potentialPoints.empty() )
 	{
@@ -423,8 +426,11 @@ std::vector<Vector3> ProcessLifetime::GetEntrancePoints()
 	{
 		if( ( *tunnel )->tunnelGroupType == ENTRANCE_TUNNELS )
 		{
-			Vector3 point = ( *tunnel )->splinePoints[0].pos;
-			entrancePoints.push_back( point );
+			if( !( *tunnel )->splinePoints.empty() )
+			{
+				Vector3 point = ( *tunnel )->splinePoints[0].pos;
+				entrancePoints.push_back( point );
+			}
 		}
 	}
 	return entrancePoints;

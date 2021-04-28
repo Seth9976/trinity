@@ -482,6 +482,9 @@ void BehaviorGroup::RemoveAgentsByCount( int count )
 void BehaviorGroup::UpdateAgents( const float dt, EveChildBehaviorSystem& system )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
+	
+	// make sure the update isn't too big when e.g. a player resizes his window (in window mode)
+	float deltaTime = TriClamp( dt, 0.0, 0.1 );
 
 	if( m_agents.empty() )
 	{
@@ -515,7 +518,7 @@ void BehaviorGroup::UpdateAgents( const float dt, EveChildBehaviorSystem& system
 
 		for( int i = 0; i < static_cast<int>( m_behaviors.size() ); ++i )
 		{
-			std::vector<Vector3> forces = m_behaviors[m_sortedBehaviorIndexes[i]]->CalculateBehavior( m_agents, ( scratch + m_sortedBehaviorIndexes[i] )->get(), dt, *this, system, ( *dronesInRange )[m_sortedBehaviorIndexes[i]] );
+			std::vector<Vector3> forces = m_behaviors[m_sortedBehaviorIndexes[i]]->CalculateBehavior( m_agents, ( scratch + m_sortedBehaviorIndexes[i] )->get(), deltaTime, *this, system, ( *dronesInRange )[m_sortedBehaviorIndexes[i]] );
 			for( auto force = forces.begin(); force != forces.end(); ++force )
 			{
 				m_forces.push_back( *force );
@@ -527,12 +530,9 @@ void BehaviorGroup::UpdateAgents( const float dt, EveChildBehaviorSystem& system
 		auto scratch = m_scratchData.begin();
 		for( int i = 0; i < static_cast<int>( m_behaviors.size() ); ++i )
 		{
-			m_behaviors[m_sortedBehaviorIndexes[i]]->CalculateBehavior( m_agents, ( scratch + m_sortedBehaviorIndexes[i] )->get(), dt, *this, system, ( *dronesInRange )[m_sortedBehaviorIndexes[i]] );
+			m_behaviors[m_sortedBehaviorIndexes[i]]->CalculateBehavior( m_agents, ( scratch + m_sortedBehaviorIndexes[i] )->get(), deltaTime, *this, system, ( *dronesInRange )[m_sortedBehaviorIndexes[i]] );
 		}
 	}
-
-	// make sure the update isn't too big when e.g. a player resizes his window (in window mode)
-	float deltaTime = TriClamp( dt, 0.0, 0.1 );
 
 	// Move the agents based on the behaviors
 	for( auto agent = m_agents.begin(); agent != m_agents.end(); ++agent )
