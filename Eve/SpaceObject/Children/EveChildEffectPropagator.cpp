@@ -35,7 +35,7 @@ EveChildEffectPropagator::EveChildEffectPropagator( IRoot* lockobj )
 	m_frequency( 1 ),
 	m_numDeleted( 0 ),
 	m_effectDuration( 3 ),
-	m_stopAfterNumTriggers( -1 ),
+	m_stopAfterNumTriggers( -1.f ),
 	m_trigger( false )
 {
 }
@@ -238,14 +238,14 @@ void EveChildEffectPropagator::UpdateTriggerInterval( EveUpdateContext& updateCo
 	auto dt = updateContext.GetDeltaT();
 	m_playTime += dt;
 
-	if( m_stopAfterNumTriggers != -1 && m_playTime > (  m_stopAfterNumTriggers / m_frequency + m_effectDuration ) )
+	if( m_stopAfterNumTriggers < 0.0 && m_playTime > (  m_stopAfterNumTriggers / m_frequency + m_effectDuration ) )
 	{
 		Stop();
 		return;
 	}
 
 	// triggers based on the frequency interval unless maximum ammount of spawns has been reached
-	if( m_playTime > m_currentTriggerIndex / m_frequency && ( m_currentTriggerIndex < m_stopAfterNumTriggers || m_stopAfterNumTriggers == -1 ) )
+	if( m_playTime > m_currentTriggerIndex / m_frequency && ( m_currentTriggerIndex < m_stopAfterNumTriggers || m_stopAfterNumTriggers < 0 ) )
 	{
 		int locatorIndex = GetSmartRandomLocatorIndex();
 		if( !m_lastTriggered.empty() )

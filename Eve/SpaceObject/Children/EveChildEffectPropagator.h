@@ -126,7 +126,7 @@ private:
 	// Interval triggers
 	float m_frequency;
 	float m_effectDuration;
-	int32_t m_stopAfterNumTriggers;
+	float m_stopAfterNumTriggers;
 	int m_numDeleted;
 	std::vector<int> m_lastTriggered;
 
