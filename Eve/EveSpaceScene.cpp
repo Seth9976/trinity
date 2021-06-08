@@ -2341,7 +2341,9 @@ void EveSpaceScene::PopulatePerFramePSData( PerFramePSData &data, Tr2RenderConte
 	// make sure whatever direction we get in here, it is normalized! And inverted: Shaders work with direction to light...
 	data.Sun.DirWorld = -Normalize( data.Sun.DirWorld );
 	data.AmbientColor = Vector3( m_ambientColor.r, m_ambientColor.g, m_ambientColor.b );
-	data.NebulaIntensity = ( HasReflectionProbe() && m_reflectionProbe->IsHollyWoodModeOn() ) ? m_reflectionProbeIntensity : ( m_nebulaBrightnessOverride > 0.0f ? m_nebulaBrightnessOverride : m_nebulaIntensity );
+
+	float intensityValue = ( HasReflectionProbe() && m_reflectionProbe->IsHollyWoodModeOn() ) ? 1.0f : ( m_nebulaBrightnessOverride > 0.0f ? m_nebulaBrightnessOverride : m_nebulaIntensity );
+	data.NebulaIntensity = m_reflectionProbeIntensity * intensityValue;
 	data.FogColor = Vector4( m_fogColor.r, m_fogColor.g, m_fogColor.b, m_fogMax );
 
 	// ps gamma brightness
