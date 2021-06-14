@@ -72,14 +72,14 @@ TriStepRenderPostProcess::TriStepRenderPostProcess(IRoot* lockobj) :
 	m_tonemappingEffect->SetParameter(BlueSharedString("BlitCurrent"), m_renderInfo->GetBlackBuffer());
 	m_tonemappingEffect->SetParameter(BlueSharedString("BlitOriginal"), m_renderInfo->GetSourceBufferCopy());
 
-	m_tonemappingEffect->SetParameter( BlueSharedString( "ShoulderStrength" ), 0.15f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "LinearStrength" ), 0.50f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "ShoulderStrength" ), 0.21f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "LinearStrength" ), 0.20f );
 	m_tonemappingEffect->SetParameter( BlueSharedString( "LinearAngle" ), 0.1f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeStrength" ), 0.2f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeNumerator" ), 0.02f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeStrength" ), 0.21f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeNumerator" ), 0.021f );
 	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeDenominator" ), 0.3f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "WhiteScale" ), 11.2f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "SplitScreenRatio" ), 1280.0f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "WhiteScale" ), 4.35f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "SplitScreenRatio" ), 1.0f ); // TODO: review. 1.0 == new settings. we may want to remove this once we've found settings that we're happy with
 	m_tonemappingEffect->SetParameter( BlueSharedString( "AutoSwipe" ), Vector4( 0.0, 1000.0, 0.0, 0.0 ) );
 
 	m_tonemappingEffect->EndUpdate();
