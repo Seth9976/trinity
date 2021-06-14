@@ -72,10 +72,10 @@ TriStepRenderPostProcess::TriStepRenderPostProcess(IRoot* lockobj) :
 	m_tonemappingEffect->SetParameter(BlueSharedString("BlitCurrent"), m_renderInfo->GetBlackBuffer());
 	m_tonemappingEffect->SetParameter(BlueSharedString("BlitOriginal"), m_renderInfo->GetSourceBufferCopy());
 
-	m_tonemappingEffect->SetParameter( BlueSharedString( "ShoulderStrength" ), 0.21f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "LinearStrength" ), 0.20f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "ShoulderStrength" ), 0.125f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "LinearStrength" ), 0.25f );
 	m_tonemappingEffect->SetParameter( BlueSharedString( "LinearAngle" ), 0.1f );
-	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeStrength" ), 0.21f );
+	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeStrength" ), 0.15f );
 	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeNumerator" ), 0.021f );
 	m_tonemappingEffect->SetParameter( BlueSharedString( "ToeDenominator" ), 0.3f );
 	m_tonemappingEffect->SetParameter( BlueSharedString( "WhiteScale" ), 2.5f );
