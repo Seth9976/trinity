@@ -199,7 +199,7 @@ protected:
 
 		SunData Sun;
 		Vector3 AmbientColor;
-		float NebulaIntensity;
+		float ReflectionIntensity;
 		Vector4 FogColor;
 
 		// ViewportOffsetSize
@@ -434,6 +434,8 @@ protected:
 	Color m_ambientColor;
 	Color m_fogColor;
 	float m_nebulaIntensity;
+	Tr2Variable m_nebulaIntensityVar;
+
 	float m_fogStart; // Depth at which fogging starts
 	float m_fogEnd; // Depth at which fog does not get stronger
 	float m_fogMax; // Maximum strength of fog, range [0,1], at m_fogEnd distance.
@@ -560,8 +562,6 @@ private:
 	bool m_hasBackgroundDistortionBatches;
 	bool m_hasForegroundDistortionBatches;
 
-	float m_nebulaBrightnessOverride;
-	Tr2Variable m_nebulaBrightnessOverrideVar;
 	void TAAOffset( Tr2RenderContext& renderContext );
 
 	Tr2ImpostorManagerPtr m_impostorManager;
@@ -573,9 +573,9 @@ private:
 	Tr2PostProcess2Ptr m_postProcess;
 	Tr2ReflectionProbePtr m_reflectionProbe;
 
-	float m_reflectionProbeIntensity;
-	float m_reflectionProbeBackLightingContrast;
-	Color m_reflectionProbeBackLightingColor;
+	float m_reflectionIntensity;
+	float m_reflectionBackLightingContrast;
+	Color m_reflectionBackLightingColor;
 
 	BlueSharedString m_name;
 };
