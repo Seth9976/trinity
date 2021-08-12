@@ -68,6 +68,7 @@ BLUE_DECLARE( EveEffectRoot2 );
 BLUE_DECLARE( Tr2ReflectionProbe );
 BLUE_DECLARE( EvePlanet );
 BLUE_DECLARE_VECTOR( EvePlanet );
+BLUE_DECLARE( EveVirtualCameraSystem );
 
 enum TAASampling { TAA_NONE=0, TAA_RANDOM=1, TAA_2X=2, TAA_3X=3, TAA_4X=4 };
 
@@ -572,6 +573,7 @@ private:
 
 	Tr2PostProcess2Ptr m_postProcess;
 	Tr2ReflectionProbePtr m_reflectionProbe;
+	EveVirtualCameraSystemPtr m_virtualCameraSystem;
 
 	float m_reflectionIntensity;
 	float m_reflectionBackLightingContrast;

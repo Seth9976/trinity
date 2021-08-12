@@ -34,6 +34,7 @@
 #include "Tr2DebugRenderer.h"
 #include "EveEffectRoot2.h"
 #include "Tr2ReflectionProbe.h"
+#include "VirtualCamera/EveVirtualCameraSystem.h"
 
 using namespace Tr2RenderContextEnum;
 
@@ -137,7 +138,7 @@ EveSpaceScene::EveSpaceScene( IRoot* lockobj ) :
 	m_shadowCasterMaxCount( 16 ),
 	m_visualizeMethod( VM_NONE ),
 	m_perFrameDebug( 0.f ),
-	m_pickBuffer( NULL,  Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM, 1 ),
+	m_pickBuffer( NULL, Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM, 1 ),
 	m_envMapRotation( 0.0f, 0.0f, 0.0f, 1.0f ),
 	m_backgroundRenderingEnabled( false ),
 	m_debugShowShadowCasters( false ),
@@ -154,7 +155,7 @@ EveSpaceScene::EveSpaceScene( IRoot* lockobj ) :
 	m_depthMapMsaaVar( "DepthMapMsaa", (ITr2TextureProvider*)nullptr ),
 	m_envMapTransformVar( "EnvMapTransform", IdentityMatrix() ),
 	m_reflectionMapTransformVar( "ReflectionMapTransform", IdentityMatrix() ),
-	m_suncVecVar( "SunVec", Vector3( 0.0f, 0.0f, 1.0f )),
+	m_suncVecVar( "SunVec", Vector3( 0.0f, 0.0f, 1.0f ) ),
 	m_shadowLightnessVar( "ShadowLightness", 0.0f ),
 	m_nebulaIntensity( 1.f ),
 	m_nebulaIntensityVar( "NebulaIntensity", m_nebulaIntensity ),
@@ -172,7 +173,8 @@ EveSpaceScene::EveSpaceScene( IRoot* lockobj ) :
 	m_hasDepthPass( false ),
 	m_msaaSamples( 0 ),
 	m_hasBackgroundDistortionBatches( false ),
-	m_hasForegroundDistortionBatches( false )
+	m_hasForegroundDistortionBatches( false ),
+	m_virtualCameraSystem()
 {
 	TriPoolAllocator* allocator = Tr2Renderer::GetPoolAllocator();
 	m_primaryBatches[TRIBATCHTYPE_OPAQUE] = CCP_NEW( "EveSpaceScene/m_batches" ) TriRenderBatchAccumulator<EffectKeyGenerator>( allocator );
@@ -346,6 +348,11 @@ void EveSpaceScene::Update( Be::Time realTime, Be::Time simTime )
 
 	// Update planets
 	UpdatePlanets( m_updateContext );
+
+	if( m_virtualCameraSystem )
+	{
+		m_virtualCameraSystem->Update( realTime );
+	}
 
 	// Update all space objects
 	for( TriCurveSetVector::const_iterator it = m_curveSets.begin(); it != m_curveSets.end(); ++it )
@@ -2670,6 +2677,11 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 	if( m_debugRenderer )
 	{
 		gizmo = m_debugRenderer->Pick( gizmoDepth, renderContext );
+		if( gizmo )
+		{
+			result = gizmo.m_object;
+			areaID = gizmo.m_area;
+		}
 	}
 
 	// Find objects inside our 1-by-1 pick frustum
@@ -2757,11 +2769,6 @@ IRoot* EveSpaceScene::PickObjectAndArea( int x, int y, TriProjection* proj, TriV
 		{
 			result = collisionSet[objId].first->GetID( aId );
 			areaID = aId;
-		}
-		else if( gizmo )
-		{
-			result = gizmo.m_object;
-			areaID = gizmo.m_area;
 		}
 	}
 
@@ -2993,6 +3000,12 @@ void EveSpaceScene::RenderDebugInfo( Tr2RenderContext& renderContext )
 		{
 			(*it)->RenderDebugInfo( *m_debugRenderer );
 		}
+		
+		if( m_virtualCameraSystem )
+		{
+			m_virtualCameraSystem->RenderDebugInfo( *m_debugRenderer );
+		}
+
 		m_debugRenderer->EndRender( renderContext );
 
 		Tr2Renderer::RenderDebugInfo( renderContext );

@@ -127,6 +127,9 @@
     <Filter Include="Source Files\Eve\SpaceObject\Utils\fxAttributes">
       <UniqueIdentifier>{cffb3c09-f722-4bab-8126-8f6dc5168a0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Eve\VirtualCamera">
+      <UniqueIdentifier>{6c8d655e-9d59-43c6-92d2-edaa8a8cab2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ALResultBlue.h">
@@ -999,7 +1002,7 @@
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\SeekTarget.h">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
- 	<ClInclude Include="Eve\SpaceObject\Children\Behaviors\SpawnDrones.h">
+    <ClInclude Include="Eve\SpaceObject\Children\Behaviors\SpawnDrones.h">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClInclude>
     <ClInclude Include="Eve\SpaceObject\Children\Behaviors\SplineTunnelGroup.h">
@@ -3213,7 +3216,7 @@
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\SeekTarget_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClCompile>
-	<ClCompile Include="Eve\SpaceObject\Children\Behaviors\SpawnDrones.cpp">
+    <ClCompile Include="Eve\SpaceObject\Children\Behaviors\SpawnDrones.cpp">
       <Filter>Source Files\Eve\SpaceObject\Children\Behaviors</Filter>
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Children\Behaviors\SpawnDrones_Blue.cpp">
@@ -4461,6 +4464,18 @@
     <ClInclude Include="Eve\SpaceObject\Utils\fxAttributes\EveCameraFxAttributes.h">
       <Filter>Source Files\Eve\SpaceObject\Utils\fxAttributes</Filter>
     </ClInclude>
+    <ClInclude Include="Eve\VirtualCamera\EveVirtualCamera.h">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\VirtualCamera\EveVirtualCameraBehaviour.h">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\VirtualCamera\EveVirtualCameraSystem.h">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Eve\VirtualCamera\EveVirtualCameraTransition.h">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Audio\Tr2AudioStretchAuto.cpp">
@@ -4522,6 +4537,30 @@
     </ClCompile>
     <ClCompile Include="Eve\SpaceObject\Utils\fxAttributes\EveCameraFxAttributes_Blue.cpp">
       <Filter>Source Files\Eve\SpaceObject\Utils\fxAttributes</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCamera.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCamera_Blue.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCameraBehaviour.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCameraBehaviour_Blue.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCameraSystem.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCameraSystem_Blue.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCameraTransition.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Eve\VirtualCamera\EveVirtualCameraTransition_Blue.cpp">
+      <Filter>Source Files\Eve\VirtualCamera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
