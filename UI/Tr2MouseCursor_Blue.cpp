@@ -16,22 +16,26 @@ const Be::ClassInfo* Tr2MouseCursor::ExposeToBlue()
 
 		MAP_INTERFACE( Tr2MouseCursor )
 
-		MAP_METHOD_AND_WRAP( 
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS(
 			"__init__", 
-			py__init__, 
+			py__init__,
+			1,
 			"Creates a cursor from bitmap\n"
 			":param bitmap: bitmap containing cursor image\n"
 			":param hotspotX: horizontal offset to cursor hotspot\n"
 			":param hotspotY: vertical offset to cursor hotspot\n"
+			":param representations: optional list of alternative bitmaps for the cursor for different DPIs\n"
 			)
 
-		MAP_METHOD_AND_WRAP( 
+		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS(
 			"Create", 
-			Create, 
+			Create,
+			1,
 			"Creates a new mouse cursor image\n" 
 			":param bitmap: bitmap containing cursor image\n"
 			":param hotspotX: horizontal offset to cursor hotspot\n"
 			":param hotspotY: vertical offset to cursor hotspot\n"
+			":param representations: optional list of alternative bitmaps for the cursor for different DPIs\n"
 			)
 
 		MAP_METHOD_AND_WRAP( 

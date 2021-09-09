@@ -45,11 +45,11 @@ Tr2MouseCursor::~Tr2MouseCursor()
 // Description:
 //   Blue-exposed initializer. 
 // --------------------------------------------------------------------------------------
-void Tr2MouseCursor::py__init__( Tr2HostBitmap* bitmap, unsigned hotspotX, unsigned hotspotY )
+void Tr2MouseCursor::py__init__( Tr2HostBitmap* bitmap, unsigned hotspotX, unsigned hotspotY, const std::vector<Tr2HostBitmap*>& representations )
 {
 	if( bitmap )
 	{
-		Create( bitmap, hotspotX, hotspotY );
+		Create( bitmap, hotspotX, hotspotY, representations );
 	}
 }
 
@@ -229,6 +229,40 @@ static void DecompressBC2( char* dest, const char* source, unsigned width, unsig
 	}
 }
 
+std::unique_ptr<char[]> GetUncompressedBitmap( const Tr2HostBitmap* bitmap )
+{
+	std::unique_ptr<char[]> bits( new char[bitmap->GetWidth() * bitmap->GetHeight() * 4] );
+	switch( bitmap->GetFormat() )
+	{
+	case Tr2RenderContextEnum::PIXEL_FORMAT_BC1_TYPELESS:
+	case Tr2RenderContextEnum::PIXEL_FORMAT_BC1_UNORM:
+	case Tr2RenderContextEnum::PIXEL_FORMAT_BC1_UNORM_SRGB:
+		DecompressBC1( bits.get(), bitmap->GetRawData(), bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetWidth() * sizeof( uint32_t ) );
+		break;
+
+	case Tr2RenderContextEnum::PIXEL_FORMAT_BC2_TYPELESS:
+	case Tr2RenderContextEnum::PIXEL_FORMAT_BC2_UNORM:
+	case Tr2RenderContextEnum::PIXEL_FORMAT_BC2_UNORM_SRGB:
+		DecompressBC2( bits.get(), bitmap->GetRawData(), bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetWidth() * sizeof( uint32_t ) );
+		break;
+	case Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_TYPELESS:
+	case Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM:
+	case Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM_SRGB:
+		{
+			const char* row = bitmap->GetRawData();
+			for( uint32_t j = 0; j < bitmap->GetHeight(); ++j )
+			{
+				memcpy( bits.get() + j * bitmap->GetWidth() * 4, row, bitmap->GetWidth() * 4 );
+				row += bitmap->GetPitch();
+			}
+		}
+		break;
+	default:
+		return nullptr;
+	}
+	return bits;
+}
+
 // --------------------------------------------------------------------------------------
 // Description:
 //   Creates a new cursor.
@@ -241,7 +275,7 @@ static void DecompressBC2( char* dest, const char* source, unsigned width, unsig
 //   true If the cursor was successfully created
 //   false Otherwise
 // --------------------------------------------------------------------------------------
-bool Tr2MouseCursor::Create( Tr2HostBitmap* bitmap, int hotspotX, int hotspotY )
+bool Tr2MouseCursor::Create( Tr2HostBitmap* bitmap, int hotspotX, int hotspotY, const std::vector<Tr2HostBitmap*>& representations )
 {
 	if( bitmap == nullptr )
 	{
@@ -441,36 +475,27 @@ bool Tr2MouseCursor::Create( Tr2HostBitmap* bitmap, int hotspotX, int hotspotY )
 
 	return m_cursor != nullptr;
 #elif __APPLE__
-    std::unique_ptr<char[]> bits( new char[bitmap->GetWidth() * bitmap->GetHeight() * 4] );
-    switch( bitmap->GetFormat() )
-    {
-    case Tr2RenderContextEnum::PIXEL_FORMAT_BC1_TYPELESS:
-    case Tr2RenderContextEnum::PIXEL_FORMAT_BC1_UNORM:
-    case Tr2RenderContextEnum::PIXEL_FORMAT_BC1_UNORM_SRGB:
-        DecompressBC1( bits.get(), bitmap->GetRawData(), bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetWidth() * sizeof( uint32_t ) );
-        break;
-
-    case Tr2RenderContextEnum::PIXEL_FORMAT_BC2_TYPELESS:
-    case Tr2RenderContextEnum::PIXEL_FORMAT_BC2_UNORM:
-    case Tr2RenderContextEnum::PIXEL_FORMAT_BC2_UNORM_SRGB:
-        DecompressBC2( bits.get(), bitmap->GetRawData(), bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetWidth() * sizeof( uint32_t ) );
-        break;
-    case Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_TYPELESS:
-    case Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM:
-    case Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM_SRGB:
-        {
-            const char* row = bitmap->GetRawData();
-            for( uint32_t j = 0; j < bitmap->GetHeight(); ++j )
-            {
-                memcpy( bits.get() + j * bitmap->GetWidth() * 4, row, bitmap->GetWidth() * 4 );
-                row += bitmap->GetPitch();
-            }
-        }
-        break;
-    default:
-        return false;
-    }
-    return Create_MacOS( bits.get(), bitmap->GetWidth(), bitmap->GetHeight(), hotspotX, hotspotY );
+	std::vector<Representation> reprData;
+    std::unique_ptr<char[]> bits( GetUncompressedBitmap( bitmap ) );
+	if( !bits )
+	{
+		return false;
+	}
+	reprData.emplace_back( Representation{ bitmap->GetWidth(), bitmap->GetHeight(), std::move( bits ) } );
+	for (auto bmp : representations )
+	{
+		if( bmp )
+		{
+			auto reprBits( GetUncompressedBitmap( bmp ) );
+			if( !reprBits )
+			{
+				continue;
+			}
+			reprData.emplace_back( Representation{ bmp->GetWidth(), bmp->GetHeight(), std::move( reprBits ) } );
+		}
+	}
+	
+    return Create_MacOS( reprData, bitmap->GetWidth(), bitmap->GetHeight(), hotspotX, hotspotY );
 #else
     return false;
 #endif

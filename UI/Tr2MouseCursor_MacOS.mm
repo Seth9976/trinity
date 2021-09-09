@@ -11,23 +11,27 @@
 #import <Cocoa/Cocoa.h>
 
 
-bool Tr2MouseCursor::Create_MacOS( const char* bits, uint32_t width, uint32_t height, int hotspotX, int hotspotY )
+bool Tr2MouseCursor::Create_MacOS( const std::vector<Representation>& representations, uint32_t width, uint32_t height, int hotspotX, int hotspotY )
 {
-    auto rep = [[NSBitmapImageRep alloc]
-                initWithBitmapDataPlanes:nil
-                pixelsWide:width
-                pixelsHigh:height
-                bitsPerSample:8
-                samplesPerPixel:4
-                hasAlpha:YES
-                isPlanar:NO
-                colorSpaceName:NSCalibratedRGBColorSpace
-                bitmapFormat:NSBitmapFormatAlphaNonpremultiplied
-                bytesPerRow:width * 4
-                bitsPerPixel:32];
-    memcpy( [rep bitmapData], bits, width * height * 4 );
     auto image = [[NSImage alloc] initWithSize:NSMakeSize( width, height )];
-    [image addRepresentation:rep];
+
+    for( const auto& repr : representations )
+    {
+        auto bmp = [[NSBitmapImageRep alloc]
+                    initWithBitmapDataPlanes:nil
+                    pixelsWide:repr.width
+                    pixelsHigh:repr.height
+                    bitsPerSample:8
+                    samplesPerPixel:4
+                    hasAlpha:YES
+                    isPlanar:NO
+                    colorSpaceName:NSCalibratedRGBColorSpace
+                    bitmapFormat:NSBitmapFormatAlphaNonpremultiplied
+                    bytesPerRow:repr.width * 4
+                    bitsPerPixel:32];
+        memcpy( [bmp bitmapData], repr.pixelData.get(), repr.width * repr.height * 4 );
+        [image addRepresentation:bmp];
+    }
     
     m_cursor = [[NSCursor alloc] initWithImage:image hotSpot:NSMakePoint( CGFloat( hotspotX ), CGFloat( hotspotY ) )];
     
