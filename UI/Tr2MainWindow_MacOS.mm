@@ -15,7 +15,7 @@
 #import <Cocoa/Cocoa.h>
 #import <GameController/GameController.h>
 #import <QuartzCore/QuartzCore.h>
-
+#import <IOKit/pwr_mgt/IOPMLib.h>
 
 extern CcpMeanStatisticsEntry g_activeFrametimeMean;
 extern CcpStdDevStatisticsEntry g_activeFrametimeStdDev;
@@ -162,6 +162,17 @@ void HandleThermalState()
 	}
 }
 
+bool DisableScreensaver()
+{
+	IOPMAssertionID assertionID;
+	IOReturn success = IOPMAssertionCreateWithName(
+						   kIOPMAssertionTypeNoDisplaySleep,
+						   kIOPMAssertionLevelOn,
+						   static_cast<CFStringRef>( @"Prevent sleep" ),
+						   &assertionID );
+	return success == kIOReturnSuccess;
+}
+
 void InitializeApplication()
 {
     if( s_applicationInitialized )
@@ -183,6 +194,8 @@ void InitializeApplication()
     [NSNotificationCenter.defaultCenter addObserverForName:@"NSProcessInfoThermalStateDidChangeNotification" object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
         HandleThermalState();
     }];
+	
+	DisableScreensaver();
 
     if (@available(macOS 10.15, *))
     {
