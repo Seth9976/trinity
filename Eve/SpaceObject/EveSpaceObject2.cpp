@@ -197,6 +197,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 
 	m_controllers.SetNotify( this );
 	m_effectChildren.SetNotify( this );
+    m_overlayEffects.SetNotify( this );
 
 	SetControllerVariable( "DirtLevel", m_dirtLevel );
 	SetControllerVariable( "ActivationStrength", m_spaceObjectShipData.y );
@@ -286,6 +287,23 @@ void EveSpaceObject2::OnListModified( long event, ssize_t key, ssize_t key2, IRo
 			break;
 		}
 	}
+    else if( list == &m_overlayEffects && ( event & BELIST_LOADING ) == 0 )
+    {
+        switch( event & BELIST_EVENTMASK )
+        {
+            case BELIST_INSERTED:
+                if( ITr2ControllerOwnerPtr child = BlueCastPtr( value ) )
+                {
+                    for( auto it = begin( m_controllerVariables ); it != end( m_controllerVariables ); ++it )
+                    {
+                        child->SetControllerVariable( it->first.c_str(), it->second );
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void EveSpaceObject2::RegisterSecondaryLightSource( Tr2ShLightingManager& manager )
@@ -2487,18 +2505,18 @@ void EveSpaceObject2::AddLocator( EveLocator2* newLocator )
 // Description:
 //   Add a new overlayEffect to the space object
 // --------------------------------------------------------------------------------
-void EveSpaceObject2::AddOverlayEffect( EveMeshOverlayEffect* newOverlayEffect )
+void EveSpaceObject2::AddOverlayEffect( EveMeshOverlayEffectPtr newOverlayEffect )
 {
-	this->m_overlayEffects.Append( newOverlayEffect );
+    this->m_overlayEffects.Append( newOverlayEffect->GetRawRoot() );
 }
 
 // --------------------------------------------------------------------------------
 // Description:
 //   Remove a specific overlayEffect from the space object
 // --------------------------------------------------------------------------------
-void EveSpaceObject2::RemoveOverlayEffect( EveMeshOverlayEffect* overlayEffectToRemove )
+void EveSpaceObject2::RemoveOverlayEffect( EveMeshOverlayEffectPtr overlayEffectToRemove )
 {
-	ssize_t index = m_overlayEffects.FindKey( overlayEffectToRemove );
+	ssize_t index = m_overlayEffects.FindKey( overlayEffectToRemove->GetRawRoot() );
 	m_overlayEffects.Remove( index );
 }
 
@@ -3172,6 +3190,10 @@ void EveSpaceObject2::SetControllerVariable( const char* name, float value )
 		auto child = *it;
 		child->SetControllerVariable( name, value );
 	}
+    for( auto it = begin( m_overlayEffects ); it != end( m_overlayEffects ); ++it )
+    {
+        ( *it )->SetControllerVariable( name, value );
+    }
 }
 
 void EveSpaceObject2::HandleControllerEvent( const char* name )
@@ -3182,8 +3204,12 @@ void EveSpaceObject2::HandleControllerEvent( const char* name )
 	}
 	for( auto it = begin( m_effectChildren ); it != end( m_effectChildren ); ++it )
 	{
-		( *it )->HandleControllerEvent( name );
+        ( *it )->HandleControllerEvent( name );
 	}
+    for( auto it = begin( m_overlayEffects ); it != end( m_overlayEffects ); ++it )
+    {
+        ( *it )->HandleControllerEvent( name );
+    }
 }
 
 void EveSpaceObject2::StartControllers()
@@ -3196,6 +3222,10 @@ void EveSpaceObject2::StartControllers()
 	{
 		auto child = *it;
 		child->StartControllers();
+	}
+    for( auto it = begin( m_overlayEffects ); it != end( m_overlayEffects ); ++it )
+	{
+        ( *it )->StartControllers();
 	}
 }
 

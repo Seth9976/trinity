@@ -8,6 +8,7 @@
 #include "EveMeshOverlayEffect.h"
 #include "Shader/Tr2Effect.h"
 #include "Curves/TriCurveSet.h"
+#include "Controllers/ITr2Controller.h"
 
 
 // --------------------------------------------------------------------------------------
@@ -29,8 +30,10 @@ EveMeshOverlayEffect::EveMeshOverlayEffect( IRoot* lockobj ):
 	PARENTLOCK( m_decalEffects ),
 	PARENTLOCK( m_transparentEffects ),
 	PARENTLOCK( m_additiveEffects ),
-	PARENTLOCK( m_distortionEffects )
+	PARENTLOCK( m_distortionEffects ),
+    PARENTLOCK( m_controllers )
 {
+    m_controllers.SetNotify( this );
 }
 
 // --------------------------------------------------------------------------------------
@@ -39,7 +42,35 @@ EveMeshOverlayEffect::EveMeshOverlayEffect( IRoot* lockobj ):
 // --------------------------------------------------------------------------------------
 bool EveMeshOverlayEffect::Initialize()
 {
+    for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+    {
+        ( *it )->Link( *GetRawRoot() );
+    }
+
 	return true;
+}
+
+// --------------------------------------------------------------------------------------
+// Description:
+//   IListNotify
+// --------------------------------------------------------------------------------------
+void EveMeshOverlayEffect::OnListModified( long event, ssize_t key, ssize_t key2, IRoot* value, const IList* list ) {
+    if (list == &m_controllers && (event & BELIST_LOADING) == 0) {
+        switch (event & BELIST_EVENTMASK) {
+            case BELIST_INSERTED:
+                if (ITr2ControllerPtr controller = BlueCastPtr(value)) {
+                    controller->Link(*GetRawRoot());
+                }
+                break;
+            case BELIST_REMOVED:
+                if (ITr2ControllerPtr controller = BlueCastPtr(value)) {
+                    controller->Unlink();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 // --------------------------------------------------------------------------------------
@@ -125,6 +156,33 @@ const PTr2EffectVector& EveMeshOverlayEffect::GetEffects(TriBatchType batchType,
 	return m_opaqueEffects;
 }
 
+// --------------------------------------------------------------------------------
+// ITr2ControllerOwner
+
+void EveMeshOverlayEffect::SetControllerVariable( const char* name, float value )
+{
+    for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+    {
+        ( *it )->SetVariable( name, value );
+    }
+}
+
+
+void EveMeshOverlayEffect::HandleControllerEvent( const char* name )
+{
+    for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+    {
+        ( *it )->HandleEvent( name );
+    }
+}
+
+void EveMeshOverlayEffect::StartControllers()
+{
+    for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+    {
+        ( *it )->Start();
+    }
+}
 
 // --------------------------------------------------------------------------------------
 // Description:
@@ -138,4 +196,9 @@ void EveMeshOverlayEffect::Update( Be::Time realTime, Be::Time simTime )
 	}
 
 	m_curveSet->Update( realTime, simTime );
+
+    for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
+    {
+        ( *it )->Update();
+    }
 }
