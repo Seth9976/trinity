@@ -22,6 +22,11 @@ EveSpaceObjectFxAttributes::~EveSpaceObjectFxAttributes()
 
 void EveSpaceObjectFxAttributes::UpdateAsyncronous( EveUpdateContext& updateContext, const EveChildUpdateParams& params )
 {
+    if (nullptr == params.spaceObjectParent)
+    {
+        return;
+    }
+
 	if( !m_initialized )
 	{
 		// things we only want to calculate once
