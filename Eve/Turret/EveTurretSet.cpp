@@ -2872,6 +2872,11 @@ void EveTurretSet::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 // --------------------------------------------------------------------------------
 void EveTurretSet::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
+    if( !m_display )
+    {
+        return;
+    }
+    
 	if( nullptr != m_firingEffect )
 	{
 		m_firingEffect->AddQuadsToQuadRenderer( frustum, quadRenderer );
