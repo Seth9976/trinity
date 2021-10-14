@@ -20,7 +20,6 @@ Tr2ActionSetExternalControllerVariable::Tr2ActionSetExternalControllerVariable( 
 	m_value( 0.0 ),
 	m_startControllers( false )
 {
-
 }
 
 void Tr2ActionSetExternalControllerVariable::Link( Tr2Controller& controller )
@@ -37,6 +36,11 @@ void Tr2ActionSetExternalControllerVariable::Unlink()
 
 void Tr2ActionSetExternalControllerVariable::Start( Tr2Controller& controller )
 {
+	if( !IsDestinationValid() )
+	{
+		LinkToDestinationOwner();
+	}
+
 	if( IsDestinationValid() )
 	{
 		if( m_startControllers )
@@ -44,14 +48,14 @@ void Tr2ActionSetExternalControllerVariable::Start( Tr2Controller& controller )
 			m_destination->StartControllers();
 		}
 		float value = m_value;
-		if( !m_sourceVariable.empty() ) 
+		if( !m_sourceVariable.empty() )
 		{
 			if( auto var = m_controller->GetVariableByName( m_sourceVariable.c_str() ) )
 			{
-				value = var->GetValue();				
-			}			
+				value = var->GetValue();
+			}
 		}
-	
+
 		m_destination->SetControllerVariable( m_variable.c_str(), value );
 	}
 }
@@ -88,7 +92,7 @@ void Tr2ActionSetExternalControllerVariable::LinkToDestinationOwner()
 	std::string destOwner = m_destinationOwner.c_str();
 	std::transform( destOwner.begin(), destOwner.end(), destOwner.begin(), ::tolower );
 
-	for( auto &it : bindingPathRoots )
+	for( auto& it : bindingPathRoots )
 	{
 		auto key = it.first;
 		std::transform( key.begin(), key.end(), key.begin(), ::tolower );
