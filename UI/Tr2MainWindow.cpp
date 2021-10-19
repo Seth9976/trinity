@@ -262,11 +262,13 @@ ALResult Tr2MainWindow::SetState( bool adjustWindow, const Tr2MainWindowState::S
 	Tr2PresentParametersAL presentParams;
 
 	m_isResizing = true;
+	bool justCreatedWindow = false;
 
 	if( !HasWindow() )
 	{
 		CCP_LOG_CH( s_moduleChannel, "Creating window" );
 		CreateOSWindow( state );
+		justCreatedWindow = true;
 		// TODO: this SetPresentation thing is not doing what you'd think it would be doing :/
 		gTriDev->SetPresentation( state.adapter, &presentParams );
 	}
@@ -291,7 +293,7 @@ ALResult Tr2MainWindow::SetState( bool adjustWindow, const Tr2MainWindowState::S
 	}
 
 #ifdef _WIN32
-	if( adjustWindow && m_state.windowMode == Tr2WindowMode::FULL_SCREEN && state.windowMode != Tr2WindowMode::FULL_SCREEN )
+	if( adjustWindow && !justCreatedWindow && m_state.windowMode == Tr2WindowMode::FULL_SCREEN && state.windowMode != Tr2WindowMode::FULL_SCREEN )
 	{
 		AdjustWindow( state );
 	}
