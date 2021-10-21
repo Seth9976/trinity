@@ -24,6 +24,8 @@
 CCP_STATS_DECLARED_ELSEWHERE( primitiveCount );
 
 using namespace Tr2RenderContextEnum;
+extern bool g_brokenMacOSNvidiaDrivers;
+
 
 // names of system bones like they are in the granny file
 static std::string s_systemBoneSkeletonNames[] = {
@@ -851,6 +853,15 @@ bool EveTurretSet::UpdateLOD()
 	{
 		return false;
 	}
+
+    LOD oldLOD = m_lodLevel;
+
+    if( g_brokenMacOSNvidiaDrivers && m_singleTurrets.size() > 1 )
+    {
+        m_lodLevel = LOD_EMPTY;
+        return oldLOD != m_lodLevel;
+    }
+    
 	// if the pixeldiameter is negative that means it is not a reliable value, so
 	// don't do lod calculations with it
 	if( m_estimatedPixelDiameter < 0.f )
@@ -858,7 +869,6 @@ bool EveTurretSet::UpdateLOD()
 		return false;
 	}
 
-	LOD oldLOD = m_lodLevel;
 	if( m_estimatedPixelDiameter < 2.f * g_eveSpaceSceneVisibilityThreshold )
 	{
 		// totally EMPTY: no turret visible at all

@@ -25,6 +25,8 @@ extern CcpStaticStatisticsEntry * g_ccpStatistics_drawcallCount;
 #define CCP_STATS_INC_PTR( name )
 #endif
 
+extern bool g_brokenMacOSNvidiaDrivers;
+
 // --------------------------------------------------------------------------------------
 // Description:
 //   Render batch for Tr2InstancedMesh.
@@ -417,7 +419,7 @@ void Tr2InstancedMesh::GetBatches( ITriRenderBatchAccumulator* batches,
 					const Tr2PerObjectData* data,
 					ITr2MeshBatchCallback* callback ) const
 {
-	if( !GetDisplay() )
+	if( !GetDisplay() || g_brokenMacOSNvidiaDrivers )
 	{
 		return;
 	}
@@ -616,6 +618,10 @@ void Tr2InstancedMesh::RenderAreas( unsigned int areaIx,
 									bool reversed, 
 									Tr2RenderContext& renderContext )
 {
+    if( g_brokenMacOSNvidiaDrivers )
+    {
+        return;
+    }
 	if( m_instanceCount )
 	{
 		if( !m_geometryResource || !m_geometryResource->IsGood() )
