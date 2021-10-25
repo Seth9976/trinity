@@ -256,7 +256,6 @@ EveSpaceScene::~EveSpaceScene()
 	}
 }
 
-
 void EveSpaceScene::ReleaseResources( TriStorage s )
 {
 	// handles
@@ -270,6 +269,18 @@ void EveSpaceScene::ReleaseResources( TriStorage s )
 		m_perFrameVSBuffer = Tr2ConstantBufferAL();
 		m_perFramePSBuffer = Tr2ConstantBufferAL();
 		m_shadowPerFrameVSBuffer = Tr2ConstantBufferAL();
+	}
+}
+
+Tr2PostProcess2Ptr EveSpaceScene::GetPostProcess()
+{
+	if( !m_display )
+	{
+		return nullptr;
+	}
+	else
+	{
+		return m_postProcess;
 	}
 }
 
@@ -949,7 +960,7 @@ bool EveSpaceScene::RenderDistortionBatches( BatchMap& batches, Tr2RenderContext
     {
         return false;
     }
-
+	
     // Hold on to original depth stencil and back buffer
 	Tr2PushPopRT pushPopRT( *m_distortionMap, renderContext );
 	Tr2PushPopDS pushPopDS( renderContext );

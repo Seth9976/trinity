@@ -157,7 +157,7 @@ public:
 	void SetShLightingManager( Tr2ShLightingManager* manager );
 
 	IEveSpaceObject2Vector& Objects() { return m_objects; }
-	Tr2PostProcess2Ptr GetPostProcess() { return m_postProcess; }
+	Tr2PostProcess2Ptr GetPostProcess();
 	Tr2ShaderBufferPtr GetPostProcessPSBuffer();
 	void SetupTAA( Tr2RenderTargetPtr velocityMap, float pixelOffsetScale, TAASampling sampling );
 
