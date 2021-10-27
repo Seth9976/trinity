@@ -48,6 +48,9 @@ private:
 	// Number of pixels on the right edge of the texture
 	unsigned int m_rightEdgeSize;
 
+	// Scaling for edges when rendering (for UI scaling)
+	float m_edgeScale;
+
 	// Saturation factor, used when TR2_SFX_COLOROVERLAY or TR2_SFX_SOFTLIGHT is used
 	float m_saturation;
 

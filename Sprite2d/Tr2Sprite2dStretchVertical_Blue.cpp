@@ -24,6 +24,12 @@ const Be::ClassInfo* Tr2Sprite2dStretchVertical::ExposeToBlue()
 			Be::READWRITE | Be::NOTIFY
 		)
 
+		MAP_ATTRIBUTE(
+			"edgeScale",
+			m_edgeScale,
+			"Edge size scaling when rendering the stretch; used for UI scaling",
+			Be::READWRITE | Be::NOTIFY )
+
 		MAP_ATTRIBUTE
 		(
 			"fillCenter",

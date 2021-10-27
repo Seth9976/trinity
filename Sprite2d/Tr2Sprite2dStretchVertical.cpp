@@ -23,6 +23,7 @@ static const Color WHITE( 1.0f, 1.0f, 1.0f, 1.0f );
 Tr2Sprite2dStretchVertical::Tr2Sprite2dStretchVertical( IRoot* lockobj ) : 
 	m_topEdgeSize( 0 ),
 	m_bottomEdgeSize( 0 ),
+	m_edgeScale( 1.f ),
 	m_fillCenter( true ),
 	m_offset( 0 ),
 	m_saturation( 1.0f ),
@@ -186,7 +187,7 @@ void Tr2Sprite2dStretchVertical::PrepareVertices( Tr2Sprite2dVertexBase* v, floa
 	//
 	// Vertex 2
 	v->position.x = 0.0f + vertOffset.x;
-	v->position.y = offsetY + topEdgeSize * scale.y + vertOffset.y;
+	v->position.y = offsetY + topEdgeSize * m_edgeScale * scale.y + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = 0.0f;
 	v->texCoord[0].y = topEdgeSize / srcHeight;
@@ -197,7 +198,7 @@ void Tr2Sprite2dStretchVertical::PrepareVertices( Tr2Sprite2dVertexBase* v, floa
 
 	// Vertex 3
 	v->position.x = scaledWidth + vertOffset.x;
-	v->position.y = offsetY + topEdgeSize * scale.y + vertOffset.y;
+	v->position.y = offsetY + topEdgeSize * m_edgeScale * scale.y + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = 1.0f;
 	v->texCoord[0].y = topEdgeSize / srcHeight;
@@ -211,7 +212,7 @@ void Tr2Sprite2dStretchVertical::PrepareVertices( Tr2Sprite2dVertexBase* v, floa
 	//
 	// Vertex 4
 	v->position.x = 0.0f + vertOffset.x;
-	v->position.y = offsetY + scaledHeight - bottomEdgeSize * scale.y + vertOffset.y;
+	v->position.y = offsetY + scaledHeight - bottomEdgeSize * m_edgeScale * scale.y + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = 0.0f;
 	v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;
@@ -222,7 +223,7 @@ void Tr2Sprite2dStretchVertical::PrepareVertices( Tr2Sprite2dVertexBase* v, floa
 
 	// Vertex 5
 	v->position.x = scaledWidth + vertOffset.x;
-	v->position.y = offsetY + scaledHeight - bottomEdgeSize * scale.y + vertOffset.y;
+	v->position.y = offsetY + scaledHeight - bottomEdgeSize * m_edgeScale * scale.y + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = 1.0f;
 	v->texCoord[0].y = 1.0f - topEdgeSize / srcHeight;

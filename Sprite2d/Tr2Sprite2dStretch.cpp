@@ -23,6 +23,7 @@ static const Color WHITE( 1.0f, 1.0f, 1.0f, 1.0f );
 Tr2Sprite2dStretch::Tr2Sprite2dStretch( IRoot* lockobj ) : 
 	m_leftEdgeSize( 0 ),
 	m_rightEdgeSize( 0 ),
+	m_edgeScale( 1.f ),
 	m_offset( 0 ),
 	m_fillCenter( true ),
 	m_dpiScaleBehavior( S2D_SSC_ALIGN_BOTTOMRIGHT ),
@@ -185,7 +186,7 @@ void Tr2Sprite2dStretch::PrepareVertices( Tr2Sprite2dVertexBase* v, float srcWid
 	++v;
 
 	// Vertex 1
-	v->position.x = offsetX + leftEdgeSize * scale.x + vertOffset.x;
+	v->position.x = offsetX + leftEdgeSize * m_edgeScale * scale.x + vertOffset.x;
 	v->position.y = offsetY + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = leftEdgeSize / srcWidth;
@@ -196,7 +197,7 @@ void Tr2Sprite2dStretch::PrepareVertices( Tr2Sprite2dVertexBase* v, float srcWid
 	++v;
 
 	// Vertex 2
-	v->position.x = offsetX + scaledWidth - rightEdgeSize * scale.x + vertOffset.x;
+	v->position.x = offsetX + scaledWidth - rightEdgeSize * m_edgeScale * scale.x + vertOffset.x;
 	v->position.y = offsetY + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = 1.0f - rightEdgeSize / srcWidth;
@@ -232,7 +233,7 @@ void Tr2Sprite2dStretch::PrepareVertices( Tr2Sprite2dVertexBase* v, float srcWid
 	++v;
 
 	// Vertex 5
-	v->position.x = offsetX + leftEdgeSize * scale.x + vertOffset.x;
+	v->position.x = offsetX + leftEdgeSize * m_edgeScale * scale.x + vertOffset.x;
 	v->position.y = y1 + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = leftEdgeSize / srcWidth;
@@ -243,7 +244,7 @@ void Tr2Sprite2dStretch::PrepareVertices( Tr2Sprite2dVertexBase* v, float srcWid
 	++v;
 
 	// Vertex 6
-	v->position.x = offsetX + scaledWidth - rightEdgeSize * scale.x + vertOffset.x;
+	v->position.x = offsetX + scaledWidth - rightEdgeSize * m_edgeScale * scale.x + vertOffset.x;
 	v->position.y = y1 + vertOffset.y;
 	v->position.z = 0.0f;
 	v->texCoord[0].x = 1.0f - rightEdgeSize / srcWidth;
