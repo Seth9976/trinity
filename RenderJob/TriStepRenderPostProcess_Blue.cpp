@@ -18,6 +18,7 @@ const Be::ClassInfo* TriStepRenderPostProcess::ExposeToBlue()
 	EXPOSURE_BEGIN( TriStepRenderPostProcess, "Render step for rendering post process" )
 
 		MAP_INTERFACE( TriRenderStep )
+		MAP_INTERFACE( INotify )
 		MAP_INTERFACE( TriStepRenderPostProcess )
 
 		MAP_ATTRIBUTE( "scene", m_scene, "The scene to be rendered", Be::READWRITE )
@@ -41,7 +42,7 @@ const Be::ClassInfo* TriStepRenderPostProcess::ExposeToBlue()
 		MAP_ATTRIBUTE( "accumulationBuffer", m_accumulationBuffer, "The accumulation buffer", Be::READWRITE )
 		MAP_ATTRIBUTE( "velocityBuffer", m_velocityBuffer, "The velocity buffer", Be::READWRITE )
 
-		MAP_ATTRIBUTE_WITH_CHOOSER( "quality", m_quality, "The quality of the post process", Be::READWRITE | Be::ENUM, PostProcessQualityChooser )
+		MAP_ATTRIBUTE_WITH_CHOOSER( "quality", m_quality, "The quality of the post process", Be::READWRITE | Be::ENUM | Be::NOTIFY, PostProcessQualityChooser )
 
 		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(

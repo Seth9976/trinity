@@ -56,12 +56,12 @@ TriStepRenderPostProcess::TriStepRenderPostProcess(IRoot* lockobj) :
 	m_tonemappingEffect->SetParameter(BlueSharedString("VignetteDetailScroll"), Vector4(0.0, 0.0, 0.0, 0.0));
 	m_tonemappingEffect->SetParameter(BlueSharedString("GrainColorAmount"), 0.600000023842f);
 	m_tonemappingEffect->SetOption(BlueSharedString("TONE_MAPPING_TOGGLE"), BlueSharedString("TONE_MAPPING_ENABLED"));
-	m_tonemappingEffect->SetOption(BlueSharedString("DESATURATE_TOGGLE"), BlueSharedString("DESATURATE_ENABLED"));
+	m_tonemappingEffect->SetOption(BlueSharedString("DESATURATE_TOGGLE"), BlueSharedString("DESATURATE_DISABLED"));
 	m_tonemappingEffect->SetParameter(BlueSharedString("VignetteColor"), Vector4(1.0, 1.0, 1.0, 1.0));
 	m_tonemappingEffect->SetParameter(BlueSharedString("VignetteSineRange"), Vector4(0.0, 1.0, 0.0, 0.0));
 	m_tonemappingEffect->SetParameter(BlueSharedString("GrainIntensity"), 0.00300000002608f);
 	m_tonemappingEffect->SetOption(BlueSharedString("COLORED_GRAIN_TOGGLE"), BlueSharedString("COLORED_GRAIN_DISABLED"));
-	m_tonemappingEffect->SetOption(BlueSharedString("LUT_TOGGLE"), BlueSharedString("LUT_ENABLED"));
+	m_tonemappingEffect->SetOption(BlueSharedString("LUT_TOGGLE"), BlueSharedString("LUT_DISABLED"));
 	m_tonemappingEffect->SetParameter(BlueSharedString("FadeAmount"), 0.0f);
 	m_tonemappingEffect->SetParameter(BlueSharedString("GrimeWeight"), 0.0f);
 	m_tonemappingEffect->SetParameter(BlueSharedString("ExposureAdjust"), 1.0f);
@@ -124,6 +124,12 @@ void SetDirtyIfNotNull(Tr2PPEffect *effect)
 	{
 		effect->SetDirty(true);
 	}
+}
+
+bool TriStepRenderPostProcess::OnModified( Be::Var* value )
+{
+	m_sceneDirty = true;
+	return true;
 }
 
 TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext)
@@ -215,13 +221,10 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 		m_sceneDirty = false;
 	}
 
-	auto nonMsaaSource = sourceBuffer;
-	if( sourceBuffer->GetMsaaType() > 1 )
-	{
-		nonMsaaSource = m_renderInfo->GetTempTexture();
-		sourceBuffer->GetRenderTarget().Resolve( *nonMsaaSource, renderContext );
-	}
-
+        // Always resolve (if no msaa then we copy)
+	auto nonMsaaSource = m_renderInfo->GetTempTexture();
+	sourceBuffer->GetRenderTarget().Resolve( *nonMsaaSource, renderContext );
+	
 	if (ProcessFog(fog))
 	{
 		RenderFog( nonMsaaSource, renderContext, fog );

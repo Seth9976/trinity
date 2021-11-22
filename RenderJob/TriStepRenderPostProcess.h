@@ -22,7 +22,9 @@ BLUE_DECLARE( Tr2PPFidelityFXEffect );
 // SeeAlso:
 //   TriRenderStep
 // -------------------------------------------------------------
-BLUE_CLASS( TriStepRenderPostProcess ) : public TriRenderStep
+BLUE_CLASS( TriStepRenderPostProcess ) : 
+	public TriRenderStep,
+	public INotify
 {
 public:
 	EXPOSE_TO_BLUE();
@@ -40,6 +42,9 @@ public:
 
 	//RenderStep
 	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
+
+	// INotify
+	bool OnModified( Be::Var * val );
 
 	void py__init__( EveSpaceScene* scene, Tr2RenderTarget* source );
 private:
