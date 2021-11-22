@@ -184,7 +184,7 @@ const Vector4* EveSOFUtils::SearchForParameterData( const EveSOFDataMgr* dataMgr
 		auto finder = areaMaterialData->glowColor.find( k );
 		if( finder != areaMaterialData->glowColor.end() )
 		{
-			EveSOFDataFactionColorSet::ColorType glowColorType = finder->second;
+            SOFDataFactionColorChooser::ColorType glowColorType = finder->second;
 			return (const Vector4*)&colorSet[glowColorType];
 		}
 	}

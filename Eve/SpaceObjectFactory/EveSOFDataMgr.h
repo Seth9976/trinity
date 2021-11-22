@@ -44,7 +44,7 @@ public:
 	struct AreaMaterialData
 	{
 		std::map<std::pair<uint32_t, uint32_t>, BlueSharedString> materialNames;
-		std::map<std::pair<uint32_t, std::string>, EveSOFDataFactionColorSet::ColorType> glowColor;
+		std::map<std::pair<uint32_t, std::string>, SOFDataFactionColorChooser::ColorType> glowColor;
 	};
 
 	// pattern data structs
@@ -143,7 +143,7 @@ public:
 		Vector3 position;
 		float blinkRate, blinkPhase, minScale, maxScale, falloff, intensity;
 		int boneIndex;
-		EveSOFDataFactionColorSet::ColorType colorType;
+        SOFDataFactionColorChooser::ColorType colorType;
 	};
 
 	struct HullSpriteSetData
@@ -160,7 +160,7 @@ public:
 		float spacing, blinkRate, blinkPhase, blinkPhaseShift, minScale, maxScale, falloff, intensity;
 		int boneIndex;
 		bool isCircle;
-		EveSOFDataFactionColorSet::ColorType colorType;
+        SOFDataFactionColorChooser::ColorType colorType;
 	};
 
 	struct HullSpriteLineSetData
@@ -175,7 +175,7 @@ public:
 		Vector3 position, scaling;
 		int boneIndex;
 		Quaternion rotation;
-		EveSOFDataFactionColorSet::ColorType colorType;
+        SOFDataFactionColorChooser::ColorType colorType;
 		float hazeBrightness, hazeFalloff, sourceSize, sourceBrightness;
 		bool boosterGainInfluence;
 	};
@@ -381,7 +381,7 @@ public:
 	struct ColorData
 	{
 		// color data
-		Color colors[EveSOFDataFactionColorSet::TYPE_MAX];
+		Color colors[SOFDataFactionColorChooser::TYPE_MAX];
 	};
 
 

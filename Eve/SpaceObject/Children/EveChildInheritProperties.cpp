@@ -23,3 +23,8 @@ void EveChildInheritProperties::SetProperties( const Color* colorSet )
 		memcpy( m_colorSet, colorSet, sizeof( m_colorSet ) );
 	}
 }
+
+const Color* EveChildInheritProperties::GetProperties()
+{
+    return m_colorSet;
+}

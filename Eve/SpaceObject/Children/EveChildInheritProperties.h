@@ -19,8 +19,9 @@ public:
 	~EveChildInheritProperties();
 
 	void SetProperties( const Color *colorSet );
+    const Color* GetProperties();
 protected:
-	Color m_colorSet[EveSOFDataFactionColorSet::TYPE_MAX];
+	Color m_colorSet[SOFDataFactionColorChooser::TYPE_MAX];
 };
 
 TYPEDEF_BLUECLASS( EveChildInheritProperties );

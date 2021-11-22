@@ -24,7 +24,7 @@ EveSOFData::~EveSOFData()
 
 
 EveSOFDataAreaMaterial::EveSOFDataAreaMaterial( IRoot* lockobj ) :
-	m_glowColorType( EveSOFDataFactionColorSet::TYPE_HULL )
+	m_glowColorType( SOFDataFactionColorChooser::TYPE_HULL )
 {}
 
 
@@ -34,7 +34,7 @@ EveSOFDataArea::EveSOFDataArea( IRoot* lockobj )
 
 EveSOFDataFactionColorSet::EveSOFDataFactionColorSet( IRoot* lockobj )
 {
-	memset( m_colors, 0, TYPE_MAX * sizeof( Color ) );
+	memset( m_colors, 0, SOFDataFactionColorChooser::TYPE_MAX * sizeof( Color ) );
 }
 
 EveSOFDataLogo::EveSOFDataLogo( IRoot* lockobj ):
@@ -296,8 +296,8 @@ EveSOFDataHull::EveSOFDataHull( IRoot* lockobj ) :
 
 
 EveSOFDataRace::EveSOFDataRace( IRoot* lockobj ) :
-	m_hullPrimaryHeatColorType( EveSOFDataFactionColorSet::TYPE_BOOSTER ),
-	m_hullReactorHeatColorType( EveSOFDataFactionColorSet::TYPE_REACTOR )
+	m_hullPrimaryHeatColorType( SOFDataFactionColorChooser::TYPE_BOOSTER ),
+	m_hullReactorHeatColorType( SOFDataFactionColorChooser::TYPE_REACTOR )
 {}
 
 
@@ -507,7 +507,7 @@ EveSOFDataHullSpriteSetItem::EveSOFDataHullSpriteSetItem( IRoot* lockobj ) :
 	m_position( 0.f, 0.f, 0.f ),
 	m_blinkRate( 0.1f ), m_blinkPhase( 0.f ), m_minScale( 1.f ), m_maxScale( 10.f ), m_falloff( 0.f ), m_intensity( 1.f ),
 	m_boneIndex( 0 ),
-	m_colorType( EveSOFDataFactionColorSet::TYPE_PRIMARY )
+	m_colorType( SOFDataFactionColorChooser::TYPE_PRIMARY )
 {}
 
 
@@ -523,7 +523,7 @@ EveSOFDataHullSpriteLineSetItem::EveSOFDataHullSpriteLineSetItem( IRoot* lockobj
 	m_spacing( 1.f ), m_blinkRate( 0.1f ), m_blinkPhase( 0.f ), m_blinkPhaseShift( 0.f ), m_minScale( 1.f ), m_maxScale( 10.f ), m_falloff( 0.f ), m_intensity( 1.f ),
 	m_boneIndex( 0 ),
 	m_isCircle( false ),
-	m_colorType( EveSOFDataFactionColorSet::TYPE_PRIMARY )
+	m_colorType( SOFDataFactionColorChooser::TYPE_PRIMARY )
 {}
 
 EveSOFDataHullHazeSet::EveSOFDataHullHazeSet( IRoot* lockobj ) :
@@ -537,7 +537,7 @@ EveSOFDataHullHazeSetItem::EveSOFDataHullHazeSetItem( IRoot* lockobj ) :
 	m_position( 0.f, 0.f, 0.f ), m_scaling( 1.f, 1.f, 1.f ), 
 	m_boneIndex( -1 ),
 	m_rotation( 0.f, 0.f, 0.f, 1.f ),
-	m_colorType( EveSOFDataFactionColorSet::TYPE_PRIMARY ),
+	m_colorType( SOFDataFactionColorChooser::TYPE_PRIMARY ),
 	m_hazeBrightness( 1.f ), m_hazeFalloff( 6.f ), m_sourceSize( 0.2f ), m_sourceBrightness( 2.f ),
 	m_boosterGainInfluence( false )
 {}
@@ -781,7 +781,7 @@ EveSOFDataHullDecalSetItem::EveSOFDataHullDecalSetItem( IRoot* lockobj ) :
 	m_scaling( 1.f, 1.f, 1.f ),
 	m_boneIndex( -1 ),
 	m_meshIndex( -1 ),
-	m_glowColorType( EveSOFDataFactionColorSet::TYPE_PRIMARY ),
+	m_glowColorType( SOFDataFactionColorChooser::TYPE_PRIMARY ),
 	m_logoType( EveSOFDataLogoSet::TYPE_PRIMARY ),
 	PARENTLOCK( m_textures ),
 	PARENTLOCK( m_parameters ),
@@ -804,7 +804,7 @@ EveSOFDataHullLightSetItem::EveSOFDataHullLightSetItem( IRoot* lockobj ) :
 	m_data.innerRadius = 0.0f;
 	m_data.innerAngle = 0.0f;
 	m_data.outerAngle = 0.0f;
-	m_data.lightColor = EveSOFDataFactionColorSet::TYPE_PRIMARY;
+	m_data.lightColor = SOFDataFactionColorChooser::TYPE_PRIMARY;
 	m_data.noiseAmplitude = 0.0f;
 	m_data.noiseFrequency = 1.0f;
 	m_data.noiseOctaves = 1;

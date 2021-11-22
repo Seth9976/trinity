@@ -1048,7 +1048,7 @@ void EveSOFDataMgr::GenerateFactionData( FactionData& fd, EveSOFDataFactionPtr s
 	memset( &fd.colorData, 0, sizeof( ColorData ) );
 	if( srcData->m_colorSet )
 	{
-		for( size_t i = 0; i < EveSOFDataFactionColorSet::TYPE_MAX; ++i )
+		for( size_t i = 0; i < SOFDataFactionColorChooser::TYPE_MAX; ++i )
 		{
 			// spriteset colors
 			fd.colorData.colors[i] = srcData->m_colorSet->m_colors[i];

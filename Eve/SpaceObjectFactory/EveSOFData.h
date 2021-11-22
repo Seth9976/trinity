@@ -132,6 +132,39 @@ public:
 TYPEDEF_BLUECLASS( EveSOFDataTransform );
 BLUE_DECLARE_VECTOR( EveSOFDataTransform );
 
+namespace SOFDataFactionColorChooser
+{
+    enum ColorType
+    {
+        TYPE_PRIMARY = 0,
+        TYPE_SECONDARY,
+        TYPE_TERTIARY,
+        TYPE_BLACK,
+        TYPE_WHITE,
+        TYPE_YELLOW,
+        TYPE_ORANGE,
+        TYPE_RED,
+        TYPE_BLUE,
+        TYPE_GREEN,
+        TYPE_CYAN,
+        TYPE_FIRE,
+        TYPE_HULL,
+        TYPE_GLASS,
+        TYPE_REACTOR,
+        TYPE_DARKHULL,
+        TYPE_BOOSTER,
+        TYPE_KILLMARK,
+        TYPE_PRIMARY_LIGHT,
+        TYPE_SECONDARY_LIGHT,
+        TYPE_TERTIARY_LIGHT,
+        TYPE_WHITE_LIGHT,
+
+        TYPE_MAX,
+    };
+
+    extern const Be::VarChooser EveSOFDataFactionColorSetTypeChooser[];
+}
+
 BLUE_CLASS( EveSOFDataFactionColorSet ) :
 	public IRoot
 {
@@ -140,37 +173,9 @@ public:
 	EveSOFDataFactionColorSet( IRoot* lockobj = NULL );
 	~EveSOFDataFactionColorSet() {}
 
-	// color type
-	enum ColorType
-	{
-		TYPE_PRIMARY = 0,
-		TYPE_SECONDARY,
-		TYPE_TERTIARY,
-		TYPE_BLACK,
-		TYPE_WHITE,
-		TYPE_YELLOW,
-		TYPE_ORANGE,
-		TYPE_RED,
-		TYPE_BLUE,
-		TYPE_GREEN,
-		TYPE_CYAN,
-		TYPE_FIRE,
-		TYPE_HULL,
-		TYPE_GLASS,
-		TYPE_REACTOR,
-		TYPE_DARKHULL,
-		TYPE_BOOSTER,
-		TYPE_KILLMARK,
-		TYPE_PRIMARY_LIGHT,
-		TYPE_SECONDARY_LIGHT,
-		TYPE_TERTIARY_LIGHT,
-		TYPE_WHITE_LIGHT,
-
-		TYPE_MAX,
-	};
 
 	// color data
-	Color m_colors[TYPE_MAX];
+	Color m_colors[SOFDataFactionColorChooser::TYPE_MAX];
 };
 TYPEDEF_BLUECLASS( EveSOFDataFactionColorSet );
 
@@ -267,7 +272,7 @@ public:
 
 	// data
 	std::string m_material[MATERIAL_MAX];
-	EveSOFDataFactionColorSet::ColorType m_glowColorType;
+    SOFDataFactionColorChooser::ColorType m_glowColorType;
 };
 TYPEDEF_BLUECLASS( EveSOFDataAreaMaterial );
 
@@ -518,7 +523,7 @@ public:
 	Vector3 m_position;
 	float m_blinkRate, m_blinkPhase, m_minScale, m_maxScale, m_falloff, m_intensity;
 	int32_t m_boneIndex;
-	EveSOFDataFactionColorSet::ColorType m_colorType;
+    SOFDataFactionColorChooser::ColorType m_colorType;
 };
 TYPEDEF_BLUECLASS( EveSOFDataHullSpriteSetItem );
 BLUE_DECLARE_VECTOR( EveSOFDataHullSpriteSetItem );
@@ -558,7 +563,7 @@ public:
 	float m_spacing, m_blinkRate, m_blinkPhase, m_blinkPhaseShift, m_minScale, m_maxScale, m_falloff, m_intensity;
 	int32_t m_boneIndex;
 	bool m_isCircle;
-	EveSOFDataFactionColorSet::ColorType m_colorType;
+    SOFDataFactionColorChooser::ColorType m_colorType;
 };
 TYPEDEF_BLUECLASS( EveSOFDataHullSpriteLineSetItem );
 BLUE_DECLARE_VECTOR( EveSOFDataHullSpriteLineSetItem );
@@ -598,7 +603,7 @@ public:
 	int32_t m_boneIndex;
 
 	Quaternion m_rotation;
-	EveSOFDataFactionColorSet::ColorType m_colorType;
+    SOFDataFactionColorChooser::ColorType m_colorType;
 	float m_hazeBrightness, m_hazeFalloff, m_sourceSize, m_sourceBrightness;
 	bool m_boosterGainInfluence;
 };
@@ -1028,7 +1033,7 @@ public:
 	Vector3 m_position, m_scaling;
 	Quaternion m_rotation;
 	int32_t m_boneIndex, m_meshIndex;
-	EveSOFDataFactionColorSet::ColorType m_glowColorType;
+    SOFDataFactionColorChooser::ColorType m_glowColorType;
 	PEveSOFDataTextureVector m_textures;
 	PEveSOFDataParameterVector m_parameters;
 	PEveSOFDataDecalIndexStructureList m_indexBuffer;
@@ -1082,7 +1087,7 @@ public:
 		float noiseAmplitude;
 		float noiseFrequency;
 		int noiseOctaves;
-		EveSOFDataFactionColorSet::ColorType lightColor;
+        SOFDataFactionColorChooser::ColorType lightColor;
 		std::wstring texturePath;
 		float innerAngle;
 		float outerAngle;
@@ -1496,8 +1501,8 @@ public:
 	// data
 	EveSOFDataBoosterPtr m_booster;
 	// colors
-	EveSOFDataFactionColorSet::ColorType m_hullPrimaryHeatColorType;
-	EveSOFDataFactionColorSet::ColorType m_hullReactorHeatColorType;
+    SOFDataFactionColorChooser::ColorType m_hullPrimaryHeatColorType;
+    SOFDataFactionColorChooser::ColorType m_hullReactorHeatColorType;
 	// impact effect
 	EveSOFDataRaceDamagePtr m_damage;
 };
