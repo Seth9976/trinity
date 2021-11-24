@@ -1031,9 +1031,9 @@ bool TriDevice::Render()
 		m_renderJobs->Run( m_realTime, m_simTime );
 	}
 
+    Tr2GpuProfiler::GetProfiler().EndFrame();
 	Tr2Renderer::EndRenderContext();
 	Tr2Renderer::EndFrame();
-	Tr2GpuProfiler::GetProfiler().EndFrame();
 
 	return true;
 }

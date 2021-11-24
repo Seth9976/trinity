@@ -118,6 +118,11 @@ extern bool g_requestDeviceDebugLayer;
 extern bool g_requestDebugMarkers;
 extern bool g_gpuTimersEnabled;
 
+#if TRINITY_PLATFORM == TRINITY_METAL
+extern bool g_enableMetalCounters;
+TRI_REGISTER_SETTING( "enableMetalCounters", g_enableMetalCounters );
+#endif
+
 void InitializeTrinity()
 {
 	GlobalStore().RegisterVariable( "BlitOriginal", static_cast<ITr2TextureProvider*>( nullptr ) );
