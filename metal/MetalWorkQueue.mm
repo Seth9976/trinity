@@ -17,6 +17,13 @@
 
 using namespace Tr2RenderContextEnum;
 
+CCP_STATS_DECLARE( gpuFrameTime, "Trinity/AL/GpuFrameTime", false, CST_TIME, "Time spent on GPU processing a frame" );
+
+namespace
+{
+double s_gpuFrameTime = 0;
+}
+
 namespace TrinityALImpl
 {
 
@@ -595,11 +602,31 @@ bool MetalWorkQueue::BlitToDrawableAndPresent( id<MTLTexture> srcTexture, NSView
 #define METAL_SERIALISE_PRESENT 0
 
 #if METAL_SERIALISE_PRESENT
+    [m_commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
+        if (@available(macOS 10.15, *))
+        {
+            auto duration = commandBuffer.GPUEndTime - commandBuffer.GPUEndTime;
+            s_gpuFrameTime += duration;
+#if CCP_STATS_ENABLED
+            g_ccpStatistics_gpuFrameTime.Set( s_gpuFrameTime );
+#endif
+            s_gpuFrameTime = 0;
+        }
+    }];
 	[m_commandBuffer presentDrawable:drawable];
 	CommitCommandBuffer(MTLCBCOMMIT_WAITUNTILCOMPLETE);
     ++*renderedFrameNumber;
 #else
 	[m_commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
+        if (@available(macOS 10.15, *))
+        {
+            auto duration = commandBuffer.GPUEndTime - commandBuffer.GPUEndTime;
+            s_gpuFrameTime += duration;
+#if CCP_STATS_ENABLED
+            g_ccpStatistics_gpuFrameTime.Set( s_gpuFrameTime );
+#endif
+            s_gpuFrameTime = 0;
+        }
         ++*renderedFrameNumber;
 	}];
 	[m_commandBuffer presentDrawable:drawable];
@@ -927,6 +954,13 @@ void MetalWorkQueue::ReadBackBufferToCPU( id<MTLBuffer> buffer, bool waitForData
 	if( waitForData )
 	{
 		ReleaseEncoder( true );
+        [m_commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
+            if (@available(macOS 10.15, *))
+            {
+                auto duration = commandBuffer.GPUEndTime - commandBuffer.GPUEndTime;
+                s_gpuFrameTime += duration;
+            }
+        }];
 		CommitCommandBuffer( MTLCBCOMMIT_WAITUNTILCOMPLETE );
 	}
 	else
@@ -1214,6 +1248,13 @@ void MetalWorkQueue::CopyTextureToMTLBuffer(id<MTLTexture> texture,
 	if( waitForData )
 	{
 		ReleaseEncoder(true);
+        [m_commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
+            if (@available(macOS 10.15, *))
+            {
+                auto duration = commandBuffer.GPUEndTime - commandBuffer.GPUEndTime;
+                s_gpuFrameTime += duration;
+            }
+        }];
 		CommitCommandBuffer(MTLCBCOMMIT_WAITUNTILCOMPLETE);
 	}
 	else
@@ -2745,6 +2786,13 @@ bool MetalWorkQueue::GetVisibilityQueryPixelCount( uint64_t queryNumber, uint64_
 	if( finishOutstandingWork )
 	{
 		FlushOutstandingOperations();
+        [m_commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
+            if (@available(macOS 10.15, *))
+            {
+                auto duration = commandBuffer.GPUEndTime - commandBuffer.GPUEndTime;
+                s_gpuFrameTime += duration;
+            }
+        }];
 		CommitCommandBuffer(MTLCBCOMMIT_WAITUNTILCOMPLETE);
 	}
 
