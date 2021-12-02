@@ -130,7 +130,7 @@ void EveShip2::RegisterWithQuadRenderer( Tr2QuadRenderer& quadRenderer )
 
 void EveShip2::AddQuadsToQuadRenderer( const TriFrustum& frustum, Tr2QuadRenderer& quadRenderer )
 {
-	if( !m_isInFrustum || !m_display )
+	if( !m_display )
 	{
 		return;
 	}
