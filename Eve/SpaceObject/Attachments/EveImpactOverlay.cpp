@@ -18,6 +18,7 @@
 #include "Particle/Tr2GpuUniqueEmitter.h"
 #include "Shader/Tr2Effect.h"
 #include "TriSequencer.h"
+#include <random>
 
 // settings
 extern bool g_eveSpaceObjectImpactEffectEnabled;
@@ -50,7 +51,9 @@ EveImpactOverlay::EveImpactOverlay( IRoot* lockobj ) :
 	m_armorImpactParentSize( 0.f ),
 	m_shieldImpactColorFade( 0.f ),
 	m_shieldImpactParentSize( 0.f ),
-	m_hullDamageFactor( 0.f )
+	m_hullDamageFactor( 0.f ),
+	m_seed( 0 ),
+	m_damageLocatorCount( 0 )
 {
 	// 0
 	memset( &m_impactTexelHeader, 0, sizeof( DataRow ) );
@@ -79,6 +82,28 @@ void EveImpactOverlay::Set( TriPerlinCurvePtr hullDamageFlickerCurve, Tr2GpuUniq
 	m_hullImpactEmitter = hullImpactEmitter;
 	m_armorDamageShader = armorDamageShader;
 	m_mesh = shieldImpactMesh;
+}
+
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Sets the name of the impact overlay, this is used for seeding the randomness of 
+//	 the impacts between session changes
+// --------------------------------------------------------------------------------
+void EveImpactOverlay::SetSeed( unsigned int seed )
+{
+	m_seed = seed;
+}
+
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Sets the amount of damage locators, used for the randomness of the impacts
+//   between session change
+// --------------------------------------------------------------------------------
+void EveImpactOverlay::SetDamageLocatorCount( unsigned int count)
+{
+	m_damageLocatorCount = count;
 }
 
 // --------------------------------------------------------------------------------
@@ -578,9 +603,15 @@ void EveImpactOverlay::SetDamageState( float shield, float armor, float hull, bo
 	// do we forcefully have to create the amror impact holes?
 	if( doCreateArmorImpacts )
 	{
+		// create a random seed that is m_seed and also the armor impact size (so we get some variation into the damage)
+		auto generator = std::mt19937();
+		generator.seed( m_seed + (unsigned)m_armorImpactData.size() );
+		std::uniform_int_distribution<int> damageLocatorDistribution( 0, m_damageLocatorCount );
+		std::uniform_real_distribution<float> damageSizeDistribution( 0.2f, 0.8f );
+
 		for( size_t i = m_armorImpactData.size(); i < m_armorImpactGoalCount; ++i )
-		{
-			CreateArmorImpact( (int)i, 0.2f + 0.8f * TriRand(), m_debugForceSpawnDebris );
+		{	
+			CreateArmorImpact( damageLocatorDistribution( generator ), damageSizeDistribution( generator ), m_debugForceSpawnDebris );
 		}
 	}
 }

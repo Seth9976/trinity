@@ -677,6 +677,25 @@ const std::vector<EveSOFDataMgr::LocatorDirectionData>* EveSOFDNA::GetHullLocato
 	return &locatorSet->second;
 }
 
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Return an array to all the damage locators on this hull
+// --------------------------------------------------------------------------------
+unsigned int EveSOFDNA::GetLocatorCount( const char* setName ) const
+{
+	size_t count = 0;
+	for( const auto& hull : m_hullDatas ) {
+		auto locatorSet = hull->locatorSets.find( BlueSharedString( setName ) );
+		
+		if( locatorSet != hull->locatorSets.end() )
+		{
+			count += locatorSet->second.size();
+		}
+	}
+	return (unsigned int)count;
+}
+
 // --------------------------------------------------------------------------------
 // Description:
 //   Return an array to all the children of this hull

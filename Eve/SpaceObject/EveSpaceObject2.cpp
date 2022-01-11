@@ -1762,6 +1762,13 @@ bool EveSpaceObject2::OnModified( Be::Var* val )
 	{
 		ReRegister();
 	}
+	else if( IsMatch( val, m_name ) )
+	{
+		if( m_impactOverlay )
+		{ 
+			m_impactOverlay->SetSeed( CcpHashFNV1( m_name.c_str(), m_name.length() ) );
+		}
+	}
 
 	return true;
 }

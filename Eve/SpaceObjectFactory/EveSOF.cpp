@@ -1909,6 +1909,8 @@ void EveSOF::SetupEffects( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) cons
 			EveImpactOverlayPtr impactOverlay;
 			impactOverlay.CreateInstance();
 
+			impactOverlay->SetDamageLocatorCount( dna->GetLocatorCount( "damage" ) );
+
 			// shield impact effect via Tr2Mesh with LOD
 			Tr2MeshLodPtr shieldMesh;
 

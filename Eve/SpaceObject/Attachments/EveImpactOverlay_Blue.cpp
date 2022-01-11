@@ -15,6 +15,7 @@ const Be::ClassInfo* EveImpactOverlay::ExposeToBlue()
         MAP_INTERFACE( EveImpactOverlay )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST	)
+		MAP_ATTRIBUTE( "seed", m_seed, "", Be::READ )
 		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE )
 		MAP_ATTRIBUTE( "configuration", m_configuration, "Impact goes into what?", Be::READ )
 		MAP_ATTRIBUTE( "impactDataNextIdx", m_impactDataNextIdx, "", Be::READ )

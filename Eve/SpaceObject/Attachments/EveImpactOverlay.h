@@ -101,6 +101,10 @@ public:
 	float GetActivationStrength( EveUpdateContext& updateContext ) const;
 	float GetArmorImpactLifeTime() const;
 
+	// setters
+	void SetSeed( const unsigned int seed );
+	void SetDamageLocatorCount( unsigned int count );
+
 	// control animation
 	void ToggleEffect( const std::string& name, bool on, float duration );
 	// lod
@@ -134,6 +138,8 @@ private:
 	int m_impactDataNextIdx;
 	bool m_debugForceSpawnDebris;
 	float m_armorImpactLifeTime;
+	unsigned int m_seed;
+	unsigned int m_damageLocatorCount;
 
 	// priotiy
 	float m_renderPriority;

@@ -105,6 +105,7 @@ public:
 	const std::vector<EveSOFDataMgr::HullBannerSetData>& GetHullBannerSets( size_t n ) const;
 	const std::vector<EveSOFDataMgr::LocatorData>& GetHullTurretLocators( size_t n ) const;
 	const std::vector<EveSOFDataMgr::LocatorDirectionData>* GetHullLocators( const char* setName, size_t n ) const;
+	unsigned int GetLocatorCount( const char* setName ) const;
 	const std::vector<BlueSharedString> GetHullLocatorSetNames( size_t n ) const;
 	const Vector3* GetHullNextSubsystemOffset( size_t n ) const;
 	bool GetHullTextureWithMeshIndex( std::string& resPath, const BlueSharedString& textureName, int32_t meshIndex, size_t n ) const;
