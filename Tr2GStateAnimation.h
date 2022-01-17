@@ -93,6 +93,14 @@ public:
 	void TogglePauseAnimations( bool pause );
 	void InstantiateCharacter();
 
+	float GetAnimationTime();
+	void StartScrub();
+	void ClearScrub();
+	void PlayFromScrub();
+	void StopPlayFromScrub();
+	void SetScrubOffset( float scrub_offset );
+	float GetScrubOffset();
+
 	//////////////////////////////////////////////////////////////////////////////////////
 	// IInitialize
 	bool Initialize();
@@ -155,10 +163,15 @@ private:
 	bool m_useMeshBinding;
 	bool m_animationEnabled;
 
-	float GetAnimationTime();
 	bool m_paused;
 	float m_pauseTime;
 	float m_totalPauseOffset;
+
+	bool m_scrubbing;
+	float m_scrub_time;
+	float m_scrub_offset;
+	float m_scrub_play_offset;
+	bool m_scrub_playing;
 
 	granny_file_info* GetFileInfo() const;
 	void LoadGrannyRes();

@@ -48,6 +48,11 @@ Tr2GStateAnimation::Tr2GStateAnimation( IRoot* lockobj ) :
 	m_paused( false ),
 	m_pauseTime( 0.0 ),
 	m_totalPauseOffset( 0.0 ),
+	m_scrubbing( false ),
+	m_scrub_time( 0.0 ),
+	m_scrub_offset( 0.0 ),
+	m_scrub_play_offset( 0.0 ),
+	m_scrub_playing( false ),
 	PARENTLOCK( m_gStateParameterList ),
 	PARENTLOCK( m_gStateParameterDefaultList )
 {
@@ -1241,13 +1246,104 @@ const granny_matrix_3x4* Tr2GStateAnimation::GetMeshBoneMatrixList() const
 	return m_meshBoneMatrixList;
 }
 
+
 float Tr2GStateAnimation::GetAnimationTime()
 {
 	if( m_paused )
 	{
 		return m_pauseTime;
 	}
+
+	if( m_scrubbing )
+	{
+		if( m_scrub_playing )
+		{
+			return Tr2Renderer::GetAnimationTime() - m_totalPauseOffset + m_scrub_play_offset;
+		}
+
+		return m_scrub_time + m_scrub_offset;
+	}
+
 	return Tr2Renderer::GetAnimationTime() - m_totalPauseOffset;
+}
+
+
+void Tr2GStateAnimation::StartScrub()
+{
+	if( m_scrubbing )
+	{
+		return;
+	}
+	m_scrub_time = GetAnimationTime();
+	m_scrub_offset = 0.0;
+	m_scrubbing = true;
+}
+
+
+void Tr2GStateAnimation::ClearScrub()
+{
+	m_scrubbing = false;
+	m_scrub_time = 0.0;
+	m_scrub_offset = 0.0;
+	m_scrub_playing = false;
+	m_scrub_play_offset = 0.0;
+}
+
+
+void Tr2GStateAnimation::PlayFromScrub()
+{
+	if ( !m_scrubbing )
+	{
+		return;
+	}
+
+	m_scrub_play_offset = m_scrub_time + m_scrub_offset - ( Tr2Renderer::GetAnimationTime() + m_totalPauseOffset );
+	m_scrub_playing = true;
+}
+
+
+void Tr2GStateAnimation::StopPlayFromScrub()
+{
+	if( !m_scrubbing )
+	{
+		return;
+	}
+
+	if( !m_scrub_playing )
+	{
+		return;	
+	}
+
+	m_scrub_offset = GetAnimationTime() - m_scrub_time;
+	m_scrub_playing = false;
+	m_scrub_play_offset = 0.0;
+}
+
+
+void Tr2GStateAnimation::SetScrubOffset(float scrub_offset)
+{
+	if( !m_scrubbing )
+	{
+		return;
+	}
+
+	if( m_scrub_playing )
+	{
+		return;
+	}
+
+	m_scrub_offset = scrub_offset;
+}
+
+
+float Tr2GStateAnimation::GetScrubOffset()
+{
+	if( !m_scrubbing )
+	{
+		return 0.0;
+	}
+
+	return m_scrub_offset;
 }
 
 

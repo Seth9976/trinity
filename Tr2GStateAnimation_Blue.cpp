@@ -214,6 +214,48 @@ const Be::ClassInfo* Tr2GStateAnimation::ExposeToBlue()
 			"ResetParamsToDefault()\n\n"
 			"Resets all parameters to initial values." )
 
+		MAP_METHOD_AND_WRAP(
+			"GetAnimationTime",
+			GetAnimationTime,
+			"GetAnimationTime()\n\n"
+			"Returns float indicating current GState animation time" )
+
+		MAP_METHOD_AND_WRAP(
+			"StartScrub",
+			StartScrub,
+			"StartScrub()\n\n"
+			"Enables scrub mode and sets scrub offset to 0" )
+
+		MAP_METHOD_AND_WRAP(
+			"ClearScrub",
+			ClearScrub,
+			"ClearScrub()\n\n"
+			"Exits scrub mode" )
+
+		MAP_METHOD_AND_WRAP(
+			"PlayFromScrub",
+			PlayFromScrub,
+			"PlayFromScrub()\n\n"
+			"When scrubbing mode enabled, plays from scrub time." )
+
+		MAP_METHOD_AND_WRAP(
+			"StopPlayFromScrub",
+			StopPlayFromScrub,
+			"StopPlayFromScrub()\n\n"
+			"When scrubbing mode enabled, stops playing from scrub time." )
+
+		MAP_METHOD_AND_WRAP(
+			"GetScrubOffset",
+			GetScrubOffset,
+			"GetScrubOffset()\n\n"
+			"When scrubbing mode enabled, returns the scrub offset as a float" )
+
+		MAP_METHOD_AND_WRAP(
+			"SetScrubOffset",
+			SetScrubOffset,
+			"SetScrubOffset(float scrub_offset)\n\n"
+			"When scrubbing mode enabled, sets scrub offset to the float value passed in (in ms)" )
+
 	EXPOSURE_END()
 }
 
