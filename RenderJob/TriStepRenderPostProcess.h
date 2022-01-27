@@ -50,6 +50,22 @@ public:
 
 	void py__init__( EveSpaceScene* scene, Tr2RenderTarget* source );
 private:
+
+	// Some blur helpers
+	enum BlurType
+	{
+		Big,
+		Small
+	};
+
+	enum BlurChannel
+	{
+		r,
+		g,
+		b,
+		rgba
+	};
+
 	// bloom
 	bool ProcessBloom( Tr2PPBloomEffect* bloom, Tr2PPDynamicExposureEffect* dynamicExposure );
 	Tr2PostProcessRenderInfo::Texture RenderBloom( Tr2RenderTarget* dest, Tr2RenderContext & renderContext, Tr2PPBloomEffect * bloom );
@@ -81,11 +97,12 @@ private:
 	// depth of field
 	bool ProcessDepthOfField( Tr2RenderContext& renderContext, Tr2PPDepthOfFieldEffect* fx );
 	void RenderDepthOfField( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPDepthOfFieldEffect* depthOfField );	
-	Tr2EffectPtr m_depthOfFieldCoCFarShader;
-	Tr2EffectPtr m_depthOfFieldCoCNearShader;
+	Tr2EffectPtr m_depthOfFieldCoCShader;
 	Tr2EffectPtr m_depthOfFieldBokehBlendShader;
-	Tr2EffectPtr m_depthOfFieldBokehBlurShader;
-	Tr2EffectPtr m_depthOfFieldBokehFillShader;
+	Tr2EffectPtr m_depthOfFieldBokehForegroundBlurShader;
+	Tr2EffectPtr m_depthOfFieldBokehForegroundFillShader;
+	Tr2EffectPtr m_depthOfFieldBokehBackgroundBlurShader;
+	Tr2EffectPtr m_depthOfFieldBokehBackgroundFillShader;
 	
 	// fidelityFX
 	bool ProcessFidelityFX( Tr2RenderContext& renderContext, Tr2PPFidelityFXEffect* fx );
@@ -141,10 +158,12 @@ private:
 	PostProcessingQuality m_quality;
 
 	// Common
-	void Blur( Tr2RenderTarget* dest, Tr2RenderTarget* src, Tr2RenderContext& renderContext );
+	void Blur( Tr2RenderTarget * dest, Tr2RenderTarget * src, Tr2RenderContext & renderContext, BlurType blurType = BlurType::Big, BlurChannel blurChannel = BlurChannel::rgba, float size = 0.5f );
 	Tr2RenderTarget* DownSampleDepth( Tr2RenderContext& renderContext, float size = 0.5f );
 
 	Tr2EffectPtr m_downsampleDepthEffect;
+	std::map<uint32_t, std::pair<Tr2EffectPtr, Tr2EffectPtr>> m_blurEffects;
+
 	Tr2EffectPtr m_blurBigVertical;
 	Tr2EffectPtr m_blurBigHorizontal;
 };

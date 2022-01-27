@@ -36,11 +36,12 @@ const Be::ClassInfo* TriStepRenderPostProcess::ExposeToBlue()
 		MAP_ATTRIBUTE( "taaEffect", m_taaEffect, "The taa effect", Be::READWRITE )
 		MAP_ATTRIBUTE( "accumulationBuffer", m_accumulationBuffer, "The accumulation buffer", Be::READWRITE )
 		
-		MAP_ATTRIBUTE( "depthOfFieldCoCFarShader", m_depthOfFieldCoCFarShader, "The DoF far Circle of Confusion shader", Be::READWRITE);
-		MAP_ATTRIBUTE( "depthOfFieldCoCNearShader", m_depthOfFieldCoCNearShader, "The DoF near Circle of Confusion shader", Be::READWRITE );
+		MAP_ATTRIBUTE( "depthOfFieldCoCShader", m_depthOfFieldCoCShader, "The DoF Circle of Confusion shader", Be::READWRITE);
 		MAP_ATTRIBUTE( "depthOfFieldBokehBlendShader", m_depthOfFieldBokehBlendShader, "The DoF bend shader", Be::READWRITE );
-		MAP_ATTRIBUTE( "depthOfFieldBokehBlurShader", m_depthOfFieldBokehBlurShader, "The bokeh blur shader", Be::READWRITE );
-		MAP_ATTRIBUTE( "depthOfFieldBokehFillShader", m_depthOfFieldBokehFillShader, "The bokeh fill shader", Be::READWRITE );
+		MAP_ATTRIBUTE( "depthOfFieldBokehForegroundBlurShader", m_depthOfFieldBokehForegroundBlurShader, "The foreground bokeh blur shader", Be::READWRITE );
+		MAP_ATTRIBUTE( "depthOfFieldBokehForegroundFillShader", m_depthOfFieldBokehForegroundFillShader, "The foreground bokeh fill shader", Be::READWRITE );
+		MAP_ATTRIBUTE( "depthOfFieldBokehBackgroundBlurShader", m_depthOfFieldBokehBackgroundBlurShader, "The background bokeh blur shader", Be::READWRITE );
+		MAP_ATTRIBUTE( "depthOfFieldBokehBackgroundFillShader", m_depthOfFieldBokehBackgroundFillShader, "The background bokeh fill shader", Be::READWRITE );
 
 		MAP_ATTRIBUTE_WITH_CHOOSER( "quality", m_quality, "The quality of the post process", Be::READWRITE | Be::ENUM | Be::NOTIFY, PostProcessQualityChooser )
 

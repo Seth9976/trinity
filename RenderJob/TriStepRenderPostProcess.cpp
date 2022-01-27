@@ -234,6 +234,11 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 		RenderGodRays( nonMsaaSource, renderContext, godrays );
 	}
 
+	if( ProcessDepthOfField( renderContext, dof ) )
+	{
+		RenderDepthOfField( nonMsaaSource, renderContext, dof );
+	}
+
 	if (ProcessTaa(taa))
 	{
 		RenderTaa( nonMsaaSource, renderContext, taa );
@@ -250,11 +255,6 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 	if( ProcessBloom( bloom, dynamicExposure ) )
 	{
 		bloomTexture = RenderBloom( nonMsaaSource, renderContext, bloom );
-	}
-
-	if( ProcessDepthOfField( renderContext, dof ) )
-	{
-		RenderDepthOfField( bloomTexture ? bloomTexture.GetRenderTarget(): nonMsaaSource, renderContext, dof );
 	}
 
 	m_tonemappingEffect->SetParameter( BlueSharedString( "BlitCurrent" ), bloomTexture ? bloomTexture.GetRenderTarget() : m_renderInfo->GetBlackTexture() );
@@ -305,30 +305,79 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 	return RS_OK;
 }
 
-
-void TriStepRenderPostProcess::Blur( Tr2RenderTarget* dest, Tr2RenderTarget* src, Tr2RenderContext& renderContext )
+// Helper function to blur certain channel of a source render target to a destination render target with a blur type (Big/Small)
+void TriStepRenderPostProcess::Blur( Tr2RenderTarget* dest, Tr2RenderTarget* src, Tr2RenderContext& renderContext, BlurType blurType, BlurChannel blurChannel, float size )
 {
-	if( !m_blurBigHorizontal || !m_blurBigVertical )
+	uint32_t identifier = blurChannel * 10 + blurType;
+	auto lookup = m_blurEffects.find( identifier );
+
+
+	// Horizontal and vertical blur effects, IN THAT ORDER!
+	std::pair<Tr2EffectPtr, Tr2EffectPtr> effects;
+	if( lookup == m_blurEffects.end() )
 	{
-		m_blurBigHorizontal.CreateInstance();
-		m_blurBigHorizontal->StartUpdate();
-		m_blurBigHorizontal->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/BlurBig.fx" );
-		m_blurBigHorizontal->EndUpdate();
+		// create the effect
+		effects.first.CreateInstance();
+		effects.first->StartUpdate();
+		effects.first->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/Blur.fx" );
 
-		m_blurBigVertical.CreateInstance();
-		m_blurBigVertical->StartUpdate();
-		m_blurBigVertical->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/BlurBig.fx" );
-		m_blurBigVertical->SetParameter( BlueSharedString( "Direction" ), Vector2( 0, 1 ) );
-		m_blurBigVertical->EndUpdate();
+		effects.second.CreateInstance();
+		effects.second->StartUpdate();
+		effects.second->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/Blur.fx" );
+		effects.second->SetParameter( BlueSharedString( "Direction" ), Vector2( 0, 1 ) );
+
+
+		switch( blurType )
+		{
+		case BlurType::Big:
+			effects.first->SetOption( BlueSharedString( "BLUR_TYPE" ), BlueSharedString( "BLUR_BIG" ) );
+			effects.second->SetOption( BlueSharedString( "BLUR_TYPE" ), BlueSharedString( "BLUR_BIG" ) );
+			break;
+		case BlurType::Small:
+			effects.first->SetOption( BlueSharedString( "BLUR_TYPE" ), BlueSharedString( "BLUR_SMALL" ) );
+			effects.second->SetOption( BlueSharedString( "BLUR_TYPE" ), BlueSharedString( "BLUR_SMALL" ) );
+			break;
+		default:
+			break;
+		}
+
+		switch( blurChannel )
+		{
+		case BlurChannel::r:
+			effects.first->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_R" ) );
+			effects.second->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_R" ) );
+			break;
+		case BlurChannel::g:
+			effects.first->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_G" ) );
+			effects.second->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_G" ) );
+			break;
+		case BlurChannel::b:
+			effects.first->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_B" ) );
+			effects.second->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_B" ) );
+			break;
+		case BlurChannel::rgba:
+			effects.first->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_RGBA" ) );
+			effects.second->SetOption( BlueSharedString( "BLUR_CHANNEL" ), BlueSharedString( "BLUR_CHANNEL_RGBA" ) );
+			break;
+		default:
+			break;
+		}
+
+		effects.first->EndUpdate();
+		effects.second->EndUpdate();
+		m_blurEffects.insert( std::pair( identifier, effects ) );
 	}
+	else
+	{
+		effects = lookup->second;
+	}
+	
+	auto rt2 = m_renderInfo->GetTempTexture( 1.0f );
+	effects.first->SetParameter( BlueSharedString( "BlitCurrent" ), src );
+	DrawInto( *rt2, Tr2LoadAction::DONT_CARE, effects.first, renderContext );
 
-	auto rt2 = m_renderInfo->GetTempTexture( 0.5f );
-	m_blurBigHorizontal->SetParameter( BlueSharedString( "BlitCurrent" ), src );
-	DrawInto( *rt2, Tr2LoadAction::DONT_CARE, m_blurBigHorizontal, renderContext );
-
-	m_blurBigVertical->SetParameter( BlueSharedString( "BlitCurrent" ), rt2 );
-	DrawInto( *dest, Tr2LoadAction::DONT_CARE, m_blurBigVertical, renderContext );
-
+	effects.second->SetParameter( BlueSharedString( "BlitCurrent" ), rt2 );
+	DrawInto( *dest, Tr2LoadAction::DONT_CARE, effects.second, renderContext );
 }
 
 Tr2RenderTarget* TriStepRenderPostProcess::DownSampleDepth( Tr2RenderContext& renderContext, float size )
@@ -1111,89 +1160,103 @@ bool TriStepRenderPostProcess::ProcessDepthOfField( Tr2RenderContext& renderCont
 {
 	if( fx && fx->IsActive() )
 	{
-		if( !m_depthOfFieldBokehBlendShader || !m_depthOfFieldBokehBlurShader || !m_depthOfFieldCoCFarShader || 
-			!m_depthOfFieldCoCNearShader || !m_depthOfFieldBokehFillShader )
+		if( !m_depthOfFieldBokehBlendShader || !m_depthOfFieldCoCShader || !m_depthOfFieldBokehBackgroundBlurShader ||! m_depthOfFieldBokehBackgroundFillShader ||
+			!m_depthOfFieldBokehForegroundBlurShader || !m_depthOfFieldBokehForegroundFillShader )
 		{
 			// we just created the effect
 			m_depthOfFieldBokehBlendShader.CreateInstance();
 			m_depthOfFieldBokehBlendShader->StartUpdate();
 			m_depthOfFieldBokehBlendShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/DepthOfFieldBlend.fx" );
 			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BlitCurrent" ), PLACEHOLDER );
-			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "FarMap" ), PLACEHOLDER );
-			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "NearMap" ), PLACEHOLDER );
-			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "CoCNearMap" ), PLACEHOLDER );
-			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "CoCFarMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BokehForegroundBlurMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BokehBackgroundBlurMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
 			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 0.0, 0.0 ) );
 			m_depthOfFieldBokehBlendShader->EndUpdate();
 
-			m_depthOfFieldBokehBlurShader.CreateInstance();
-			m_depthOfFieldBokehBlurShader->StartUpdate();
-			m_depthOfFieldBokehBlurShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/BokehBlur.fx" );
-			m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), PLACEHOLDER );
-			m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
-			m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 0.0, 0.0 ) );
-			m_depthOfFieldBokehBlurShader->EndUpdate();
+			m_depthOfFieldBokehBackgroundBlurShader.CreateInstance();
+			m_depthOfFieldBokehBackgroundBlurShader->StartUpdate();
+			m_depthOfFieldBokehBackgroundBlurShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/Bokeh.fx" );
+			m_depthOfFieldBokehBackgroundBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), PLACEHOLDER );
+			m_depthOfFieldBokehBackgroundBlurShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehBackgroundBlurShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale * 2.0f, 0.0, 1.0, 0.0 ) );
+			m_depthOfFieldBokehBackgroundBlurShader->SetOption( BlueSharedString( "BOKEH_PIXEL_METHOD" ), BlueSharedString( "BOKEH_PIXEL_AVERAGE" ) );
+			m_depthOfFieldBokehBackgroundBlurShader->SetOption( BlueSharedString( "BOKEH_SHAPE" ), BlueSharedString( "BOKEH_SHAPE_DISK" ) );
+			m_depthOfFieldBokehBackgroundBlurShader->EndUpdate();
 
-			m_depthOfFieldBokehFillShader.CreateInstance();
-			m_depthOfFieldBokehFillShader->StartUpdate();
-			m_depthOfFieldBokehFillShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/BokehFill.fx" );
-			m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "BokehBlurMap" ), PLACEHOLDER );
-			m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
-			m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 0.0, 0.0 ) );
-			m_depthOfFieldBokehFillShader->EndUpdate();
+			m_depthOfFieldBokehBackgroundFillShader.CreateInstance();
+			m_depthOfFieldBokehBackgroundFillShader->StartUpdate();
+			m_depthOfFieldBokehBackgroundFillShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/Bokeh.fx" );
+			m_depthOfFieldBokehBackgroundFillShader->SetParameter( BlueSharedString( "BlitCurrent" ), PLACEHOLDER );
+			m_depthOfFieldBokehBackgroundFillShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehBackgroundFillShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 1.0, 0.0 ) );
+			m_depthOfFieldBokehBackgroundFillShader->SetOption( BlueSharedString( "BOKEH_PIXEL_METHOD" ), BlueSharedString( "BOKEH_PIXEL_MAX" ) );
+			m_depthOfFieldBokehBackgroundFillShader->SetOption( BlueSharedString( "BOKEH_SHAPE" ), BlueSharedString( "BOKEH_SHAPE_DISK" ) );
+			m_depthOfFieldBokehBackgroundFillShader->EndUpdate();
 
-			m_depthOfFieldCoCFarShader.CreateInstance();
-			m_depthOfFieldCoCFarShader->StartUpdate();
-			m_depthOfFieldCoCFarShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/DepthOfFieldCoc.fx" );
-			m_depthOfFieldCoCFarShader->SetParameter( BlueSharedString( "FocalInfo" ), Vector4( fx->m_focalDistance, fx->m_focalLength, 0.0, 0.0 ) );
-			m_depthOfFieldCoCFarShader->SetOption( BlueSharedString( "CoC_Mode" ), BlueSharedString( "CoC_Far" ) );
-			m_depthOfFieldCoCFarShader->EndUpdate();
+			m_depthOfFieldBokehForegroundBlurShader.CreateInstance();
+			m_depthOfFieldBokehForegroundBlurShader->StartUpdate();
+			m_depthOfFieldBokehForegroundBlurShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/Bokeh.fx" );
+			m_depthOfFieldBokehForegroundBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), PLACEHOLDER );
+			m_depthOfFieldBokehForegroundBlurShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehForegroundBlurShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale * 2.0f, 1.0, 0.0, 0.0 ) );
+			m_depthOfFieldBokehForegroundBlurShader->SetOption( BlueSharedString( "BOKEH_PIXEL_METHOD" ), BlueSharedString( "BOKEH_PIXEL_AVERAGE" ) );
+			m_depthOfFieldBokehForegroundBlurShader->SetOption( BlueSharedString( "BOKEH_SHAPE" ), BlueSharedString( "BOKEH_SHAPE_DISK" ) );
+			m_depthOfFieldBokehForegroundBlurShader->EndUpdate();
 
-			m_depthOfFieldCoCNearShader.CreateInstance();
-			m_depthOfFieldCoCNearShader->StartUpdate();
-			m_depthOfFieldCoCNearShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/DepthOfFieldCoc.fx" );
-			m_depthOfFieldCoCNearShader->SetParameter( BlueSharedString( "FocalInfo" ), Vector4( fx->m_focalDistance, fx->m_focalLength, 0.0, 0.0 ) );
-			m_depthOfFieldCoCNearShader->SetOption( BlueSharedString( "CoC_Mode" ), BlueSharedString( "CoC_Near" ) );
+			m_depthOfFieldBokehForegroundFillShader.CreateInstance();
+			m_depthOfFieldBokehForegroundFillShader->StartUpdate();
+			m_depthOfFieldBokehForegroundFillShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/Bokeh.fx" );
+			m_depthOfFieldBokehForegroundFillShader->SetParameter( BlueSharedString( "BlitCurrent" ), PLACEHOLDER );
+			m_depthOfFieldBokehForegroundFillShader->SetParameter( BlueSharedString( "CoCMap" ), PLACEHOLDER );
+			m_depthOfFieldBokehForegroundFillShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 1.0, 0.0, 0.0 ) );
+			m_depthOfFieldBokehForegroundFillShader->SetOption( BlueSharedString( "BOKEH_PIXEL_METHOD" ), BlueSharedString( "BOKEH_PIXEL_MAX" ) );
+			m_depthOfFieldBokehForegroundFillShader->SetOption( BlueSharedString( "BOKEH_SHAPE" ), BlueSharedString( "BOKEH_SHAPE_DISK" ) );
+			m_depthOfFieldBokehForegroundFillShader->EndUpdate();
 
-			m_depthOfFieldCoCNearShader->EndUpdate();
+			m_depthOfFieldCoCShader.CreateInstance();
+			m_depthOfFieldCoCShader->StartUpdate();
+			m_depthOfFieldCoCShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/CircleOfConfusion.fx" );
+			m_depthOfFieldCoCShader->SetParameter( BlueSharedString( "FocalInfo" ), Vector4( fx->m_focalDistance, fx->m_focalLength, 0.0, 0.0 ) );
+			m_depthOfFieldCoCShader->EndUpdate();
 		}
 		else if( fx->IsDirty() )
 		{
 			// we just changed the effect
-			m_depthOfFieldCoCFarShader->StartUpdate();
-			m_depthOfFieldCoCFarShader->SetParameter( BlueSharedString( "FocalInfo" ), Vector4( fx->m_focalDistance, fx->m_focalLength, 0.0, 0.0 ) );
-			m_depthOfFieldCoCFarShader->EndUpdate();
+			m_depthOfFieldCoCShader->StartUpdate();
+			m_depthOfFieldCoCShader->SetParameter( BlueSharedString( "FocalInfo" ), Vector4( fx->m_focalDistance, fx->m_focalLength, 0.0, 0.0 ) );
+			m_depthOfFieldCoCShader->EndUpdate();
 
-			m_depthOfFieldCoCNearShader->StartUpdate();
-			m_depthOfFieldCoCNearShader->SetParameter( BlueSharedString( "FocalInfo" ), Vector4( fx->m_focalDistance, fx->m_focalLength, 0.0, 0.0 ) );
-			m_depthOfFieldCoCNearShader->EndUpdate();
+			m_depthOfFieldBokehBackgroundBlurShader->StartUpdate();
+			m_depthOfFieldBokehBackgroundBlurShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale * 2.0f, 0.0, 1.0, 0.0 ) );
+			m_depthOfFieldBokehBackgroundBlurShader->EndUpdate();
 
-			m_depthOfFieldBokehBlurShader->StartUpdate();
-			m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 0.0, 0.0 ) );
-			m_depthOfFieldBokehBlurShader->EndUpdate();
+			m_depthOfFieldBokehBackgroundFillShader->StartUpdate();
+			m_depthOfFieldBokehBackgroundFillShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 1.0, 0.0 ) );
+			m_depthOfFieldBokehBackgroundFillShader->EndUpdate();
 
-			m_depthOfFieldBokehBlendShader->StartUpdate();
-			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 0.0, 0.0 ) );
-			m_depthOfFieldBokehBlendShader->EndUpdate();
+			m_depthOfFieldBokehForegroundBlurShader->StartUpdate();
+			m_depthOfFieldBokehForegroundBlurShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale * 2.0f, 1.0, 0.0, 0.0 ) );
+			m_depthOfFieldBokehForegroundBlurShader->EndUpdate();
 
-			m_depthOfFieldBokehFillShader->StartUpdate();
-			m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 0.0, 0.0, 0.0 ) );
-			m_depthOfFieldBokehFillShader->EndUpdate();
+			m_depthOfFieldBokehForegroundFillShader->StartUpdate();
+			m_depthOfFieldBokehForegroundFillShader->SetParameter( BlueSharedString( "BokehInfo" ), Vector4( fx->m_scale, 1.0, 0.0, 0.0 ) );
+			m_depthOfFieldBokehForegroundFillShader->EndUpdate();
 		}
 		fx->SetDirty( false );
 
 	}
 	else
 	{
-		if( m_depthOfFieldBokehBlendShader || m_depthOfFieldBokehBlurShader || m_depthOfFieldCoCFarShader ||
-			m_depthOfFieldCoCNearShader || m_depthOfFieldBokehFillShader )
+		if( m_depthOfFieldBokehBlendShader || m_depthOfFieldCoCShader || m_depthOfFieldBokehBackgroundBlurShader || m_depthOfFieldBokehBackgroundFillShader || m_depthOfFieldBokehForegroundFillShader || m_depthOfFieldBokehForegroundBlurShader )
 		{
 			// we have just deleted the effect
 			m_depthOfFieldBokehBlendShader = nullptr;
-			m_depthOfFieldBokehBlurShader = nullptr;
-			m_depthOfFieldCoCFarShader = nullptr;
-			m_depthOfFieldCoCNearShader = nullptr;
-			m_depthOfFieldBokehFillShader = nullptr;
+			m_depthOfFieldCoCShader = nullptr;
+			m_depthOfFieldBokehBackgroundBlurShader = nullptr;
+			m_depthOfFieldBokehBackgroundFillShader = nullptr;
+			m_depthOfFieldBokehForegroundBlurShader = nullptr;
+			m_depthOfFieldBokehForegroundFillShader = nullptr;
 		}
 	}
 	return fx && fx->IsActive();
@@ -1202,52 +1265,63 @@ bool TriStepRenderPostProcess::ProcessDepthOfField( Tr2RenderContext& renderCont
 void TriStepRenderPostProcess::RenderDepthOfField( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPDepthOfFieldEffect* depthOfField )
 {
 	GPU_REGION( renderContext, "DepthOfField" );
-	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_FULLSCREEN );
+	{
+		renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_FULLSCREEN );
 
-	// Determine what is in focus (what is black in this will be in focus)
-	auto nearCoC = m_renderInfo->GetTempTexture( 1.0f );
-	DrawInto( *nearCoC, Tr2LoadAction::DONT_CARE, m_depthOfFieldCoCNearShader, renderContext );
+		auto result = m_renderInfo->GetTempTexture( 1.0f );
+		auto fgBlur = m_renderInfo->GetTempTexture( 1.0f );
+		auto fgFill = m_renderInfo->GetTempTexture( 1.0f );
+		auto bgBlur = m_renderInfo->GetTempTexture( 1.0f );
+		auto bgFill = m_renderInfo->GetTempTexture( 1.0f );
 
-	// blur the near CoC with a simple gaussian blur so out of focus objects don't create sharp edges on in focus objects...
-	Blur( nearCoC, nearCoC, renderContext );
-
-	auto farCoC = m_renderInfo->GetTempTexture( 1.0f );
-	DrawInto( *farCoC, Tr2LoadAction::DONT_CARE, m_depthOfFieldCoCFarShader, renderContext );
-
-	// Blur and fill background
-	auto background = m_renderInfo->GetTempTexture( 1.0f );
-	auto backgroundFilled = m_renderInfo->GetTempTexture( 1.0f );
-	m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), dest );
-	m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "CoCMap" ), farCoC );
-	DrawInto( *background, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehBlurShader, renderContext );
-
-	m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "BokehBlurMap" ), background );
-	m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "CoCMap" ), farCoC );
-	DrawInto( *backgroundFilled, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehFillShader, renderContext );
-
-	// Blur and fill foreground
-	auto foreground = m_renderInfo->GetTempTexture( 1.0f );
-	auto foregroundFilled = m_renderInfo->GetTempTexture( 1.0f );
-
-	m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), dest );
-	m_depthOfFieldBokehBlurShader->SetParameter( BlueSharedString( "CoCMap" ), nearCoC );
-	DrawInto( *foreground, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehBlurShader, renderContext );
-
-	m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "BokehBlurMap" ), foreground );
-	m_depthOfFieldBokehFillShader->SetParameter( BlueSharedString( "CoCMap" ), nearCoC );
-	DrawInto( *foregroundFilled, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehFillShader, renderContext );
-	
-
-	// blend into dest
-	auto result = m_renderInfo->GetTempTexture( 1.0f);
-	m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BlitCurrent" ), dest );
-	m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "NearMap" ), foregroundFilled );
-	m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "FarMap" ), backgroundFilled );
-	m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "CoCFarMap" ), farCoC );
-	m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "CoCNearMap" ), nearCoC );
-	DrawInto( *result, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehBlendShader, renderContext );
-
-	DrawInto( *dest, Tr2LoadAction::LOAD, *result, renderContext );
+		auto coc = m_renderInfo->GetTempTexture( 0.5, Tr2RenderContextEnum::EX_NONE, Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM );
+		{
+			GPU_REGION( renderContext, "CoC" );
+			// Render the CoC - r is near, g is far, black is focus
+			DrawInto( *coc, Tr2LoadAction::DONT_CARE, m_depthOfFieldCoCShader, renderContext );
+			// Blur the near CoC
+			Blur( coc, coc, renderContext, BlurType::Small, BlurChannel::r );
+		} 
+		{
+			GPU_REGION( renderContext, "Bokeh Foreground Blur" );
+			// Bokeh foreground Blur
+			m_depthOfFieldBokehForegroundBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), dest );
+			m_depthOfFieldBokehForegroundBlurShader->SetParameter( BlueSharedString( "CoCMap" ), coc );
+			DrawInto( *fgBlur, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehForegroundBlurShader, renderContext );
+		}
+		{
+			GPU_REGION( renderContext, "Bokeh Background Blur" );
+			// Bokeh background Blur
+			m_depthOfFieldBokehBackgroundBlurShader->SetParameter( BlueSharedString( "BlitCurrent" ), dest );
+			m_depthOfFieldBokehBackgroundBlurShader->SetParameter( BlueSharedString( "CoCMap" ), coc );
+			DrawInto( *bgBlur, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehBackgroundBlurShader, renderContext );
+		}
+		{
+			GPU_REGION( renderContext, "Bokeh Foreground Fill" );
+			// Bokeh foreground Fill
+			m_depthOfFieldBokehForegroundFillShader->SetParameter( BlueSharedString( "BlitCurrent" ), fgBlur );
+			m_depthOfFieldBokehForegroundFillShader->SetParameter( BlueSharedString( "CoCMap" ), coc );
+			DrawInto( *fgFill, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehForegroundFillShader, renderContext );
+		}
+		{
+			GPU_REGION( renderContext, "Bokeh Background Fill" );
+			// Bokeh background Fill
+			m_depthOfFieldBokehBackgroundFillShader->SetParameter( BlueSharedString( "BlitCurrent" ), bgBlur );
+			m_depthOfFieldBokehBackgroundFillShader->SetParameter( BlueSharedString( "CoCMap" ), coc );
+			DrawInto( *bgFill, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehBackgroundFillShader, renderContext );
+		}
+		{
+			GPU_REGION( renderContext, "Bokeh Blend" );
+			// Depth of Field Blend
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BlitCurrent" ), dest );
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BokehForegroundBlurMap" ), fgFill );
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "BokehBackgroundBlurMap" ), bgFill );
+			m_depthOfFieldBokehBlendShader->SetParameter( BlueSharedString( "CoCMap" ), coc );
+			DrawInto( *result, Tr2LoadAction::DONT_CARE, m_depthOfFieldBokehBlendShader, renderContext );
+		}
+		
+		DrawInto( *dest, Tr2LoadAction::LOAD, *result, renderContext );
+	}
 }
 
 
