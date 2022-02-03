@@ -12,15 +12,17 @@ const Be::ClassInfo* TriStepPushRenderTarget::ExposeToBlue()
 		MAP_INTERFACE( TriRenderStep )
 		MAP_INTERFACE( TriStepPushRenderTarget )
 
-		MAP_ATTRIBUTE("renderTarget", m_renderTarget, "na", Be::READWRITE )
+		MAP_ATTRIBUTE( "renderTarget", m_renderTarget, "na", Be::READWRITE )
+		MAP_ATTRIBUTE( "slot", m_slot, "", Be::READWRITE )
 
 		MAP_METHOD_AND_WRAP_OPTIONAL_ARGS
 		(
 			"__init__", 
 			py__init__, 
-			1, 
+			2, 
 			"Creates a render job that pushes a rendertarget to the device\n"
-			":param renderTarget: a Tr2RenderTarget"
+			":param renderTarget: a Tr2RenderTarget\n"
+			":param slot: render target slot"
 		)
 
 	EXPOSURE_CHAINTO( TriRenderStep )

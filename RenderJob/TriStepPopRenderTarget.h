@@ -11,10 +11,14 @@ public:
 	EXPOSE_TO_BLUE();
 	
 	TriStepPopRenderTarget( IRoot* lockobj = 0);
-	~TriStepPopRenderTarget(void);
 
 	//IRenderStep
 	TriStepResult Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext );
+
+	void py__init__( uint32_t slot = 0 );
+
+private:
+	uint32_t m_slot;
 };
 
 TYPEDEF_BLUECLASS( TriStepPopRenderTarget );
