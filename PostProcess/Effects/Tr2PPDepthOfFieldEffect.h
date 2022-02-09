@@ -7,6 +7,15 @@
 #pragma once
 
 #include "Tr2PPEffect.h"
+namespace Tr2Bokeh
+{
+	enum Shape
+	{
+		Disk,
+		Rectangle,
+		Triangle
+	};
+}
 
 BLUE_CLASS( Tr2PPDepthOfFieldEffect ) :
 	public Tr2PPEffect
@@ -17,11 +26,15 @@ public:
 	Tr2PPDepthOfFieldEffect( IRoot* lockobj = NULL );
 	~Tr2PPDepthOfFieldEffect();
 
+	BlueSharedString GetBokehShapeString() const;
+
+
 	// Tr2PPEffect
 	bool IsActive() override;
 
 	float m_focalDistance;
 	float m_focalLength;
 	float m_scale;
+	Tr2Bokeh::Shape m_bokehShape;
 };
 TYPEDEF_BLUECLASS( Tr2PPDepthOfFieldEffect );

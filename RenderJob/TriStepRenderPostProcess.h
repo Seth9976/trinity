@@ -18,6 +18,64 @@ BLUE_DECLARE( Tr2PPFidelityFXEffect );
 BLUE_DECLARE( Tr2Effect );
 
 
+namespace PostProcessBlur
+{
+	// Some blur helpers
+	enum BlurType
+	{
+		Big,
+		Small
+	};
+
+	enum BlurChannel
+	{
+		r,
+		g,
+		b,
+		a,
+		rgba
+	};
+
+	enum BlurOutputProcess
+	{
+		Average,
+		Brighten,
+		Darken
+	};
+
+	enum BlurRange
+	{
+		Range_Off,
+		Range_On
+	};
+
+	struct BlurContext
+	{
+		BlurType type;
+		BlurChannel channel;
+		BlurRange rangeMode;
+		BlurOutputProcess outputProcess;
+		float outputSize;
+		Vector2 range;
+
+		uint32_t Hash()
+		{
+			return type * 1000 + channel * 100 + rangeMode * 10 + outputProcess;
+		}
+	};
+
+	BlurContext CreateBlurContext( float outputSize );
+	BlurContext CreateBlurContext( float outputSize, BlurType type );
+	BlurContext CreateBlurContext( BlurType type, BlurChannel channel, float outputSize );
+	BlurContext CreateBlurContext( BlurType type, BlurChannel channel, float outputSize, Vector2 range );
+	BlurContext CreateBlurContext( BlurType type, BlurChannel channel, float outputSize, Vector2 range, BlurOutputProcess process );
+
+	BlueSharedString GetBlurRangeOptionValue( BlurRange range );
+	BlueSharedString GetBlurOutputProcessOptionValue( BlurOutputProcess process );
+	BlueSharedString GetBlurChannelOptionValue( BlurChannel channel );
+	BlueSharedString GetBlurTypeOptionValue( BlurType type );
+}
+
 // -------------------------------------------------------------
 // Description:
 //   A render step to render post process. Takes a scene and the source buffer as a parameter
@@ -51,29 +109,14 @@ public:
 	void py__init__( EveSpaceScene* scene, Tr2RenderTarget* source );
 private:
 
-	// Some blur helpers
-	enum BlurType
-	{
-		Big,
-		Small
-	};
-
-	enum BlurChannel
-	{
-		r,
-		g,
-		b,
-		rgba
-	};
-
 	// bloom
 	bool ProcessBloom( Tr2PPBloomEffect* bloom, Tr2PPDynamicExposureEffect* dynamicExposure );
-	Tr2PostProcessRenderInfo::Texture RenderBloom( Tr2RenderTarget* dest, Tr2RenderContext & renderContext, Tr2PPBloomEffect * bloom );
+	Tr2PostProcessRenderInfo::Texture RenderBloom( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPBloomEffect* bloom );
 	Tr2EffectPtr m_bloomHighPassFilter;
 
 	// godRays
 	bool ProcessGodRays( Tr2PPGodRaysEffect* godrays );
-	void RenderGodRays( Tr2RenderTarget* dest, Tr2RenderContext & renderContext, Tr2PPGodRaysEffect * godrays );
+	void RenderGodRays( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPGodRaysEffect* godrays );
 	Tr2EffectPtr m_godrayEffect;
 
 	// signal loss
@@ -82,7 +125,7 @@ private:
 	Tr2EffectPtr m_signalLossEffect;
 
 	// dynamic exposure
-	bool ProcessDynamicExposure( Tr2RenderContext & renderContext, Tr2PPDynamicExposureEffect * dynamicExposure, Tr2PPBloomEffect * bloom );
+	bool ProcessDynamicExposure( Tr2RenderContext& renderContext, Tr2PPDynamicExposureEffect* dynamicExposure, Tr2PPBloomEffect* bloom );
 	void RenderDynamicExposure( Tr2RenderTarget* dest, Tr2RenderContext & renderContext, Tr2PPDynamicExposureEffect * dynamicExposure );
 	Tr2GpuBufferPtr m_localHistograms;
 	Tr2GpuBufferPtr m_histogram;
@@ -98,15 +141,12 @@ private:
 	bool ProcessDepthOfField( Tr2RenderContext& renderContext, Tr2PPDepthOfFieldEffect* fx );
 	void RenderDepthOfField( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPDepthOfFieldEffect* depthOfField );	
 	Tr2EffectPtr m_depthOfFieldCoCShader;
-	Tr2EffectPtr m_depthOfFieldBokehBlendShader;
-	Tr2EffectPtr m_depthOfFieldBokehForegroundBlurShader;
-	Tr2EffectPtr m_depthOfFieldBokehForegroundFillShader;
-	Tr2EffectPtr m_depthOfFieldBokehBackgroundBlurShader;
-	Tr2EffectPtr m_depthOfFieldBokehBackgroundFillShader;
+	Tr2EffectPtr m_depthOfFieldBokehBlurShader;
+	Tr2EffectPtr m_depthOfFieldBokehFillShader;
 	
 	// fidelityFX
 	bool ProcessFidelityFX( Tr2RenderContext& renderContext, Tr2PPFidelityFXEffect* fx );
-	Tr2PostProcessRenderInfo::Texture RenderFidelityFX( Tr2RenderTarget * src, Tr2RenderContext & renderContext, Tr2PPFidelityFXEffect * fx );
+	Tr2PostProcessRenderInfo::Texture RenderFidelityFX( Tr2RenderTarget* src, Tr2RenderContext& renderContext, Tr2PPFidelityFXEffect* fx );
 	Tr2EffectPtr m_fidelityFXShader;
 
 	// fog
@@ -117,14 +157,14 @@ private:
 
 	// TAA
 	bool ProcessTaa( Tr2PPTaaEffect* taa );
-	void RenderTaa( Tr2RenderTarget * dest, Tr2RenderContext & renderContext, Tr2PPTaaEffect * taa );
+	void RenderTaa( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPTaaEffect* taa );
 	Tr2EffectPtr m_taaEffect;
 	Tr2RenderTargetPtr m_accumulationBuffer;
 	Tr2RenderTargetPtr m_velocityBuffer;
 
 	// film grain
 	bool ProcessFilmGrain( Tr2PPFilmGrainEffect* filmGrain );
-	void RenderFilmGrain( Tr2RenderTarget* dest, Tr2RenderContext & renderContext, Tr2PPFilmGrainEffect * filmGrain );
+	void RenderFilmGrain( Tr2RenderTarget* dest, Tr2RenderContext& renderContext, Tr2PPFilmGrainEffect* filmGrain );
 	Tr2EffectPtr m_grainShader;
 
 	// desaturate
@@ -158,8 +198,8 @@ private:
 	PostProcessingQuality m_quality;
 
 	// Common
-	void Blur( Tr2RenderTarget * dest, Tr2RenderTarget * src, Tr2RenderContext & renderContext, BlurType blurType = BlurType::Big, BlurChannel blurChannel = BlurChannel::rgba, float size = 0.5f );
-	void DownSampleDepth( Tr2RenderContext & renderContext, Tr2RenderTarget* destination );
+	void Blur( Tr2RenderTarget& dest, Tr2RenderTarget& src, Tr2RenderContext& renderContext, PostProcessBlur::BlurContext& blurContext);
+	void DownSampleDepth( Tr2RenderContext& renderContext, Tr2RenderTarget* destination );
 
 	Tr2EffectPtr m_downsampleDepthEffect;
 	std::map<uint32_t, std::pair<Tr2EffectPtr, Tr2EffectPtr>> m_blurEffects;

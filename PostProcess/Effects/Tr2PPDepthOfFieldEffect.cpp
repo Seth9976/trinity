@@ -11,7 +11,8 @@
 Tr2PPDepthOfFieldEffect::Tr2PPDepthOfFieldEffect( IRoot* lockobj ) :
 	m_focalDistance( 0.0f ),
 	m_focalLength(0.0f),
-	m_scale( 0.0f )
+	m_scale( 0.0f ),
+	m_bokehShape( Tr2Bokeh::Disk )
 {
 }
 
@@ -22,4 +23,19 @@ Tr2PPDepthOfFieldEffect::~Tr2PPDepthOfFieldEffect()
 bool Tr2PPDepthOfFieldEffect::IsActive()
 {
 	return Tr2PPEffect::IsActive() && m_scale > 0.0f;
+}
+
+BlueSharedString Tr2PPDepthOfFieldEffect::GetBokehShapeString() const
+{
+	switch( m_bokehShape )
+	{
+	case Tr2Bokeh::Disk:
+		return BlueSharedString( "BOKEH_SHAPE_DISK" );
+	case Tr2Bokeh::Rectangle:
+		return BlueSharedString( "BOKEH_SHAPE_RECTANGLE" );
+	case Tr2Bokeh::Triangle:
+		return BlueSharedString( "BOKEH_SHAPE_TRIANGLE" );
+	default:
+		return BlueSharedString( "BOKEH_SHAPE_DISK" );
+	}
 }
