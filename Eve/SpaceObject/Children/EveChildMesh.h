@@ -90,7 +90,11 @@ public:
 	void SetMesh( Tr2MeshBase* mesh );
 	void SetOrigin( Origin origin );
 
+	Tr2GrannyAnimation* GetAnimationController() const;
+	void SetAnimationController( Tr2GrannyAnimation* animation );
+
 protected:
+	void InitializeAnimation();
 	bool ShouldReflect() const;
 
 
@@ -101,6 +105,7 @@ protected:
 	Tr2MeshBasePtr m_mesh;
 
 	PIEveChildTransformModifierVector m_transformModifiers;
+	Tr2GrannyAnimationPtr m_animationUpdater;
 
 	Tr2Lod m_lowestLodVisible;
 

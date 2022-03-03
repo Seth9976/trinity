@@ -211,8 +211,6 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 
 EveSpaceObject2::~EveSpaceObject2()
 {
-	FreeAnimationData();
-
 	if( m_geometryResFromMesh )
 	{
 		m_geometryResFromMesh->RemoveNotifyTarget( this );
@@ -1672,8 +1670,6 @@ void EveSpaceObject2::ReleaseCachedData( BlueAsyncRes* p )
 {
 	CCP_ASSERT( p == m_geometryResFromMesh );
 
-	FreeAnimationData();
-
 	// no more overlay effects
 	for( int i = 0; i < EveMeshOverlayEffect::TYPE_COUNT; ++i )
 	{
@@ -1708,15 +1704,6 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 	{
 		m_wantsGeometryResFromMesh = true;
 		return;
-	}
-
-	m_animationUpdater->SetUseMeshBinding( true );
-	m_animationUpdater->SetSharedGeometryRes( m_geometryResFromMesh );
-	m_animationUpdater->RebuildCachedData( p );
-
-	if( m_animationUpdater->IsInitialized() )
-	{
-		m_animationUpdater->PrePhysicsAnimation( 0, IdentityMatrix() );
 	}
 
 	if( m_boundingSphereRadius < 0.0f )
@@ -2430,14 +2417,6 @@ void EveSpaceObject2::FreezeHighDetailMesh()
 	}
 }
 
-void EveSpaceObject2::FreeAnimationData()
-{
-	if( m_animationUpdater )
-	{
-		m_animationUpdater->Cleanup();
-	}
-}
-
 void EveSpaceObject2::PrepareForAnimation()
 {
 	if( m_wantsGeometryResFromMesh )
@@ -2458,6 +2437,10 @@ void EveSpaceObject2::PrepareForAnimation()
 			}
 			m_geometryResFromMesh = geometryRes;
 			m_wantsGeometryResFromMesh = false;
+
+			m_animationUpdater->SetUseMeshBinding( true );
+			m_animationUpdater->SetSharedGeometryRes( m_geometryResFromMesh );
+
 			m_geometryResFromMesh->AddNotifyTarget( this );
 		}
 	}

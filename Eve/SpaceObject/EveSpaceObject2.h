@@ -445,7 +445,6 @@ protected:
 	Vector3 GetTransformedDamageLocator( uint32_t index );
 
 	void PrepareForAnimation();
-	void FreeAnimationData();
 	void SelectMeshLevelOfDetail();
 	void GetBatchesFromOverlayVector( ITriRenderBatchAccumulator * batches, const Tr2PerObjectData* perObjectData, TriBatchType batchType, Tr2MeshBase* mesh );
 

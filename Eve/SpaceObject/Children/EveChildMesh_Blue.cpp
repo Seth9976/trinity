@@ -17,6 +17,12 @@ const Be::ClassInfo* EveChildMesh::ExposeToBlue()
 		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 		MAP_ATTRIBUTE( "useSpaceObjectData", m_useSpaceObjectData, "", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "mesh", m_mesh, "", Be::READWRITE | Be::PERSIST | Be::NOTIFY )
+
+		MAP_ATTRIBUTE(
+			"animationUpdater",
+			m_animationUpdater,
+			"Granny animation exposure",
+			Be::READWRITE | Be::PERSIST | Be::NOTIFY )
 		MAP_ATTRIBUTE( "lowestLodVisible", m_lowestLodVisible, "Lowest LOD this guy is visible\n:jessica-group: LOD", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( 
 			"minScreenSize", 

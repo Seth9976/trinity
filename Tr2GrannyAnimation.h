@@ -37,6 +37,7 @@ public:
 	void SetAnimationEnabled( bool enabled );
 
 	void	SetSharedGeometryRes( TriGeometryResPtr res );
+	TriGeometryRes* GetSharedGeometryRes() const;
 	void	SetUseMeshBinding( bool enable ) { m_useMeshBinding = enable; }
 
 	const std::string& GetModel() const;

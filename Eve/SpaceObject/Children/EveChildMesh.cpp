@@ -6,6 +6,7 @@
 #include "Eve/EveTransform.h"
 #include "Utilities/BoundingSphere.h"
 #include "Tr2MeshLod.h"
+#include "Tr2GrannyAnimation.h"
 
 
 extern float g_eveSpaceSceneLODFactor;
@@ -47,6 +48,9 @@ bool EveChildMesh::Initialize()
 	{
 		RebuildLocalTransform();
 	}
+
+	InitializeAnimation();
+
 	return true;
 }
 
@@ -55,6 +59,10 @@ bool EveChildMesh::OnModified( Be::Var* val )
 	if( IsMatch( val, m_reflectionMode ) || IsMatch( val, m_display) || IsMatch( val, m_mesh) )
 	{
 		ReRegister();
+	}
+	if( IsMatch( val, m_mesh ) || IsMatch( val, m_animationUpdater ) )
+	{
+		InitializeAnimation();
 	}
 	return true;
 }
@@ -68,6 +76,24 @@ void EveChildMesh::SetName( const char* name )
 {
 	m_name = BlueSharedString( name );
 }
+
+void EveChildMesh::InitializeAnimation()
+{
+	if( m_animationUpdater && m_animationUpdater->GetResPath().empty() )
+	{
+		if( m_mesh )
+		{
+			if( auto geometry = m_mesh->GetGeometryResource() )
+			{
+				m_animationUpdater->SetUseMeshBinding( true );
+				m_animationUpdater->SetSharedGeometryRes( geometry );
+				return;
+			}
+		}
+		m_animationUpdater->SetSharedGeometryRes( nullptr );
+	}
+}
+
 
 // --------------------------------------------------------------------------------
 // Description:
@@ -219,7 +245,13 @@ uint32_t EveChildMesh::GetPerObjectDataSize( Tr2RenderContextEnum::ShaderType sh
 	}
 	else
 	{
-		return sizeof( m_vsData );
+		int boneCount = 0;
+		if( m_animationUpdater && m_animationUpdater->IsInitialized() )
+		{
+			boneCount = m_animationUpdater->GetMeshBoneCount();
+		}
+
+		return sizeof( m_vsData ) + boneCount * 3 * 16; // m_vsBonesMatrix (3x4)
 	}
 }
 
@@ -234,6 +266,13 @@ void EveChildMesh::UpdatePerObjectBuffer( Tr2RenderContextEnum::ShaderType shade
 	{
 		uint8_t* perObjectVS = (uint8_t*)data;
 		memcpy( perObjectVS, &m_vsData, sizeof( m_vsData ) );
+		perObjectVS += sizeof( m_vsData );
+
+		size -= sizeof( m_vsData );
+		if( size )
+		{
+			memcpy( perObjectVS, m_animationUpdater->GetMeshBoneMatrixList(), size );
+		}
 	}
 }
 
@@ -277,6 +316,18 @@ void EveChildMesh::UpdateAsyncronous( EveUpdateContext& updateContext, const Eve
 
 void EveChildMesh::UpdateSyncronous( EveUpdateContext& updateContext, const EveChildUpdateParams& )
 {
+	if( m_animationUpdater )
+	{
+		if( m_mesh && m_animationUpdater->GetResPath().empty() )
+		{
+			if( m_mesh->GetGeometryResource() != m_animationUpdater->GetSharedGeometryRes() )
+			{
+				InitializeAnimation();
+			}
+		}
+
+		m_animationUpdater->PrePhysicsAnimation( 0, IdentityMatrix() );
+	}
 }
 
 void EveChildMesh::GetLocalToWorldTransform( Matrix& transform ) const
@@ -345,17 +396,37 @@ void EveChildMesh::GetDebugOptions( Tr2DebugRendererOptions& options )
 	{
 		m_mesh->GetDebugOptions( options );
 	}
+	options.insert( "Bones" );
 }
 
 void EveChildMesh::RenderDebugInfo( ITr2DebugRenderer2& renderer )
 {
-	if( m_display && m_mesh )
+	if( !m_display )
+	{
+		return;
+	}
+	if( m_mesh )
 	{
 		m_mesh->RenderDebugInfo( m_worldTransform, renderer );
+	}
+	if( m_animationUpdater && renderer.HasOption( GetRawRoot(), "Bones" ) )
+	{
+		m_animationUpdater->RenderBones( m_worldTransform );
 	}
 }
 
 void EveChildMesh::AddTransformModifier( IEveChildTransformModifier* modifier )
 {
 	m_transformModifiers.Append( modifier );
+}
+
+Tr2GrannyAnimation* EveChildMesh::GetAnimationController() const
+{
+	return m_animationUpdater;
+}
+
+void EveChildMesh::SetAnimationController( Tr2GrannyAnimation* animation )
+{
+	m_animationUpdater = animation;
+	InitializeAnimation();
 }

@@ -42,6 +42,11 @@ Tr2GrannyAnimation::~Tr2GrannyAnimation()
 {
 	Cleanup();
 
+	if( m_geometryRes )
+	{
+		m_geometryRes->RemoveNotifyTarget( this );
+	}
+
 	if( m_grannyRes )
 	{
 		m_grannyRes->RemoveNotifyTarget( this );
@@ -129,8 +134,26 @@ granny_animation* Tr2GrannyAnimation::FindAnimationByName( const char* name ) co
 
 void Tr2GrannyAnimation::SetSharedGeometryRes( TriGeometryResPtr res )
 {
+	if( res == m_geometryRes )
+	{
+		return;
+	}
+	if( m_geometryRes )
+	{
+		m_geometryRes->RemoveNotifyTarget( this );
+	}
+	Cleanup();
 	m_geometryRes = res;
-	m_resPath = "<EveSpaceObject2>";
+	if( m_geometryRes )
+	{
+		m_geometryRes->AddNotifyTarget( this );
+	}
+	m_resPath = "";
+}
+
+TriGeometryRes* Tr2GrannyAnimation::GetSharedGeometryRes() const
+{
+	return m_geometryRes;
 }
 
 Tr2GrannyAnimationLayer* Tr2GrannyAnimation::GetAnimationLayer( const char* name )
@@ -192,6 +215,13 @@ void Tr2GrannyAnimation::LoadSecondaryResPath( const std::string& val )
 
 void Tr2GrannyAnimation::ReleaseCachedData( BlueAsyncRes* p )
 {
+	if( p == m_geometryRes && IsInitialized() )
+	{
+		// We ignore notifications from the shared gemoetry res if we already loaded animation data for it.
+		// Otherwise we'd loose current animation state if the geometry res is reloaded for any reason
+		// (because of client settings change for example).
+		return;
+	}
 	Cleanup();
 }
 
@@ -222,7 +252,12 @@ granny_file_info* Tr2GrannyAnimation::GetFileInfo() const
 
 void Tr2GrannyAnimation::RebuildCachedData( BlueAsyncRes* p )
 {
-	if ( p != m_grannyRes && p != m_geometryRes )
+	if( p == m_geometryRes && IsInitialized() )
+	{
+		return;
+	}
+
+	if( p != m_grannyRes && p != m_geometryRes )
 	{
 		for ( auto it = m_secondaryGrannyRes.begin(); it != m_secondaryGrannyRes.end(); it++ )
 		{
@@ -376,6 +411,12 @@ void Tr2GrannyAnimation::RebuildCachedData( BlueAsyncRes* p )
 	for( auto it = m_animationLayers.begin(); it != m_animationLayers.end(); it++ )
 	{
 		it->second.ConsumeAnimationQueue( this );
+	}
+
+	if( m_geometryRes )
+	{
+		// Pump animation immediately, so that we have valid pose before the next update.
+		PrePhysicsAnimation( 0, IdentityMatrix() );
 	}
 }
 
