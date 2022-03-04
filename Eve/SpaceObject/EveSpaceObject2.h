@@ -31,6 +31,8 @@
 #include "Controllers/ITr2ControllerOwner.h"
 #include "Eve/EveEntity.h"
 #include "Eve/Components/IEveLightOwner.h"
+#include "Tr2GrannyAnimation.h"
+
 
 // consts
 #define EVE_SPACEOBJECT_DIRT_LEVEL_DEFAULT (0.f)
@@ -46,7 +48,6 @@ BLUE_DECLARE( Tr2MeshArea );
 BLUE_DECLARE_VECTOR( Tr2MeshArea );
 BLUE_DECLARE( EveLocator2 );
 BLUE_DECLARE_VECTOR( EveLocator2 );
-BLUE_DECLARE( Tr2GrannyAnimation );
 BLUE_DECLARE( EveTransform );
 BLUE_DECLARE( EveCustomMask );
 BLUE_DECLARE_VECTOR( EveCustomMask );
@@ -163,6 +164,7 @@ BLUE_CLASS( EveSpaceObject2 ):
 	public IShaderConfigurer,
 	public ITr2SoundEmitterOwner,
 	public ITr2ControllerOwner,
+	public ITr2GrannyAnimationOwner,
 	public EveEntity
 {
 public:
@@ -328,7 +330,7 @@ public:
 	Vector3 GetModelWorldPosition() const;
 	void GetWorldVelocity( Vector3& velocity ) const;
 
-	Tr2GrannyAnimationPtr GetAnimationController() { return m_animationUpdater; }
+	Tr2GrannyAnimation* GetAnimationController() const override { return m_animationUpdater; }
 	bool IsAnimated() const; 
 
 	// bounding sphere

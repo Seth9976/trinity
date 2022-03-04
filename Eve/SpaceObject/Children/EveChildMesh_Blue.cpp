@@ -12,6 +12,7 @@ const Be::ClassInfo* EveChildMesh::ExposeToBlue()
 		MAP_INTERFACE( ITr2Renderable )
 		MAP_INTERFACE( IInitialize )
 		MAP_INTERFACE( INotify )
+		MAP_INTERFACE( ITr2GrannyAnimationOwner )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST	)
 		MAP_ATTRIBUTE( "display", m_display, "", Be::READWRITE | Be::PERSIST | Be::NOTIFY )

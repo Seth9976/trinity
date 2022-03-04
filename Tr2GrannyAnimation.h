@@ -8,12 +8,20 @@
 
 BLUE_DECLARE( TriGrannyRes );
 BLUE_DECLARE( TriGeometryRes );
+BLUE_DECLARE( Tr2GrannyAnimation );
 
 
 struct GrannyBoneBindingBounds
 {
 	int m_boneIndex;
 	Vector3 m_corners[8];
+};
+
+
+BLUE_INTERFACE( ITr2GrannyAnimationOwner ) :
+	public IRoot
+{
+	virtual Tr2GrannyAnimation* GetAnimationController() const = 0;
 };
 
 

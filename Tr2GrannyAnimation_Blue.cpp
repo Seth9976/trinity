@@ -3,6 +3,10 @@
 #include "Resources/TriGeometryRes.h"
 #include "Resources/TriGrannyRes.h"
 
+
+BLUE_DEFINE_INTERFACE( ITr2GrannyAnimationOwner );
+
+
 BLUE_DEFINE( Tr2GrannyAnimation );
 
 const Be::ClassInfo* Tr2GrannyAnimation::ExposeToBlue()

@@ -29,6 +29,7 @@ BLUE_CLASS( EveChildMesh ) :
 	public ITr2Renderable,
 	public IInitialize,
 	public ITr2DebugRenderable,
+	public ITr2GrannyAnimationOwner,
 	public EveEntity,
 	public INotify
 {
@@ -90,7 +91,7 @@ public:
 	void SetMesh( Tr2MeshBase* mesh );
 	void SetOrigin( Origin origin );
 
-	Tr2GrannyAnimation* GetAnimationController() const;
+	Tr2GrannyAnimation* GetAnimationController() const override;
 	void SetAnimationController( Tr2GrannyAnimation* animation );
 
 protected:
