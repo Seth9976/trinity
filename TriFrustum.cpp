@@ -244,6 +244,11 @@ float TriFrustum::GetPixelSizeAccross( const Vector3& center, float radius ) con
 
 	d = -d;
 
+	if( LengthSq( d ) < radius * radius )
+	{
+		return std::numeric_limits<float>::max();
+	}
+
 	float depth = m_viewDir.x*d.x + m_viewDir.y*d.y + m_viewDir.z*d.z;
 	// clamp values close to zero and below
 	const float epsilon = 1e-5f;
@@ -269,6 +274,12 @@ float TriFrustum::GetPixelSizeAccrossEst( const Vector3& center, float radius ) 
 		return 0;
 	}
 	Vector3 d( center - m_viewPos );
+
+	if( LengthSq( d ) < radius * radius )
+	{
+		return std::numeric_limits<float>::max();
+	}
+
 	const float epsilon = 1e-5f;
 	float distance = std::max( epsilon, Length( d ) );
 	float ratio = radius / distance;
