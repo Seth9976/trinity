@@ -97,7 +97,6 @@ struct EveBannerSet::Vertex
 
 EveBannerSet::EveBannerSet( IRoot* lockobj )
 	:PARENTLOCK( m_banners ),
-	PARENTLOCK( m_associatedResources ),
 	PARENTLOCK( m_lights ),
 	m_key( 0 ),
 	m_vertexDeclaration( Tr2EffectStateManager::UNINITIALIZED_DECLARATION ),

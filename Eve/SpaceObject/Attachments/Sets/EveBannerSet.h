@@ -13,7 +13,6 @@
 
 
 BLUE_DECLARE( Tr2Effect );
-BLUE_DECLARE_VECTOR( Tr2LodResource );
 BLUE_DECLARE( Tr2Light );
 BLUE_DECLARE_VECTOR( Tr2Light );
 BLUE_DECLARE( TriTextureParameter );
@@ -93,7 +92,6 @@ private:
 	Tr2EffectPtr m_effect;
 	PEveBannerItemStructureList m_banners;
 	TriTextureParameterPtr m_primaryTextureParameter;
-	PTr2LodResourceVector m_associatedResources;
 
 	Tr2BufferAL m_vertexBuffer;
 	Tr2BufferAL m_indexBuffer;

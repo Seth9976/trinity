@@ -1367,11 +1367,7 @@ void EveSpaceObject2::UpdateVisibility( const TriFrustum& frustum, const Matrix&
 
 	if( m_isVisible )
 	{
-		if( g_lodLevelUltraEnabled && m_estimatedPixelDiameter > g_eveSpaceSceneHighDetailThreshold )
-		{
-			m_lodLevel = TR2_LOD_ULTRA;
-		}
-		else if( m_estimatedPixelDiameter > g_eveSpaceSceneMediumDetailThreshold )
+		if( m_estimatedPixelDiameter > g_eveSpaceSceneMediumDetailThreshold )
 		{
 			m_lodLevel = TR2_LOD_HIGH;
 		}
@@ -1384,11 +1380,7 @@ void EveSpaceObject2::UpdateVisibility( const TriFrustum& frustum, const Matrix&
 			m_lodLevel = TR2_LOD_LOW;
 		}
 
-		if( g_lodLevelUltraEnabled && m_estimatedPixelDiameterWithChildren > g_eveSpaceSceneHighDetailThreshold )
-		{
-			m_lodLevelWithChildren = TR2_LOD_ULTRA;
-		}
-		else if( m_estimatedPixelDiameterWithChildren > g_eveSpaceSceneMediumDetailThreshold )
+		if( m_estimatedPixelDiameterWithChildren > g_eveSpaceSceneMediumDetailThreshold )
 		{
 			m_lodLevelWithChildren = TR2_LOD_HIGH;
 		}

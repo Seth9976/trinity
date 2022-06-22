@@ -7,7 +7,6 @@
 
 BLUE_DECLARE( TriTextureParameter );
 BLUE_DECLARE( Tr2VariableStore );
-BLUE_DECLARE( Tr2LodResource );
 BLUE_DECLARE_INTERFACE( ITriEffectParameter );
 BLUE_DECLARE_IVECTOR( ITriEffectParameter );
 BLUE_DECLARE_INTERFACE( ITriEffectResourceParameter );

@@ -985,10 +985,7 @@ set(_SOURCES
     Resources/Tr2LightProfileRes_Blue.cpp
     Resources/Tr2LoadPrepareFence.cpp
     Resources/Tr2LoadPrepareFence.h
-    Resources/Tr2LodResource.cpp
     Resources/Tr2LodResource.h
-    Resources/Tr2LodResource_Blue.cpp
-    Resources/Tr2LodResourceCache.h
     Resources/Tr2MaterialRes.cpp
     Resources/Tr2MaterialRes.h
     Resources/Tr2MaterialRes_Blue.cpp
@@ -1016,9 +1013,6 @@ set(_SOURCES
     Shader/Parameter/Tr2RuntimeTextureParameter.cpp
     Shader/Parameter/Tr2RuntimeTextureParameter.h
     Shader/Parameter/Tr2RuntimeTextureParameter_Blue.cpp
-    Shader/Parameter/Tr2Texture2dLodParameter.cpp
-    Shader/Parameter/Tr2Texture2dLodParameter.h
-    Shader/Parameter/Tr2Texture2dLodParameter_Blue.cpp
     Shader/Parameter/Tr2Vector2Parameter.cpp
     Shader/Parameter/Tr2Vector2Parameter.h
     Shader/Parameter/Tr2Vector2Parameter_Blue.cpp
@@ -1297,9 +1291,6 @@ set(_SOURCES
     Tr2MeshBase.cpp
     Tr2MeshBase.h
     Tr2MeshBase_Blue.cpp
-    Tr2MeshLod.cpp
-    Tr2MeshLod.h
-    Tr2MeshLod_Blue.cpp
     Tr2Model.cpp
     Tr2Model.h
     Tr2Model_Blue.cpp

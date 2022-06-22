@@ -12,7 +12,6 @@
 #include "Shader/Parameter/Tr2Matrix4Parameter.h"
 #include "Shader/Parameter/TriFloatArrayParameter.h"
 #include "Shader/Parameter/TriTextureParameter.h"
-#include "Shader/Parameter/Tr2Texture2DLodParameter.h"
 #include "Shader/Parameter/Tr2GeometryBufferParameter.h"
 #include "Shader/Parameter/TriVariableParameter.h"
 #include "Shader/Parameter/Tr2RuntimeTextureParameter.h"
