@@ -571,6 +571,7 @@ bool TriStepRenderPostProcess::ProcessBloom( Tr2PPBloomEffect* bloom, Tr2PPDynam
 
 			m_tonemappingEffect->StartUpdate();
 			m_tonemappingEffect->SetParameter(BlueSharedString("BlitCurrent"), m_renderInfo->GetBlackTexture());
+			m_tonemappingEffect->SetParameter( BlueSharedString( "Grime" ), m_renderInfo->GetBlackTexture() );
 			m_tonemappingEffect->EndUpdate();
 		}
 	}
