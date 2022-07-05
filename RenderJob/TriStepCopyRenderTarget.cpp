@@ -15,8 +15,8 @@ TriStepResult TriStepCopyRenderTarget::Execute( Be::Time realTime, Be::Time simT
 		return RS_OK;
 	}
 
-	const unsigned destX = m_destinationViewport ? m_destinationViewport->x : 0;
-	const unsigned destY = m_destinationViewport ? m_destinationViewport->y : 0;
+	unsigned destX = m_destinationViewport ? m_destinationViewport->x : 0;
+	unsigned destY = m_destinationViewport ? m_destinationViewport->y : 0;
 
 
 	HRESULT hr = 0;
@@ -27,6 +27,20 @@ TriStepResult TriStepCopyRenderTarget::Execute( Be::Time realTime, Be::Time simT
 		{
 			Tr2TextureSubresource dest( 0 );
 			dest.SetRect( destX, destY, destX + m_sourceRT->GetWidth(), destY + m_sourceRT->GetHeight() );
+
+			if( m_destinationViewport )
+			{
+				if( m_destinationViewport->x < 0 )
+				{
+					dest.m_left = 0;
+					dest.m_right = uint32_t( int32_t( m_sourceRT->GetWidth() ) + int32_t( m_destinationViewport->x ) );
+				}
+				if( m_destinationViewport->y < 0 )
+				{
+					dest.m_top = 0;
+					dest.m_bottom = uint32_t( int32_t( m_sourceRT->GetHeight() ) + int32_t( m_destinationViewport->y ) );
+				}
+			}
 			hr = m_destinationRT->GetRenderTarget().CopySubresourceRegion( dest, *m_sourceRT, Tr2TextureSubresource( 0 ), renderContext );
 		}
 		else
@@ -34,6 +48,21 @@ TriStepResult TriStepCopyRenderTarget::Execute( Be::Time realTime, Be::Time simT
 			const auto& vp = *m_sourceViewport;
 			Tr2TextureSubresource src( 0 );
 			src.SetRect( (uint32_t)vp.x, (uint32_t)vp.y, (uint32_t)(vp.x + vp.width), (uint32_t)(vp.y + vp.height) );
+
+			if( m_destinationViewport )
+			{
+				if( m_destinationViewport->x < 0 )
+				{
+					destX = 0;
+					src.m_right -= uint32_t( -m_destinationViewport->x );
+				}
+				if( m_destinationViewport->y < 0 )
+				{
+					destY = 0;
+					src.m_bottom -= uint32_t( -m_destinationViewport->y );
+				}
+			}
+
 			Tr2TextureSubresource dest( 0 );
 			dest.SetRect( destX, destY, destX + src.m_right - src.m_left, destY + src.m_bottom - src.m_top );
 

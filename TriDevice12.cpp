@@ -162,12 +162,16 @@ void TriDevice::ApplicationActivated( ApplicationActivation activated )
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 		if( activated == APP_ACTIVATED )
 		{
+#if !USE_BORDERLESS_WINDOW
 			ChangeDevice( mAdapter, mHwnd, nullptr );
+#endif
 		}
 		else
 		{
 			ShowWindow( mHwnd, SW_MINIMIZE );
+#if !USE_BORDERLESS_WINDOW
 			ChangeDevice( mAdapter, mHwnd, nullptr );
+#endif
 		}
 	}
 }

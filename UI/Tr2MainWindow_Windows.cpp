@@ -80,17 +80,16 @@ void Tr2MainWindow::CreateOSWindow( Tr2MainWindowState::State& state )
 
 	auto width = LONG( state.width );
 	auto height = LONG( state.height );
-#if USE_PROPER_FIXED_WINDOW
-	if( state.windowMode == Tr2WindowMode::FIXED_WINDOW )
+#if USE_BORDERLESS_WINDOW
+	if( state.windowMode == Tr2WindowMode::FULL_SCREEN )
 	{
 		auto monitorRect = GetMonitorRect( state.adapter );
 		auto monitorWidth = monitorRect.right - monitorRect.left;
 		auto monitorHeight = monitorRect.bottom - monitorRect.top;
-		if( width <= monitorWidth && height <= monitorHeight )
-		{
-			width = monitorWidth;
-			height = monitorHeight;
-		}
+		state.left = monitorRect.left;
+		state.top = monitorRect.top;
+		width = monitorWidth;
+		height = monitorHeight;
 	}
 #endif
 	RECT rect = { 0, 0, width, height };
@@ -159,17 +158,16 @@ void Tr2MainWindow::AdjustWindow( Tr2MainWindowState::State& state )
 
 	auto width = LONG( state.width );
 	auto height = LONG( state.height );
-#if USE_PROPER_FIXED_WINDOW
-	if( state.windowMode == Tr2WindowMode::FIXED_WINDOW )
+#if USE_BORDERLESS_WINDOW
+	if( state.windowMode == Tr2WindowMode::FULL_SCREEN )
 	{
 		auto monitorRect = GetMonitorRect( state.adapter );
 		auto monitorWidth = monitorRect.right - monitorRect.left;
 		auto monitorHeight = monitorRect.bottom - monitorRect.top;
-		if( width <= monitorWidth && height <= monitorHeight )
-		{
-			width = monitorWidth;
-			height = monitorHeight;
-		}
+		state.left = monitorRect.left;
+		state.top = monitorRect.top;
+		width = monitorWidth;
+		height = monitorHeight;
 	}
 #endif
 	RECT rect = { 0, 0, width, height };
@@ -541,8 +539,13 @@ LRESULT Tr2MainWindow::WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			auto prevWidth = m_state.width;
 			auto prevHeight = m_state.height;
 			auto newMode = m_state;
-			newMode.width = uint32_t( rect.right - rect.left );
-			newMode.height = uint32_t( rect.bottom - rect.top );
+#if USE_BORDERLESS_WINDOW
+			if( newMode.windowMode != Tr2WindowMode::FULL_SCREEN)
+#endif
+			{
+				newMode.width = uint32_t( rect.right - rect.left );
+				newMode.height = uint32_t( rect.bottom - rect.top );
+			}
 			if( wParam == SIZE_MAXIMIZED )
 			{
 				newMode.showState = Tr2WindowShowState::MAXIMIZED;

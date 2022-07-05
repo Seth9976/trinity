@@ -269,7 +269,13 @@ ALResult Tr2MainWindow::SetState( bool adjustWindow, const Tr2MainWindowState::S
 		gTriDev->SetPresentation( state.adapter, &presentParams );
 	}
 #ifdef _WIN32
+
+#if USE_BORDERLESS_WINDOW
+	else if( adjustWindow )
+#else
 	else if( adjustWindow && m_state.windowMode != Tr2WindowMode::FULL_SCREEN )
+#endif
+
 #else
 		else if( adjustWindow )
 #endif
