@@ -51,6 +51,7 @@ void SeekTarget::InitializeScratch( void* scratchMemory )
 std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& agents, void* scratchData, const float deltaTime, BehaviorGroup& group, EveChildBehaviorSystem& system, const std::vector<std::vector<DroneAgent*>>& dronesInSearchRadius )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
+	m_arrivalPoints.resize( agents.size() );
 
 	if( m_parent == nullptr )
 	{
@@ -76,9 +77,10 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 		m_exit = false;
 		m_counter = 0;
 	}
-
+	int agentCount = 0;
 	for( auto agent = agents.begin(); agent != agents.end(); ++agent, ++data )
 	{
+		
 		// find an initial spawn position
 		// might have to move this to behaviorGroup for this to be used in other behaviors but this is just a test
 		if( !data->hasSpawned && m_firstSpawnAtRandomPlaces )
@@ -188,7 +190,8 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 		fakePoint += agent->target;
 
 		// For debugging
-		m_arrivalPoint = fakePoint;
+		m_arrivalPoints[agentCount] = fakePoint;
+		agentCount++;
 
 		Vector3 desiredVelocity = fakePoint - agent->position;
 		float distance = Length( desiredVelocity );
@@ -260,6 +263,7 @@ std::vector<Vector3> SeekTarget::CalculateBehavior( std::vector<DroneAgent>& age
 		m_repairTimePassed += deltaTime;
 	}
 
+	
 	return m_todo;
 }
 
@@ -450,9 +454,12 @@ void SeekTarget::RenderDebugInfo( ITr2DebugRenderer2& renderer, std::vector<Dron
 {
 	if( renderer.HasOption( this, "SeekTarget" ) )
 	{
-		renderer.DrawSphere( this, m_arrivalPoint, m_arrivedRadius, 8, Tr2DebugRenderer::Wireframe, 0xffffffff );
-		renderer.DrawSphere( this, m_arrivalPoint, 5, 8, Tr2DebugRenderer::Wireframe, 0xff0000ff );
-		renderer.DrawSphere( this, m_arrivalPoint, m_slowDownRadius, 8, Tr2DebugRenderer::Wireframe, 0xffcc11ff );
+		for( int i = 0; i <= m_arrivalPoints.size(); i++ )
+		{
+			renderer.DrawSphere( this, m_arrivalPoints[i], m_arrivedRadius, 8, Tr2DebugRenderer::Wireframe, 0xffffffff );
+			renderer.DrawSphere( this, m_arrivalPoints[i], 5, 8, Tr2DebugRenderer::Wireframe, 0xff0000ff );
+			renderer.DrawSphere( this, m_arrivalPoints[i], m_slowDownRadius, 8, Tr2DebugRenderer::Wireframe, 0xffcc11ff );
+		}
 	}
 
 	if( renderer.HasOption( this, "Locators" ) )

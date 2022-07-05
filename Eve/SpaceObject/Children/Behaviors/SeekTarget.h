@@ -80,7 +80,7 @@ private:
 	float m_slowDownRadius;
 	float m_distFromOrigin;
 	float m_seconds;
-	Vector3 m_arrivalPoint; // debug
+	std::vector<Vector3> m_arrivalPoints; // debug
 	EveSpaceObject2* m_target;
 
 	IBehavior* m_fxBehavior;
