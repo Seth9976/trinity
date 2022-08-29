@@ -33,9 +33,9 @@ std::vector<Vector3> SpawnDrones::CalculateBehavior( std::vector<DroneAgent>& ag
 		// for behaviors to work we always have to add one decoy drone, delete that one so he doesn't mess up the cube
 		group.RemoveAgent();
 		Vector3 startPos = group.m_spawnPosition;
-		int xCount = m_gridInfo.x;
-		int yCount = m_gridInfo.y;
-		int zCount = m_gridInfo.z;
+		int xCount = int(m_gridInfo.x);
+		int yCount = int(m_gridInfo.y);
+		int zCount = int(m_gridInfo.z);
 		float distBetween = m_gridInfo.w;
 
 
@@ -65,7 +65,7 @@ std::vector<Vector3> SpawnDrones::CalculateBehavior( std::vector<DroneAgent>& ag
 	// If m_addByCount is toggled on the behavior adds agents by count
 	if( m_addByCount == true )
 	{
-		for( unsigned int i = 0; i < m_count; i++ )
+		for( int i = 0; i < m_count; ++i )
 		{
 			group.AddAgent();
 		}
@@ -99,7 +99,7 @@ std::vector<Vector3> SpawnDrones::CalculateBehavior( std::vector<DroneAgent>& ag
 
 		group.m_spawnPosition = m_spawnPosition;
 
-		for( unsigned int i = 0; i < m_count; i++ )
+		for( int i = 0; i < m_count; ++i )
 		{
 			group.AddAgent();
 		}
