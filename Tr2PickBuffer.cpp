@@ -76,6 +76,8 @@ bool Tr2PickBuffer::EndRendering( Tr2RenderContext& renderContext )
 // ------------------------------------------------------------------------------------------------------
 bool Tr2PickBuffer::PrepareGetResults( const void*& data, uint32_t& pitch, Tr2RenderContext& renderContext )
 {
+	CCP_STATS_ZONE( __FUNCTION__ );
+
 	if( !m_pickTarget.IsValid() )
 	{
 		// This could happen if device is lost
