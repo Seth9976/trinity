@@ -588,6 +588,7 @@ void BehaviorGroup::UpdateVisibility( const TriFrustum& frustum, const Matrix& w
 			float pixelSize = frustum.GetPixelSizeAccross( agentPosInWorld, m_boundingSphereRadius * m_scale );
 			agent->screenSize = pixelSize; // Store the screen size for each agent
 			m_currentScreenSize = max( m_currentScreenSize, pixelSize );
+			m_mesh->UseWithScreenSize( m_currentScreenSize );
 			if( pixelSize >= m_blendScreenSizeMax )
 			{
 				agent->xfade = 0.0; // Render as mesh
