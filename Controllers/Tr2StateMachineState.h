@@ -50,6 +50,7 @@ private:
 	uint64_t m_transitionVariableMask;
 	bool m_isActive;
 	bool m_isFinalizing;
+	bool m_hasBeenVetoed;
 };
 
 TYPEDEF_BLUECLASS( Tr2StateMachineState );

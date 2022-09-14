@@ -21,7 +21,8 @@ Tr2StateMachineState::Tr2StateMachineState( IRoot* lockobj )
 	m_stateMachine( nullptr ),
 	m_transitionVariableMask( 0 ),
 	m_isActive( false ),
-	m_isFinalizing( false )
+	m_isFinalizing( false ),
+	m_hasBeenVetoed( false )
 {
 	m_actions.SetNotify( this );
 	m_transitions.SetNotify( this );
@@ -181,6 +182,11 @@ Tr2StateMachineState* Tr2StateMachineState::Update( uint64_t variableDirtyMask )
 		}
 		return nullptr;
 	}
+	// If an action has vetoed transition before, we can't rely on variable dirty state anymore
+	if( m_hasBeenVetoed )
+	{
+		variableDirtyMask = 0xffffffffffffffffull;
+	}
 	if( m_transitionVariableMask != 0 && ( ( m_transitionVariableMask & variableDirtyMask ) == 0 ) )
 	{
 		return nullptr;
@@ -195,6 +201,7 @@ Tr2StateMachineState* Tr2StateMachineState::Update( uint64_t variableDirtyMask )
 			{
 				if( !( *ai )->CanTransition() )
 				{
+					m_hasBeenVetoed = true;
 					return nullptr;
 				}
 			}
@@ -256,6 +263,7 @@ void Tr2StateMachineState::Start()
 		}
 		m_isActive = true;
 		m_isFinalizing = false;
+		m_hasBeenVetoed = false;
 	}
 }
 
