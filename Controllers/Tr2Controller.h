@@ -56,6 +56,9 @@ public:
 	void Callback( BlueSharedString callbackName);
 	void RegisterCallback( BlueSharedString callbackName, BlueScriptCallback callback );
 	void ClearCallbacks();
+
+	void ReLink();
+
 private:
 	size_t GetCallbackCount() { return m_callbacks.size(); };
 

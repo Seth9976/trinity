@@ -65,6 +65,10 @@ const Be::ClassInfo* Tr2Controller::ExposeToBlue()
 			ClearCallbacks,
 			"Clears all callbacks"
 		)
+		MAP_METHOD_AND_WRAP(
+			"ReLink",
+			ReLink,
+			"Re-links the controller with the assigned owner. Used by tools only." )
 
 	EXPOSURE_END()
 }

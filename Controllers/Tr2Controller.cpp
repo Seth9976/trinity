@@ -188,6 +188,16 @@ void Tr2Controller::Unlink()
 	m_bindingPathRoots.clear();
 }
 
+void Tr2Controller::ReLink()
+{
+	if( !m_owner )
+	{
+		return;
+	}
+	auto owner = m_owner;
+	Link( *owner );
+}
+
 bool Tr2Controller::IsLinked() const
 {
 	return m_owner != nullptr;
