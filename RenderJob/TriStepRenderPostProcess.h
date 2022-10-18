@@ -148,6 +148,8 @@ private:
 	bool ProcessFidelityFX( Tr2RenderContext& renderContext, Tr2PPFidelityFXEffect* fx );
 	Tr2PostProcessRenderInfo::Texture RenderFidelityFX( Tr2RenderTarget* src, Tr2RenderContext& renderContext, Tr2PPFidelityFXEffect* fx );
 	Tr2EffectPtr m_fidelityFXShader;
+	Tr2EffectPtr m_fidelityFXFsrEASUShader;
+	Tr2EffectPtr m_fidelityFXFsrRCASShader;
 
 	// fog
 	bool ProcessFog( Tr2PPFogEffect* fog );

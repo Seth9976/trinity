@@ -35,6 +35,9 @@ const Be::ClassInfo* TriStepRenderPostProcess::ExposeToBlue()
 		MAP_ATTRIBUTE( "fogCompositeEffect", m_fogCompositeEffect, "The fog composite effect", Be::READWRITE )
 		MAP_ATTRIBUTE( "taaEffect", m_taaEffect, "The taa effect", Be::READWRITE )
 		MAP_ATTRIBUTE( "accumulationBuffer", m_accumulationBuffer, "The accumulation buffer", Be::READWRITE )
+
+		MAP_ATTRIBUTE( "fsrEasuShader", m_fidelityFXFsrEASUShader, "FSR EASU", Be::READWRITE )
+		MAP_ATTRIBUTE( "fsrRCASShader", m_fidelityFXFsrRCASShader, "FSR RCASS", Be::READWRITE )
 		
 		MAP_ATTRIBUTE( "depthOfFieldCoCShader", m_depthOfFieldCoCShader, "The DoF Circle of Confusion shader", Be::READWRITE);
 		MAP_ATTRIBUTE( "depthOfFieldBokehBlurShader", m_depthOfFieldBokehBlurShader, "The bokeh blur shader", Be::READWRITE );

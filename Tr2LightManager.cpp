@@ -259,8 +259,8 @@ ALResult Tr2LightManager::DoUpdateLists( uint32_t msaaType, Tr2RenderContext& re
 	perFrameData.projInverse = Transpose( Tr2Renderer::GetInverseProjectionTransform() );
 	perFrameData.viewInverse = Transpose( Tr2Renderer::GetInverseViewTransform() );
 	perFrameData.cameraPos = Tr2Renderer::GetViewPosition();
-	perFrameData.width = uint32_t( renderContext.m_esm.GetDeviceViewport().m_width );
-	perFrameData.height = uint32_t( renderContext.m_esm.GetDeviceViewport().m_height );
+	perFrameData.width = uint32_t( renderContext.m_esm.GetRenderTargetWidth() );
+	perFrameData.height = uint32_t( renderContext.m_esm.GetRenderTargetHeight() );
 	perFrameData.tilesX = ( perFrameData.width + ( TILE_WIDTH - 1 ) ) / TILE_WIDTH;
 	perFrameData.tilesY = ( perFrameData.height + ( TILE_HEIGHT - 1 ) ) / TILE_HEIGHT;
 	perFrameData.lightCount = std::min( m_lightBuffer->GetGpuBuffer( 0 )->GetDesc().count, uint32_t( m_lightData.GetCount() ) );

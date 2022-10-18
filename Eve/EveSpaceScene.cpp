@@ -2563,6 +2563,12 @@ void EveSpaceScene::PopulatePerFramePSData( PerFramePSData &data, Tr2RenderConte
 	data.ProjectionToView.x = projection._43;
 	data.ProjectionToView.y = projection._33;
 
+	data.SceneMipLodBias = 0.0f;
+	if( m_postProcess )
+	{
+		data.SceneMipLodBias = m_postProcess->GetMipLodBias();
+	}
+
 	data.Debug = m_perFrameDebug;
 }
 

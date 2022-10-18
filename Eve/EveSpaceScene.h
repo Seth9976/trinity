@@ -233,7 +233,7 @@ protected:
 
 		// MiscData
 		float Time;
-		float unused2;
+		float SceneMipLodBias;
 		float unused3;
 		float GammaBrightness;
 	};

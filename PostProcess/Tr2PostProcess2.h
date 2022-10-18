@@ -61,6 +61,9 @@ public:
 	Tr2PPTaaEffectPtr GetTaa() { return m_taa; }
 	Tr2PPDepthOfFieldEffectPtr GetDepthOfField() { return m_depthOfField; }
 
+	// Helper method for scenes to decide on miplodbias
+	float GetMipLodBias() const;
+
 private:
 	Tr2PPSignalLossEffectPtr m_signalLoss;
 	Tr2PPGodRaysEffectPtr m_godRays;

@@ -4,12 +4,6 @@
 #include "Shader/Parameter/TriTextureParameter.h"
 #include "PostProcess/Effects/Tr2PPFidelityFXEffect.h"
 
-// FidelityFX headers
-#define A_CPU
-#include "ffx_a.h"
-#include "ffx_cas.h"
-
-
 namespace
 {
 const uint32_t HISTOGRAM_TILE_SIZE_X = 16;
@@ -23,6 +17,14 @@ void DrawInto( Tr2TextureAL& dest, Tr2LoadAction::Type loadAction, Tr2TextureAL&
 	renderContext.RenderPassHint( { loadAction, Tr2StoreAction::STORE }, {} );
 	renderContext.m_esm.PushRenderTarget( dest );
 	Tr2Renderer::DrawTexture( renderContext, src );
+	renderContext.m_esm.PopRenderTarget();
+}
+
+void DrawPartiallyInto( Tr2TextureAL& dest, Tr2LoadAction::Type loadAction, Tr2TextureAL& src, Tr2RenderContext& renderContext, const Vector2 tlTextureCoords = Vector2(0, 0), const Vector2 brTextureCoords = Vector2(1, 1))
+{
+	renderContext.RenderPassHint( { loadAction, Tr2StoreAction::STORE }, {} );
+	renderContext.m_esm.PushRenderTarget( dest );
+	Tr2Renderer::DrawTexture( renderContext, src, tlTextureCoords, brTextureCoords, Tr2Blitter::FILTER_LINEAR );
 	renderContext.m_esm.PopRenderTarget();
 }
 
@@ -261,7 +263,7 @@ bool TriStepRenderPostProcess::OnModified( Be::Var* value )
 	return true;
 }
 
-TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext)
+TriStepResult TriStepRenderPostProcess::Execute( Be::Time realTime, Be::Time simTime, Tr2RenderContext& renderContext )
 {
 	if( !m_renderInfo->Setup( renderContext ) )
 	{
@@ -270,12 +272,12 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 
 	auto sourceBuffer = m_renderInfo->GetSourceBuffer();
 
-	if (!sourceBuffer)
+	if( !sourceBuffer )
 	{
 		return RS_OK;
 	}
 
-	if (m_scene == nullptr)
+	if( m_scene == nullptr )
 	{
 		return RS_OK;
 	}
@@ -298,17 +300,16 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 	Tr2PPTaaEffectPtr taa = nullptr;
 	Tr2PPDepthOfFieldEffectPtr dof = nullptr;
 
-	if (postProcess != nullptr)
+	if( postProcess != nullptr )
 	{
 		// filter by quality
-		switch (m_quality)
+		switch( m_quality )
 		{
 		case HIGH:
 			godrays = postProcess->GetGodRays();
 			filmGrain = postProcess->GetFilmGrain();
 			fog = postProcess->GetFog();
 			dynamicExposure = postProcess->GetDynamicExposure();
-			fidelity = postProcess->GetFidelityFX();
 			dof = postProcess->GetDepthOfField();
 		case MEDIUM:
 			bloom = postProcess->GetBloom();
@@ -318,35 +319,36 @@ TriStepResult TriStepRenderPostProcess::Execute(Be::Time realTime, Be::Time simT
 		case LOW:
 			signalLoss = postProcess->GetSignalLoss();
 			fade = postProcess->GetFade();
+			fidelity = postProcess->GetFidelityFX();
 		default:
 			break;
 		}
-		if (Tr2Renderer::GetShaderModel() == TR2SM_3_0_DEPTH)
+		if( Tr2Renderer::GetShaderModel() == TR2SM_3_0_DEPTH )
 		{
 			taa = postProcess->GetTaa();
 		}
 	}
-	renderContext.m_esm.ApplyStandardStates(Tr2EffectStateManager::RM_FULLSCREEN);
+	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_FULLSCREEN );
 
 	renderContext.m_esm.PushRenderTarget();
 	renderContext.m_esm.PushDepthStencilBuffer( Tr2TextureAL() );
 
-	if(m_sceneDirty)
+	if( m_sceneDirty )
 	{
-		SetDirtyIfNotNull(godrays);
-		SetDirtyIfNotNull(bloom);
-		SetDirtyIfNotNull(signalLoss);
-		SetDirtyIfNotNull(dynamicExposure);
-		SetDirtyIfNotNull(filmGrain);
-		SetDirtyIfNotNull(desaturate);
-		SetDirtyIfNotNull(fade);
-		SetDirtyIfNotNull(lut);
-		SetDirtyIfNotNull(vignette);
-		SetDirtyIfNotNull(fog);
-		SetDirtyIfNotNull(taa);
-		SetDirtyIfNotNull(fidelity);
-		SetDirtyIfNotNull(dof);
-		m_sceneDirty = false;
+		SetDirtyIfNotNull( godrays );
+		SetDirtyIfNotNull( bloom );
+		SetDirtyIfNotNull( signalLoss );
+		SetDirtyIfNotNull( dynamicExposure );
+		SetDirtyIfNotNull( filmGrain );
+		SetDirtyIfNotNull( desaturate );
+		SetDirtyIfNotNull( fade );
+		SetDirtyIfNotNull( lut );
+		SetDirtyIfNotNull( vignette );
+		SetDirtyIfNotNull( fog );
+		SetDirtyIfNotNull( taa );
+		SetDirtyIfNotNull( fidelity );
+		SetDirtyIfNotNull( dof );
+		m_sceneDirty = false; 
 	}
 
     // Always resolve (if no msaa then we copy)
@@ -864,31 +866,78 @@ bool TriStepRenderPostProcess::ProcessFidelityFX( Tr2RenderContext& renderContex
 {
 	if( fx && fx->IsActive() )
 	{
-		if( fx->IsDirty() || !m_fidelityFXShader )
+		if( fx->IsDirty())
 		{
-			if( !m_fidelityFXShader )
+			if( fx->m_fsrEnabled )
 			{
-				m_fidelityFXShader.CreateInstance();
-				m_fidelityFXShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/CAS.fx" );
+				m_fidelityFXShader = nullptr;
+				if( !m_fidelityFXFsrEASUShader )
+				{
+					m_fidelityFXFsrEASUShader = nullptr;
+					m_fidelityFXFsrRCASShader = nullptr;
+					m_fidelityFXFsrEASUShader.CreateInstance();
+					m_fidelityFXFsrEASUShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/fsr/fsr.fx" );
+					m_fidelityFXFsrRCASShader.CreateInstance();
+					m_fidelityFXFsrRCASShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/fsr/fsr.fx" );
+
+					m_fidelityFXFsrEASUShader->SetOption( BlueSharedString( "FSR_STEP" ), BlueSharedString( "EDGE_ADAPTIVE_SPATIAL_UPSAMPLING" ) );
+					m_fidelityFXFsrRCASShader->SetOption( BlueSharedString( "FSR_STEP" ), BlueSharedString( "ROBUST_CONTRAST_ADAPTIVE_SHARPENING" ) );
+				}								
+				
+				if( fx->m_slowFSR )
+				{
+					m_fidelityFXFsrEASUShader->SetOption( BlueSharedString( "FSR_SLOW_FALLBACK" ), BlueSharedString( "FSR_SLOW_FALLBACK_ON" ) );
+					m_fidelityFXFsrRCASShader->SetOption( BlueSharedString( "FSR_SLOW_FALLBACK" ), BlueSharedString( "FSR_SLOW_FALLBACK_ON" ) );
+				}
+				else
+				{
+					m_fidelityFXFsrEASUShader->SetOption( BlueSharedString( "FSR_SLOW_FALLBACK" ), BlueSharedString( "FSR_SLOW_FALLBACK_OFF" ) );
+					m_fidelityFXFsrRCASShader->SetOption( BlueSharedString( "FSR_SLOW_FALLBACK" ), BlueSharedString( "FSR_SLOW_FALLBACK_OFF" ) );
+				}
+				
+				FidelityFX::FSRConstants easuConst;
+				fx->PrepEasuConsts( GetRenderTarget()->GetWidth(), GetRenderTarget()->GetHeight(), easuConst );
+
+				FidelityFX::FSRConstants rcasConst;
+				fx->PrepRcasConsts( rcasConst );
+
+				m_fidelityFXFsrEASUShader->StartUpdate();
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "InputTexture" ), PLACEHOLDER );
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "OutputTexture" ), PLACEHOLDER );
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "Const0" ), FidelityFX::AsVector( easuConst.Const0 ) );
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "Const1" ), FidelityFX::AsVector( easuConst.Const1 ) );
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "Const2" ), FidelityFX::AsVector( easuConst.Const2 ) );
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "Const3" ), FidelityFX::AsVector( easuConst.Const3 ) );
+				m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "Sample" ), FidelityFX::AsVector( easuConst.Sample ) );
+				m_fidelityFXFsrEASUShader->EndUpdate();
+
+				m_fidelityFXFsrRCASShader->StartUpdate();
+				m_fidelityFXFsrRCASShader->SetParameter( BlueSharedString( "InputTexture" ), PLACEHOLDER );
+				m_fidelityFXFsrRCASShader->SetParameter( BlueSharedString( "OutputTexture" ), PLACEHOLDER );
+				m_fidelityFXFsrRCASShader->SetParameter( BlueSharedString( "Const0" ), FidelityFX::AsVector( rcasConst.Const0 ) );
+				m_fidelityFXFsrRCASShader->SetParameter( BlueSharedString( "Sample" ), FidelityFX::AsVector( rcasConst.Sample ) );
+				m_fidelityFXFsrRCASShader->EndUpdate();
 			}
+			else
+			{	
+				m_fidelityFXFsrEASUShader = nullptr;
+				m_fidelityFXFsrRCASShader = nullptr;
+				if( !m_fidelityFXShader )
+				{
+					m_fidelityFXShader.CreateInstance();
+					m_fidelityFXShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/CAS.fx" );
+				}
+				FidelityFX::CASConstants constants;
+				fx->PrepCasConsts( GetRenderTarget()->GetWidth(), GetRenderTarget()->GetHeight(), constants );
 
-			AF1 outWidth = static_cast<AF1>( m_renderInfo->GetSourceBuffer()->GetWidth() );
-			AF1 outHeight = static_cast<AF1>( m_renderInfo->GetSourceBuffer()->GetHeight() );
-
-			union
-			{
-				AU1 u[4];
-				float f[4];
-			} const0 = {}, const1 = {};
-			CasSetup( const0.u, const1.u, fx->m_intensity, outWidth, outHeight, outWidth, outHeight );
-
-			m_fidelityFXShader->StartUpdate();
-			m_fidelityFXShader->SetParameter( BlueSharedString( "InputTexture" ), PLACEHOLDER );
-			m_fidelityFXShader->SetParameter( BlueSharedString( "OutputTexture" ), PLACEHOLDER );
-			m_fidelityFXShader->SetParameter( BlueSharedString( "const0" ), Vector4( const0.f[0], const0.f[1], const0.f[2], const0.f[3] ) );
-			m_fidelityFXShader->SetParameter( BlueSharedString( "const1" ), Vector4( const1.f[0], const1.f[1], const1.f[2], const1.f[3] ) );
-			m_fidelityFXShader->EndUpdate();
-
+				m_fidelityFXShader->StartUpdate();
+				m_fidelityFXShader->SetParameter( BlueSharedString( "InputTexture" ), PLACEHOLDER );
+				m_fidelityFXShader->SetParameter( BlueSharedString( "OutputTexture" ), PLACEHOLDER );
+				m_fidelityFXShader->SetParameter( BlueSharedString( "const0" ), FidelityFX::AsVector( constants.const0 ) );
+				m_fidelityFXShader->SetParameter( BlueSharedString( "const1" ), FidelityFX::AsVector( constants.const1 ) );
+				m_fidelityFXShader->EndUpdate();
+			}
+			
 			fx->SetDirty( false );
 		}
 
@@ -897,6 +946,9 @@ bool TriStepRenderPostProcess::ProcessFidelityFX( Tr2RenderContext& renderContex
 	else
 	{
 		m_fidelityFXShader = nullptr;
+		m_fidelityFXFsrEASUShader = nullptr;
+		m_fidelityFXFsrRCASShader = nullptr;
+
 		return false;
 	}
 }
@@ -907,13 +959,48 @@ Tr2PostProcessRenderInfo::Texture TriStepRenderPostProcess::RenderFidelityFX( Tr
 
 	renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_FULLSCREEN );
 
-	auto temp = m_renderInfo->GetTempTexture( 1.f, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS );
-	m_fidelityFXShader->SetParameter( BlueSharedString( "InputTexture" ), src );
-	m_fidelityFXShader->SetParameter( BlueSharedString( "OutputTexture" ), temp );
-	int dispatchX = ( src->GetWidth() + ( CAS_THREAD_GROUP_WORK_REGION_DIM - 1 ) ) / CAS_THREAD_GROUP_WORK_REGION_DIM;
-	int dispatchY = ( src->GetHeight() + ( CAS_THREAD_GROUP_WORK_REGION_DIM - 1 ) ) / CAS_THREAD_GROUP_WORK_REGION_DIM;
-	Tr2Renderer::RunComputeShader( m_fidelityFXShader, dispatchX, dispatchY, 1, renderContext );
-	return temp;
+	if( fx->m_fsrEnabled )
+	{
+		if( fx->m_debug )
+		{
+			auto t = m_renderInfo->GetTempTexture();
+			DrawPartiallyInto( *t, Tr2LoadAction::DONT_CARE, *src, renderContext, Vector2( 0, 0 ), Vector2( fx->m_upsampling, fx->m_upsampling ) );
+			return t;
+		}
+
+		auto easuOutput = m_renderInfo->GetTempTexture( fx->m_upsampling, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS );
+		auto rcasOutput = m_renderInfo->GetTempTexture( fx->m_upsampling, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS );
+		
+		int dispatchX = ( easuOutput->GetWidth() + ( CAS_THREAD_GROUP_WORK_REGION_DIM - 1 ) ) / CAS_THREAD_GROUP_WORK_REGION_DIM;
+		int dispatchY = ( easuOutput->GetHeight() + ( CAS_THREAD_GROUP_WORK_REGION_DIM - 1 ) ) / CAS_THREAD_GROUP_WORK_REGION_DIM;
+		
+		m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "InputTexture" ), src );
+		m_fidelityFXFsrEASUShader->SetParameter( BlueSharedString( "OutputTexture" ), easuOutput );
+		
+		if( fx->m_useRcas )
+		{
+			m_fidelityFXFsrRCASShader->SetParameter( BlueSharedString( "InputTexture" ), easuOutput );
+			m_fidelityFXFsrRCASShader->SetParameter( BlueSharedString( "OutputTexture" ), rcasOutput );
+		}
+		Tr2Renderer::RunComputeShader( m_fidelityFXFsrEASUShader, dispatchX, dispatchY, 1, renderContext );
+		if( !fx->m_useRcas )
+		{
+			return easuOutput;
+		}
+		Tr2Renderer::RunComputeShader( m_fidelityFXFsrRCASShader, dispatchX, dispatchY, 1, renderContext );
+		return rcasOutput;
+	}
+	else
+	{
+		int dispatchX = ( src->GetWidth() + ( CAS_THREAD_GROUP_WORK_REGION_DIM - 1 ) ) / CAS_THREAD_GROUP_WORK_REGION_DIM;
+		int dispatchY = ( src->GetHeight() + ( CAS_THREAD_GROUP_WORK_REGION_DIM - 1 ) ) / CAS_THREAD_GROUP_WORK_REGION_DIM;
+		auto temp = m_renderInfo->GetTempTexture( 1.f, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS );
+		m_fidelityFXShader->SetParameter( BlueSharedString( "InputTexture" ), src );
+		m_fidelityFXShader->SetParameter( BlueSharedString( "OutputTexture" ), temp );
+		Tr2Renderer::RunComputeShader( m_fidelityFXShader, dispatchX, dispatchY, 1, renderContext );
+		return temp;
+	}
+	
 }
 
 bool TriStepRenderPostProcess::ProcessFilmGrain( Tr2PPFilmGrainEffect* filmGrain )

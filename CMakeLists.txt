@@ -2,6 +2,7 @@ project(trinity VERSION 1.0.0)
 
 find_package(libSquish REQUIRED)
 find_package(FidelityFX REQUIRED)
+find_package(FidelityFX_FSR REQUIRED)
 find_package(CACAO REQUIRED)
 find_package(IntelTBB REQUIRED)
 
@@ -1539,6 +1540,7 @@ function(set_shared_trinity_properties target)
             Freetype::Freetype
             SQUISH::SQUISH
             AMD::FidelityFX
+            AMD::FidelityFX_FSR
             AMD::CACAO
             RadGameTools::Granny
             Intel::TBB
