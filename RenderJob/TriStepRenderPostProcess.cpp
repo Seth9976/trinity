@@ -866,24 +866,33 @@ bool TriStepRenderPostProcess::ProcessFidelityFX( Tr2RenderContext& renderContex
 {
 	if( fx && fx->IsActive() )
 	{
-		if( fx->IsDirty())
+		bool updateShader = false;
+		if( fx->m_fsrEnabled && ( !m_fidelityFXFsrEASUShader || !m_fidelityFXFsrRCASShader) )
+		{
+			m_fidelityFXShader = nullptr;
+			m_fidelityFXFsrEASUShader.CreateInstance();
+			m_fidelityFXFsrEASUShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/fsr/fsr.fx" );
+			m_fidelityFXFsrRCASShader.CreateInstance();
+			m_fidelityFXFsrRCASShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/fsr/fsr.fx" );
+
+			m_fidelityFXFsrEASUShader->SetOption( BlueSharedString( "FSR_STEP" ), BlueSharedString( "EDGE_ADAPTIVE_SPATIAL_UPSAMPLING" ) );
+			m_fidelityFXFsrRCASShader->SetOption( BlueSharedString( "FSR_STEP" ), BlueSharedString( "ROBUST_CONTRAST_ADAPTIVE_SHARPENING" ) );
+			updateShader = true;
+		}
+		else if( !fx->m_fsrEnabled && !m_fidelityFXShader)
+		{
+			m_fidelityFXFsrEASUShader = nullptr;
+			m_fidelityFXFsrRCASShader = nullptr;
+			
+			m_fidelityFXShader.CreateInstance();
+			m_fidelityFXShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/CAS.fx" );
+			updateShader = true;
+		}
+
+		if( fx->IsDirty() || updateShader )
 		{
 			if( fx->m_fsrEnabled )
-			{
-				m_fidelityFXShader = nullptr;
-				if( !m_fidelityFXFsrEASUShader )
-				{
-					m_fidelityFXFsrEASUShader = nullptr;
-					m_fidelityFXFsrRCASShader = nullptr;
-					m_fidelityFXFsrEASUShader.CreateInstance();
-					m_fidelityFXFsrEASUShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/fsr/fsr.fx" );
-					m_fidelityFXFsrRCASShader.CreateInstance();
-					m_fidelityFXFsrRCASShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/fsr/fsr.fx" );
-
-					m_fidelityFXFsrEASUShader->SetOption( BlueSharedString( "FSR_STEP" ), BlueSharedString( "EDGE_ADAPTIVE_SPATIAL_UPSAMPLING" ) );
-					m_fidelityFXFsrRCASShader->SetOption( BlueSharedString( "FSR_STEP" ), BlueSharedString( "ROBUST_CONTRAST_ADAPTIVE_SHARPENING" ) );
-				}								
-				
+			{						
 				if( fx->m_slowFSR )
 				{
 					m_fidelityFXFsrEASUShader->SetOption( BlueSharedString( "FSR_SLOW_FALLBACK" ), BlueSharedString( "FSR_SLOW_FALLBACK_ON" ) );
@@ -920,13 +929,6 @@ bool TriStepRenderPostProcess::ProcessFidelityFX( Tr2RenderContext& renderContex
 			}
 			else
 			{	
-				m_fidelityFXFsrEASUShader = nullptr;
-				m_fidelityFXFsrRCASShader = nullptr;
-				if( !m_fidelityFXShader )
-				{
-					m_fidelityFXShader.CreateInstance();
-					m_fidelityFXShader->SetEffectPathName( "res:/Graphics/Effect/Managed/Space/PostProcess/CAS.fx" );
-				}
 				FidelityFX::CASConstants constants;
 				fx->PrepCasConsts( GetRenderTarget()->GetWidth(), GetRenderTarget()->GetHeight(), constants );
 
