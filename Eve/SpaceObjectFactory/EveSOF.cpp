@@ -201,7 +201,7 @@ IRootPtr EveSOF::BuildFromDNA( const char* dnaString )
 	SetupLocatorSets( newObj, dna, centerOffset );
 	
 	// Attachments
-	SetupAttachments( BlueCastPtr( newObj->GetRawRoot() ), dna, centerOffset );
+	SetupAttachments( BlueCastPtr( newObj->GetRawRoot() ), dna, centerOffset, EveSOFDataHullBuildFilter::STANDALONE );
 
 	SetupImpactEffects( newObj, dna );
 
@@ -242,14 +242,14 @@ IRootPtr EveSOF::BuildFromDNA( const char* dnaString )
 	return newObj->GetRawRoot();
 }
 
-void EveSOF::SetupAttachments( IEveSpaceObjectAttachmentOwnerPtr newObj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets ) const
+void EveSOF::SetupAttachments( IEveSpaceObjectAttachmentOwnerPtr newObj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets, uint32_t buildFlags ) const
 {
 	// Add all the fluff!
-	SetupSpriteSets( newObj, dna, offsets );
-	SetupSpotlightSets( newObj, dna, offsets );
-	SetupPlaneSets( newObj, dna, offsets );
-	SetupSpriteLineSets( newObj, dna, offsets );
-	SetupHazeSets( newObj, dna, offsets );
+	SetupSpriteSets( newObj, dna, offsets, buildFlags );
+	SetupSpotlightSets( newObj, dna, offsets, buildFlags );
+	SetupPlaneSets( newObj, dna, offsets, buildFlags );
+	SetupSpriteLineSets( newObj, dna, offsets, buildFlags );
+	SetupHazeSets( newObj, dna, offsets, buildFlags );
 	
         // Banners need to have external parameters, which we don't have for anything except for EveSpaceObject2Ptr...
         // So no banners for layouts... yet
@@ -659,7 +659,7 @@ bool EveSOF::GenerateLodResourcePaths( std::string& mediumResPath, std::string& 
 // Description:
 //   This is where it is all going to happen
 // --------------------------------------------------------------------------------
-void EveSOF::SetupSpriteSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets ) const
+void EveSOF::SetupSpriteSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets, uint32_t buildFlags ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -681,7 +681,7 @@ void EveSOF::SetupSpriteSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSO
 				spriteSet.CreateInstance();
 				// set skinned or unskinned shader
 				spriteSet->SetEffect( m_spriteSetEffect );
-				spriteSet->SetSkinned( spriteSetData->skinned );
+				spriteSet->SetSkinned( spriteSetData->skinned && buildFlags != EveSOFDataHullBuildFilter::INSTANCED_PLACEMENT );
 				for( auto& offset : offsets )
 				{
 					// add all the individual items
@@ -733,7 +733,7 @@ void EveSOF::SetupSpriteSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSO
 // Description:
 //   This is where it is all going to happen
 // --------------------------------------------------------------------------------
-void EveSOF::SetupSpotlightSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets ) const
+void EveSOF::SetupSpotlightSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets, uint32_t buildFlags ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -777,7 +777,7 @@ void EveSOF::SetupSpotlightSets( IEveSpaceObjectAttachmentOwnerPtr obj, const Ev
 			// set to set
 			spotlightSet->SetConeEffect( coneEffect );
 			spotlightSet->SetGlowEffect( glowEffect );
-			spotlightSet->SetSkinned( spotlightSetData->skinned );
+			spotlightSet->SetSkinned( spotlightSetData->skinned && buildFlags != EveSOFDataHullBuildFilter::INSTANCED_PLACEMENT );
 
 			for( auto& offset: offsets)
 			{
@@ -833,7 +833,7 @@ void EveSOF::SetupSpotlightSets( IEveSpaceObjectAttachmentOwnerPtr obj, const Ev
 // Description:
 //   This is where it is all going to happen
 // --------------------------------------------------------------------------------
-void EveSOF::SetupPlaneSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets ) const
+void EveSOF::SetupPlaneSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets, uint32_t buildFlags ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -860,21 +860,22 @@ void EveSOF::SetupPlaneSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOF
 			// Select the planeset's data based on the usage
 			std::string effectResPath, imageMapResPath;
 			float angularFadeOut = 0.f;
+			auto isSkinned = planeSetData->skinned && buildFlags != EveSOFDataHullBuildFilter::INSTANCED_PLACEMENT;
 			switch( planeSetData->usage )
 			{
 			case EveSOFDataHullPlaneSet::USAGE_STANDARD:
-				effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
+				effectResPath = isSkinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
 				break;
 			case EveSOFDataHullPlaneSet::USAGE_HAZE:
 				angularFadeOut = 1.f;
-				effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
+				effectResPath = isSkinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planeglow.fx";
 				break;
 			case EveSOFDataHullPlaneSet::USAGE_SPACE_VIDEO:
-				effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
+				effectResPath = isSkinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
 				imageMapResPath = "dynamic:/inspacevideos";
 				break;
 			case EveSOFDataHullPlaneSet::USAGE_HANGAR_VIDEO:
-				effectResPath = planeSetData->skinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
+				effectResPath = isSkinned ? "res:/graphics/effect/managed/space/spaceobject/fx/skinned_planehologram.fx" : "res:/graphics/effect/managed/space/spaceobject/fx/planehologram.fx";
 				imageMapResPath = "dynamic:/hangarvideos";
 				// Set the pickbuffer so we can pick the videos in the client
 				planeSet->SetPickBufferID( PICKABLE_HANGARVIEO_BUFFER_ID );
@@ -958,7 +959,7 @@ void EveSOF::SetupPlaneSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOF
 // Description:
 //   This is where it is all going to happen
 // --------------------------------------------------------------------------------
-void EveSOF::SetupSpriteLineSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets ) const
+void EveSOF::SetupSpriteLineSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets, uint32_t buildFlags ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -980,7 +981,7 @@ void EveSOF::SetupSpriteLineSets( IEveSpaceObjectAttachmentOwnerPtr obj, const E
 				EveSpriteLineSetPtr spriteLineSet;
 				spriteLineSet.CreateInstance();
 				// set shader
-				spriteLineSet->Setup( m_spriteSetEffect, spriteLineSetData->skinned );
+				spriteLineSet->Setup( m_spriteSetEffect, spriteLineSetData->skinned && buildFlags != EveSOFDataHullBuildFilter::INSTANCED_PLACEMENT );
 
 				for( auto& offset : offsets )
 				{
@@ -1040,7 +1041,7 @@ void EveSOF::SetupSpriteLineSets( IEveSpaceObjectAttachmentOwnerPtr obj, const E
 // Description:
 //   This is where it is all going to happen
 // --------------------------------------------------------------------------------
-void EveSOF::SetupHazeSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets ) const
+void EveSOF::SetupHazeSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFDNAPtr dna, const std::vector<Matrix>& offsets, uint32_t buildFlags ) const
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -1066,7 +1067,7 @@ void EveSOF::SetupHazeSets( IEveSpaceObjectAttachmentOwnerPtr obj, const EveSOFD
 				switch( hazeSetData->hazeType )
 				{
 				case EveSOFDataHullHazeSet::TYPE_SPHERICAL:
-					if( hazeSetData->skinned )
+					if( hazeSetData->skinned && buildFlags != EveSOFDataHullBuildFilter::INSTANCED_PLACEMENT )
 					{
 						hazeSet->Setup( m_skinnedHazeSetEffectSpherical );					
 					}
@@ -3142,7 +3143,7 @@ EveChildContainerPtr EveSOF::CreatePlacement( EveSpaceObject2Ptr parent, EveSOFD
 				SetupDecalSets( BlueCastPtr( child->GetRawRoot() ), extensionDna );
 				auto centerOffset = std::vector<Matrix>( 1, IdentityMatrix() );
 
-				SetupAttachments( BlueCastPtr( child->GetRawRoot() ), extensionDna, centerOffset );
+				SetupAttachments( BlueCastPtr( child->GetRawRoot() ), extensionDna, centerOffset, buildFlags );
 				
 				placementContainer->AddToEffectChildrenList( child );
 			}
@@ -3190,7 +3191,7 @@ EveChildContainerPtr EveSOF::CreatePlacement( EveSpaceObject2Ptr parent, EveSOFD
 		// do this last so it sets all the needed shaders as instanced
 		child->SetShaderOption( BlueSharedString( "SPACE_OBJECT_INSTANCED_ATTACHMENT" ), BlueSharedString( "SOIA_ENABLED" ) );
 		
-		SetupAttachments( BlueCastPtr( container->GetRawRoot() ), extensionDna, placementOffsets );
+		SetupAttachments( BlueCastPtr( container->GetRawRoot() ), extensionDna, placementOffsets, buildFlags );
 
 		container->AddToEffectChildrenList( child );
 	}
