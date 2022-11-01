@@ -22,7 +22,11 @@ Tr2PPDepthOfFieldEffect::~Tr2PPDepthOfFieldEffect()
 
 bool Tr2PPDepthOfFieldEffect::IsActive()
 {
+#if TRINITY_PLATFORM == TRINITY_METAL
+	return false;
+#else
 	return Tr2PPEffect::IsActive() && m_scale > 0.0f;
+#endif
 }
 
 BlueSharedString Tr2PPDepthOfFieldEffect::GetBokehShapeString() const

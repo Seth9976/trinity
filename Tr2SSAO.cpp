@@ -152,7 +152,7 @@ bool Tr2SSAO::PrepareSsaoResources( Layer& layer, const Layer* prevLayer, Tr2Pri
 	if( !layer.resources.deinterleavedDepthTexture.IsValid() )
 	{
 		unsigned mipCount = settings.qualityLevel >= FFX_CACAO_QUALITY_MEDIUM ? 4 : 1;
-		Tr2BitmapDimensions dims( TEX_TYPE_2D, PIXEL_FORMAT_R16_FLOAT, size.deinterleavedDepthBufferWidth, size.deinterleavedDepthBufferHeight, 1, mipCount, SSAO_PASS_COUNT );
+		Tr2BitmapDimensions dims( TEX_TYPE_2D, PIXEL_FORMAT_R32_FLOAT, size.deinterleavedDepthBufferWidth, size.deinterleavedDepthBufferHeight, 1, mipCount, SSAO_PASS_COUNT );
 		if( prevLayer && prevLayer->resources.deinterleavedDepthTexture.GetDesc() == dims )
 		{
 			layer.resources.deinterleavedDepthTexture = prevLayer->resources.deinterleavedDepthTexture;
@@ -232,10 +232,6 @@ bool Tr2SSAO::PrepareSsaoResources( Layer& layer, const Layer* prevLayer, Tr2Pri
 			}
 		}
 	}
-	if( !prevLayer && m_large.enabled && !layer.resources.outputTarget->IsValid() )
-	{
-		CR_RETURN_VAL( layer.resources.outputTarget->Create( m_inputDepthBuffer->GetWidth(), m_inputDepthBuffer->GetHeight(), 1, PIXEL_FORMAT_R8_UNORM, 1, 0, EX_BIND_UNORDERED_ACCESS ), false );
-	}
 	return true;
 }
 
@@ -254,6 +250,11 @@ bool Tr2SSAO::OnPrepareResources()
 	if( !m_detail.enabled )
 	{
 		return false;
+	}
+
+	if( !m_detail.effect->GetEffectRes() )
+	{
+		m_detail.effect->SetEffectPathName( "res:/graphics/effect/managed/space/System/SSAO/SSAO.fx" );
 	}
 
 	if( !m_inputDepthBuffer || !m_inputDepthBuffer->IsValid() )
@@ -390,11 +391,6 @@ void Tr2SSAO::Filter( Tr2RenderContext& renderContext )
 	{
 		GPU_REGION( renderContext, "Detail" );
 		PerformPass( m_detail, false, renderContext );
-	}
-	if( m_large.enabled )
-	{
-		GPU_REGION( renderContext, "Large" );
-		PerformPass( m_large, m_detail.enabled && m_detail.downsampled == m_large.downsampled, renderContext );
 	}
 }
 
