@@ -371,6 +371,11 @@ Tr2RenderTargetPtr Tr2SSAO::GetOutput() const
 	return m_outputTarget;
 }
 
+ITr2TextureProviderPtr Tr2SSAO::GetBlankOutput() const
+{
+	return BlueCastPtr( m_blankOutputTexture );
+}
+
 HRESULT Tr2SSAO::ApplyConstBuffer( unsigned pass, Tr2RenderContext& renderContext )
 {
 	return renderContext.SetConstants( m_constBuffers[std::min( pass, SSAO_PASS_COUNT )], COMPUTE_SHADER, Tr2Renderer::GetPerFramePSStartRegister() );

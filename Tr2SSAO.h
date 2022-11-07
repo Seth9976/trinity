@@ -49,6 +49,7 @@ public:
 	void Filter( Tr2RenderContext& renderContext );
 
 	Tr2RenderTargetPtr GetOutput() const;
+	ITr2TextureProviderPtr GetBlankOutput() const;
 
 private:
 	struct SSAOResources;

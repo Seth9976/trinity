@@ -1523,6 +1523,10 @@ void EveSpaceScene::UpdateImpostors( Tr2RenderContext& renderContext )
 
 	SetNoShadow();
 	UpdateVariableStore();
+	if( m_ssao )
+	{
+		m_ssaoMapHandle->SetValue( m_ssao->GetBlankOutput() );
+	}
 
 	Vector3 eye = Tr2Renderer::GetInverseViewTransform().GetTranslation();
 	Vector3 up = TransformNormal( Vector3( 0, 1, 0 ), Tr2Renderer::GetInverseViewTransform() );
