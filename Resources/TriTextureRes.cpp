@@ -171,7 +171,7 @@ void TriTextureRes::Initialize( const wchar_t* name, const wchar_t* ext )
 
 	if( IsCtrPath( name ) )
 	{
-		m_pipeline = BlueCastPtr( BeResMan->LoadObjectW( name ) );
+		m_pipeline = BeResMan->LoadObject<Tr2TexturePipeline>( name );
 		if( m_pipeline )
 		{
 			std::set<std::wstring> resources;

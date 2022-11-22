@@ -587,11 +587,7 @@ Tr2PerObjectData* Tr2InteriorPlaceable::GetPerObjectDataWithLightSet( ITriRender
 void Tr2InteriorPlaceable::LoadPlaceableRes()
 {
 	m_placeableRes.Unlock();
-
-	IRootPtr p;
-	p.Attach( BeResMan->LoadObject( m_placeableResPath.c_str() ) );
-
-	m_placeableRes = BlueCastPtr( p );
+	m_placeableRes = BeResMan->LoadObject<WodPlaceableRes>( m_placeableResPath.c_str() );
 }
 
 // -------------------------------------------------------------

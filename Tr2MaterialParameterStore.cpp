@@ -47,11 +47,9 @@ void Tr2MaterialParameterStore::LoadParentResource()
 
 	m_parentStore = NULL;
 	
-	IRootPtr p;
 	if (m_parentPath.size() > 0)
 	{
-		p.Attach( BeResMan->LoadObject( m_parentPath.c_str() ) );
-		BlueQIPtrAssign( ( IRoot** )&m_parentStore, p, BlueInterfaceIID<Tr2MaterialParameterStore>() );
+		m_parentStore = BeResMan->LoadObject<Tr2MaterialParameterStore>( m_parentPath.c_str() );
 	}
 
 }

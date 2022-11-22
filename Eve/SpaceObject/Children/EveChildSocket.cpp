@@ -489,7 +489,7 @@ bool EveChildSocket::LoadChild()
 	UnRegisterComponents();
 
 	CCP_LOG( "Loading child red file...", m_plugResPath.c_str() );
-	m_plug = BlueCastPtr( BeResMan->LoadObject( m_plugResPath.c_str() ) );
+	m_plug = BeResMan->LoadObject<EveChildPlug>( m_plugResPath.c_str() );
 	if ( !m_plug )
 	{
 		CCP_LOGERR( "Red file %s is invalid or not an Eve Child type.", m_plugResPath.c_str() );

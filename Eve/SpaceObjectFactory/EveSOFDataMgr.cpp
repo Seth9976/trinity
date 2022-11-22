@@ -447,19 +447,10 @@ bool EveSOFDataMgr::LoadData( const char* filePath )
 	CCP_LOGNOTICE( "SOF: start loading data from: %s", filePath );
 
 	// load via resman
-	IRootPtr p;
-	p.Attach( BeResMan->LoadObject( filePath ) );
-	if( p == NULL )
+	auto dbData = BeResMan->LoadObject<EveSOFData>( filePath );
+	if( !dbData )
 	{
-		CCP_LOGERR( "Couldn't find SOF db data resource file: %s", filePath );
-		return false;
-	}
-
-	// is it of right type?
-	EveSOFDataPtr dbData;
-	if( !p->QueryInterface( BlueInterfaceIID<EveSOFData>(), (void**)&dbData ) )
-	{
-		CCP_LOGERR( "SOF resource file %s is not of correct type!", filePath );
+		CCP_LOGERR( "Couldn't find SOF db data resource file %s or it is not of correct type!", filePath );
 		return false;
 	}
 

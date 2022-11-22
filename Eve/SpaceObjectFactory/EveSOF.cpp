@@ -1458,16 +1458,9 @@ void EveSOF::SetupModelCurves( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) 
 	const char* rotationCurvePath = dna->GetModelRotationCurvePath();
 	if( rotationCurvePath )
 	{
-		IRootPtr p;
-		IRoot* tmp = BeResMan->LoadObject( rotationCurvePath );
-		if( tmp )
+		if( auto rotationCurve = BeResMan->LoadObject<ITriQuaternionFunction>( rotationCurvePath ) )
 		{
-			p.Attach( tmp );
-			ITriQuaternionFunctionPtr rotationCurve;
-			if( p->QueryInterface( BlueInterfaceIID<ITriQuaternionFunction>(), (void**)&rotationCurve ) )
-			{
-				obj->SetModelRotationCurve( rotationCurve );
-			}
+			obj->SetModelRotationCurve( rotationCurve );
 		}
 	}
 
@@ -1475,16 +1468,9 @@ void EveSOF::SetupModelCurves( EveSpaceObject2Ptr obj, const EveSOFDNAPtr dna ) 
 	const char* translationCurvePath = dna->GetModelTranslationCurvePath();
 	if( translationCurvePath )
 	{
-		IRootPtr p;
-		IRoot* tmp = BeResMan->LoadObject( translationCurvePath );
-		if( tmp )
+		if( auto translationCurve = BeResMan->LoadObject<ITriVectorFunction>( translationCurvePath ) )
 		{
-			p.Attach( tmp );
-			ITriVectorFunctionPtr translationCurve;
-			if( p->QueryInterface( BlueInterfaceIID<ITriVectorFunction>(), (void**)&translationCurve ) )
-			{
-				obj->SetModelTranslationCurve( translationCurve );
-			}
+			obj->SetModelTranslationCurve( translationCurve );
 		}
 	}
 }
@@ -1574,14 +1560,12 @@ void EveSOF::SetupChildrenAndAnimations( EveSpaceObject2Ptr obj, IEveEffectChild
 			continue;
 		}
 
-		IRootPtr p;
-		IRoot* tmp = BeResMan->LoadObject( childIt->redFilePath.c_str() );
-		if( !tmp )
+		IRootPtr p = BeResMan->LoadObject( childIt->redFilePath.c_str() );
+		if( !p )
 		{
 			CCP_LOGERR( "resource file %s is invalid!", childIt->redFilePath.c_str() );
 			continue;
 		}
-		p.Attach( tmp );
 
 		// is it of right type?
 		if( EveTransformPtr child = BlueCastPtr( p ) )
@@ -1739,19 +1723,15 @@ void EveSOF::SetupEffectChildren( EveSpaceObject2Ptr newObj, IEveEffectChildrenO
 				continue;
 			}
 
-			IRootPtr p;
-			IRoot* tmp = BeResMan->LoadObject( childSetItem.redFilePath.c_str() );
-			if( !tmp )
+			IRootPtr p = BeResMan->LoadObject( childSetItem.redFilePath.c_str() );
+			if( !p )
 			{
 				CCP_LOGERR( "resource file %s is invalid!", childSetItem.redFilePath.c_str() );
 				continue;
 			}
-			p.Attach( tmp );
 
 			// is it of right type?
-			EveTransformPtr child;
-			IEveSpaceObjectChildPtr effectChild;
-			if( p->QueryInterface( BlueInterfaceIID<EveTransform>(), (void**)&child, BEQI_SILENT ) )
+			if( EveTransformPtr child = BlueCastPtr( p ) )
 			{
 				for( auto& offset : offsets )
 				{
@@ -1769,7 +1749,7 @@ void EveSOF::SetupEffectChildren( EveSpaceObject2Ptr newObj, IEveEffectChildrenO
 					newObj->AddToChildrenList( transformedChild );
 				}
 			}
-			else if( p->QueryInterface( BlueInterfaceIID<IEveSpaceObjectChild>(), (void**)&effectChild, BEQI_SILENT ) )
+			else if( IEveSpaceObjectChildPtr effectChild = BlueCastPtr( p ) )
 			{
 				for( auto& offset : offsets )
 				{
