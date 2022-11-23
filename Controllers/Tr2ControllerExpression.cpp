@@ -370,59 +370,43 @@ namespace
 	}
 
 	// Helper function to reduce nesting in f: ServerTimeGreaterThan() and ServerTimeLessThan()
-	float CompareTimeFloats(float arg, float arg2)
+	float CompareTimeFloats(float arg1, float arg2)
 	{
-		if ( arg != -1 && arg2 != -1 )
+		if ( arg1 == -1 || arg2 == -1 )
 		{
-			if ( arg2 > arg )
-			{
-				return 1;
-			}
-
-			if ( arg2 < arg )
-			{
-				return 0;
-			}
+			return 1.f;	
 		}
-		return -1;
+		
+		if( arg1 >= arg2 )
+		{
+			return 1.f;
+		}
+		
+		return 0.f;		
 	}
 
 	float ServerTimeGreaterThan( float year, float month, float day, float hour, float minute, float second )
 	{
-		float ret = -1;
-
-		ret = CompareTimeFloats( year, GetServerYear() );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( month, GetServerMonth() );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( day, GetServerDay() );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( hour, GetServerHour() );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( minute, GetServerMinute() );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( second, GetServerSecond() );
-		if ( ret != -1 ) return ret;
-		return 1;
+		float isTrue = 1.f;
+		isTrue *= CompareTimeFloats( GetServerYear(), year );
+		isTrue *= CompareTimeFloats( GetServerMonth(), month );
+		isTrue *= CompareTimeFloats( GetServerDay(), day );
+		isTrue *= CompareTimeFloats( GetServerHour(), hour );
+		isTrue *= CompareTimeFloats( GetServerMinute(), minute );
+		isTrue *= CompareTimeFloats( GetServerSecond(), second );
+		return isTrue;
 	}
 
 	float ServerTimeLessThanOrEqual( float year, float month, float day, float hour, float minute, float second )
 	{
-		float ret = -1;
-
-		ret = CompareTimeFloats(  GetServerYear(), year );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( GetServerMonth(), month );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats(  GetServerDay(), day );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats( GetServerHour(), hour );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats(  GetServerMinute(),  minute );
-		if ( ret != -1 ) return ret;
-		ret = CompareTimeFloats(  GetServerSecond(), second );
-		if ( ret != -1 ) return ret;
-		return 1;
+		float isTrue = 1.f;
+		isTrue *= CompareTimeFloats( year, GetServerYear() );
+		isTrue *= CompareTimeFloats( month, GetServerMonth() );
+		isTrue *= CompareTimeFloats( day, GetServerDay() );
+		isTrue *= CompareTimeFloats( hour, GetServerHour() );
+		isTrue *= CompareTimeFloats( minute, GetServerMinute() );
+		isTrue *= CompareTimeFloats( second, GetServerSecond() );
+		return isTrue;
 	}
 
 	CcpParser::Function s_functions[] = {
