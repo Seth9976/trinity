@@ -75,7 +75,7 @@ const Be::ClassInfo* EveSOFDataHullDecalSet::ExposeToBlue()
 		MAP_INTERFACE( EveSOFDataHullDecalSet )
 
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "visibilityGroup", m_visibilityGroup, "Name for visibility group to toggle visibility for the whole set.\n:jessica-widget: visibilityGroup", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "visibilityGroup", m_visibilityGroup, "Name for visibility group to toggle visibility for the whole set.\n:jessica-widget: visibilitygroup", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "items", m_items, "The items in this decalset", Be::READ | Be::PERSIST )
 	EXPOSURE_END()
 }
@@ -102,7 +102,7 @@ const Be::ClassInfo* EveSOFDataHullLightSet::ExposeToBlue()
 	EXPOSURE_BEGIN( EveSOFDataHullLightSet, "" )
 		MAP_INTERFACE( EveSOFDataHullLightSet )
 		MAP_ATTRIBUTE( "name", m_name, "", Be::READWRITE | Be::PERSIST )
-		MAP_ATTRIBUTE( "visibilityGroup", m_visibilityGroup, "Name for visibility group to toggle visibility for the whole set.\n:jessica-widget: visibilityGroup", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "visibilityGroup", m_visibilityGroup, "Name for visibility group to toggle visibility for the whole set.\n:jessica-widget: visibilitygroup", Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE( "items", m_items, "The items in this decalset", Be::READ | Be::PERSIST )
 		EXPOSURE_END()
 }
