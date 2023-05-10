@@ -1793,6 +1793,11 @@ void EveSpaceScene::RenderBackgroundPassObjects( Tr2RenderContext& renderContext
 void EveSpaceScene::RenderDepthPass( Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
+    
+    if( !m_display )
+    {
+        return;
+    }
 
 	renderContext.m_esm.BeginManagedRendering();
 

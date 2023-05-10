@@ -309,6 +309,7 @@ void Tr2ShadowMap::DrawToShadowMapResult( Tr2RenderContext& renderContext, ITr2T
 
 	if( !m_shadowMapResultRT || !m_shadowMapResultRT->IsValid() || viewportChanged )
 	{
+		m_shadowMapResultRT = nullptr;
 		m_shadowMapResultRT.CreateInstance();
 		m_shadowMapResultRT->Create( width, height, 1, PixelFormat::PIXEL_FORMAT_R8_UNORM );
 	}
