@@ -395,9 +395,11 @@ void EveChildCloud2::SetSceneInformation( const SceneInformation& sceneInformati
 	m_targetWidth = sceneInformation.targetWidth;
 	m_targetHeight = sceneInformation.targetHeight;
 
-	m_effect->SetOption(
-		BlueSharedString( "CLOUD_SHADOWS" ),
-		sceneInformation.receiveShadows && m_receiveShadows ? BlueSharedString( "CLOUD_SHADOWS_RECEIVE" ) : BlueSharedString( "CLOUD_SHADOWS_NONE" ) );
+	if( m_effect ){
+		m_effect->SetOption(
+			BlueSharedString( "CLOUD_SHADOWS" ),
+			sceneInformation.receiveShadows && m_receiveShadows ? BlueSharedString( "CLOUD_SHADOWS_RECEIVE" ) : BlueSharedString( "CLOUD_SHADOWS_NONE" ) );
+	}
 }
 
 void EveChildCloud2::ReleaseResources( TriStorage s )
