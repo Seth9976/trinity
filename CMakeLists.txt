@@ -1657,7 +1657,7 @@ function(set_shared_trinity_properties target)
 
     # override the output directory to ensure that all TrinityAL outputs end up in the same folder.
     # this is OK because we're differentiating them by OUTPUT_NAME
-    set(output_directory "${CMAKE_SOURCE_DIR}/carbon/autobuild/Trinity/${CCP_PLATFORM}/${CCP_ARCHITECTURE}/${CCP_TOOLSET}/$<$<CONFIG:DEBUG>:>")
+    set(output_directory "${CCP_PLATFORM}/${CCP_ARCHITECTURE}/${CCP_TOOLSET}/$<$<CONFIG:DEBUG>:>")
     message(STATUS "Overriding ${target} output directory to ${output_directory}")
     set_target_properties(${target}
         PROPERTIES
