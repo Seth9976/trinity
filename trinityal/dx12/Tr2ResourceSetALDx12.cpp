@@ -113,7 +113,9 @@ namespace TrinityALImpl
 			case Tr2ResourceSetDescriptionAL::Resource::TEXTURE:
 				if( resource.texture.IsValid() && it->registerType >= Tr2ShaderRegisterAL::SRV_TEXTURE1D )
 				{
-					m_srv[reg.parameter] = resource.texture.m_texture->m_view[resource.colorSpace];
+					auto ptr = resource.texture.m_texture.lock();
+					CCP_ASSERT_M( ptr, "Tr2WeakTextureAL inside Tr2ResourceSetAL does not hold a valid pointer!" );
+					m_srv[reg.parameter] = ptr->m_view[resource.colorSpace];
 				}
 				else
 				{
@@ -125,7 +127,9 @@ namespace TrinityALImpl
 				}
 				else
 				{
-					AddTransition( resource.texture.m_texture->GetResourceDx12(), resource.texture.m_texture->m_defaultState, stateFlag );
+					auto ptr = resource.texture.m_texture.lock();
+					CCP_ASSERT_M( ptr, "Tr2WeakTextureAL inside Tr2ResourceSetAL does not hold a valid pointer!" );
+					AddTransition( ptr->GetResourceDx12(), ptr->m_defaultState, stateFlag );
 				}
 				break;
 			case Tr2ResourceSetDescriptionAL::Resource::BUFFER:
@@ -168,7 +172,9 @@ namespace TrinityALImpl
 				{
 					if( resource.texture.IsValid() && it->registerType >= Tr2ShaderRegisterAL::UAV_TEXTURE1D )
 					{
-						m_uav[reg.parameter] = resource.texture.m_texture->m_uav[resource.mip];
+						auto ptr = resource.texture.m_texture.lock();
+						CCP_ASSERT_M( ptr, "Tr2WeakTextureAL inside Tr2ResourceSetAL does not hold a valid pointer!" );
+						m_uav[reg.parameter] = ptr->m_uav[resource.mip];
 					}
 					else
 					{
@@ -180,7 +186,9 @@ namespace TrinityALImpl
 					}
 					else
 					{
-						AddTransition( resource.texture.m_texture->GetResourceDx12(), resource.texture.m_texture->m_defaultState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
+						auto ptr = resource.texture.m_texture.lock();
+						CCP_ASSERT_M( ptr, "Tr2WeakTextureAL inside Tr2ResourceSetAL does not hold a valid pointer!" );
+						AddTransition( ptr->GetResourceDx12(), ptr->m_defaultState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
 					}
 				}
 				break;

@@ -3,7 +3,7 @@
 #include "../ALResult.h"
 #include "../Tr2DeviceResourceAL.h"
 #include "Tr2BufferAL.h"
-#include "Tr2TextureAL.h"
+#include "Tr2WeakTextureAL.h"
 #include "Tr2SamplerStateAL.h"
 
 class Tr2ShaderAL;
@@ -84,7 +84,7 @@ private:
 		bool Is( const Tr2TextureAL& other, uint32_t otherMip ) const;
 		void UpdateHash( uint32_t& hash ) const;
 
-		Tr2TextureAL texture;
+		Tr2WeakTextureAL texture;
 		Tr2BufferAL buffer;
 		Type type;
 		union

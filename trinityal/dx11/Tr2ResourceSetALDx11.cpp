@@ -54,7 +54,11 @@ namespace TrinityALImpl
 					stage.resources[registerIndex] = desc.buffer.m_buffer->m_srv;
 					break;
 				case Tr2ResourceSetDescriptionAL::Resource::TEXTURE:
-					stage.resources[registerIndex] = desc.texture.m_texture->m_view[desc.colorSpace];
+					{
+						auto ptr = desc.texture.m_texture.lock();
+						CCP_ASSERT_M( ptr, "Tr2WeakTextureAL inside Tr2ResourceSetAL does not hold a valid pointer!" );
+						stage.resources[registerIndex] = ptr->m_view[desc.colorSpace];
+					}
 					break;
 				case Tr2ResourceSetDescriptionAL::Resource::NONE:
 					continue;
@@ -109,16 +113,20 @@ namespace TrinityALImpl
 					m_uavOffset = std::min( m_uavOffset, registerIndex );
 					break;
 				case Tr2ResourceSetDescriptionAL::Resource::TEXTURE:
-					if( desc.mip < desc.texture.m_texture->m_uav.size() )
 					{
-						m_uavs[registerIndex] = desc.texture.m_texture->m_uav[desc.mip];
+						auto ptr = desc.texture.m_texture.lock();
+						CCP_ASSERT_M( ptr, "Tr2WeakTextureAL inside Tr2ResourceSetAL does not hold a valid pointer!" );
+						if( desc.mip < ptr->m_uav.size() )
+						{
+							m_uavs[registerIndex] = ptr->m_uav[desc.mip];
+						}
+						else
+						{
+							m_uavs[registerIndex] = nullptr;
+						}
+						m_uavCount = registerIndex + 1;
+						m_uavOffset = std::min( m_uavOffset, registerIndex );
 					}
-					else
-					{
-						m_uavs[registerIndex] = nullptr;
-					}
-					m_uavCount = registerIndex + 1;
-					m_uavOffset = std::min( m_uavOffset, registerIndex );
 					break;
 				default:
 					return E_INVALIDARG;

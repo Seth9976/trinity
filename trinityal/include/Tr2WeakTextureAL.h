@@ -3,12 +3,13 @@
 #include "../Tr2DeviceResourceAL.h"
 #include "../ALResult.h"
 #include "../Tr2RenderContextEnum.h"
+#include "Tr2TextureAL.h"
 
 namespace TrinityALImpl
 {
-	class Tr2TextureAL;
-	class Tr2ResourceSetAL;
-	class Tr2SwapChainAL;
+class Tr2TextureAL;
+class Tr2ResourceSetAL;
+class Tr2SwapChainAL;
 }
 
 
@@ -19,18 +20,12 @@ struct Tr2MsaaDesc;
 struct Tr2TextureSubresource;
 
 
-class Tr2TextureAL
+class Tr2WeakTextureAL
 {
 public:
-	Tr2TextureAL();
+	Tr2WeakTextureAL();
+	Tr2WeakTextureAL( Tr2TextureAL other );
 
-	ALResult Create( const Tr2BitmapDimensions& desc, Tr2GpuUsage::Type gpuUsage, Tr2PrimaryRenderContextAL& renderContext );
-	ALResult Create( const Tr2BitmapDimensions& desc, const Tr2MsaaDesc& msaa, Tr2GpuUsage::Type gpuUsage, Tr2PrimaryRenderContextAL& renderContext );
-	ALResult Create( const Tr2BitmapDimensions& desc, Tr2GpuUsage::Type gpuUsage, Tr2SubresourceData* initialData, Tr2PrimaryRenderContextAL& renderContext );
-	ALResult Create( const Tr2BitmapDimensions& desc, Tr2GpuUsage::Type gpuUsage, Tr2CpuUsage::Type cpuUsage, Tr2PrimaryRenderContextAL& renderContext );
-	ALResult Create( const Tr2BitmapDimensions& desc, Tr2GpuUsage::Type gpuUsage, Tr2CpuUsage::Type cpuUsage, Tr2SubresourceData* initialData, Tr2PrimaryRenderContextAL& renderContext );
-	ALResult Create( const Tr2BitmapDimensions& desc, const Tr2MsaaDesc& msaa, Tr2GpuUsage::Type gpuUsage, Tr2CpuUsage::Type cpuUsage, Tr2SubresourceData* initialData, Tr2PrimaryRenderContextAL& renderContext );
-	ALResult OpenShared( uintptr_t handle, Tr2GpuUsage::Type gpuUsage, Tr2PrimaryRenderContextAL& renderContext );
 	bool IsValid() const;
 	Tr2ALMemoryType GetMemoryClass();
 
@@ -50,6 +45,7 @@ public:
 	uint32_t GetMipSize( uint32_t mip ) const;
 
 	bool operator==( const Tr2TextureAL& other ) const;
+	bool operator==( const Tr2WeakTextureAL& other ) const;
 
 	ALResult MapForReading( const Tr2TextureSubresource& region, const void*& data, uint32_t& pitch, Tr2RenderContextAL& renderContext );
 	void UnmapForReading( Tr2RenderContextAL& renderContext );
@@ -70,15 +66,12 @@ public:
 	ALResult SetName( const char* name );
 
 private:
-	std::shared_ptr<TrinityALImpl::Tr2TextureAL> m_texture;
+	std::weak_ptr<TrinityALImpl::Tr2TextureAL> m_texture;
 
 	friend class Tr2PrimaryRenderContextAL;
 	friend class Tr2RenderContextAL;
 	friend class TrinityALImpl::Tr2SwapChainAL;
 	friend class TrinityALImpl::Tr2ResourceSetAL;
 	friend class TrinityALImpl::Tr2TextureAL;
-	friend class Tr2WeakTextureAL;
-
-private:
-	static std::shared_ptr<TrinityALImpl::Tr2TextureAL>& NullTexture();
+	friend class Tr2TextureAL;
 };

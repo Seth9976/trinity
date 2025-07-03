@@ -6,15 +6,11 @@
 bool g_preloadTextureToDeviceOnPrepare = true;
 
 
-namespace
-{
 
-std::shared_ptr<TrinityALImpl::Tr2TextureAL>& NullTexture()
+std::shared_ptr<TrinityALImpl::Tr2TextureAL>& Tr2TextureAL::NullTexture()
 {
 	static std::shared_ptr<TrinityALImpl::Tr2TextureAL> nullTexture = std::make_shared<TrinityALImpl::Tr2TextureAL>();
 	return nullTexture;
-}
-	
 }
 
 

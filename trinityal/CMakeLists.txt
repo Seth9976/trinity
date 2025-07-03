@@ -205,6 +205,7 @@ set(_SOURCES
     include/Tr2StreamlineAL.h    
     include/Tr2SwapChainAL.h
     include/Tr2TextureAL.h
+    include/Tr2WeakTextureAL.h
     include/Tr2VertexLayoutAL.h
     include/Tr2VideoAdapterInfoAL.h
     include/TrinityAL.h
@@ -287,6 +288,7 @@ set(_SOURCES
     src/Tr2StreamlineAL.cpp    
     src/Tr2SwapChainAL.cpp
     src/Tr2TextureAL.cpp
+    src/Tr2WeakTextureAL.cpp
     src/Tr2VertexLayoutAL.cpp
     src/upscaling/Tr2Fsr1Upscaling.cpp
     src/upscaling/Tr2UpscalingAL.cpp
