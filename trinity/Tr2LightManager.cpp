@@ -333,18 +333,11 @@ void Tr2LightManager::UpdateShadowAtlasSize( ShadowQuality shadowQuality )
 	{
 		// Setup depth stencil texture
 		m_ShadowMap.m_atlasDepthStencil->Destroy();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
-		m_ShadowMap.m_atlasDepthStencil.CreateInstance();
 		if ( shadowQuality != ShadowQuality::SHADOW_DISABLED )
 		{
 			Tr2LightManager::ShadowMapAtlasSettings settings = CalculateShadowMapAtlasSettings( shadowQuality );
-        
-		// Texture is created on the fly in the render function when needed.
+			m_ShadowMap.m_atlasDepthStencil->Create( settings.size, settings.size, Tr2RenderContextEnum::DSFMT_D32F, 0, 0 );
+        }
 	}
 	m_ShadowMap.m_qualityUsedByAtlas = m_ShadowMap.m_atlasDepthStencil->IsValid() ? shadowQuality : ShadowQuality::SHADOW_DISABLED;
 }
