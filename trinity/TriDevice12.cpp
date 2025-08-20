@@ -201,48 +201,50 @@ void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
 		// Example sourced from https://github.com/NANAnoo/Adria/blob/f25306f66fab1bba35fc0622880ff876d230a8c8/Adria/Graphics/GfxDevice.cpp
 
 		CComPtr<ID3D12DeviceRemovedExtendedData1> pDred;
-		SUCCEEDED( Tr2RenderContext_GetMainThreadRenderContext().m_device->QueryInterface( IID_PPV_ARGS( &pDred ) ) );
-		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 DredAutoBreadcrumbsOutput;
-		D3D12_DRED_PAGE_FAULT_OUTPUT1 DredPageFaultOutput;
-		if( SUCCEEDED( pDred->GetAutoBreadcrumbsOutput1( &DredAutoBreadcrumbsOutput ) ) )
+		if( SUCCEEDED( Tr2RenderContext_GetMainThreadRenderContext().m_device->QueryInterface( IID_PPV_ARGS( &pDred ) ) ) )
 		{
-
-			CCP_LOGERR( "[DRED] Last tracked GPU operations:" );
-			std::map<UINT, std::wstring> contextStrings;
-			D3D12_AUTO_BREADCRUMB_NODE1 const* pNode = DredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode;
-			while( pNode && pNode->pLastBreadcrumbValue )
+			D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 DredAutoBreadcrumbsOutput;
+			D3D12_DRED_PAGE_FAULT_OUTPUT1 DredPageFaultOutput;
+			if( SUCCEEDED( pDred->GetAutoBreadcrumbsOutput1( &DredAutoBreadcrumbsOutput ) ) )
 			{
-				UINT lastCompletedOp = *pNode->pLastBreadcrumbValue;
-				if( lastCompletedOp != (int)pNode->BreadcrumbCount && lastCompletedOp != 0 )
+
+				CCP_LOGERR( "[DRED] Last tracked GPU operations:" );
+				std::map<UINT, std::wstring> contextStrings;
+				D3D12_AUTO_BREADCRUMB_NODE1 const* pNode = DredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode;
+				while( pNode && pNode->pLastBreadcrumbValue )
 				{
-					CCP_LOGERR( "[DRED] Commandlist compleated %d of %d commands", lastCompletedOp, pNode->BreadcrumbCount );
-
-					UINT firstOp = std::max<UINT>( lastCompletedOp - 100, 0 );
-					UINT lastOp = std::min<UINT>( lastCompletedOp + 20, UINT( pNode->BreadcrumbCount ) - 1 );
-
-					contextStrings.clear();
-					for( UINT breadcrumbContext = firstOp; breadcrumbContext < pNode->BreadcrumbContextsCount; ++breadcrumbContext )
+					UINT lastCompletedOp = *pNode->pLastBreadcrumbValue;
+					if( lastCompletedOp != (int)pNode->BreadcrumbCount && lastCompletedOp != 0 )
 					{
-						const D3D12_DRED_BREADCRUMB_CONTEXT& context = pNode->pBreadcrumbContexts[breadcrumbContext];
-						contextStrings[context.BreadcrumbIndex] = context.pContextString;
-					}
+						CCP_LOGERR( "[DRED] Commandlist completed %d of %d commands", lastCompletedOp, pNode->BreadcrumbCount );
 
-					for( UINT op = firstOp; op <= lastOp; ++op )
-					{
-						D3D12_AUTO_BREADCRUMB_OP breadcrumbOp = pNode->pCommandHistory[op];
+						UINT firstOp = std::max<UINT>( lastCompletedOp - 100, 0 );
+						UINT lastOp = std::min<UINT>( lastCompletedOp + 20, UINT( pNode->BreadcrumbCount ) - 1 );
 
-						std::wstring contextString;
-						auto it = contextStrings.find( op );
-						if( it != contextStrings.end() )
+						contextStrings.clear();
+						for( UINT breadcrumbContext = firstOp; breadcrumbContext < pNode->BreadcrumbContextsCount; ++breadcrumbContext )
 						{
-							contextString = it->second;
+							const D3D12_DRED_BREADCRUMB_CONTEXT& context = pNode->pBreadcrumbContexts[breadcrumbContext];
+							contextStrings[context.BreadcrumbIndex] = context.pContextString;
 						}
 
-						char const* opName = DredBreadcrumbOpName( breadcrumbOp );
-						CCP_LOGERR( "\tOp: %d, %s%ls%s", op, opName, contextString.c_str(), ( op + 1 == lastCompletedOp ) ? " - Last completed" : "" );
+						for( UINT op = firstOp; op <= lastOp; ++op )
+						{
+							D3D12_AUTO_BREADCRUMB_OP breadcrumbOp = pNode->pCommandHistory[op];
+
+							std::wstring contextString;
+							auto it = contextStrings.find( op );
+							if( it != contextStrings.end() )
+							{
+								contextString = it->second;
+							}
+
+							char const* opName = DredBreadcrumbOpName( breadcrumbOp );
+							CCP_LOGERR( "\tOp: %d, %s%ls%s", op, opName, contextString.c_str(), ( op + 1 == lastCompletedOp ) ? " - Last completed" : "" );
+						}
 					}
+					pNode = pNode->pNext;
 				}
-				pNode = pNode->pNext;
 			}
 		}
 
