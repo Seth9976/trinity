@@ -203,14 +203,14 @@ void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
 		CComPtr<ID3D12DeviceRemovedExtendedData1> pDred;
 		if( SUCCEEDED( Tr2RenderContext_GetMainThreadRenderContext().m_device->QueryInterface( IID_PPV_ARGS( &pDred ) ) ) )
 		{
-			D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 DredAutoBreadcrumbsOutput;
-			D3D12_DRED_PAGE_FAULT_OUTPUT1 DredPageFaultOutput;
-			if( SUCCEEDED( pDred->GetAutoBreadcrumbsOutput1( &DredAutoBreadcrumbsOutput ) ) )
+			D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 dredAutoBreadcrumbsOutput;
+			D3D12_DRED_PAGE_FAULT_OUTPUT1 dredPageFaultOutput;
+			if( SUCCEEDED( pDred->GetAutoBreadcrumbsOutput1( &dredAutoBreadcrumbsOutput ) ) )
 			{
 
 				CCP_LOGERR( "[DRED] Last tracked GPU operations:" );
 				std::map<UINT, std::wstring> contextStrings;
-				D3D12_AUTO_BREADCRUMB_NODE1 const* pNode = DredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode;
+				D3D12_AUTO_BREADCRUMB_NODE1 const* pNode = dredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode;
 				while( pNode && pNode->pLastBreadcrumbValue )
 				{
 					UINT lastCompletedOp = *pNode->pLastBreadcrumbValue;
@@ -246,23 +246,21 @@ void TriDevice::HandleRenderTick( Be::Time realTime, Be::Time simTime )
 					pNode = pNode->pNext;
 				}
 			}
-		}
-
-
-		if( SUCCEEDED( pDred->GetPageFaultAllocationOutput1( &DredPageFaultOutput ) ) )
-		{
-			for( auto node = DredPageFaultOutput.pHeadExistingAllocationNode; node != nullptr; node = node->pNext )
+			if( SUCCEEDED( pDred->GetPageFaultAllocationOutput1( &dredPageFaultOutput ) ) )
 			{
-				if( node->ObjectNameW )
+				for( auto node = dredPageFaultOutput.pHeadExistingAllocationNode; node != nullptr; node = node->pNext )
 				{
-					CCP_LOGERR( "Page Fault Allocation on: %s", node->ObjectNameW );
+					if( node->ObjectNameW )
+					{
+						CCP_LOGERR( "Page Fault Allocation on: %s", node->ObjectNameW );
+					}
 				}
-			}
-			for( auto node = DredPageFaultOutput.pHeadRecentFreedAllocationNode; node != nullptr; node = node->pNext )
-			{
-				if( node->ObjectNameW )
+				for( auto node = dredPageFaultOutput.pHeadRecentFreedAllocationNode; node != nullptr; node = node->pNext )
 				{
-					CCP_LOGERR( "Page Fault Free on: %s", node->ObjectNameW );
+					if( node->ObjectNameW )
+					{
+						CCP_LOGERR( "Page Fault Free on: %s", node->ObjectNameW );
+					}
 				}
 			}
 		}
