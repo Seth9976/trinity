@@ -9,6 +9,8 @@ const Be::ClassInfo* EveAudioObject::ExposeToBlue()
 		MAP_INTERFACE( IEveSpaceObject2 )
 		MAP_INTERFACE( IInitialize )
 		MAP_INTERFACE( IWorldPosition )
+		MAP_INTERFACE( ITr2DebugRenderable )
+		MAP_INTERFACE( INotify )
 
 		MAP_ATTRIBUTE
 		(
@@ -72,6 +74,14 @@ const Be::ClassInfo* EveAudioObject::ExposeToBlue()
 			m_ballRotation,
 			"Function for animated rotation updates",
 			Be::READWRITE | Be::PERSIST
+		)
+		
+		MAP_ATTRIBUTE
+		(
+			"audioEvent",
+			m_audioEvent,
+			"Audio event name to play on this emitter",
+			Be::READWRITE | Be::PERSIST | Be::NOTIFY
 		)
 
 		MAP_METHOD_AND_WRAP( "GetAudioEmitter", GetAudioEmitter, "Gets the audio emitter for this object" )

@@ -7,7 +7,8 @@ EveAudioObject::EveAudioObject( IRoot* lockobj ) :
 	m_rotation( 0.0f, 0.0f, 0.0f, 1.0f ),
 	m_translation( 0.0f, 0.0f, 0.0f ),
 	m_display( true ),
-	m_mute( false )
+	m_mute( false ),
+	m_audioEvent( L"" )
 {
 }
 
@@ -20,6 +21,12 @@ bool EveAudioObject::Initialize()
 		Vector3 position = GetWorldPosition();
 		Vector3 front( 0, 1, 0 ), top( 0, 0, 1 );
 		m_audioEmitter->SetPosition( front, top, position );
+		
+		// Play the configured audio event if one is set
+		if( !m_audioEvent.empty() )
+		{
+			PlayAudioEvent( m_audioEvent );
+		}
 		
 		return true;
 	}
@@ -155,4 +162,42 @@ void EveAudioObject::UpdateWorldTransform( Be::Time time )
 	}
 
 	m_worldTransform = RotationMatrix( rotation ) * TranslationMatrix( translation );
+}
+
+void EveAudioObject::GetDebugOptions( Tr2DebugRendererOptions& options )
+{
+	options.insert( "Bounding Sphere" );
+}
+
+void EveAudioObject::RenderDebugInfo( ITr2DebugRenderer2& renderer )
+{
+	if( renderer.HasOption( GetRawRoot(), "Bounding Sphere" ) )
+	{
+		Vector4 boundingSphere;
+		if( GetBoundingSphere( boundingSphere ) )
+		{
+			renderer.DrawSphere( this, boundingSphere.GetXYZ(), boundingSphere.w, 8, Tr2DebugRenderer::Wireframe, 0xffff00ff );
+		}
+	}
+}
+
+bool EveAudioObject::OnModified( Be::Var* val )
+{
+	if( IsMatch( val, m_display ) )
+	{
+		// Handle display state changes if needed
+	}
+	else if( IsMatch( val, m_mute ) )
+	{
+		SetMute( m_mute );
+	}
+	else if( IsMatch( val, m_audioEvent ) )
+	{
+		// Play the new audio event when it changes from GUI
+		if( m_audioEmitter && !m_audioEvent.empty() )
+		{
+			PlayAudioEvent( m_audioEvent );
+		}
+	}
+	return true;
 }

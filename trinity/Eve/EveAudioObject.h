@@ -12,6 +12,7 @@
 #include "IWorldPosition.h"
 #include "EveTransform.h"
 #include "IEveSpaceObject2.h"
+#include "Include/ITr2DebugRenderer2.h"
 #include <ITr2AudEmitter.h>
 
 BLUE_DECLARE_INTERFACE( ITr2AudEmitter );
@@ -31,7 +32,9 @@ BLUE_DECLARE( EveAudioObject );
 BLUE_CLASS( EveAudioObject ):
 	public IWorldPosition,
 	public IEveSpaceObject2,
-	public IInitialize
+	public IInitialize,
+	public ITr2DebugRenderable,
+	public INotify
 
 {
 public:
@@ -40,6 +43,9 @@ public:
 	EveAudioObject( IRoot* lockobj = NULL );
 	
 	bool Initialize();
+	
+	// INotify
+	virtual bool OnModified( Be::Var* val );
 
 	// IEveSpaceObject2
 	void UpdateSyncronous( const EveUpdateContext& updateContext );
@@ -56,6 +62,10 @@ public:
 	// IWorldPosition
 	virtual Vector3 GetWorldPosition();
 	virtual Quaternion GetWorldRotation();
+	
+	// ITr2DebugRenderable
+	virtual void GetDebugOptions( Tr2DebugRendererOptions& options );
+	virtual void RenderDebugInfo( ITr2DebugRenderer2& renderer );
 	
 	/**
 	 * @brief Gets the audio emitter for this object.
@@ -119,6 +129,7 @@ protected:
 
 	std::string m_name;
 	bool m_display;
+	std::wstring m_audioEvent;
 };
 
 TYPEDEF_BLUECLASS( EveAudioObject );
