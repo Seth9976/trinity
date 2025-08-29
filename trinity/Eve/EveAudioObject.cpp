@@ -10,16 +10,20 @@ EveAudioObject::EveAudioObject( IRoot* lockobj ) :
 	m_mute( false ),
 	m_audioEvent( L"" )
 {
+	Initialize();
 }
 
 bool EveAudioObject::Initialize()
 {
 	if( SUCCEEDED( BeClasses->CreateInstanceFromName( "AudEmitter", BlueInterfaceIID<ITr2AudEmitter>(), reinterpret_cast<void**>(&m_audioEmitter.p) ) ) )
 	{
-		m_audioEmitter->SetName( m_name.empty() ? "audio_object" : m_name.c_str() );
+		UpdateWorldTransform( Be::Time( 0.0 ) );
 		
 		Vector3 position = GetWorldPosition();
+		std::string emitterName = m_name.empty() ? "audio_object" : m_name;
 		Vector3 front( 0, 1, 0 ), top( 0, 0, 1 );
+		
+		m_audioEmitter->Initialize( emitterName, L"", position );
 		m_audioEmitter->SetPosition( front, top, position );
 		
 		if( !m_audioEvent.empty() )
