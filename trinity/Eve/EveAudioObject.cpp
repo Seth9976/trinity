@@ -126,9 +126,9 @@ void EveAudioObject::SetRotation( const Quaternion& rotation )
 
 unsigned int EveAudioObject::PlayAudioEvent( const std::wstring& eventName )
 {
-	if( m_audioEmitter )
+	if( m_audioEmitter && !eventName.empty() )
 	{
-		return 0;
+		return m_audioEmitter->SendEvent( eventName );
 	}
 	return 0;
 }
