@@ -514,7 +514,7 @@ TriStepResult TriStepRenderPostProcess::Execute( Be::Time realTime, Be::Time sim
 	}
 	else
 	{
-		output = m_renderInfo->GetTempTexture();
+		output = m_renderInfo->GetTempTexture( 1.0f, Tr2RenderContextEnum::EX_NONE, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
 	}
 
 	ProcessSharpening( !upscalingInfo.hasSharpening, output->GetWidth(), output->GetHeight(), upscalingInfo.upscalingAmount );
@@ -558,7 +558,7 @@ TriStepResult TriStepRenderPostProcess::Execute( Be::Time realTime, Be::Time sim
 		auto upscalingContext = renderContext.GetPrimaryRenderContext().GetUpscalingContext( m_upscalingContextID );
 		upscalingContext->SetHudLessTexture( output->GetTexture() );
 
-		upscaledSource = RenderUpscaling( nonMsaaSource, renderContext, upscalingContext, dynamicExposure );
+		upscaledSource = RenderUpscaling( nonMsaaSource, renderContext, upscalingContext, dynamicExposure, Tr2RenderContextEnum::PIXEL_FORMAT_R11G11B10_FLOAT );
 		// upscale the temp textures so everything hence forth is correct
 		uint32_t w, h;
 		upscalingContext->GetDisplayDimensions( w, h );
@@ -616,14 +616,14 @@ TriStepResult TriStepRenderPostProcess::Execute( Be::Time realTime, Be::Time sim
 		if( upscalingEnabled && !upscalingInfo.temporal )
 		{
 			
-			auto temp = m_renderInfo->GetTempTexture( "Tonemapping Result" );
+			auto temp = m_renderInfo->GetTempTexture( "Tonemapping Result", 1.0f, Tr2RenderContextEnum::EX_NONE, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
 
 			renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_FULLSCREEN );
 			DrawInto( *temp, Tr2LoadAction::DONT_CARE, m_tonemappingEffect, renderContext );
 			
 			auto upscalingContext = renderContext.GetPrimaryRenderContext().GetUpscalingContext( m_upscalingContextID );
 			
-			output = RenderUpscaling( temp, renderContext, upscalingContext, dynamicExposure );
+			output = RenderUpscaling( temp, renderContext, upscalingContext, dynamicExposure, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
 			
 			// upscale the temp textures so everything hence forth is correct
 			uint32_t w, h;
@@ -723,7 +723,7 @@ Tr2PostProcessRenderInfo::Texture TriStepRenderPostProcess::RenderSharpening( Tr
 		GPU_REGION( renderContext, "CAS Sharpening" );
 
 		static const uint32_t CAS_THREAD_GROUP_WORK_REGION_DIM = 16;
-		Tr2PostProcessRenderInfo::Texture output = m_renderInfo->GetTempTexture( 1.0f, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS );
+		Tr2PostProcessRenderInfo::Texture output = m_renderInfo->GetTempTexture( 1.0f, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
 
 		m_fidelityFxCasShader->SetParameter( BlueSharedString( "InputTexture" ), input );
 		m_fidelityFxCasShader->SetParameter( BlueSharedString( "OutputTexture" ), output );
@@ -1466,7 +1466,7 @@ void TriStepRenderPostProcess::RenderDynamicExposureDebug( Tr2RenderContext& ren
 	}
 }
 
-Tr2PostProcessRenderInfo::Texture TriStepRenderPostProcess::RenderUpscaling( Tr2RenderTarget* source, Tr2RenderContext& renderContext, Tr2UpscalingContextAL* upscalingContext, Tr2PPDynamicExposureEffect* dynamicExposure )
+Tr2PostProcessRenderInfo::Texture TriStepRenderPostProcess::RenderUpscaling( Tr2RenderTarget* source, Tr2RenderContext& renderContext, Tr2UpscalingContextAL* upscalingContext, Tr2PPDynamicExposureEffect* dynamicExposure, ImageIO::PixelFormat outputFormat )
 {
 	GPU_REGION( renderContext, "Upscaling" );
 	if( renderContext.GetPrimaryRenderContext().GetUpscalingInfo( m_upscalingContextID ).temporal )
@@ -1480,7 +1480,7 @@ Tr2PostProcessRenderInfo::Texture TriStepRenderPostProcess::RenderUpscaling( Tr2
 
 	Tr2UpscalingAL::DispatchParameters dispatchParameters = {};
 	auto dispatchRequirements = upscalingContext->GetDispatchRequirements();
-	auto dest = m_renderInfo->GetTempTexture( w, h, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS );
+	auto dest = m_renderInfo->GetTempTexture( w, h, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS, outputFormat );
 	dispatchParameters.output = dest.GetRenderTarget()->GetTexture();
 
 	bool wantsExposure = dispatchRequirements & Tr2UpscalingAL::DispatchRequirements::OPTIONAL_EXPOSURE;
