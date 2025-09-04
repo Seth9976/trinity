@@ -558,7 +558,7 @@ TriStepResult TriStepRenderPostProcess::Execute( Be::Time realTime, Be::Time sim
 		auto upscalingContext = renderContext.GetPrimaryRenderContext().GetUpscalingContext( m_upscalingContextID );
 		upscalingContext->SetHudLessTexture( output->GetTexture() );
 
-		upscaledSource = RenderUpscaling( nonMsaaSource, renderContext, upscalingContext, dynamicExposure, Tr2RenderContextEnum::PIXEL_FORMAT_R11G11B10_FLOAT );
+		upscaledSource = RenderUpscaling( nonMsaaSource, renderContext, upscalingContext, dynamicExposure, sourceBuffer.GetRenderTarget()->GetFormat() );
 		// upscale the temp textures so everything hence forth is correct
 		uint32_t w, h;
 		upscalingContext->GetDisplayDimensions( w, h );
@@ -610,20 +610,22 @@ TriStepResult TriStepRenderPostProcess::Execute( Be::Time realTime, Be::Time sim
 		m_tonemappingEffect->SetOption( BlueSharedString( "TONE_MAPPING_METHOD" ), BlueSharedString( "TONE_MAPPING_DISABLED" ) );
 	}
 
+	ImageIO::PixelFormat tonemappingOutputFormat = Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM;
+
 	bool doGrain = ProcessFilmGrain( filmGrain );
 	if( !upscalingInfo.temporal || doGrain )
 	{
 		if( upscalingEnabled && !upscalingInfo.temporal )
 		{
 			
-			auto temp = m_renderInfo->GetTempTexture( "Tonemapping Result", 1.0f, Tr2RenderContextEnum::EX_NONE, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
+			auto temp = m_renderInfo->GetTempTexture( "Tonemapping Result", 1.0f, Tr2RenderContextEnum::EX_NONE, tonemappingOutputFormat );
 
 			renderContext.m_esm.ApplyStandardStates( Tr2EffectStateManager::RM_FULLSCREEN );
 			DrawInto( *temp, Tr2LoadAction::DONT_CARE, m_tonemappingEffect, renderContext );
 			
 			auto upscalingContext = renderContext.GetPrimaryRenderContext().GetUpscalingContext( m_upscalingContextID );
 			
-			output = RenderUpscaling( temp, renderContext, upscalingContext, dynamicExposure, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
+			output = RenderUpscaling( temp, renderContext, upscalingContext, dynamicExposure, tonemappingOutputFormat );
 			
 			// upscale the temp textures so everything hence forth is correct
 			uint32_t w, h;
@@ -723,7 +725,7 @@ Tr2PostProcessRenderInfo::Texture TriStepRenderPostProcess::RenderSharpening( Tr
 		GPU_REGION( renderContext, "CAS Sharpening" );
 
 		static const uint32_t CAS_THREAD_GROUP_WORK_REGION_DIM = 16;
-		Tr2PostProcessRenderInfo::Texture output = m_renderInfo->GetTempTexture( 1.0f, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS, Tr2RenderContextEnum::PIXEL_FORMAT_R8G8B8A8_UNORM );
+		Tr2PostProcessRenderInfo::Texture output = m_renderInfo->GetTempTexture( 1.0f, Tr2RenderContextEnum::EX_BIND_UNORDERED_ACCESS, input.GetRenderTarget()->GetFormat() );
 
 		m_fidelityFxCasShader->SetParameter( BlueSharedString( "InputTexture" ), input );
 		m_fidelityFxCasShader->SetParameter( BlueSharedString( "OutputTexture" ), output );
