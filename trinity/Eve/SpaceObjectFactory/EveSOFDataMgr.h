@@ -44,7 +44,7 @@ public:
 
 		operator Locator() const
 		{
-			return Locator{ position, rotation, boneIndex };
+			return Locator{ position, rotation, scaling, boneIndex };
 		};
 	};
 
@@ -402,6 +402,14 @@ public:
 		std::map<BlueSharedString, Vector4> parameters;
 	};
 
+	struct MultiHullDecalIndexBuffers
+	{
+		explicit MultiHullDecalIndexBuffers( const EveSOFDataMultiHullDecalIndexBuffers& buffers );
+
+		std::string combinedGeometryResPath;
+		std::vector<std::vector<uint32_t>> indexBuffers;
+	};
+
 	struct HullDecalSetItemData
 	{
 		EveSOFDataHullDecalSetItem::Usage usage;
@@ -415,6 +423,7 @@ public:
 		std::map<BlueSharedString, TextureData> textures;
 		std::map<BlueSharedString, Vector4> parameters;
 		std::vector<std::vector<uint32_t>> indexBuffers;
+		std::vector<MultiHullDecalIndexBuffers> multiHullIndexBuffers;
 	};
 
 	struct HullDecalSetData
@@ -812,6 +821,7 @@ public:
 		// swarm behavior
 		EveSwarm::BehaviorProperties swarmBehavior;
 		GenericBannerShaderData bannerShader;
+		std::map<std::string, EntityComponents::ReflectionMode> categoryData;
 	};
 
 

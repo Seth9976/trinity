@@ -16,7 +16,7 @@
 #include "Tr2Renderer.h"
 #include "Tr2BoneTransformBuffer.h"
 
-#include "Audio/ITr2AudEmitter.h"
+#include <ITr2AudEmitter.h>
 #include "Eve/EveUpdateContext.h"
 #include "Eve/Turret/EveTurretTarget.h"
 #include "EveTurretFiringFX.h"
@@ -1941,7 +1941,7 @@ void EveTurretSet::PushRtGeometry( Tr2RaytracingManager& rtManager ) const
 	
 	for( auto it = m_singleTurrets.begin(); it != m_singleTurrets.end(); ++it )
 	{
-		if( it->visible && it->valid && it->rtMesh && it->rtMeshArea )
+		if( it->visible && it->valid && it->rtMesh && it->rtMesh->IsGood() && it->rtMeshArea )
 		{
 			if( !it->rtPerObjectData.IsValid() )
 			{
@@ -1966,7 +1966,7 @@ void EveTurretSet::PushRtGeometry( Tr2RaytracingManager& rtManager ) const
 
 			it->rtPerObjectData.Unlock( renderContext );
 
-			rtManager.GetGeometry().AddGeometry( *it->rtMesh, *it->rtMeshArea, m_turretEffect, &it->rtPerObjectData, it->worldMatrix );
+			rtManager.GetGeometry().AddGeometry( *it->rtMesh, *it->rtMeshArea, m_turretEffect, &it->rtPerObjectData, nullptr, it->worldMatrix );
 		}
 	}
 }

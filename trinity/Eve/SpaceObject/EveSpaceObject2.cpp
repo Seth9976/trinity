@@ -10,7 +10,7 @@
 #include "Resources/TriGeometryRes.h"
 #include "TriFrustumOrtho.h"
 
-#include "Audio/ITr2AudEmitter.h"
+#include <ITr2AudEmitter.h>
 #include "Eve/EveTransform.h"
 #include "EveSpaceObject2.h"
 #include "Eve/EveSpaceScene.h"
@@ -194,7 +194,6 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_lastDamageLocatorHit( -1 ),
 	m_worldTransform( XMMatrixIdentity() ),
 	m_invWorldTransform( XMMatrixIdentity() ),
-	m_controllerVariables( "EveSpaceObject2::m_controllerVariables" ),
 	m_reflectionMode( EntityComponents::REFLECT_NEVER )
 {
 	m_positionDelta.CreateInstance();
@@ -208,6 +207,7 @@ EveSpaceObject2::EveSpaceObject2( IRoot* lockobj ) :
 	m_lights.SetNotify( this );
 	m_effectChildren.SetNotify( this );
 	m_overlayEffects.SetNotify( this );
+	m_decals.SetNotify( this );
 
 	SetControllerVariable( "DirtLevel", m_dirtLevel );
 	SetControllerVariable( "ActivationStrength", m_spaceObjectShipData.y );
@@ -240,6 +240,11 @@ bool EveSpaceObject2::Initialize()
 		{
 			controller->Link( *GetRawRoot() );
 		}
+	}
+
+	for( uint32_t i = 0; i < m_decals.size(); i++ )
+	{
+		m_decals[i]->SetPriority( i );
 	}
 
 	return true;
@@ -348,6 +353,43 @@ void EveSpaceObject2::OnListModified( long event, ssize_t key, ssize_t key2, IRo
 			if( IEveInheritPropertiesOwnerPtr light = BlueCastPtr( value ) )
 			{
 				light->SetInheritProperties( m_inheritProperties->GetProperties() );
+			}
+		}
+	}
+
+	if( list == &m_decals )
+	{
+		if( ( event & BELIST_EVENTMASK ) == BELIST_INSERTED && key == m_decals.size() )
+		{
+			// this is here in case someone calls the append function of bluelist from python. Remove this once the off by one error has been fixed!
+			m_decals[m_decals.size() - 1]->SetPriority( (uint32_t)m_decals.size() - 1 );
+		}
+		else if( ( event & BELIST_EVENTMASK ) == BELIST_INSERTED )
+		{
+			for( size_t i = key; i < m_decals.size(); i++ )
+			{
+				m_decals[i]->SetPriority( (uint32_t)i );
+			}
+		}
+		else if( ( event & BELIST_EVENTMASK ) == BELIST_REMOVED )
+		{
+			for( size_t i = key; i < m_decals.size(); i++ )
+			{
+				m_decals[i]->SetPriority( (uint32_t)i );
+			}
+		}
+		else if( ( event & BELIST_EVENTMASK ) == BELIST_SWAPPED )
+		{
+			m_decals[key]->SetPriority( (uint32_t)key );
+			m_decals[key2]->SetPriority( (uint32_t)key2 );
+		}
+		else if( ( event & BELIST_EVENTMASK ) == BELIST_MOVED )
+		{
+			size_t low = min( key, key2 );
+			size_t high = max( key, key2 );
+			for( size_t i = low; i <= high; i++ )
+			{
+				m_decals[i]->SetPriority( (uint32_t)i );
 			}
 		}
 	}
@@ -1032,23 +1074,26 @@ void EveSpaceObject2::GetShadowBatches( ITriRenderBatchAccumulator* batches, con
 		return;
 	}
 
-	auto& shadowAreas = m_shadowMeshAreas.m_areaBlockVector;
-	Tr2Material* shadowShader = m_shadowMeshAreas.m_shaderMaterial;
-	for( auto& areaBlock : shadowAreas )
+	for( TriRenderBatchAreaBlocksWithSharedMaterial& shadowMeshArea : m_shadowMeshOpaqueAreas )
 	{
-		if( auto primCount = GetPrimitiveCount( *mesh, areaBlock.m_startIndex, areaBlock.m_count ) )
+		auto& shadowAreas = shadowMeshArea.m_areaBlockVector;
+		Tr2Material* shadowShader = shadowMeshArea.m_shaderMaterial;
+		for( auto& areaBlock : shadowAreas )
 		{
-			Tr2RenderBatch batch;
-			batch.SetMaterial( shadowShader );
-			batch.SetGeometry( mesh->m_vertexDeclaration, mesh->m_vertexAllocation, mesh->m_indexAllocation );
-			batch.SetPerObjectData( perObjectData );
-			batch.SetDrawIndexedInstanced(
-				primCount * 3,
-				1,
-				mesh->m_indexAllocation.GetStartIndex() + mesh->m_areas[areaBlock.m_startIndex].m_firstIndex,
-				mesh->m_vertexAllocation.GetOffset() / mesh->m_vertexAllocation.GetStride(),
-				0 );
-			batches->Commit( batch );
+			if( auto primCount = GetPrimitiveCount( *mesh, areaBlock.m_startIndex, areaBlock.m_count ) )
+			{
+				Tr2RenderBatch batch;
+				batch.SetMaterial( shadowShader );
+				batch.SetGeometry( mesh->m_vertexDeclaration, mesh->m_vertexAllocation, mesh->m_indexAllocation );
+				batch.SetPerObjectData( perObjectData );
+				batch.SetDrawIndexedInstanced(
+					primCount * 3,
+					1,
+					mesh->m_indexAllocation.GetStartIndex() + mesh->m_areas[areaBlock.m_startIndex].m_firstIndex,
+					mesh->m_vertexAllocation.GetOffset() / mesh->m_vertexAllocation.GetStride(),
+					0 );
+				batches->Commit( batch );
+			}
 		}
 	}
 }
@@ -1103,7 +1148,8 @@ void EveSpaceObject2::GetBatchesFromOverlayVector( ITriRenderBatchAccumulator* b
 			if( auto primCount = GetPrimitiveCount( *meshData, areaBlock.m_startIndex, areaBlock.m_count ) )
 			{
 				Tr2RenderBatch batch;
-			batch.SetMaterial( impactOverlayEffect );
+				batch.SetMaterial( impactOverlayEffect );
+				batch.SetPriority( 0xFFFFFFFF );
 				batch.SetGeometry( meshData->m_vertexDeclaration, meshData->m_vertexAllocation, meshData->m_indexAllocation );
 				batch.SetPerObjectData( perObjectData );
 				batch.SetDrawIndexedInstanced(
@@ -1285,6 +1331,7 @@ Tr2PerObjectData* EveSpaceObject2::GetPerObjectData( ITriRenderBatchAccumulator*
 	}
 	m_vsData.boneOffsets[0] = m_boneOffsets.GetCurrentFrameOffset();
 	m_vsData.boneOffsets[1] = m_boneOffsets.GetPreviousFrameOffset();
+	m_vsData.customData = m_psData.customData;
 
 	Tr2PerObjectDataWithPersistentBuffers<EveSpaceObject2>* perObjectData = accumulator->Allocate<Tr2PerObjectDataWithPersistentBuffers<EveSpaceObject2>>();
 	if( !perObjectData )
@@ -1327,6 +1374,7 @@ void EveSpaceObject2::UpdatePerObjectBuffer( Tr2RenderContextEnum::ShaderType sh
 void EveSpaceObject2::GetPerObjectStructs( EveSpaceObjectVSData& vsData, EveSpaceObjectPSData& psData ) const
 {
 	vsData = m_vsData;
+	vsData.customData = m_psData.customData;
 	psData = m_psData;
 }
 
@@ -1552,7 +1600,6 @@ void EveSpaceObject2::UpdateRtMesh( const EveUpdateContext& updateContext )
 	{
 		return;
 	}
-
 	auto areas = m_mesh->GetAreas( TRIBATCHTYPE_OPAQUE );
 	if( !areas->empty() )
 	{
@@ -1572,33 +1619,33 @@ void EveSpaceObject2::UpdateRtSkeleton()
 	{
 		return;
 	}
-
-	auto areas = m_mesh->GetAreas( TRIBATCHTYPE_OPAQUE );
+    
 	auto rtMesh = m_mesh->GetRtMesh();
-	if( areas->empty() || !rtMesh )
+	if( !rtMesh )
 	{
-		return; //no areas at all or no RT mesh
+		return;
 	}
-
+    
 	auto geo = m_mesh->GetGeometryResource();
 	if( !geo || !geo->IsGood() )
 	{
 		return;
 	}
-
+	
 	auto meshIndex = m_mesh->GetMeshIndex();
 	auto meshData = geo->GetMeshData( meshIndex );
 	if( !meshData )
 	{
 		return;
 	}
-
+    
 	bool hasSkinned = false;
-
+    
+	auto areas = m_mesh->GetAreas( TRIBATCHTYPE_OPAQUE );
 	for( auto& area : *areas )
 	{
 		auto index = area->GetIndex();
-
+		
 		if( index >= 0 && index < meshData->m_areas.size() && meshData->m_areas[index].m_isSkinned )
 		{
 			hasSkinned = true;
@@ -1610,7 +1657,7 @@ void EveSpaceObject2::UpdateRtSkeleton()
 	{
 		return; //no skinned areas
 	}
-
+	
 	auto boneCount = uint32_t( m_animationUpdater->GetMeshBoneCount() );
 	m_boneOffsets.UploadTransforms( Tr2BoneTransformBuffer::GetInstance(), reinterpret_cast<const Tr2BoneTransformBuffer::Float4x3*>( m_animationUpdater->GetMeshBoneMatrixList() ), boneCount );
 	auto offset = m_boneOffsets.GetCurrentFrameOffset();
@@ -1688,6 +1735,7 @@ void EveSpaceObject2::GetParentData( ParentData* pd ) const
 	pd->clipFactor = m_psData.clipSphereFactor;
 	pd->clipFactor2 = m_psData.clipSphereFactor2;
 	pd->shLighting = m_psData.shLightingCoefficients;
+	pd->customData = m_psData.customData;
 }
 
 // --------------------------------------------------------------------------------
@@ -1850,7 +1898,7 @@ void EveSpaceObject2::ReleaseCachedData( BlueAsyncRes* p )
 	{
 		m_overlayMeshAreaBlocks[i].clear();
 	}
-	m_shadowMeshAreas.Clear();
+	m_shadowMeshOpaqueAreas.clear();
 }
 
 void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
@@ -1868,8 +1916,11 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 			TriRenderBatchAreaBlock::Optimize( m_overlayMeshAreaBlocks[i] );
 		}
 
-		m_mesh->CollectAreaBlocksWithSharedMaterial( m_shadowMeshAreas, TRIBATCHTYPE_OPAQUE );
-		m_shadowMeshAreas.Optimize();
+		m_mesh->CollectAreaBlocksWithSharedMaterials( m_shadowMeshOpaqueAreas, TRIBATCHTYPE_OPAQUE );
+		for( auto& collector : m_shadowMeshOpaqueAreas )
+		{
+			collector.Optimize();
+		}
 	}
 
 	// If we already have a model we don't want to go through here
@@ -1886,7 +1937,7 @@ void EveSpaceObject2::RebuildCachedData( BlueAsyncRes* p )
 
 	if( m_boundingSphereRadius < 0.0f )
 	{
-		CCP_LOGWARN( "Bounding sphere not set for '%s' - calculating from '%s'", m_name.c_str(), m_geometryResFromMesh->GetPath() );
+		CCP_LOGWARN( "Bounding sphere not set for '%s' - calculating from '%ls'", m_name.c_str(), m_geometryResFromMesh->GetPath() );
 		m_geometryResFromMesh->RecalculateBoundingSphere();
 		Vector4 sphere;
 		if( m_mesh )
@@ -2641,7 +2692,8 @@ void EveSpaceObject2::AddDecal( EveSpaceObjectDecalPtr newDecal )
 	{
 		newDecal->SetHighDetailDecalState( true );
 	}
-	m_decals.Append( newDecal->GetRawRoot() );
+	newDecal->SetPriority( (uint32_t)m_decals.size() );
+	m_decals.Insert( -1, newDecal->GetRawRoot() );
 }
 
 // --------------------------------------------------------------------------------
@@ -3093,6 +3145,10 @@ void EveSpaceObject2::EstimatePixelDiameter( const TriFrustum& frustum )
 	// estimate the pixel diameter using the local bounding box,
 	// as the bounding sphere may not pepresent the mesh bounding sphere,
 	// but rather the bounding sphere of the object and it's EveChildMesh attachments
+	if( m_mesh )
+	{
+		m_mesh->GetBoundingBox( m_localAabbMin, m_localAabbMax );
+	}
 	Vector4 sphere;
 	BoundingSphereFromBox( sphere, m_localAabbMin, m_localAabbMax, &m_worldTransform );
 	m_estimatedPixelDiameter = frustum.GetPixelSizeAccross( sphere.GetXYZ(), sphere.w );
@@ -3372,6 +3428,7 @@ void EveSpaceObject2::GetPickingBatches( ITriRenderBatchAccumulator* batches, Tr
 	if( ( pickTypes & PICK_TYPE_OPAQUE ) != 0 )
 	{
 		GetBatches( batches, TRIBATCHTYPE_OPAQUE, perObjectData );
+		GetBatches( batches, TRIBATCHTYPE_DECAL, perObjectData );
 		// We also get stuff from overlay so that some effects (like cloaking) can be pickable
 		GetBatchesFromOverlayVector( batches, perObjectData, TRIBATCHTYPE_TRANSPARENT, m_mesh );
 		GetBatchesFromOverlayVector( batches, perObjectData, TRIBATCHTYPE_ADDITIVE, m_mesh );
@@ -3446,7 +3503,15 @@ void EveSpaceObject2::GetLastImpostorBoundingSphere( Vector4& sphere ) const
 
 void EveSpaceObject2::SetControllerVariable( const char* name, float value )
 {
-	m_controllerVariables[name] = value;
+	auto found = find_if( begin( m_controllerVariables ), end( m_controllerVariables ), [name]( auto& x ) { return x.first == name; } );
+	if( found == end( m_controllerVariables ) )
+	{
+		m_controllerVariables.push_back( { name, value } );
+	}
+	else
+	{
+		found->second = value;
+	}
 	for( auto it = begin( m_controllers ); it != end( m_controllers ); ++it )
 	{
 		( *it )->SetVariable( name, value );
@@ -3651,9 +3716,28 @@ void EveSpaceObject2::SetMute( bool isMute )
 	}
 }
 
+void UpdateRtPerObjectData( const EveSpaceObjectPSData& psData, const Matrix* instanceTransform, Tr2PrimaryRenderContext& renderContext, Tr2ConstantBufferAL& perObjectData )
+{
+	auto size = sizeof( EveSpaceObjectPSData ) + ( instanceTransform ? sizeof( Matrix ) : 0 );
+
+	if( !perObjectData.IsValid() || perObjectData.GetSize() != size )
+	{
+		perObjectData.Create( uint32_t( size ), renderContext );
+	}
+
+	EveSpaceObjectPSData* bufferPtr;
+	perObjectData.Lock( (void**)&bufferPtr, renderContext );
+	*bufferPtr = psData;
+	if( instanceTransform )
+	{
+		*reinterpret_cast<Matrix*>( bufferPtr + 1 ) = Transpose( *instanceTransform );
+	}
+	perObjectData.Unlock( renderContext );
+}
+
 void EveSpaceObject2::PushRtGeometry( Tr2RaytracingManager& rtManager ) const
 {
-	if( !m_mesh || !m_display )
+	if( !m_mesh || !m_display || !m_castShadow )
 	{
 		return;
 	}
@@ -3670,28 +3754,37 @@ void EveSpaceObject2::PushRtGeometry( Tr2RaytracingManager& rtManager ) const
 
 	auto rtMesh = m_mesh->GetRtMesh();
 
-	USE_MAIN_THREAD_RENDER_CONTEXT();
-
-	if( !m_rtPerObjectData.IsValid() )
+	if( !rtMesh || !rtMesh->IsGood() )
 	{
-		m_rtPerObjectData.Create( sizeof( EveSpaceObjectPSData ), renderContext );
+		return;
 	}
-	EveSpaceObjectPSData* perObjectData;
-	m_rtPerObjectData.Lock( (void**)&perObjectData, renderContext );
-	*perObjectData = m_psData;
-	m_rtPerObjectData.Unlock( renderContext );
 
-	const Tr2MeshAreaVector* areas = m_mesh->GetAreas( TRIBATCHTYPE_OPAQUE );
-	for( Tr2MeshAreaVector::const_iterator it = areas->begin(); it != areas->end(); ++it )
+	USE_MAIN_THREAD_RENDER_CONTEXT();
+	
+	const Tr2MeshAreaVector* opaqueAreas = m_mesh->GetAreas( TRIBATCHTYPE_OPAQUE );
+
+	UpdateRtPerObjectData( m_psData, nullptr, renderContext, m_rtPerObjectData );
+	
+	#pragma region geometry
+	uint32_t vertexBufferDataIndex = 0;
+	for( Tr2MeshAreaVector::const_iterator it = opaqueAreas->begin(); it != opaqueAreas->end(); ++it, ++vertexBufferDataIndex )
 	{
 		auto area = *it;
-		if( area->GetDisplay() )
+		if( area->GetDisplay() && area->IsCastingShadows() )
 		{
 			auto geometry = area->GetRtMeshArea();
 			if( geometry )
 			{
-				rtManager.GetGeometry().AddGeometry( *rtMesh, *geometry, area->GetMaterialInterface(), &m_rtPerObjectData, m_worldTransform );
+				const Tr2ConstantBufferAL* vertexBufferData = nullptr;
+				if( area->HasVertexBufferAccessInRtShadow() )
+				{
+					vertexBufferData = area->GetRtMeshArea()->GetGeometryConstants( *rtMesh, renderContext );
+				}
+				rtManager.GetGeometry().AddGeometry( *rtMesh, *geometry, area->GetMaterialInterface(), &m_rtPerObjectData, vertexBufferData, m_worldTransform );
 			}
 		}
 	}
+#pragma endregion
+
+	rtManager.GetGeometry().AddBindlessResources( *opaqueAreas, *rtMesh );
 }

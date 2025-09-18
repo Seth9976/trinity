@@ -398,8 +398,8 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 		}
 
 		size_t byteSize = m_vertexBufferSize * 6 * sizeof( LineVertex );
-		CcpMallocBuffer buffer( "curveLineSetBuffer", byteSize );
-		LineVertex* vertexBuffer = reinterpret_cast<LineVertex*>( buffer.get() );
+		auto buffer = Tr2Renderer::GetPoolAllocator()->Allocate( byteSize );
+		LineVertex* vertexBuffer = reinterpret_cast<LineVertex*>( buffer );
 
 		for( unsigned int i = 0; i < m_lines.size(); ++i )
 		{
@@ -595,7 +595,7 @@ bool Tr2CurveLineSet::FillVertexBuffer()
 		// lock and fill it
 		CR_RETURN_VAL( m_vertexBuffer.MapForWriting( vertexBuffer, renderContext ), false );
 
-		memcpy( vertexBuffer, buffer.get(), byteSize );
+		memcpy( vertexBuffer, buffer, byteSize );
 
 		m_vertexBuffer.UnmapForWriting( renderContext );
 	}
@@ -763,7 +763,7 @@ unsigned int Tr2CurveLineSet::AddStraightLine( const Vector3& position1, const V
 // Return value:
 //   The line's id
 // -------------------------------------------------------------
-unsigned int Tr2CurveLineSet::AddCurvedLineCrt( const Vector3& position1, const Vector4& color1, const Vector3& position2, const Vector4& color2, const Vector3& middle, float width )
+unsigned int Tr2CurveLineSet::AddCurvedLineCrt( const Vector3& position1, const Vector4& color1, const Vector3& position2, const Vector4& color2, const Vector3& middle, float width, Be::OptionalWithDefaultValue<int, 20> segments )
 {
 	LineData newLine;
 
@@ -779,7 +779,7 @@ unsigned int Tr2CurveLineSet::AddCurvedLineCrt( const Vector3& position1, const 
 	newLine.overlayColor = Color( 0.f, 0.f, 0.f, 0.f );
 	newLine.animationSpeed = 0.f;
 	newLine.animationScale = 1.f;
-	newLine.numOfSegments = 20;
+	newLine.numOfSegments = segments > 0 ? segments.GetValue() : 1;
 
 	// use helper function to put this line in list
 	return addLineData( &newLine );

@@ -8,7 +8,7 @@
 #include "Tr2ActionPlaySound.h"
 #include "Controllers/Tr2Controller.h"
 #include "ITr2SoundEmitterOwner.h"
-#include "Audio/ITr2AudEmitter.h"
+#include <ITr2AudEmitter.h>
 #include "Eve/EveMultiEffect.h"
 #include "Eve/EveMultiEffectParameter.h"
 #include "Eve/SpaceObject/Children/IEveEffectChildrenOwner.h"
@@ -20,7 +20,7 @@ Tr2ActionPlaySound::Tr2ActionPlaySound( IRoot* ) :
 {
 }
 
-void Tr2ActionPlaySound::Start( Tr2Controller& controller )
+void Tr2ActionPlaySound::Start( ITr2ActionController& controller )
 {
 	ITr2SoundEmitterOwnerPtr owner = BlueCastPtr( controller.GetOwner() );
 

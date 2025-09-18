@@ -16,6 +16,7 @@
 #include "../Tr2TextureALDx11.h"
 
 extern bool g_upscalingDebug;
+extern uint32_t g_streamlineAppID;
 
 namespace DlssUtils
 {
@@ -45,7 +46,7 @@ Tr2DlssUpscalingTechnique::Tr2DlssUpscalingTechnique( Tr2RenderContextAL& render
 	//We need to create a dummy device to figure out if DLSS and frame generation actually is supported.
 
 	{
-		if( SL_FAILED( res, Tr2StreamlineAL::InitializeStreamline() ) )
+		if( SL_FAILED( res, Tr2StreamlineAL::InitializeStreamline( g_streamlineAppID ) ) )
 		{
 			CCP_LOGERR( "Streamline initialization failed with error %d", res );
 			return;
@@ -78,8 +79,7 @@ Tr2DlssUpscalingTechnique::Tr2DlssUpscalingTechnique( Tr2RenderContextAL& render
 	}
 	
 	//We're done gathering info, initialize Streamline again and await the actual device!
-	
-	if( SL_FAILED( res, Tr2StreamlineAL::InitializeStreamline() ) )
+	if( SL_FAILED( res, Tr2StreamlineAL::InitializeStreamline( g_streamlineAppID ) ) )
 	{
 		CCP_LOGERR( "Streamline initialization failed with error %d", res );
 		return;
@@ -229,8 +229,6 @@ Tr2DlssUpscalingContext::Tr2DlssUpscalingContext(
 
 Tr2DlssUpscalingContext::~Tr2DlssUpscalingContext()
 {
-	Tr2StreamlineAL::FreeResources( sl::kFeatureDLSS, m_viewHandle );
-	Tr2StreamlineAL::FreeResources( sl::kFeatureNIS, m_viewHandle );
 }
 
 void Tr2DlssUpscalingContext::SetFrameToken( sl::FrameToken* frameToken )
@@ -289,7 +287,7 @@ sl::Result Tr2DlssUpscalingContext::ReadyDLSSResources( Tr2UpscalingAL::Dispatch
 
 	sl::ResourceTag resources[] = { colorInTag, opaqueColorInTag, colorOutTag, depthTag, mvecTag, exposureTag };
 	
-	if( SL_FAILED( res, Tr2StreamlineAL::SetTags( m_params.renderContext, m_viewHandle, resources, 6 ) ) )
+	if( SL_FAILED( res, Tr2StreamlineAL::SetTagsForFrame( m_params.renderContext, *m_frameToken, m_viewHandle, resources, 6 ) ) )
 	{
 		CCP_LOGERR( "DLSS Failed to tag resources (%d)", res );
 		return res;
@@ -312,7 +310,7 @@ sl::Result Tr2DlssUpscalingContext::ReadyNISResources( Tr2UpscalingAL::DispatchP
 
 	sl::ResourceTag resources[] = { colorInTag, colorOutTag };
 
-	if( SL_FAILED( res, Tr2StreamlineAL::SetTags( m_params.renderContext, m_viewHandle, resources, 2 ) ) )
+	if( SL_FAILED( res, Tr2StreamlineAL::SetTagsForFrame( m_params.renderContext, *m_frameToken, m_viewHandle, resources, 2 ) ) )
 	{
 		CCP_LOGERR( "NIS Failed to tag resources (%d)", res );
 		return res;

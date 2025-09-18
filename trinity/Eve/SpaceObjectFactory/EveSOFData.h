@@ -12,7 +12,7 @@
 
 
 // --------------------------------------------------------------------------------
-// All data storage classes for gerenal purposes
+// All data storage classes for general purposes
 // --------------------------------------------------------------------------------
 
 
@@ -1221,6 +1221,20 @@ public:
 TYPEDEF_BLUECLASS( EveSOFDataDecalIndexBuffer );
 BLUE_DECLARE_VECTOR( EveSOFDataDecalIndexBuffer );
 
+BLUE_CLASS( EveSOFDataMultiHullDecalIndexBuffers ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+
+	EveSOFDataMultiHullDecalIndexBuffers( IRoot* lockobj = NULL );
+
+	std::string m_combinedGeometryResPath;
+	PEveSOFDataDecalIndexBufferVector m_indexBuffers;
+};
+TYPEDEF_BLUECLASS( EveSOFDataMultiHullDecalIndexBuffers );
+BLUE_DECLARE_VECTOR( EveSOFDataMultiHullDecalIndexBuffers );
+
 BLUE_CLASS( EveSOFDataHullDecalSetItem ) :
 	public IRoot
 {
@@ -1254,6 +1268,7 @@ public:
 	PEveSOFDataTextureVector m_textures;
 	PEveSOFDataParameterVector m_parameters;
 	PEveSOFDataDecalIndexBufferVector m_indexBuffers;
+	PEveSOFDataMultiHullDecalIndexBuffersVector m_multiHullIndexBuffers;
 };
 TYPEDEF_BLUECLASS( EveSOFDataHullDecalSetItem );
 BLUE_DECLARE_VECTOR( EveSOFDataHullDecalSetItem );
@@ -2149,6 +2164,25 @@ public:
 TYPEDEF_BLUECLASS( EveSOFDataGenericVariant );
 BLUE_DECLARE_VECTOR( EveSOFDataGenericVariant );
 
+BLUE_CLASS( EveSOFDataGenericHullCategory ) :
+	public IRoot
+{
+public:
+	EXPOSE_TO_BLUE();
+	EveSOFDataGenericHullCategory( IRoot* lockobj = NULL );
+	~EveSOFDataGenericHullCategory()
+	{
+	}
+
+	// hull categories
+	BlueSharedString m_categoryName;
+
+	// Reflection mode for the hull category
+	EntityComponents::ReflectionMode m_reflectionMode;
+};
+TYPEDEF_BLUECLASS( EveSOFDataGenericHullCategory );
+BLUE_DECLARE_VECTOR( EveSOFDataGenericHullCategory );
+
 
 BLUE_CLASS( EveSOFDataGeneric ) :
 	public IRoot
@@ -2199,6 +2233,9 @@ public:
 
 	// hull categories
 	PEveSOFDataGenericStringVector m_hullCategories;
+
+	// hull category data
+	PEveSOFDataGenericHullCategoryVector m_hullCategoryData;
 };
 TYPEDEF_BLUECLASS( EveSOFDataGeneric );
 

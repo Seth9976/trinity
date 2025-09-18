@@ -5,7 +5,7 @@
 //
 
 #include "StdAfx.h"
-#include "Audio/ITr2AudEmitter.h"
+#include <ITr2AudEmitter.h>
 #include "Controllers/Tr2Controller.h"
 #include "Controllers/Tr2ControllerFloatVariable.h"
 #include "ITr2SoundEmitterOwner.h"
@@ -13,11 +13,12 @@
 
 
 Tr2ActionSetAttenuationScaling::Tr2ActionSetAttenuationScaling( IRoot* lockobj ) :
-	m_scalingFactor( 1.0f )
+	m_scalingFactor( 1.0f ),
+	m_controller( nullptr )
 {
 }
 
-void Tr2ActionSetAttenuationScaling::Link( Tr2Controller& controller )
+void Tr2ActionSetAttenuationScaling::Link( ITr2ActionController& controller )
 {
 	m_controller = &controller;
 }
@@ -27,7 +28,7 @@ void Tr2ActionSetAttenuationScaling::Unlink()
 	m_controller = nullptr;
 }
 
-void Tr2ActionSetAttenuationScaling::Start( Tr2Controller& controller )
+void Tr2ActionSetAttenuationScaling::Start( ITr2ActionController& controller )
 {
 	if( ITr2SoundEmitterOwnerPtr emitters = BlueCastPtr( controller.GetOwner() ) )
 	{
@@ -38,9 +39,8 @@ void Tr2ActionSetAttenuationScaling::Start( Tr2Controller& controller )
 	}
 }
 
-void Tr2ActionSetAttenuationScaling::StartWithController( PyObject* obj )
+void Tr2ActionSetAttenuationScaling::StartWithController( ITr2ActionController* controller )
 {
-	Tr2Controller* controller = BluePythonCast<Tr2Controller*>( obj );
 	if( !controller )
 	{
 		PyErr_SetString( PyExc_TypeError, "StartWithController expects a Tr2Controller as a parameter." );
@@ -57,9 +57,9 @@ float Tr2ActionSetAttenuationScaling::GetScalingFactor() const
 
 	if ( !m_controllerVariableName.empty() && m_controller != nullptr )
 	{
-		if ( auto var = m_controller->GetVariableByName( m_controllerVariableName.c_str()) )
+		if( auto var = m_controller->GetFloatVariableByName( m_controllerVariableName.c_str() ) )
 		{
-			controllerVariableValue = var->GetValue();
+			controllerVariableValue = *var;
 		}
 	}
 

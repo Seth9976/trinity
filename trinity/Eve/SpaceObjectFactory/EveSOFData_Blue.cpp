@@ -944,7 +944,7 @@ const Be::ClassInfo* EveSOFDataHullController::ExposeToBlue()
 			m_path,
 			"Path to the red file for the controller\n"
 			":jessica-widget: filepath\n"
-			":jessica-file-filter : redfile",
+			":jessica-file-filter: redfile",
 			Be::READWRITE | Be::PERSIST )
 		MAP_ATTRIBUTE_WITH_CHOOSER( "buildFilter", m_buildFilter, "", Be::READWRITE | Be::PERSIST, EveSOFDataHullBuildFilterChooser )
 	EXPOSURE_END()
@@ -1053,6 +1053,18 @@ const Be::ClassInfo* EveSOFDataHull::ExposeToBlue()
     EXPOSURE_END()
 }
 
+
+BLUE_DEFINE( EveSOFDataMultiHullDecalIndexBuffers );
+
+const Be::ClassInfo* EveSOFDataMultiHullDecalIndexBuffers::ExposeToBlue(){
+	EXPOSURE_BEGIN( EveSOFDataMultiHullDecalIndexBuffers, "" )
+		MAP_INTERFACE( EveSOFDataMultiHullDecalIndexBuffers )
+		MAP_ATTRIBUTE( "combinedGeometryResPath", m_combinedGeometryResPath, "", Be::READWRITE | Be::PERSIST )
+		MAP_ATTRIBUTE( "indexBuffers", m_indexBuffers, "", Be::READ | Be::PERSIST )
+	EXPOSURE_END()
+}
+
+
 BLUE_DEFINE( EveSOFDataHullDecalSetItem );
 
 Be::VarChooser EveSOFDecalUsageChooser[] =
@@ -1084,6 +1096,7 @@ const Be::ClassInfo* EveSOFDataHullDecalSetItem::ExposeToBlue()
 		MAP_ATTRIBUTE( "parameters", m_parameters, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "textures", m_textures, "", Be::READ | Be::PERSIST )
 		MAP_ATTRIBUTE( "indexBuffers", m_indexBuffers, "", Be::READ | Be::PERSIST )
+		MAP_ATTRIBUTE( "multiHullIndexBuffers", m_multiHullIndexBuffers, "", Be::READ | Be::PERSIST )
 	EXPOSURE_END()
 }
 

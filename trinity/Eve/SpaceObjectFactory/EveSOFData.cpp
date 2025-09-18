@@ -186,7 +186,8 @@ EveSOFDataGeneric::EveSOFDataGeneric( IRoot* lockobj ) :
 	PARENTLOCK( m_variants ),
 	PARENTLOCK( m_bannerShader ),
 	PARENTLOCK( m_visibilityGroups ),
-	PARENTLOCK( m_hullCategories )
+	PARENTLOCK( m_hullCategories ),
+	PARENTLOCK( m_hullCategoryData )
 {
 	std::fill( std::begin( m_decalMinScreenSizes ), std::end( m_decalMinScreenSizes ), 0.f );
 }
@@ -195,6 +196,13 @@ EveSOFDataGeneric::EveSOFDataGeneric( IRoot* lockobj ) :
 EveSOFDataGenericVariant::EveSOFDataGenericVariant( IRoot* lockobj ) :
 	m_isTransparent( false )
 	{}
+
+
+EveSOFDataGenericHullCategory::EveSOFDataGenericHullCategory( IRoot* lockobj ) :
+		m_categoryName( "" ),
+		m_reflectionMode( EntityComponents::REFLECT_NEVER )
+	{
+	}
 
 
 EveSOFDataFaction::EveSOFDataFaction( IRoot* lockobj ) :
@@ -865,6 +873,11 @@ EveSOFDataHullDecalSet::EveSOFDataHullDecalSet( IRoot* lockobj ):
 	m_visibilityGroup( PRIMARY_VISIBILITY_GROUP )
 {}
 
+EveSOFDataMultiHullDecalIndexBuffers::EveSOFDataMultiHullDecalIndexBuffers( IRoot* lockobj ) :
+	PARENTLOCK( m_indexBuffers )
+{
+}
+
 EveSOFDataHullDecalSetItem::EveSOFDataHullDecalSetItem( IRoot* lockobj ) :
 	m_usage( USAGE_STANDARD ),
 	m_position( 0.f, 0.f, 0.f ),
@@ -876,7 +889,8 @@ EveSOFDataHullDecalSetItem::EveSOFDataHullDecalSetItem( IRoot* lockobj ) :
 	m_logoType( EveSOFDataLogoSet::TYPE_PRIMARY ),
 	PARENTLOCK( m_textures ),
 	PARENTLOCK( m_parameters ),
-	PARENTLOCK( m_indexBuffers )
+	PARENTLOCK( m_indexBuffers ),
+	PARENTLOCK( m_multiHullIndexBuffers )
 {
 }
 
