@@ -19,7 +19,7 @@ Tr2TextureAtlas::Tr2TextureAtlas( IRoot* lockobj ) :
 	m_createOutsiders( true ),
 	m_margin( 2 ),
 	m_maxTextureArea( 512 * 512 ),
-	m_freeMaxWidth( -1 ), 
+	m_freeMaxWidth( -1 ),
 	m_freeMaxHeight( -1 ),
 	m_optimizationWarranted( false ),
 	m_areasFreedSinceLastCollapse( 0 ),
@@ -46,15 +46,20 @@ void Tr2TextureAtlas::Initialize( PixelFormat fmt, unsigned int width, unsigned 
 
 void Tr2TextureAtlas::ReleaseResources( TriStorage s )
 {
-	if( s & TRISTORAGE_MANAGEDMEMORY ) 
+	if( s & TRISTORAGE_MANAGEDMEMORY )
 	{
 		m_texture = Tr2TextureAL();
 
 		for( AreaList_t::iterator it = m_freeAreas.begin(); it != m_freeAreas.end(); ++it )
 		{
-			CCP_DELETE *it;
+			CCP_DELETE* it;
 		}
 		m_freeAreas.clear();
+		for( auto [freeArea, _] : m_pendingFreeAreas )
+		{
+			CCP_DELETE freeArea;
+		}
+		m_pendingFreeAreas.clear();
 		m_dirtyMipRegions.clear();
 
 		m_onTextureChange();
@@ -68,7 +73,7 @@ bool Tr2TextureAtlas::OnPrepareResources()
 	{
 		return true;
 	}
-	
+
 	HRESULT hr;
 
 	do
@@ -77,16 +82,16 @@ bool Tr2TextureAtlas::OnPrepareResources()
 		{
 			return false;
 		}
-		
-		m_mipLevels = m_hasMipMaps ? unsigned( 0.5 + log(double(std::max(m_height, m_width))) / log(2.0) ) : 1;
+
+		m_mipLevels = m_hasMipMaps ? unsigned( 0.5 + log( double( std::max( m_height, m_width ) ) ) / log( 2.0 ) ) : 1;
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 		hr = m_texture.Create(
-			Tr2BitmapDimensions( m_width, m_height, m_mipLevels, m_format ), 
+			Tr2BitmapDimensions( m_width, m_height, m_mipLevels, m_format ),
 			Tr2GpuUsage::SHADER_RESOURCE,
 			Tr2CpuUsage::READ | Tr2CpuUsage::WRITE,
 			renderContext );
 
-		if( FAILED(hr) )
+		if( FAILED( hr ) )
 		{
 			if( m_width > m_height )
 			{
@@ -97,7 +102,7 @@ bool Tr2TextureAtlas::OnPrepareResources()
 				m_height /= 2;
 			}
 		}
-	} while( FAILED(hr) );
+	} while( FAILED( hr ) );
 
 	Tr2TextureAtlasArea* area = CCP_NEW( "Tr2TextureAtlas/Area" ) Tr2TextureAtlasArea;
 	area->type = Tr2TextureAtlasArea::FREE;
@@ -108,6 +113,7 @@ bool Tr2TextureAtlas::OnPrepareResources()
 	area->tex = NULL;
 
 	m_freeAreas.clear();
+	m_pendingFreeAreas.clear();
 	FreeArea( area );
 
 	m_freeTexels = m_width * m_height;
@@ -159,14 +165,19 @@ bool Tr2TextureAtlas::DoPrepare( Tr2AtlasTexture* tex )
 
 	Tr2ImageIOHelpers::CopyToTexture( *tex->m_loadedBitmap, m_texture, area->rect.left, area->rect.top, m_margin, renderContext );
 
-	if( m_hasMipMaps ) 
+	//potential fix for icon corruption.
+#if TRINITY_PLATFORM == TRINITY_DIRECTX12
+	renderContext.FlushBarriersDx12();
+#endif
+
+	if( m_hasMipMaps )
 	{
 		m_dirtyMipRegions.push_back( area->rect );
 	}
 
 	RegisterInsider( tex );
 
-	return true;	
+	return true;
 }
 
 // Register an atlas texture that lives inside the atlas
@@ -191,11 +202,11 @@ void Tr2TextureAtlas::RemoveFromAtlas( Tr2AtlasTexture* tex )
 	Tr2TextureAtlasArea* area = tex->m_atlasArea;
 	if( area )
 	{
-		m_freeTexels += (area->rect.bottom - area->rect.top) * (area->rect.right - area->rect.left);
+		m_freeTexels += ( area->rect.bottom - area->rect.top ) * ( area->rect.right - area->rect.left );
 		tex->m_atlasArea = NULL;
 
 		area->type = Tr2TextureAtlasArea::FREE;
-		FreeArea( area );		
+		FreeArea( area );
 
 		PaintEmptyArea( area );
 
@@ -215,21 +226,27 @@ void Tr2TextureAtlas::RemoveFromAtlas( Tr2AtlasTexture* tex )
 void Tr2TextureAtlas::ConsolidateFreeAreas()
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
+
+	ReleasePendingFreeAreas();
+
 	if( m_freeAreas.size() < 2 )
 	{
 		return;
 	}
 
-	struct Squareness {
-		static float Metric( const Tr2Rect& a ) {
+	struct Squareness
+	{
+		static float Metric( const Tr2Rect& a )
+		{
 			const int w = a.right - a.left;
 			const int h = a.bottom - a.top;
-			if( w == 0 || h == 0 ) return 0.f;
-			const float d = float(w - h);
+			if( w == 0 || h == 0 )
+				return 0.f;
+			const float d = float( w - h );
 			return d * d / float( w * h );
 		}
 	};
-	
+
 	bool restartLoop = true;
 
 	while( restartLoop )
@@ -237,16 +254,16 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 		restartLoop = false;
 		for( AreaList_t::iterator i = m_freeAreas.begin(); i != m_freeAreas.end(); ++i )
 		{
-			const auto& rect_i = (*i)->rect;
+			const auto& rect_i = ( *i )->rect;
 			const float square_i = Squareness::Metric( rect_i );
 			AreaList_t::iterator j = i;
 			for( ++j; j != m_freeAreas.end(); ++j )
 			{
-				const auto& rect_j = (*j)->rect;
+				const auto& rect_j = ( *j )->rect;
 				const float square_j = Squareness::Metric( rect_j );
 				const float squareStart = square_i + square_j;
 
-				
+
 				if( rect_i.bottom == rect_i.top ||
 					rect_i.top == rect_j.bottom )
 				{
@@ -260,10 +277,10 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 						sum.right = rect_i.right;
 						sum.top = std::min( rect_i.top, rect_j.top );
 						sum.bottom = std::max( rect_i.bottom, rect_j.bottom );
-						
-						CCP_DELETE (*j);
+
+						CCP_DELETE( *j );
 						j = m_freeAreas.erase( j );
-						(*i)->rect = sum;
+						( *i )->rect = sum;
 
 						PaintEmptyArea( *i );
 
@@ -272,7 +289,7 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 					else if( rect_i.right == rect_j.right )
 					{
 						//areas are right aligned, can rotate the splitting plane
-						Tr2Rect l,r;
+						Tr2Rect l, r;
 						l.left = std::min( rect_i.left, rect_j.left );
 						l.right = std::max( rect_i.left, rect_j.left );
 						r.left = l.right;
@@ -297,8 +314,8 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 						if( squareNew < squareStart )
 						{
 							restartLoop = true;
-							(*i)->rect = l;
-							(*j)->rect = r;
+							( *i )->rect = l;
+							( *j )->rect = r;
 							PaintEmptyArea( *i );
 							PaintEmptyArea( *j );
 						}
@@ -306,7 +323,7 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 					else if( rect_i.left == rect_j.left )
 					{
 						//left aligned, can rotate the splitting plane
-						Tr2Rect l,r;
+						Tr2Rect l, r;
 						r.left = std::min( rect_i.right, rect_j.right );
 						r.right = std::max( rect_i.right, rect_j.right );
 						l.left = rect_i.left;
@@ -331,8 +348,8 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 						if( squareNew < squareStart )
 						{
 							restartLoop = true;
-							(*i)->rect = l;
-							(*j)->rect = r;
+							( *i )->rect = l;
+							( *j )->rect = r;
 							PaintEmptyArea( *i );
 							PaintEmptyArea( *j );
 						}
@@ -340,7 +357,6 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 					else
 					{
 						//neither left nor right aligned, can split this into three areas or just skip it
-
 					}
 				}
 				else if( rect_i.left == rect_j.right ||
@@ -351,14 +367,14 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 					if( rect_i.top == rect_j.top )
 					{
 						//areas are top aligned, can rotate the splitting plane
-						Tr2Rect t,b;
+						Tr2Rect t, b;
 						t.top = rect_i.top;
 						t.bottom = std::min( rect_i.bottom, rect_j.bottom );
 						t.left = std::min( rect_i.left, rect_i.bottom );
 						t.right = std::max( rect_i.right, rect_j.right );
 						b.top = t.bottom;
 						b.bottom = std::max( rect_i.bottom, rect_j.bottom );
-						
+
 						if( rect_i.bottom > rect_j.bottom )
 						{
 							b.left = rect_i.left;
@@ -377,8 +393,8 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 						if( squareNew < squareStart )
 						{
 							restartLoop = true;
-							(*i)->rect = t;
-							(*j)->rect = b;
+							( *i )->rect = t;
+							( *j )->rect = b;
 							PaintEmptyArea( *i );
 							PaintEmptyArea( *j );
 						}
@@ -386,14 +402,14 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 					else if( rect_i.bottom == rect_j.bottom )
 					{
 						//bottom aligned, can rotate the splitting plane
-						Tr2Rect t,b;
+						Tr2Rect t, b;
 						t.top = std::min( rect_i.top, rect_j.top );
 						t.bottom = std::max( rect_i.top, rect_j.top );
 						b.left = std::min( rect_i.left, rect_i.bottom );
 						b.right = std::max( rect_i.right, rect_j.right );
 						b.top = t.bottom;
 						b.bottom = rect_i.bottom;
-						
+
 						if( rect_i.top < rect_j.top )
 						{
 							t.left = rect_i.left;
@@ -412,8 +428,8 @@ void Tr2TextureAtlas::ConsolidateFreeAreas()
 						if( squareNew < squareStart )
 						{
 							restartLoop = true;
-							(*i)->rect = t;
-							(*j)->rect = b;
+							( *i )->rect = t;
+							( *j )->rect = b;
 							PaintEmptyArea( *i );
 							PaintEmptyArea( *j );
 						}
@@ -474,11 +490,13 @@ void Tr2TextureAtlas::CollapseFreeAreas()
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
+	ReleasePendingFreeAreas();
+
 	if( m_freeAreas.size() < 2 )
 	{
 		return;
 	}
-	
+
 	m_optimizationWarranted = false;
 	m_areasFreedSinceLastCollapse = 0;
 
@@ -512,7 +530,7 @@ void Tr2TextureAtlas::CollapseFreeAreas()
 
 				Tr2Rect newRect;
 				bool isAdjacent = false;
-				if( (area1->rect.top == area2->rect.top) && (area1->rect.bottom == area2->rect.bottom) )
+				if( ( area1->rect.top == area2->rect.top ) && ( area1->rect.bottom == area2->rect.bottom ) )
 				{
 					// Top/bottom matches, see if areas are adjacent left or right
 					if( area1->rect.right == area2->rect.left )
@@ -573,7 +591,7 @@ void Tr2TextureAtlas::CollapseFreeAreas()
 
 				Tr2Rect newRect;
 				bool isAdjacent = false;
-				if( (area1->rect.left == area2->rect.left) && (area1->rect.right == area2->rect.right) )
+				if( ( area1->rect.left == area2->rect.left ) && ( area1->rect.right == area2->rect.right ) )
 				{
 					// Left/right matches, see if areas are adjacent top or bottom
 					if( area1->rect.bottom == area2->rect.top )
@@ -620,7 +638,7 @@ bool Tr2TextureAtlas::CollapseAreas( Tr2TextureAtlasArea* area1, Tr2TextureAtlas
 	Tr2Rect newRect;
 	bool isAdjacent = false;
 
-	if( (area1->rect.left == area2->rect.left) && (area1->rect.right == area2->rect.right) )
+	if( ( area1->rect.left == area2->rect.left ) && ( area1->rect.right == area2->rect.right ) )
 	{
 		// Left/right matches, see if areas are adjacent top or bottom
 		if( area1->rect.bottom == area2->rect.top )
@@ -640,7 +658,7 @@ bool Tr2TextureAtlas::CollapseAreas( Tr2TextureAtlasArea* area1, Tr2TextureAtlas
 			isAdjacent = true;
 		}
 	}
-	else if( (area1->rect.top == area2->rect.top) && (area1->rect.bottom == area2->rect.bottom) )
+	else if( ( area1->rect.top == area2->rect.top ) && ( area1->rect.bottom == area2->rect.bottom ) )
 	{
 		// Top/bottom matches, see if areas are adjacent left or right
 		if( area1->rect.right == area2->rect.left )
@@ -680,33 +698,35 @@ Tr2TextureAtlasArea* Tr2TextureAtlas::GetFreeArea( unsigned int width, unsigned 
 		return NULL;
 	}
 
+	ReleasePendingFreeAreas();
+
 	// Align to 8pixels to prevent thin slivers as free areas
-	width = (width + 7) & ~7;
-	height = (height + 7) & ~7;
+	width = ( width + 7 ) & ~7;
+	height = ( height + 7 ) & ~7;
 
 	// First search through free areas.
 	// Keep track of an area that fits, but keep looking for a perfect fit.
 	AreaList_t::iterator anyFit = m_freeAreas.end();
 	AreaList_t::iterator perfectFit = m_freeAreas.end();
-	int bestPrimaryMetric = m_width+m_height;
-	int bestSecondaryMetric = m_width+m_height;
+	int bestPrimaryMetric = m_width + m_height;
+	int bestSecondaryMetric = m_width + m_height;
 	for( AreaList_t::iterator it = m_freeAreas.begin(); it != m_freeAreas.end(); ++it )
 	{
 		Tr2TextureAtlasArea* area = *it;
 		unsigned int candidateWidth = area->rect.right - area->rect.left;
 		unsigned int candidateHeight = area->rect.bottom - area->rect.top;
 
-		if( (width == candidateWidth) && (height == candidateHeight)  )
+		if( ( width == candidateWidth ) && ( height == candidateHeight ) )
 		{
 			perfectFit = it;
 			break;
 		}
 
-		if( (width <= candidateWidth) && (height <= candidateHeight)  )
+		if( ( width <= candidateWidth ) && ( height <= candidateHeight ) )
 		{
 			int metric = std::min( candidateWidth - width, candidateHeight - height );
 			int altMetric = std::max( candidateWidth - width, candidateHeight - height );
-			if( metric < bestPrimaryMetric || (bestPrimaryMetric == metric && altMetric < bestSecondaryMetric) )
+			if( metric < bestPrimaryMetric || ( bestPrimaryMetric == metric && altMetric < bestSecondaryMetric ) )
 			{
 				bestPrimaryMetric = metric;
 				bestSecondaryMetric = altMetric;
@@ -720,19 +740,19 @@ Tr2TextureAtlasArea* Tr2TextureAtlas::GetFreeArea( unsigned int width, unsigned 
 	{
 		// Found a perfect fit
 		Tr2TextureAtlasArea* freeArea = *perfectFit;
-		m_freeTexels -= (freeArea->rect.bottom - freeArea->rect.top) * (freeArea->rect.right - freeArea->rect.left);
+		m_freeTexels -= ( freeArea->rect.bottom - freeArea->rect.top ) * ( freeArea->rect.right - freeArea->rect.left );
 		m_freeAreas.erase( perfectFit );
 
 		//update cached largest free area
-		if( (freeArea->rect.right - freeArea->rect.left) >= m_freeMaxWidth ||
-			(freeArea->rect.bottom - freeArea->rect.top) >= m_freeMaxHeight )
+		if( ( freeArea->rect.right - freeArea->rect.left ) >= m_freeMaxWidth ||
+			( freeArea->rect.bottom - freeArea->rect.top ) >= m_freeMaxHeight )
 		{
 			UpdateFreeMaxima();
 		}
 
 		return freeArea;
 	}
-	
+
 	if( anyFit != m_freeAreas.end() )
 	{
 		Tr2TextureAtlasArea* freeArea = *anyFit;
@@ -743,7 +763,7 @@ Tr2TextureAtlasArea* Tr2TextureAtlas::GetFreeArea( unsigned int width, unsigned 
 
 		//if we're allocating a small bit out of a large area, first split it into squares
 		const unsigned minNewRegion = 128 + m_margin * 4;
-		
+
 		if( height < minNewRegion && width < minNewRegion )
 		{
 			//(if we've found a small region, it is already within a square so no need to do this)
@@ -774,7 +794,7 @@ Tr2TextureAtlasArea* Tr2TextureAtlas::GetFreeArea( unsigned int width, unsigned 
 				freeArea->rect.right = freeArea->rect.left + minNewRegion;
 			}
 		}
-		
+
 		// Must split the area
 		if( candidateWidth == width )
 		{
@@ -823,8 +843,8 @@ Tr2TextureAtlasArea* Tr2TextureAtlas::GetFreeArea( unsigned int width, unsigned 
 		}
 
 		//update cached largest free area (freeArea not yet resized but has been erased from free list)
-		if( (freeArea->rect.right - freeArea->rect.left) >= m_freeMaxWidth ||
-			(freeArea->rect.bottom - freeArea->rect.top) >= m_freeMaxHeight )
+		if( ( freeArea->rect.right - freeArea->rect.left ) >= m_freeMaxWidth ||
+			( freeArea->rect.bottom - freeArea->rect.top ) >= m_freeMaxHeight )
 		{
 			UpdateFreeMaxima();
 		}
@@ -832,15 +852,14 @@ Tr2TextureAtlasArea* Tr2TextureAtlas::GetFreeArea( unsigned int width, unsigned 
 		freeArea->rect.right = freeArea->rect.left + width;
 		freeArea->rect.bottom = freeArea->rect.top + height;
 
-		m_freeTexels -= (freeArea->rect.bottom - freeArea->rect.top) * (freeArea->rect.right - freeArea->rect.left);
+		m_freeTexels -= ( freeArea->rect.bottom - freeArea->rect.top ) * ( freeArea->rect.right - freeArea->rect.left );
 
 		return freeArea;
 	}
-	
+
 
 	// Couldn't find anything!
 	return NULL;
-
 }
 
 Tr2RenderContextEnum::PixelFormat Tr2TextureAtlas::GetFormat() const
@@ -863,15 +882,15 @@ void Tr2TextureAtlas::PaintEmptyArea( Tr2TextureAtlasArea* area )
 		return;
 	}
 
-	const bool isValidArea = 
-				area->rect.left   >= 0					&&
-				area->rect.top    >= 0					&&
-				area->rect.right  >= 0					&&
-				area->rect.bottom >= 0					&&
-				area->rect.right  >= area->rect.left	&&
-				area->rect.bottom >= area->rect.top		&&
-				uint32_t( area->rect.right ) <= m_texture.GetWidth() &&
-				uint32_t( area->rect.bottom) <= m_texture.GetHeight();
+	const bool isValidArea =
+		area->rect.left >= 0 &&
+		area->rect.top >= 0 &&
+		area->rect.right >= 0 &&
+		area->rect.bottom >= 0 &&
+		area->rect.right >= area->rect.left &&
+		area->rect.bottom >= area->rect.top &&
+		uint32_t( area->rect.right ) <= m_texture.GetWidth() &&
+		uint32_t( area->rect.bottom ) <= m_texture.GetHeight();
 
 	CCP_ASSERT( isValidArea );
 	if( !isValidArea )
@@ -880,18 +899,21 @@ void Tr2TextureAtlas::PaintEmptyArea( Tr2TextureAtlasArea* area )
 	}
 
 
+	//This looks broken.
+	//This maps the entire texture atlas, but only writes to part of it.
+	//The code seems to be disabled, but would probably break it if enabled.
 	void* rgba = nullptr;
 	uint32_t pitch = 0;
 	CR_RETURN( m_texture.MapForWriting( Tr2TextureSubresource( 0 ), rgba, pitch, renderContext ) );
-	ON_BLOCK_EXIT( [&]{ m_texture.UnmapForWriting( renderContext ); } );
+	ON_BLOCK_EXIT( [&] { m_texture.UnmapForWriting( renderContext ); } );
 
-	uint8_t *dst = (uint8_t*)rgba;
+	uint8_t* dst = (uint8_t*)rgba;
 
 	static unsigned int s_fillValue = 0;
 	s_fillValue += 0xabcdef;
 	s_fillValue &= 0xffffff;
 
-	const uint32_t width  = uint32_t( area->rect.right  - area->rect.left );
+	const uint32_t width = uint32_t( area->rect.right - area->rect.left );
 	const uint32_t height = uint32_t( area->rect.bottom - area->rect.top );
 
 	if( IsCompressedFormat( m_format ) )
@@ -949,24 +971,24 @@ int Tr2TextureAtlas::GetTexturesOutsideAtlasCount()
 }
 
 void Tr2TextureAtlas::PullInOutsiders( bool optimiseInsertion )
-{	
-	std::list< Tr2AtlasTexture * > sorted( m_texturesOutsideAtlas.begin(), m_texturesOutsideAtlas.end() );
+{
+	std::list<Tr2AtlasTexture*> sorted( m_texturesOutsideAtlas.begin(), m_texturesOutsideAtlas.end() );
 
 	if( optimiseInsertion )
 	{
 		//todo: implement more options for sorting the list (squareness, power-of-two pref.)
-		struct SmallestFirst 
+		struct SmallestFirst
 		{
-			bool operator()( const Tr2AtlasTexture *a, const Tr2AtlasTexture *b ) 
+			bool operator()( const Tr2AtlasTexture* a, const Tr2AtlasTexture* b )
 			{
 				const int widthA = a->m_width;
 				const int heightA = a->m_height;
 				const int widthB = b->m_width;
 				const int heightB = b->m_height;
 
-				return (widthA * heightA) < (widthB * heightB);
+				return ( widthA * heightA ) < ( widthB * heightB );
 			}
-		};		 
+		};
 
 		SmallestFirst smallestFirst;
 		sorted.sort( smallestFirst );
@@ -986,7 +1008,7 @@ void Tr2TextureAtlas::PullInOutsiders( bool optimiseInsertion )
 
 		CCP_ASSERT( !tex->m_atlasArea );
 
-		Tr2TextureAtlasArea* area = GetFreeArea( tex->m_width + m_margin*2, tex->m_height + m_margin*2 );
+		Tr2TextureAtlasArea* area = GetFreeArea( tex->m_width + m_margin * 2, tex->m_height + m_margin * 2 );
 		if( area )
 		{
 			area->tex = tex;
@@ -1001,10 +1023,10 @@ void Tr2TextureAtlas::PullInOutsiders( bool optimiseInsertion )
 				tex->m_y = area->rect.top + m_margin;
 				tex->m_textureWidth = m_width;
 				tex->m_textureHeight = m_height;
-				
+
 				tex->FinalizePrepare();
 
-				m_texturesOutsideAtlas.erase( tex );				
+				m_texturesOutsideAtlas.erase( tex );
 				m_texturesInAtlas.insert( tex );
 			}
 			else
@@ -1029,7 +1051,7 @@ bool Tr2TextureAtlas::CopyTextureIntoAtlas( Tr2AtlasTexture* tex )
 		CCP_LOGERR( "CopyTextureIntoAtlas failed, target or source textures invalid" );
 		return false;
 	}
-	
+
 	const auto& r = tex->m_atlasArea->rect;
 
 	if( !m_margin )
@@ -1037,7 +1059,13 @@ bool Tr2TextureAtlas::CopyTextureIntoAtlas( Tr2AtlasTexture* tex )
 		Tr2TextureSubresource dest( 0, 0 );
 		dest.m_box.left = r.left;
 		dest.m_box.top = r.top;
-		return SUCCEEDED( m_texture.CopySubresourceRegion( dest, *tex->GetTexture(), Tr2TextureSubresource( 0, 0 ), renderContext ) );
+		bool success = SUCCEEDED( m_texture.CopySubresourceRegion( dest, *tex->GetTexture(), Tr2TextureSubresource( 0, 0 ), renderContext ) );
+
+		//potential fix for icon corruption.
+#if TRINITY_PLATFORM == TRINITY_DIRECTX12
+		renderContext.FlushBarriersDx12();
+#endif
+		return success;
 	}
 
 	if( m_hasMipMaps )
@@ -1048,16 +1076,23 @@ bool Tr2TextureAtlas::CopyTextureIntoAtlas( Tr2AtlasTexture* tex )
 	const void* srcData = nullptr;
 	unsigned srcPitch = 0;
 	CR_RETURN_VAL( tex->GetTexture()->MapForReading( Tr2TextureSubresource( 0 ), srcData, srcPitch, renderContext ), false );
-	ON_BLOCK_EXIT( [&]{ tex->GetTexture()->UnmapForReading( renderContext ); } );
+	ON_BLOCK_EXIT( [&] { tex->GetTexture()->UnmapForReading( renderContext ); } );
 
 	std::vector<unsigned char> pixels;
 	unsigned pitch = 0;
 	Tr2ImageIOHelpers::AddMargin( m_texture.GetFormat(), (const unsigned char*)srcData, tex->GetWidth(), tex->GetHeight(), m_margin, pixels, pitch );
 
 	// Area may be larger than texture due to alignment
-	uint32_t right = r.left + tex->GetWidth() + 2*m_margin;
-	uint32_t bottom = r.top + tex->GetHeight() + 2*m_margin;
-	return SUCCEEDED( m_texture.UpdateSubresource( Tr2TextureSubresource( 0 ).SetRect( r.left, r.top, right, bottom ), &pixels[0], pitch, 0, renderContext ) );
+	uint32_t right = r.left + tex->GetWidth() + 2 * m_margin;
+	uint32_t bottom = r.top + tex->GetHeight() + 2 * m_margin;
+	bool success = SUCCEEDED( m_texture.UpdateSubresource( Tr2TextureSubresource( 0 ).SetRect( r.left, r.top, right, bottom ), &pixels[0], pitch, 0, renderContext ) );
+
+	//potential fix for icon corruption.
+#if TRINITY_PLATFORM == TRINITY_DIRECTX12
+	renderContext.FlushBarriersDx12();
+#endif
+
+	return success;
 }
 
 ALResult Tr2TextureAtlas::CreateTexture( unsigned int width, unsigned int height, AtlasTextureType type, Tr2AtlasTexture** result )
@@ -1067,15 +1102,15 @@ ALResult Tr2TextureAtlas::CreateTexture( unsigned int width, unsigned int height
 	tex->m_textureAtlas = this;
 
 	Tr2TextureAtlasArea* area = NULL;
-	
+
 	if( type == ATT_DEFAULT && !IsLargeTexture( width, height ) )
 	{
-		area = GetFreeArea( width + m_margin*2, height + m_margin*2 );	
+		area = GetFreeArea( width + m_margin * 2, height + m_margin * 2 );
 
 		if( !area && m_optimizationWarranted )
 		{
 			CollapseFreeAreas();
-			area = GetFreeArea( width + m_margin*2, height + m_margin*2 );
+			area = GetFreeArea( width + m_margin * 2, height + m_margin * 2 );
 		}
 	}
 
@@ -1107,10 +1142,11 @@ ALResult Tr2TextureAtlas::CreateTexture( unsigned int width, unsigned int height
 
 		USE_MAIN_THREAD_RENDER_CONTEXT();
 		HRESULT hr = tex->m_texture.Create(
-			Tr2BitmapDimensions( width, height, 1, m_format ), 
-			Tr2GpuUsage::SHADER_RESOURCE,
-			Tr2CpuUsage::READ | Tr2CpuUsage::WRITE,
-			renderContext ).GetResult();
+									   Tr2BitmapDimensions( width, height, 1, m_format ),
+									   Tr2GpuUsage::SHADER_RESOURCE,
+									   Tr2CpuUsage::READ | Tr2CpuUsage::WRITE,
+									   renderContext )
+						 .GetResult();
 		if( FAILED( hr ) )
 		{
 			*result = nullptr;
@@ -1155,7 +1191,7 @@ PyObject* Tr2TextureAtlas::GetTexturesInAtlas()
 	int i;
 	for( i = 0, it = m_texturesInAtlas.begin(); it != m_texturesInAtlas.end(); ++i, ++it )
 	{
-		PyList_SET_ITEM( list, i, PyOS->WrapBlueObject( (*it)->GetRawRoot() ) );
+		PyList_SET_ITEM( list, i, PyOS->WrapBlueObject( ( *it )->GetRawRoot() ) );
 	}
 
 	return list;
@@ -1169,7 +1205,7 @@ PyObject* Tr2TextureAtlas::GetTexturesOutsideAtlas()
 	int i;
 	for( i = 0, it = m_texturesOutsideAtlas.begin(); it != m_texturesOutsideAtlas.end(); ++i, ++it )
 	{
-		PyList_SET_ITEM( list, i, PyOS->WrapBlueObject( (*it)->GetRawRoot() ) );
+		PyList_SET_ITEM( list, i, PyOS->WrapBlueObject( ( *it )->GetRawRoot() ) );
 	}
 
 	return list;
@@ -1199,9 +1235,13 @@ void Tr2TextureAtlas::SetMaxTextureArea( unsigned int maxTextureArea )
 std::list<Tr2Rect> Tr2TextureAtlas::GetFreeAreas() const
 {
 	std::list<Tr2Rect> areas;
-	for( AreaList_t::const_iterator i = m_freeAreas.begin(); i != m_freeAreas.end(); ++i ) 
+	for( AreaList_t::const_iterator i = m_freeAreas.begin(); i != m_freeAreas.end(); ++i )
 	{
-		areas.push_back( (*i)->rect );
+		areas.push_back( ( *i )->rect );
+	}
+	for( auto i = m_pendingFreeAreas.begin(); i != m_pendingFreeAreas.end(); ++i )
+	{
+		areas.push_back( i->first->rect );
 	}
 	return areas;
 }
@@ -1209,9 +1249,9 @@ std::list<Tr2Rect> Tr2TextureAtlas::GetFreeAreas() const
 std::list<Tr2Rect> Tr2TextureAtlas::GetUsedAreas() const
 {
 	std::list<Tr2Rect> areas;
-	for( Tr2AtlasTextureSet_t::const_iterator i = m_texturesInAtlas.begin(); i != m_texturesInAtlas.end(); ++i ) 
+	for( Tr2AtlasTextureSet_t::const_iterator i = m_texturesInAtlas.begin(); i != m_texturesInAtlas.end(); ++i )
 	{
-		Tr2AtlasTexture *t = *i;
+		Tr2AtlasTexture* t = *i;
 
 		// After a device reset, the texture may not have a valid area. Texture is still
 		// registered with the atlas, but it might be in the queue for reloading.
@@ -1219,7 +1259,6 @@ std::list<Tr2Rect> Tr2TextureAtlas::GetUsedAreas() const
 		{
 			areas.push_back( t->m_atlasArea->rect );
 		}
-
 	}
 	return areas;
 }
@@ -1228,16 +1267,18 @@ std::list<Tr2Rect> Tr2TextureAtlas::GetUsedAreas() const
 void Tr2TextureAtlas::UpdateFreeMaxima() const
 {
 	m_freeMaxWidth = m_freeMaxHeight = 0;
-	for( AreaList_t::const_iterator i = m_freeAreas.begin(); i != m_freeAreas.end(); ++i ) 
+	for( AreaList_t::const_iterator i = m_freeAreas.begin(); i != m_freeAreas.end(); ++i )
 	{
-		const int w = (*i)->rect.right - (*i)->rect.left;
-		const int h = (*i)->rect.bottom - (*i)->rect.top;
-		if( w > m_freeMaxWidth ) m_freeMaxWidth = w;
-		if( h > m_freeMaxHeight ) m_freeMaxHeight = h;
+		const int w = ( *i )->rect.right - ( *i )->rect.left;
+		const int h = ( *i )->rect.bottom - ( *i )->rect.top;
+		if( w > m_freeMaxWidth )
+			m_freeMaxWidth = w;
+		if( h > m_freeMaxHeight )
+			m_freeMaxHeight = h;
 	}
 }
 
-bool Tr2TextureAtlas::EjectTexture( Tr2AtlasTexture *tex )
+bool Tr2TextureAtlas::EjectTexture( Tr2AtlasTexture* tex )
 {
 	CCP_ASSERT( tex );
 
@@ -1246,11 +1287,11 @@ bool Tr2TextureAtlas::EjectTexture( Tr2AtlasTexture *tex )
 		return false;
 	}
 
-	if( EjectTextureHelper( tex) )
+	if( EjectTextureHelper( tex ) )
 	{
-		for( auto i = m_texturesInAtlas.begin(); i != m_texturesInAtlas.end(); ++i ) 
+		for( auto i = m_texturesInAtlas.begin(); i != m_texturesInAtlas.end(); ++i )
 		{
-			Tr2AtlasTexture *t = *i;
+			Tr2AtlasTexture* t = *i;
 			if( t == tex )
 			{
 				m_texturesInAtlas.erase( i );
@@ -1262,7 +1303,7 @@ bool Tr2TextureAtlas::EjectTexture( Tr2AtlasTexture *tex )
 	return false;
 }
 
-bool Tr2TextureAtlas::EjectTextureHelper( Tr2AtlasTexture *tex )
+bool Tr2TextureAtlas::EjectTextureHelper( Tr2AtlasTexture* tex )
 {
 	USE_MAIN_THREAD_RENDER_CONTEXT();
 
@@ -1273,9 +1314,9 @@ bool Tr2TextureAtlas::EjectTextureHelper( Tr2AtlasTexture *tex )
 	}
 	CCP_ASSERT( tex->m_textureAtlas == this );
 	CCP_ASSERT( tex->m_atlasArea );
-	
-	Tr2TextureAtlasArea *texArea = tex->m_atlasArea;
-	
+
+	Tr2TextureAtlasArea* texArea = tex->m_atlasArea;
+
 	Tr2Rect copyRect;
 	copyRect.left = texArea->rect.left + m_margin;
 	copyRect.top = texArea->rect.top + m_margin;
@@ -1317,6 +1358,11 @@ bool Tr2TextureAtlas::EjectTextureHelper( Tr2AtlasTexture *tex )
 
 		tex->FinalizePrepare();
 
+		//potential fix for icon corruption.
+#if TRINITY_PLATFORM == TRINITY_DIRECTX12
+		renderContext.FlushBarriersDx12();
+#endif
+
 		FreeArea( texArea );
 
 		RegisterOutsider( tex );
@@ -1326,18 +1372,18 @@ bool Tr2TextureAtlas::EjectTextureHelper( Tr2AtlasTexture *tex )
 	{
 		tex->m_texture = Tr2TextureAL();
 	}
-	
-	return false;	
+
+	return false;
 }
 
 void Tr2TextureAtlas::EjectAllTextures()
 {
-	for( auto i = m_texturesInAtlas.begin(); i != m_texturesInAtlas.end();  ) 
+	for( auto i = m_texturesInAtlas.begin(); i != m_texturesInAtlas.end(); )
 	{
-		Tr2AtlasTexture *t = *i;
+		Tr2AtlasTexture* t = *i;
 		if( EjectTextureHelper( t ) )
 		{
-			i = m_texturesInAtlas.erase(i);
+			i = m_texturesInAtlas.erase( i );
 		}
 		else
 		{
@@ -1363,17 +1409,38 @@ void Tr2TextureAtlas::EjectAllTextures()
 	{
 		CollapseFreeAreas();
 	}
-
 }
-void Tr2TextureAtlas::FreeArea( Tr2TextureAtlasArea *area )
+
+void Tr2TextureAtlas::ReleasePendingFreeAreas()
 {
-	if( area == NULL || 
-		(area->rect.right - area->rect.left) == 0 ||
-		(area->rect.bottom - area->rect.top) == 0 )
+	if( !m_pendingFreeAreas.empty() )
+	{
+		USE_MAIN_THREAD_RENDER_CONTEXT();
+		auto freeBegin = std::remove_if( m_pendingFreeAreas.begin(), m_pendingFreeAreas.end(), [&]( const auto& pair ) {
+			return pair.second <= renderContext.GetRenderedFrameNumber();
+		} );
+		if( freeBegin == m_pendingFreeAreas.end() )
+		{
+			return;
+		}
+		for( auto it = freeBegin; it != m_pendingFreeAreas.end(); ++it )
+		{
+			FreeArea( it->first );
+		}
+		m_pendingFreeAreas.erase( freeBegin, m_pendingFreeAreas.end() );
+		UpdateFreeMaxima();
+	}
+}
+
+void Tr2TextureAtlas::FreeArea( Tr2TextureAtlasArea* area )
+{
+	if( area == NULL ||
+		( area->rect.right - area->rect.left ) == 0 ||
+		( area->rect.bottom - area->rect.top ) == 0 )
 	{
 		return;
 	}
-	
+
 	area->type = Tr2TextureAtlasArea::FREE;
 	area->tex = NULL;
 	m_freeAreas.push_back( area );
@@ -1397,7 +1464,7 @@ bool Tr2TextureAtlas::IsLargeTexture( unsigned int width, unsigned int height )
 }
 
 //Call this manually to update mipmaps when appropriate
-void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext ) 
+void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext )
 {
 	CCP_STATS_ZONE( __FUNCTION__ );
 
@@ -1405,14 +1472,14 @@ void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext )
 	{
 		return;
 	}
-	if( m_format != Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM ) 
+	if( m_format != Tr2RenderContextEnum::PIXEL_FORMAT_B8G8R8A8_UNORM )
 	{
-		CCP_LOGERR( "Texture format not supported for mipmapped atlases: %08x [%d]", int(m_format), int(m_format) );
+		CCP_LOGERR( "Texture format not supported for mipmapped atlases: %08x [%d]", int( m_format ), int( m_format ) );
 		m_dirtyMipRegions.clear();
 		return;
 	}
 
-	if( !m_texture.IsValid() ) 
+	if( !m_texture.IsValid() )
 	{
 		m_dirtyMipRegions.clear();
 		return;
@@ -1449,38 +1516,38 @@ void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext )
 		// Construct next mip level data for dirty regions using previous mip level copy in system memory
 		// and update rectangles in the texture
 		bool updated = false;
-		for( auto it = m_dirtyMipRegions.begin(); it != m_dirtyMipRegions.end(); ++it ) 
+		for( auto it = m_dirtyMipRegions.begin(); it != m_dirtyMipRegions.end(); ++it )
 		{
 			const Tr2Rect source = { it->left >> ( i - 1 ), it->top >> ( i - 1 ), it->right >> ( i - 1 ), it->bottom >> ( i - 1 ) };
 			Tr2Rect dest = { it->left >> i, it->top >> i, it->right >> i, it->bottom >> i };
 			const int height = dest.bottom - dest.top;
 			const int width = dest.right - dest.left;
-			if( height == 0 || width == 0 ) 
+			if( height == 0 || width == 0 )
 			{
 				continue;
 			}
-			const unsigned char *src = &( *prevMip )[0];
+			const unsigned char* src = &( *prevMip )[0];
 			src += sourcePitch * source.top + source.left * 4;
-			unsigned char *dst = &( *nextMip )[0];
+			unsigned char* dst = &( *nextMip )[0];
 			dst += destPitch * dest.top + dest.left * 4;
 
 			uint32_t sysDestPitch;
 			void* destData;
 			if( SUCCEEDED( m_texture.MapForWriting( Tr2TextureSubresource( i ).SetRect( reinterpret_cast<uint32_t*>( &dest ) ), destData, sysDestPitch, renderContext ) ) )
 			{
-				unsigned char *dstRow = reinterpret_cast<unsigned char*>( destData );
+				unsigned char* dstRow = reinterpret_cast<unsigned char*>( destData );
 
-				for( int y = 0; y < height; ++y ) 
+				for( int y = 0; y < height; ++y )
 				{
-					for( int x = 0; x < width; ++x ) 
+					for( int x = 0; x < width; ++x )
 					{
-						for( int ch = 0; ch < 4; ++ch ) 
+						for( int ch = 0; ch < 4; ++ch )
 						{
 							unsigned s00 = src[y * 2 * sourcePitch + x * 2 * 4 + ch];
-							unsigned s01 = src[y * 2 * sourcePitch + (x * 2 + 1) * 4 + ch];
-							unsigned s10 = src[(y * 2 + 1) * sourcePitch + x * 2 * 4 + ch];
-							unsigned s11 = src[(y * 2 + 1) * sourcePitch + (x * 2 + 1) * 4 + ch];
-							dst[x * 4 + ch] = (unsigned char)( (s00 + s01 + s10 + s11) >> 2 );
+							unsigned s01 = src[y * 2 * sourcePitch + ( x * 2 + 1 ) * 4 + ch];
+							unsigned s10 = src[( y * 2 + 1 ) * sourcePitch + x * 2 * 4 + ch];
+							unsigned s11 = src[( y * 2 + 1 ) * sourcePitch + ( x * 2 + 1 ) * 4 + ch];
+							dst[x * 4 + ch] = (unsigned char)( ( s00 + s01 + s10 + s11 ) >> 2 );
 							dstRow[x * 4 + ch] = dst[x * 4 + ch];
 						}
 					}
@@ -1501,6 +1568,11 @@ void Tr2TextureAtlas::UpdateMipMaps( Tr2RenderContext& renderContext )
 	}
 
 	m_dirtyMipRegions.clear();
+
+	//potential fix for icon corruption.
+#if TRINITY_PLATFORM == TRINITY_DIRECTX12
+	renderContext.FlushBarriersDx12();
+#endif
 }
 
 void Tr2TextureAtlas::DirtyRegion( const Tr2Rect& rect )
@@ -1530,12 +1602,12 @@ bool Tr2TextureAtlas::HasALObject( int type, size_t object )
 	return false;
 }
 
-uint32_t Tr2TextureAtlas::GetMsaaSamples() const 
-{ 
-	return 1; 
+uint32_t Tr2TextureAtlas::GetMsaaSamples() const
+{
+	return 1;
 }
 
-uint32_t Tr2TextureAtlas::GetMsaaQuality() const 
-{ 
-	return 0; 
+uint32_t Tr2TextureAtlas::GetMsaaQuality() const
+{
+	return 0;
 }
