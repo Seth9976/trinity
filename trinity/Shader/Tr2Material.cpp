@@ -227,7 +227,7 @@ void Tr2Material::ApplyMaterialDataForPass( uint32_t techniqueIndex, unsigned in
 			auto& input = pp.m_stageInput[i];
 			//descChanged |= ApplyShaderInputs( techniqueIndex, passIndex, Tr2RenderContextEnum::ShaderType( i ), renderContext );
 			ApplyConstants( Tr2RenderContextEnum::ShaderType( i ), input, !pp.m_reroutedParameters.empty(), renderContext );
-			SetResources( Tr2RenderContextEnum::ShaderType( i ), input, renderContext );
+			descChanged |= SetResources( Tr2RenderContextEnum::ShaderType( i ), input, renderContext );
 			mask &= ~( 1 << i );
 		}
 	}
@@ -258,52 +258,80 @@ void Tr2Material::ApplyMaterialDataForPass( uint32_t techniqueIndex, unsigned in
 		}
 	}
 
-	for( uint32_t i = 0; i < pp.m_resourceSetDesc.m_registerMap.srvCount; ++i )
+	for( uint32_t stage = 0; stage < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++stage )
 	{
-		auto& srv = pp.m_resourceSetDesc.m_srv[i];
-		if( srv.type == Tr2ResourceSetDescriptionAL::Resource::Type::BUFFER )
+		auto shaderType = Tr2RenderContextEnum::ShaderType(	stage );
+		for( uint32_t reg = 0; reg < Tr2RegisterMapAL::MAX_RESOURCES_IN_STAGE; ++reg )
 		{
-			renderContext.SetSrv( (Tr2RenderContextEnum::ShaderType)srv.type, srv.registerIndex, srv.buffer );
-		}
-		else if( srv.type == Tr2ResourceSetDescriptionAL::Resource::Type::TEXTURE )
-		{
-			renderContext.SetSrv( (Tr2RenderContextEnum::ShaderType)srv.type, srv.registerIndex, srv.texture );
-		}
-		else if( srv.type == Tr2ResourceSetDescriptionAL::Sampler::Type::HEAP_VIEW )
-		{
-			renderContext.SetSrvHeapView( (Tr2RenderContextEnum::ShaderType)srv.type, srv.registerIndex );
+			auto idx = pp.m_resourceSetDesc.m_registerMap.srvs[stage][reg];
+			if(idx >= pp.m_resourceSetDesc.m_registerMap.srvCount)
+			{
+				continue;
+			}
+			auto& srv = pp.m_resourceSetDesc.m_srv[idx];
+			if(srv.type == Tr2ResourceSetDescriptionAL::Resource::Type::BUFFER)
+			{
+				renderContext.SetSrv( shaderType, reg, srv.buffer );
+			}
+			else if(srv.type == Tr2ResourceSetDescriptionAL::Resource::Type::TEXTURE)
+			{
+				renderContext.SetSrv( shaderType, reg, srv.texture );
+			}
+			else if(srv.type == Tr2ResourceSetDescriptionAL::Resource::Type::HEAP_VIEW)
+			{
+				renderContext.SetSrvHeapView( shaderType, reg );
+			}
 		}
 	}
 
-	for( uint32_t i = 0; i < pp.m_resourceSetDesc.m_registerMap.uavCount; ++i )
+	for( uint32_t stage = 0; stage < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++stage )
 	{
-		auto& uav = pp.m_resourceSetDesc.m_uav[i];
-		if( uav.type == Tr2ResourceSetDescriptionAL::Resource::Type::BUFFER )
+		auto shaderType = Tr2RenderContextEnum::ShaderType(	stage );
+		for( uint32_t reg = 0; reg < Tr2RegisterMapAL::MAX_RESOURCES_IN_STAGE; ++reg )
 		{
-			renderContext.SetUav( (Tr2RenderContextEnum::ShaderType)uav.type, uav.registerIndex, uav.buffer );
-		}
-		else if( uav.type == Tr2ResourceSetDescriptionAL::Resource::Type::TEXTURE )
-		{
-			renderContext.SetUav( (Tr2RenderContextEnum::ShaderType)uav.type, uav.registerIndex, uav.texture );
-		}
-		else if( uav.type == Tr2ResourceSetDescriptionAL::Sampler::Type::HEAP_VIEW )
-		{
-			renderContext.SetUavHeapView( (Tr2RenderContextEnum::ShaderType)uav.type, uav.registerIndex );
+			auto idx = pp.m_resourceSetDesc.m_registerMap.uavs[stage][reg];
+			if(idx >= pp.m_resourceSetDesc.m_registerMap.uavCount)
+			{
+				continue;
+			}
+			auto& uav = pp.m_resourceSetDesc.m_uav[idx];
+			if(uav.type == Tr2ResourceSetDescriptionAL::Resource::Type::BUFFER)
+			{
+				renderContext.SetUav( shaderType, reg, uav.buffer );
+			}
+			else if(uav.type == Tr2ResourceSetDescriptionAL::Resource::Type::TEXTURE)
+			{
+				renderContext.SetUav( shaderType, reg, uav.texture );
+			}
+			else if(uav.type == Tr2ResourceSetDescriptionAL::Resource::Type::HEAP_VIEW)
+			{
+				renderContext.SetUavHeapView( shaderType, reg );
+			}
 		}
 	}
 
-	for( uint32_t i = 0; i < pp.m_resourceSetDesc.m_registerMap.samplerCount; ++i )
+	for( uint32_t stage = 0; stage < Tr2RenderContextEnum::SHADER_TYPE_COUNT; ++stage )
 	{
-		auto& sampler = pp.m_resourceSetDesc.m_samplers[i];
-		if( sampler.type == Tr2ResourceSetDescriptionAL::Sampler::Type::SAMPLER )
+		auto shaderType = Tr2RenderContextEnum::ShaderType(	stage );
+		for( uint32_t reg = 0; reg < Tr2RegisterMapAL::MAX_RESOURCES_IN_STAGE; ++reg )
 		{
-			renderContext.SetSampler( (Tr2RenderContextEnum::ShaderType)sampler.type, sampler.registerIndex, sampler.sampler );
-		}
-		else if( sampler.type == Tr2ResourceSetDescriptionAL::Sampler::Type::HEAP_VIEW )
-		{
-			renderContext.SetSamplerHeapView( (Tr2RenderContextEnum::ShaderType)sampler.type, sampler.registerIndex );
+			auto idx = pp.m_resourceSetDesc.m_registerMap.samplers[stage][reg];
+			if(idx >= pp.m_resourceSetDesc.m_registerMap.samplerCount)
+			{
+				continue;
+			}
+			auto& sampler =	pp.m_resourceSetDesc.m_samplers[idx];
+			if(sampler.type == Tr2ResourceSetDescriptionAL::Sampler::Type::SAMPLER)
+			{
+				renderContext.SetSampler( shaderType, reg, sampler.sampler );
+			}
+			else if(sampler.type == Tr2ResourceSetDescriptionAL::Sampler::Type::HEAP_VIEW)
+			{
+				renderContext.SetSamplerHeapView( shaderType, reg );
+			}
 		}
 	}
+
 
 	// TO DO JOHN. need to find a way of setting the SRVs dynamicly
 	//renderContext.SetResourceSet( pp.m_resourceSet );

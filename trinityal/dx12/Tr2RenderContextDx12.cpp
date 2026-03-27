@@ -559,11 +559,12 @@ ALResult Tr2RenderContextAL::SetSrv( Tr2RenderContextEnum::ShaderType stage, uin
 		ResetResourceBindings();
 	}
 
-	auto& resource = m_srv_PRE_RENDER[registerIndex];
+	Resource resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.type = Resource::BUFFER;
 	resource.buffer = buffer;
+	m_srv_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -589,12 +590,13 @@ ALResult Tr2RenderContextAL::SetSrv( Tr2RenderContextEnum::ShaderType stage, uin
 		m_renderedUsingSRVs = false;
 		ResetResourceBindings();
 	}
-	auto& resource = m_srv_PRE_RENDER[registerIndex];
+	Resource resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.type = Resource::TEXTURE;
 	resource.texture = texture;
 	resource.colorSpace = colorSpace;
+	m_srv_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -620,11 +622,12 @@ ALResult Tr2RenderContextAL::SetUav( Tr2RenderContextEnum::ShaderType stage, uin
 		m_renderedUsingSRVs = false;
 		ResetResourceBindings();
 	}
-	auto& resource = m_uav_PRE_RENDER[registerIndex];
+	Resource resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.type = Resource::BUFFER;
 	resource.buffer = buffer;
+	m_uav_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -650,13 +653,13 @@ ALResult Tr2RenderContextAL::SetUav( Tr2RenderContextEnum::ShaderType stage, uin
 		m_renderedUsingSRVs = false;
 		ResetResourceBindings();
 	}
-	auto& resource = m_uav_PRE_RENDER[registerIndex];
+	Resource resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.type = Resource::TEXTURE;
 	resource.texture = texture;
 	resource.mip = mip;
-
+	m_uav_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -682,11 +685,12 @@ ALResult Tr2RenderContextAL::SetSampler( Tr2RenderContextEnum::ShaderType stage,
 		m_renderedUsingSRVs = false;
 		ResetResourceBindings();
 	}
-	auto& resource = m_samplers_TEMP[registerIndex];
+	Sampler resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.sampler = sampler;
 	resource.type = Sampler::SAMPLER;
+	m_samplers_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -713,10 +717,11 @@ ALResult Tr2RenderContextAL::SetSrvHeapView( Tr2RenderContextEnum::ShaderType st
 		m_renderedUsingSRVs = false;
 		ResetResourceBindings();
 	}
-	auto& resource = m_srv_PRE_RENDER[registerIndex];
+	Resource resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.type = Resource::HEAP_VIEW;
+	m_srv_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -743,10 +748,11 @@ ALResult Tr2RenderContextAL::SetUavHeapView( Tr2RenderContextEnum::ShaderType st
 		m_renderedUsingSRVs = false;
 		ResetResourceBindings();
 	}
-	auto& resource = m_uav_PRE_RENDER[registerIndex];
+	Resource resource = {};
 	resource.stage = stage;
 	resource.registerIndex = registerIndex;
 	resource.type = Resource::HEAP_VIEW;
+	m_uav_PRE_RENDER.push_back( resource );
 	return S_OK;
 }
 
@@ -782,9 +788,9 @@ ALResult Tr2RenderContextAL::SetSamplerHeapView( Tr2RenderContextEnum::ShaderTyp
 
 ALResult Tr2RenderContextAL::ResetResourceBindings() throw()
 {
-	std::fill( std::begin( m_srv_PRE_RENDER ), std::end( m_srv_PRE_RENDER ), Resource{} );
-	std::fill( std::begin( m_uav_PRE_RENDER ), std::end( m_uav_PRE_RENDER ), Resource{} );
-	std::fill( std::begin( m_samplers_PRE_RENDER ), std::end( m_samplers_PRE_RENDER ), Sampler{} );
+	m_srv_PRE_RENDER.clear();
+	m_uav_PRE_RENDER.clear();
+	m_samplers_PRE_RENDER.clear();
 
 
 	std::fill( std::begin( m_srv_TEMP ), std::end( m_srv_TEMP ), Resource{} );
@@ -1051,7 +1057,7 @@ ALResult Tr2RenderContextAL::UseResourceBindings() throw()
 
 	if( registerMap.srvCount != 0 )
 	{
-		for( uint32_t i = 0; i < Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE; ++i )
+		for( uint32_t i = 0; i < m_srv_PRE_RENDER.size(); ++i )
 		{
 			Resource resource = m_srv_PRE_RENDER[i];
 			if( resource.type == Resource::NONE )
@@ -1072,7 +1078,7 @@ ALResult Tr2RenderContextAL::UseResourceBindings() throw()
 
 	if( registerMap.uavCount != 0 )
 	{
-		for( uint32_t i = 0; i < Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE; ++i )
+		for( uint32_t i = 0; i < m_uav_PRE_RENDER.size(); ++i )
 		{
 			Resource resource = m_uav_PRE_RENDER[i];
 			if( resource.type == Resource::NONE )
@@ -1085,8 +1091,28 @@ ALResult Tr2RenderContextAL::UseResourceBindings() throw()
 			{
 				continue;
 			}
-			
+
 			m_uav_TEMP[index] = m_uav_PRE_RENDER[i];
+		}
+	}
+
+	if( registerMap.samplerCount != 0 )
+	{
+		for( uint32_t i = 0; i < m_samplers_PRE_RENDER.size(); ++i )
+		{
+			Sampler resource = m_samplers_PRE_RENDER[i];
+			if( resource.type == Sampler::NONE )
+			{
+				continue;
+			}
+
+			auto index = registerMap.samplers[resource.stage][resource.registerIndex];
+			if( index >= registerMap.samplerCount )
+			{
+				continue;
+			}
+
+			m_samplers_TEMP[index] = m_samplers_PRE_RENDER[i];
 		}
 	}
 

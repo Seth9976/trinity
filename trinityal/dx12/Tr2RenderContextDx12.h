@@ -335,9 +335,9 @@ protected:
 	//std::unique_ptr<Sampler[]> m_samplers_TEMP;
 
 	
-	Resource m_srv_PRE_RENDER[Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE];
-	Resource m_uav_PRE_RENDER[Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE];
-	Sampler m_samplers_PRE_RENDER[Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE];
+	std::vector<Resource> m_srv_PRE_RENDER;
+	std::vector<Resource> m_uav_PRE_RENDER;
+	std::vector<Sampler> m_samplers_PRE_RENDER;
 
 	Resource m_srv_TEMP[Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE];
 	Resource m_uav_TEMP[Tr2ResourceSetDescriptionAL::MAX_RESOURCES_IN_STAGE];
