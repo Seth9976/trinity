@@ -236,23 +236,50 @@ void EveShip2::RebuildBoosterSet()
 		return;
 	}
 
-	m_boosters->Clear();
+	// Snapshot the currently persisted booster data before clearing
+	std::vector<EveBoosterSet2::SingleBoosterData> snapshot = m_boosters->GetSingleBoosters();
 
+	// Clear only the booster items while preserving effects, glows, trails, and visual settings
+	m_boosters->RebuildPreservingSettings();
+
+	// Rebuild boosters from locators, restoring their original settings
 	static const char* kLocatorPrefix = "locator_booster";
 	const unsigned int kLocatorPrefixLength = (unsigned int)strlen( kLocatorPrefix );
 
+	unsigned int boosterIndex = 0;
 	unsigned int n = (unsigned int)m_locators.size();
-	for( unsigned int i = 0; i < n ; ++i )
+	for( unsigned int i = 0; i < n; ++i )
 	{
 		EveLocator2Ptr locator = m_locators[i];
 		const char* locatorName = locator->GetName();
 		if( strncmp( locatorName, kLocatorPrefix, kLocatorPrefixLength ) == 0 )
 		{
+			// Restore saved data if available, otherwise use defaults
 			Vector4 functionality( 0.f, 1.f, 1.f, 1.f );
-			m_boosters->Add( &locator->GetTransform(), &functionality, true, 0, 0 );
+			bool hasTrail = true;
+			uint32_t atlasIndex0 = 0;
+			uint32_t atlasIndex1 = 0;
+			float lightScale = 1.0f;
+
+			if( boosterIndex < snapshot.size() )
+			{
+				const auto& saved = snapshot[boosterIndex];
+				functionality = saved.functionality;
+				hasTrail = saved.hasTrail;
+				atlasIndex0 = saved.atlasIndex0;
+				atlasIndex1 = saved.atlasIndex1;
+				lightScale = saved.lightScale;
+			}
+
+			m_boosters->Add( &locator->GetTransform(), &functionality, hasTrail, atlasIndex0, atlasIndex1, lightScale );
+			++boosterIndex;
 		}
 	}
 
+	// Finalize the rebuild by rebuilding glows
+	m_boosters->FinalizeRebuild();
+
+	// Prepare resources to rebuild instance buffer and finalize
 	m_boosters->PrepareResources();
 }
 

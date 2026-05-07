@@ -234,7 +234,29 @@ public:
 	void UpdateTrails( float deltaT, Be::Time t );
 	// manage individual exhaust points
 	void Clear();
+	void RebuildPreservingSettings();
+	void FinalizeRebuild();
+
+	// Per-booster data. The first six fields are the source data persisted to .red
+	// files so boosters survive save/load cycles. The remaining three are derived
+	// at runtime inside Add() and are never persisted.
+	struct SingleBoosterData
+	{
+		// --- persisted ---
+		Matrix transform;
+		Vector4 functionality;
+		uint32_t atlasIndex0;
+		uint32_t atlasIndex1;
+		bool hasTrail;
+		float lightScale;
+		// --- runtime derived, not persisted ---
+		Vector3 lightPosition;
+		float lightRadius;
+		float lightPhase;
+	};
+
 	void Add( const Matrix* localMatrix, const Vector4* functionality, bool hasTrail, uint32_t atlasIndex0, uint32_t atlasIndex1, float lightScale = 1 );
+	const std::vector<SingleBoosterData>& GetSingleBoosters() const { return m_singleBoosters; }
 	// set internal visual data
 	void SetData( 
 		float glowScale, 
@@ -269,18 +291,7 @@ public:
 	void GetLights( Tr2LightManager& lightManager ) const override;
 
 private:
-	// indivual data of each booster (position, etc.)
-	struct SingleBoosterData
-	{
-		Matrix transform;
-		Vector4 functionality;
-		Vector3 lightPosition;
-		float lightRadius;
-		float lightPhase;
-		uint32_t atlasIndex0;
-		uint32_t atlasIndex1;
-	};
-	std::vector<SingleBoosterData> m_singleBoosters;
+	std::vector<BoosterItem> m_singleBoosters;
 
 	// re-alloc and init the instance vertex buffers
 	void RebuildInstanceData( Tr2RenderContext& renderContext );

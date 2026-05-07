@@ -734,10 +734,24 @@ EveBoosterSet2::~EveBoosterSet2()
 
 // --------------------------------------------------------------------------------
 // Description:
-//   If loading from a .red file, we now can start creating resources
+//   If loading from a .red file, we now can start creating resources.
+//   If m_boosters was loaded from persistence, the entries contain source data
+//   but not the derived runtime fields (lightPosition, lightRadius, lightPhase).
+//   We snapshot the loaded entries, clear, then re-add through Add() which
+//   computes all derived fields correctly.
 // --------------------------------------------------------------------------------
 bool EveBoosterSet2::Initialize()
 {
+	if( !m_singleBoosters.empty() )
+	{
+		std::vector<SingleBoosterData> loaded = m_singleBoosters;
+		m_singleBoosters.clear();
+		for( const auto& item : loaded )
+		{
+			Add( &item.transform, &item.functionality, item.hasTrail, item.atlasIndex0, item.atlasIndex1, item.lightScale );
+		}
+		FinalizeRebuild();
+	}
 	PrepareResources();
 	return true;
 }
@@ -847,9 +861,47 @@ void EveBoosterSet2::Clear()
 }
 
 // --------------------------------------------------------------------------------
+// Description:
+//   Rebuild boosters while preserving effects, glows, trails and visual settings.
+//   This is used when locators change but the booster configuration should remain.
+// --------------------------------------------------------------------------------
+void EveBoosterSet2::RebuildPreservingSettings()
+{
+	// Clear only the booster items, not the effects/glows/trails
+	m_singleBoosters.clear();
+	if( m_glows )
+	{
+		m_glows->Clear();
+	}
+	if( m_trails )
+	{
+		m_trails->Clear();
+	}
+
+	// Reset bounding info
+	BoundingSphereInitialize( m_boosterBoundingSphere );
+
+	// Release only the instance buffer resources
+	ReleaseResources( TRISTORAGE_ALL );
+}
+
+// --------------------------------------------------------------------------------
+// Description:
+//   Finalize the rebuild by rebuilding glows after all boosters have been added.
+//   Call this after RebuildPreservingSettings() and all Add() calls.
+// --------------------------------------------------------------------------------
+void EveBoosterSet2::FinalizeRebuild()
+{
+	if( m_glows )
+	{
+		m_glows->Rebuild();
+	}
+}
+
+// --------------------------------------------------------------------------------
 void EveBoosterSet2::Add( const Matrix* localMatrix, const Vector4* functionality, bool hasTrail, uint32_t atlasIndex0, uint32_t atlasIndex1, float lightScale )
 {
-	// keep it in our list of boosters
+	// keep source data for persistence and rebuild
 	SingleBoosterData sbd;
 	sbd.transform = *localMatrix;
 	sbd.functionality = *functionality;
@@ -859,6 +911,8 @@ void EveBoosterSet2::Add( const Matrix* localMatrix, const Vector4* functionalit
 	sbd.lightPhase = float( g_lightNoiseSize ) * float( rand() ) / float( RAND_MAX );
 	sbd.atlasIndex0 = atlasIndex0;
 	sbd.atlasIndex1 = atlasIndex1;
+	sbd.hasTrail = hasTrail;
+	sbd.lightScale = lightScale;
 	m_singleBoosters.push_back( sbd );
 
 	Vector3 pos( localMatrix->_41, localMatrix->_42, localMatrix->_43 );
