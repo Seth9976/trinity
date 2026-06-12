@@ -41,7 +41,6 @@
 #include "Shader/Parameter/TriTextureParameter.h"
 #include "Shader/Parameter/Tr2Vector4Parameter.h"
 #include "Shader/Parameter/Tr2FloatParameter.h"
-#include "include/ITriFunction.h"
 #include "Curves/Tr2CurveQuaternion.h"
 #include "Curves/Tr2CurveScalar.h"
 #include "Curves/TriCurveSet.h"
@@ -60,8 +59,13 @@
 #include "ITr2TextureProvider.h"
 #include "TriSettingsRegistrar.h"
 
+#include <ITriFunction.h>
+
 bool g_alphaCutoutShadowsEnabled = false; // alpha cutout refers to TRIBATCHTYPE_DECAL
 TRI_REGISTER_SETTING( "alphaCutoutShadowsEnabled", g_alphaCutoutShadowsEnabled );
+
+std::string g_volumetricTrailPath = "";
+TRI_REGISTER_SETTING( "volumetricTrailPath", g_volumetricTrailPath );
 
 namespace
 {
@@ -2726,7 +2730,8 @@ void EveSOF::SetupBoosters( EveShip2Ptr ship, const EveSOFDNAPtr dna ) const
 			trailEffect->AddParameterColor( BlueSharedString( "TrailColor" ), &rdata->trailColor );
 			trailEffect->EndUpdate();
 			trail->SetEffect( trailEffect );
-			trail->SetMeshResPath( "res:/dx9/model/ship/booster/volumetricTrail.gr2" );
+			trail->SetMeshResPath( g_volumetricTrailPath.c_str() );
+			
 			set->SetTrail( trail );
 		}
 

@@ -2,8 +2,8 @@
 #ifndef Tr2GrannyTrack_h
 #define Tr2GrannyTrack_h
 
-#include "include/ITriFunction.h"
-#include "include/ITriCurveLength.h"
+#include <ITriFunction.h>
+#include <ITriCurveLength.h>
 
 BLUE_DECLARE( TriGrannyRes );
 
@@ -100,4 +100,5 @@ protected:
 	TriGrannyResPtr m_grannyRes;
 };
 TYPEDEF_BLUECLASS( Tr2GrannyTrack );
+
 #endif //Tr2GrannyTrack_h
