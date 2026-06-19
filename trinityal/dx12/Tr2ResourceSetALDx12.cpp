@@ -58,7 +58,7 @@ namespace TrinityALImpl
 			return E_INVALIDARG;
 		}
 
-		return Create( description, program.m_program->m_rootSignature, renderContext, program.m_program->m_name.c_str() );
+		return Create( description, program.m_program->m_rootSignature, renderContext );
 	}
 
 	ALResult Tr2ResourceSetAL::Create( const Tr2ResourceSetDescriptionAL& description, const ::Tr2RtPipelineStateAL& pipeline, Tr2PrimaryRenderContextAL& renderContext )
@@ -74,10 +74,10 @@ namespace TrinityALImpl
 			return E_INVALIDARG;
 		}
 
-		return Create( description, pipeline.TrinityALImpl_GetObject()->GetGlobalRootSignature(), renderContext, "RtPipeline" );
+		return Create( description, pipeline.TrinityALImpl_GetObject()->GetGlobalRootSignature(), renderContext );
 	}
 
-	ALResult Tr2ResourceSetAL::Create( const Tr2ResourceSetDescriptionAL& description, const Tr2RootSignatureAL& rootSignature, Tr2PrimaryRenderContextAL& renderContext, const char* shaderName )
+	ALResult Tr2ResourceSetAL::Create( const Tr2ResourceSetDescriptionAL& description, const Tr2RootSignatureAL& rootSignature, Tr2PrimaryRenderContextAL& renderContext )
 	{
 		if( rootSignature.m_registerMap != description.m_registerMap )
 		{
@@ -209,7 +209,7 @@ namespace TrinityALImpl
 				m_uav[reg.parameter] = renderContext.GetUavHeapView();
 				break;
 			default:
-				CCP_AL_LOGWARN("Missing UAV resource in resource set for register %u, stage %u, shader '%s'", reg.index, reg.stage, shaderName);
+				CCP_AL_LOGWARN("Missing UAV resource in resource set for register %u, stage %u", reg.index, reg.stage);
 				m_uav[reg.parameter] = renderContext.GetNullUavDx12( it->registerType );
 				break;
 			}
