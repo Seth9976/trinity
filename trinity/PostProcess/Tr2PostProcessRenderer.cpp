@@ -1,3 +1,5 @@
+// Copyright © 2026 CCP ehf.
+
 #include "StdAfx.h"
 #include "Tr2PostProcessRenderer.h"
 #include "PostProcess/Tr2PostProcess2.h"
@@ -97,13 +99,13 @@ BlueSharedString GetTaaQualityShaderOptionValue( Tr2PPTaaEffect::Quality quality
 	switch( quality )
 	{
 	case Tr2PPTaaEffect::Quality::TAA_LOW:
-		return MEMOIZED_STRING( "TAA_QUALITY_LOW" );
+		return MEMOIZED_STRING( "QUALITY_LOW" );
 	case Tr2PPTaaEffect::Quality::TAA_MEDIUM:
-		return MEMOIZED_STRING( "TAA_QUALITY_MEDIUM" );
+		return MEMOIZED_STRING( "QUALITY_MEDIUM" );
 	case Tr2PPTaaEffect::Quality::TAA_HIGH:
-		return MEMOIZED_STRING( "TAA_QUALITY_HIGH" );
+		return MEMOIZED_STRING( "QUALITY_HIGH" );
 	default:
-		return MEMOIZED_STRING( "TAA_QUALITY_DISABLED" );
+		return MEMOIZED_STRING( "QUALITY_LOW" );
 	}
 }
 

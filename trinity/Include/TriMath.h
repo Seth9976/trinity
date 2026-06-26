@@ -1,14 +1,14 @@
-/* 
+/*
 	*************************************************************************************
 
 	TriMath.h
 
-	Author:    Hilmar Veigar Pétursson
+	Author:    Hilmar Veigar Pï¿½tursson
 	Created:   March 2001
 	OS:        Win32
 	Project:   Trinity
 
-	Description:   
+	Description:
 
 		Usefull math functions that are "missing" from the math library. Some of
 		the TriDataTypes have member functions that are direct thunkers to these functions
@@ -18,7 +18,7 @@
 
 		DirectX 9.0, Blue
 
-	(c) CCP 2000
+	Copyright Â© 2000 CCP ehf.
 
 	*************************************************************************************
 */

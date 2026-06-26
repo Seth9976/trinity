@@ -1,3 +1,5 @@
+// Copyright © 2023 CCP ehf.
+
 #include "StdAfx.h"
 #include "EveSpaceScene.h"
 
@@ -590,7 +592,7 @@ MAP_FUNCTION(
 
 static float CameraDistanceFalloff( const Vector3& posView )
 {
-	// This is some fucked up legacy math
+	// This is some messed up legacy math
 	float distSq = Dot( posView, posView );
 
 	const Matrix& projMat = Tr2Renderer::GetProjectionTransform();
