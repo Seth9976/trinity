@@ -37,3 +37,33 @@ TEST( ContinueOnMainThread, NonRecursive )
 
 	EXPECT_EQ( 2, runs );
 }
+
+TEST( ContinueOnMainThread, Crash )
+{
+	static int total = 0;
+	bool reentered = false;
+
+	ContinueOnMainThread( [&] {
+		total++;
+		if( reentered )
+		{
+			return;
+		}
+		reentered = true;
+
+		ContinueOnMainThread( [] {
+			for( int i = 0; i < 1000; i++ )
+			{
+				ContinueOnMainThread( [] { total++; } );
+			}
+		} );
+
+		ExecuteMainThreadActions();
+	} );
+	ContinueOnMainThread( [] { total++; } );
+
+	ExecuteMainThreadActions();
+	ExecuteMainThreadActions();
+
+	EXPECT_EQ( 1002, total );
+}
