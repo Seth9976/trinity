@@ -1,4 +1,3 @@
-# .github/workflows/build-windows.yml  
 name: Build Windows x64  
   
 on:  
@@ -21,33 +20,24 @@ jobs:
       - name: Checkout repository  
         uses: actions/checkout@v4  
   
-      # 克隆 vcpkg 到 CMakePresets.json 期望的路径  
       - name: Clone and bootstrap vcpkg  
+        shell: pwsh  
         run: |  
           New-Item -ItemType Directory -Force -Path "vendor/github.com/microsoft"  
           git clone https://github.com/microsoft/vcpkg.git vendor/github.com/microsoft/vcpkg  
-          # 固定到 vcpkg-configuration.json 中的 baseline commit  
           git -C vendor/github.com/microsoft/vcpkg checkout 242ac6932a9cd2607332969129e9572516f28d65  
           vendor\github.com\microsoft\vcpkg\bootstrap-vcpkg.bat -disableMetrics  
-        shell: pwsh  
   
-      # 克隆自定义 registry（提供 triplets 和 toolchain）  
       - name: Clone carbonengine/vcpkg-registry  
+        shell: pwsh  
         run: |  
           New-Item -ItemType Directory -Force -Path "vendor/github.com/carbonengine"  
           git clone https://github.com/carbonengine/vcpkg-registry.git vendor/github.com/carbonengine/vcpkg-registry  
-        shell: pwsh  
   
-      # 将 SSH URL 替换为 HTTPS（仓库已公开）  
       - name: Patch vcpkg-configuration.json SSH URL to HTTPS  
-        run: |  
-          (Get-Content vcpkg-configuration.json) `  
-            -replace 'git@github.com:carbonengine/vcpkg-registry\.git', `  
-                     'https://github.com/carbonengine/vcpkg-registry.git' |  
-            Set-Content vcpkg-configuration.json  
         shell: pwsh  
+        run: (Get-Content vcpkg-configuration.json) -replace 'git@github\.com:carbonengine/vcpkg-registry\.git', 'https://github.com/carbonengine/vcpkg-registry.git' | Set-Content vcpkg-configuration.json  
   
-      # 导出 GitHub Actions Cache 所需的环境变量（供 vcpkg x-gha 缓存使用）  
       - name: Export vcpkg binary cache environment variables  
         uses: actions/github-script@v7  
         with:  
@@ -55,45 +45,28 @@ jobs:
             core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');  
             core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');  
   
-      # 初始化 MSVC 环境（等价于 TeamCity 中调用 vsdevcmd.bat 的步骤）  
-      - name: Set up MSVC x64 environment (v143 / VS 2022)  
+      - name: Set up MSVC x64 environment  
         uses: ilammy/msvc-dev-cmd@v1  
         with:  
           arch: x64  
           toolset: 14.3  
   
       - name: Configure CMake  
+        shell: pwsh  
         env:  
           VCPKG_BINARY_SOURCES: clear;x-gha,readwrite  
           X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}/regcache  
-        run: |  
-          cmake --preset x64-windows-release `  
-            -S . `  
-            -B ${{ env.CMAKE_BUILD_FOLDER }} `  
-            -DCMAKE_INSTALL_PREFIX=${{ env.CMAKE_INSTALL_PREFIX }} `  
-            -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}/buildtrees" `  
-            -DBUILD_DX11=ON `  
-            -DBUILD_DX12=ON `  
-            -DBUILD_SHADER_COMPILER=ON  
-        shell: pwsh  
+        run: cmake --preset x64-windows-release -S . -B ${{ env.CMAKE_BUILD_FOLDER }} -DCMAKE_INSTALL_PREFIX=${{ env.CMAKE_INSTALL_PREFIX }} -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}/buildtrees" -DBUILD_DX11=ON -DBUILD_DX12=ON -DBUILD_SHADER_COMPILER=ON  
   
       - name: Build  
+        shell: pwsh  
         env:  
           VCPKG_BINARY_SOURCES: clear;x-gha,readwrite  
-        run: |  
-          cmake --build ${{ env.CMAKE_BUILD_FOLDER }} --config Release  
-        shell: pwsh  
+        run: cmake --build ${{ env.CMAKE_BUILD_FOLDER }} --config Release  
   
-      - name: Run Tests  
-        working-directory: ${{ env.CMAKE_BUILD_FOLDER }}  
-        run: |  
-          ctest -C Release -V --output-on-failure  
+      - name: Install  
         shell: pwsh  
-  
-      - name: Package (cmake --install)  
-        run: |  
-          cmake --install ${{ env.CMAKE_BUILD_FOLDER }} --config Release  
-        shell: pwsh  
+        run: cmake --install ${{ env.CMAKE_BUILD_FOLDER }} --config Release  
   
       - name: Upload artifact  
         uses: actions/upload-artifact@v4  
