@@ -9,7 +9,6 @@ on:
   
 env:  
   CMAKE_BUILD_FOLDER: .cmake-build-release  
-  CMAKE_INSTALL_PREFIX: .build-artifact  
   CMAKE_BUILD_PARALLEL_LEVEL: 4  
   
 jobs:  
@@ -54,8 +53,10 @@ jobs:
         shell: pwsh  
         env:  
           VCPKG_BINARY_SOURCES: clear;x-gha,readwrite  
-          X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}/regcache  
-        run: cmake --preset x64-windows-release -S . -B ${{ env.CMAKE_BUILD_FOLDER }} -DCMAKE_INSTALL_PREFIX=${{ env.CMAKE_INSTALL_PREFIX }} -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}/buildtrees" -DBUILD_DX11=ON -DBUILD_DX12=ON -DBUILD_SHADER_COMPILER=ON  
+          X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}\regcache  
+        run: |  
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\regcache"  
+          cmake --preset x64-windows-release -S . -B ${{ env.CMAKE_BUILD_FOLDER }} -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\.build-artifact" -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}\buildtrees" -DBUILD_DX11=ON -DBUILD_DX12=ON -DBUILD_SHADER_COMPILER=ON  
   
       - name: Build  
         shell: pwsh  
@@ -71,4 +72,4 @@ jobs:
         uses: actions/upload-artifact@v4  
         with:  
           name: trinity-windows-x64-release  
-          path: ${{ env.CMAKE_INSTALL_PREFIX }}
+          path: ${{ github.workspace }}\.build-artifact
