@@ -10,7 +10,6 @@ on:
 env:  
   CMAKE_BUILD_FOLDER: .cmake-build-release  
   CMAKE_BUILD_PARALLEL_LEVEL: 4  
-  VISUAL_STUDIO_PLATFORM_TOOLSET: v143  
   CMAKE_GENERATOR: Ninja Multi-Config  
   
 jobs:  
@@ -35,14 +34,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path "vendor/github.com/carbonengine"  
           git clone https://github.com/carbonengine/vcpkg-registry.git vendor/github.com/carbonengine/vcpkg-registry  
   
-      - name: Diagnostic - print triplet and toolchain files  
+      - name: Patch triplet VCPKG_PLATFORM_TOOLSET from v141 to v143  
         shell: pwsh  
-        run: |  
-          Write-Host "=== VISUAL_STUDIO_PLATFORM_TOOLSET=$env:VISUAL_STUDIO_PLATFORM_TOOLSET ==="  
-          Write-Host "=== x64-windows-release.cmake ==="  
-          Get-Content vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake  
-          Write-Host "=== x64-windows-carbon.cmake ==="  
-          Get-Content vendor/github.com/carbonengine/vcpkg-registry/toolchains/x64-windows-carbon.cmake  
+        run: (Get-Content vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake) -replace 'set\(VCPKG_PLATFORM_TOOLSET v141\)', 'set(VCPKG_PLATFORM_TOOLSET v143)' | Set-Content vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake  
   
       - name: Patch vcpkg-configuration.json SSH URL to HTTPS  
         shell: pwsh  
@@ -67,7 +61,7 @@ jobs:
           X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}\regcache  
         run: |  
           New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\regcache"  
-          cmake --preset x64-windows-release -S . -B ${{ env.CMAKE_BUILD_FOLDER }} -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\.build-artifact" -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}\buildtrees" -DBUILD_DX11=ON -DBUILD_DX12=ON -DBUILD_SHADER_COMPILER=ON  
+          cmake --preset x64-windows-release -S . -B ${{ env.CMAKE_BUILD_FOLDER }} -DCMAKE_MAKE_PROGRAM=ninja -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\.build-artifact" -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}\buildtrees" -DBUILD_DX11=ON -DBUILD_DX12=ON -DBUILD_SHADER_COMPILER=ON  
   
       - name: Build  
         shell: pwsh  
