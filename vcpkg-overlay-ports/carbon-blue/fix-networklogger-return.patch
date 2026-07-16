@@ -1,0 +1,6 @@
+--- a/src/NetworkLogger.cpp  
++++ b/src/NetworkLogger.cpp  
+@@ -1,4 +1,5 @@  
+-			return PyErr_SetString(PyExc_RuntimeError, errorMessage), 0;  
++			PyErr_SetString(PyExc_RuntimeError, errorMessage);  
++			return nullptr;
