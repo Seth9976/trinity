@@ -20,6 +20,10 @@ jobs:
       - name: Checkout repository  
         uses: actions/checkout@v4  
   
+      - name: Configure git global SSH-to-HTTPS URL rewrite  
+        shell: pwsh  
+        run: git config --global url."https://github.com/".insteadOf "git@github.com:"  
+  
       - name: Clone and bootstrap vcpkg  
         shell: pwsh  
         run: |  
@@ -42,12 +46,12 @@ jobs:
         shell: pwsh  
         run: (Get-Content vcpkg-configuration.json) -replace 'git@github\.com:carbonengine/vcpkg-registry\.git', 'https://github.com/carbonengine/vcpkg-registry.git' | Set-Content vcpkg-configuration.json  
   
-      - name: Export vcpkg binary cache environment variables  
-        uses: actions/github-script@v7  
+      - name: Cache vcpkg binary packages  
+        uses: actions/cache@v4  
         with:  
-          script: |  
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');  
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');  
+          path: ${{ github.workspace }}/vcpkg-binary-cache  
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}  
+          restore-keys: vcpkg-${{ runner.os }}-  
   
       - name: Set up MSVC x64 environment  
         uses: ilammy/msvc-dev-cmd@v1  
@@ -57,16 +61,17 @@ jobs:
       - name: Configure CMake  
         shell: pwsh  
         env:  
-          VCPKG_BINARY_SOURCES: clear;x-gha,readwrite  
+          VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite  
           X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}\regcache  
         run: |  
           New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\regcache"  
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\vcpkg-binary-cache"  
           cmake --preset x64-windows-release -S . -B ${{ env.CMAKE_BUILD_FOLDER }} -DCMAKE_MAKE_PROGRAM=ninja -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\.build-artifact" -DVCPKG_INSTALL_OPTIONS="--x-buildtrees-root=${{ github.workspace }}\buildtrees" -DBUILD_DX11=ON -DBUILD_DX12=ON -DBUILD_SHADER_COMPILER=ON  
   
       - name: Build  
         shell: pwsh  
         env:  
-          VCPKG_BINARY_SOURCES: clear;x-gha,readwrite  
+          VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite  
         run: cmake --build ${{ env.CMAKE_BUILD_FOLDER }} --config Release  
   
       - name: Install  
