@@ -42,7 +42,7 @@ jobs:
         shell: pwsh  
         run: |  
           (Get-Content vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake) -replace 'set\(VCPKG_PLATFORM_TOOLSET v141\)', 'set(VCPKG_PLATFORM_TOOLSET v143)' | Set-Content vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake  
-          Add-Content -Path "vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake" -Value 'set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} /D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS /permissive-")'
+          Add-Content -Path "vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake" -Value 'set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} /D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS")'
           Add-Content -Path "vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake" -Value 'set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} /D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS")'
   
       - name: Patch vcpkg-configuration.json SSH URL to HTTPS  
