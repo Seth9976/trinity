@@ -38,8 +38,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "vendor/github.com/carbonengine"  
           git clone https://github.com/carbonengine/vcpkg-registry.git vendor/github.com/carbonengine/vcpkg-registry  
   
-      - name: Patch triplet - toolset v141 to v143 and add C++17 compat flags  
-        shell: pwsh  
+
       - name: Patch triplet - toolset v141 to v143 and add C++17 compat flags  
         shell: pwsh  
         run: |  
@@ -49,8 +48,7 @@ jobs:
 
 
 
-'
-  
+
       - name: Patch vcpkg-configuration.json SSH URL to HTTPS  
         shell: pwsh  
         run: (Get-Content vcpkg-configuration.json) -replace 'git@github\.com:carbonengine/vcpkg-registry\.git', 'https://github.com/carbonengine/vcpkg-registry.git' | Set-Content vcpkg-configuration.json  
