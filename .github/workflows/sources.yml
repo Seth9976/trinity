@@ -71,23 +71,24 @@ jobs:
     
       - name: Collect source directories from buildtrees    
         shell: pwsh    
-        run: |    
-          $srcRoot = "${{ github.workspace }}\source-packages"    
+        run: |  
+          $srcRoot = "${{ github.workspace }}\source-packages"  
           New-Item -ItemType Directory -Force -Path $srcRoot  
           $dlDest = Join-Path $srcRoot "downloads"  
           New-Item -ItemType Directory -Force -Path $dlDest  
-          Get-ChildItem "vendor\github.com\microsoft\vcpkg\downloads" -File -Recurse | Where-Object { $_.Extension -in @('.gz','.zip','.bz2','.xz','.zst') } | ForEach-Object { $rel = $_.FullName.Substring((Resolve-Path "vendor\github.com\microsoft\vcpkg\downloads").Path.Length + 1); $dest = Join-Path $dlDest $rel; New-Item -ItemType Directory -Force -Path (Split-Path $dest) | Out-Null; Copy-Item $_.FullName -Destination $dest -Force; Write-Host "tarball: $rel" }  
+          $dlBase = (Get-Item -LiteralPath "vendor\github.com\microsoft\vcpkg\downloads").FullName  
+          Get-ChildItem -LiteralPath $dlBase -File -Recurse | Where-Object { $_.Extension -in @('.gz','.zip','.bz2','.xz','.zst') } | ForEach-Object { $rel = $_.FullName.Substring($dlBase.Length + 1); $dest = Join-Path $dlDest $rel; New-Item -ItemType Directory -Force -Path (Split-Path $dest) | Out-Null; Copy-Item -LiteralPath $_.FullName -Destination $dest -Force; Write-Host "tarball: $rel" }  
           $extractedDest = Join-Path $srcRoot "extracted"  
           New-Item -ItemType Directory -Force -Path $extractedDest  
-          Get-ChildItem "${{ github.workspace }}\buildtrees" -Directory | ForEach-Object {    
-            $srcDir = Join-Path $_.FullName "src"    
-            if (Test-Path $srcDir) {    
-              Copy-Item -Path $srcDir -Destination (Join-Path $extractedDest $_.Name) -Recurse -Force    
-              Write-Host "Collected: $($_.Name)"    
-            } else {    
-              Write-Host "No src/ for: $($_.Name)"    
-            }    
-          }    
+          Get-ChildItem -LiteralPath "${{ github.workspace }}\buildtrees" -Directory | ForEach-Object {  
+            $srcDir = Join-Path $_.FullName "src"  
+            if (Test-Path -LiteralPath $srcDir) {  
+              Copy-Item -LiteralPath $srcDir -Destination (Join-Path $extractedDest $_.Name) -Recurse -Force  
+              Write-Host "Collected: $($_.Name)"  
+            } else {  
+              Write-Host "No src/ for: $($_.Name)"  
+            }  
+          }  
     
       - name: Upload dependency sources as artifact    
         uses: actions/upload-artifact@v4    
