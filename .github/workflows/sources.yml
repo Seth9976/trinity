@@ -1,0 +1,94 @@
+name: Collect Dependency Sources  
+  
+on:  
+  workflow_dispatch:  
+  
+jobs:  
+  collect-sources:  
+    runs-on: windows-2022  
+  
+    steps:  
+      - name: Checkout repository  
+        uses: actions/checkout@v4  
+  
+      - name: Configure git SSH-to-HTTPS URL rewrite  
+        shell: pwsh  
+        run: git config --global url."https://github.com/".insteadOf "git@github.com:"  
+  
+      - name: Clone and bootstrap vcpkg  
+        shell: pwsh  
+        run: |  
+          New-Item -ItemType Directory -Force -Path "vendor/github.com/microsoft"  
+          git clone https://github.com/microsoft/vcpkg.git vendor/github.com/microsoft/vcpkg  
+          git -C vendor/github.com/microsoft/vcpkg checkout 242ac6932a9cd2607332969129e9572516f28d65  
+          vendor\github.com\microsoft\vcpkg\bootstrap-vcpkg.bat -disableMetrics  
+  
+      - name: Clone carbonengine/vcpkg-registry  
+        shell: pwsh  
+        run: |  
+          New-Item -ItemType Directory -Force -Path "vendor/github.com/carbonengine"  
+          git clone https://github.com/carbonengine/vcpkg-registry.git vendor/github.com/carbonengine/vcpkg-registry  
+  
+      - name: Patch triplet toolset v141 -> v143  
+        shell: pwsh  
+        run: |  
+          $f = "vendor/github.com/carbonengine/vcpkg-registry/triplets/x64-windows-release.cmake"  
+          (Get-Content $f) -replace 'set\(VCPKG_PLATFORM_TOOLSET v141\)', 'set(VCPKG_PLATFORM_TOOLSET v143)' | Set-Content $f  
+          Add-Content -Path $f -Value 'set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} /D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS /permissive-")'  
+          Add-Content -Path $f -Value 'set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} /D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS")'  
+  
+      - name: Patch vcpkg-configuration.json SSH URL to HTTPS  
+        shell: pwsh  
+        run: |  
+          (Get-Content vcpkg-configuration.json) `  
+            -replace 'git@github\.com:carbonengine/vcpkg-registry\.git', 'https://github.com/carbonengine/vcpkg-registry.git' |  
+            Set-Content vcpkg-configuration.json  
+  
+      - name: Set up MSVC x64 environment  
+        uses: ilammy/msvc-dev-cmd@v1  
+        with:  
+          arch: x64  
+  
+      # ── 第一步：只下载，不编译，确保所有 tarball 落盘 ──────────────────  
+      - name: Download all dependency sources (no build)  
+        shell: pwsh  
+        env:  
+          VCPKG_BINARY_SOURCES: "clear"  
+          X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}\regcache  
+          VCPKG_DOWNLOADS: ${{ github.workspace }}\vcpkg-downloads  
+        run: |  
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\regcache"  
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\vcpkg-downloads"  
+          $vcpkg = "vendor\github.com\microsoft\vcpkg\vcpkg.exe"  
+          & $vcpkg install `  
+            --triplet x64-windows-release `  
+            --overlay-triplets=vendor/github.com/carbonengine/vcpkg-registry/triplets `  
+            --only-downloads `  
+            --x-manifest-root=.  
+          Write-Host "=== Downloads directory contents ==="  
+          Get-ChildItem "${{ github.workspace }}\vcpkg-downloads" -Recurse -File |  
+            Select-Object -ExpandProperty FullName  
+  
+      # ── 第二步：正常安装，continue-on-error，让 vcpkg 解压源码到 buildtrees ──  
+      - name: Run vcpkg install (allow build failures)  
+        shell: pwsh  
+        continue-on-error: true  
+        env:  
+          VCPKG_BINARY_SOURCES: "clear"  
+          X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}\regcache  
+          VCPKG_DOWNLOADS: ${{ github.workspace }}\vcpkg-downloads  
+        run: |  
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}\buildtrees"  
+          $vcpkg = "vendor\github.com\microsoft\vcpkg\vcpkg.exe"  
+          $bt   = "${{ github.workspace }}\buildtrees"  
+          & $vcpkg install `  
+            --triplet x64-windows-release `  
+            --overlay-triplets=vendor/github.com/carbonengine/vcpkg-registry/triplets `  
+            --x-buildtrees-root="$bt" `  
+            --x-manifest-root=.  
+  
+      # ── 第三步：收集 tarball（downloads/）+ 已解压源码（buildtrees/*/src/）──  
+      - name: Collect all sources  
+        shell: pwsh  
+        run: |  
+          $outRoot = "${{ github.workspace }}\source-pack
